@@ -98,6 +98,7 @@
 
             // now for the newly separated characters, get the number codes
             // of the consonants and vowels
+            len = chars[i].length-1;
             chars[i][len][2] = getConsData(chars[i][len][0]);
             chars[i][len][3] = getVowData(chars[i][len][1]);
             chars[i][len][4] = 0; // len
@@ -506,16 +507,31 @@
 
   // determine when half letter will have 0 or 1 maatraa
   // the logic for default handling - which the user can always override
+  // p = previous letter (consonant+vowel array structure)
+  // c = current letter (consonant+vowel array structure) - for which the len is to be 
+  // determined
+  // n = next letter (consonant+vowel array structure)
   function halfLetterLen(p,c,n)
   {
-    //console.log("n: "+n);
-    if (p === 0)  // no previous, i.e. first letter
+    console.log("half letter");
+    console.log("p: "+p);
+    console.log("c: "+c);
+    console.log("n: "+n);
+    if (p === 0)  // no previous letter, half maatraa is first letter of line
       return 0;
-    if (p[2] === -10) // half maatraa is first letter of word
+    if (p[2] === -10) // no previous letter, half maatraa is first letter of word
       return 0;
     pLD = ""; // previous is laghu or deergha; 
-    nLD = ""; // next is laghu or deergha; 
-    switch (p[3])
+    nLD = ""; // next is laghu or deergha;
+
+    // special combinations ----------------
+    if ((c[0] == "म") && (n[0] == "ह"))
+      return 0;
+    if ((c[0] == "न") && (n[0] == "ह"))
+      return 0;
+    // end special combinations ------------
+
+    switch (p[3]) // previous vowel code
     {
       case 1: case 3: case 5: case 11: // previous letter is laghu
         pLD = "l";
@@ -528,7 +544,7 @@
     {
       return 1;
     }
-    switch (n[3])
+    switch (n[3]) // next vowel code
     {
       case 1: case 3: case 5: case 11: // next letter is laghu
         nLD = "l";
