@@ -4,32 +4,42 @@
   var showText = true;
   var prevText = "";
   var lineSpacing = true;
+  var fFreeVerse = false;
   var selWord = 1;
   var chars = [];
   var maxLen = 0;
   var maxLineLen = 0;
-
-  // toggle ShowText control
-  function fnShowText()
-  {
-    showText = !showText;
-    document.getElementById("chkShowText").checked = showText;
-    draw();
-  }
-
-  // toggle Line Spacing control
-  function fnLineSpacing()
-  {
-    lineSpacing = !lineSpacing;
-    draw();
-  }
+  var compositeLines = [];
 
   // this is where the beauty manifestation starts!
   function visualize()
   {
     splitNprocessPoem();
+    console.log("chars");
+    console.log(chars);
+    prepareCompositeLines();
+    console.log("compositeLines");
+    console.log(compositeLines);
     draw();
     document.getElementById("divControls").style.display = "block";
+  }
+
+  function prepareCompositeLines()
+  {
+    for (i = 0; i < chars.length; i++)
+    {
+      compositeLines[i] = [];
+      if (chars[i].length>0)
+      {
+        compositeLines[i][0] = chars[i][chars[i].length-1][5];
+        compositeLines[i][1] = false;
+      }
+      else
+      {
+        compositeLines[i][0] = 0;
+        compositeLines[i][1] = false;
+      }
+    }
   }
 
   // separate each line and character
@@ -478,6 +488,34 @@
     }
   }
 
+  // when free verse suppport is on
+  // allows users to join multiple lines together for 
+  // getting total maatraa count of a set of lines
+  function markCompositeLineTextDash()
+  {
+    // line clicked
+    var i = parseInt(this.parentNode.getAttribute("id").substring(5));
+    
+    // if anything before last line
+    // if not marked as composite
+    if ((i < compositeLines.length-1) && (!compositeLines[i+1][1]))
+    {
+      compositeLines[i+1][1] = !compositeLines[i+1][1]; 
+      draw();
+    } 
+  }
+
+  function unmarkCompositeLine()
+  {
+    // line clicked
+    var i = parseInt(this.parentNode.getAttribute("id").substring(5));
+    // toggle composite line setting
+    // if true, the line is composite with top
+    if (i > 0)
+      compositeLines[i][1] = !compositeLines[i][1]; 
+    draw(); 
+  }
+
   // helper for draw function to place text in correct position
   function charTxtPos(d,i)
   {
@@ -513,10 +551,6 @@
   // n = next letter (consonant+vowel array structure)
   function halfLetterLen(p,c,n)
   {
-    console.log("half letter");
-    console.log("p: "+p);
-    console.log("c: "+c);
-    console.log("n: "+n);
     if (p === 0)  // no previous letter, half maatraa is first letter of line
       return 0;
     if (p[2] === -10) // no previous letter, half maatraa is first letter of word
@@ -560,11 +594,53 @@
     return 0;
   }
 
+  function drawCompositeLine(drawWhat,i)
+  {
+    //console.log(i);
+    //var i = parseInt(this.parentNode.getAttribute("id").substring(5));
+    if (drawWhat == "x1")
+    {
+      if (i==0)
+        return charW*maxLen+(charW*1.5);
+      if (compositeLines[i][1])
+        return charW*maxLen+(charW*1.8);        
+      else
+        return charW*maxLen+(charW*1.5);
+    }
+    if (drawWhat == "y1")
+    {
+      if (compositeLines[i][1])
+      {
+        if (lineSpacing)
+          return -3;
+        else
+          return 0;
+      }               
+      else
+        return charH;
+    }
+    if (drawWhat == "styleSmall")
+    {
+
+      if (compositeLines[i][0] == 0)  // empty line
+        return "display:none;";
+
+      return "stroke:black;stroke-width:4;"
+    }
+    if (drawWhat == "styleMain")
+    {
+
+      if ((compositeLines[i][0] == 0) || (!compositeLines[i][1]))  // empty line || not composite
+        return "display:none;";
+
+      return "stroke:black;stroke-width:4;"
+    }
+  }
+
   // the D3 draw dance!
   function draw()
   {
-     console.log(chars);
-     var chart = d3.select("#chart")
+     var chart = d3.select("#chart");
      chart.select("svg").remove();
      var svg = chart.append("svg")
                   .attr("width", charW*maxLen+100)
@@ -587,6 +663,7 @@
           .attr("transform", function(d,i) { return "translate(" + 10 + "," + ((i*(charW))+(charW)) + ")" })
           .attr("id", function(d,i) { return "gLine"+i});
     }
+
     g.selectAll("path")
       .data(function(d) {return d;} )
       .enter().append("path")
@@ -608,22 +685,77 @@
             .attr("text-anchor", "middle")
             .text(function(d) {return charTxt(d);});
     }
-        
-    g.append("svg:text")            // line total maatraa
+    
+    // line total maatraa
+    if (fFreeVerse) // line maatraa count numbers are clickable
+    {
+      g.append("svg:text")            // line total maatraa
+      .attr("y", charH)
+      .attr("x", function(d) {return charW*maxLen+charW;})
+      //.attr("dominant-baseline", "central")
+      .attr("class", "graphText3")
+      .text(function(d) { return (d.length > 0) ? d[d.length-1][5] : "";})
+      .on("click",markCompositeLineTextDash);
+
+      // small dash beside maatraa count
+      g.append("svg:line")
+        //.attr("x1", function(d) {return charW*maxLen+(charW);})
+        .attr("x1", function(d,i) {return charW*maxLen+(charW*1.5);})
+        .attr("y1", function(d,i) {return charH+2;})
+        .attr("x2", function(d) {return charW*maxLen+(charW*1.8);})
+        .attr("y2", charH+2)
+        .attr("style", function(d,i) {return drawCompositeLine("styleSmall",i);})
+        .on("click",markCompositeLineTextDash);
+
+      // composite line marker
+      g.append("svg:line")
+        //.attr("x1", function(d) {return charW*maxLen+(charW);})
+        .attr("x1", function(d,i) {return drawCompositeLine("x1",i);})
+        .attr("y1", function(d,i) {return drawCompositeLine("y1",i);})
+        .attr("x2", function(d) {return charW*maxLen+(charW*1.8);})
+        .attr("y2", charH+2)
+        .attr("style", function(d,i) {return drawCompositeLine("styleMain",i);})
+        .on("click",unmarkCompositeLine);
+    }    
+    else  // normal - numbers are not clickable
+    {
+      g.append("svg:text")            // line total maatraa
       .attr("y", charH)
       .attr("x", function(d) {return charW*maxLen+charW;})
       //.attr("dominant-baseline", "central")
       .attr("class", "graphText3")
       .text(function(d) { return (d.length > 0) ? d[d.length-1][5] : "";});
+    }
+      
+  } // end draw
+
+  // toggle ShowText control
+  function fnShowText()
+  {
+    showText = !showText;
+    document.getElementById("chkShowText").checked = showText;
+    draw();
   }
 
+  // toggle Line Spacing control
+  function fnLineSpacing()
+  {
+    lineSpacing = !lineSpacing;
+    draw();
+  }
+
+  // toggle Free Verse support
+  function fnFreeVerseSupport()
+  {
+    fFreeVerse = !fFreeVerse;
+    draw();
+  }
 
   // minification used: http://jscompress.com/
   // had to fix ग़ ज़ फ़ ड़ ढ़ after that
 
   // this function is as of now defunct
   // for the software is always in "analyze" mode
-  // i.e. outlines of characters whose maatraa allocation can be 
   // be changed is not highlighted
   /*
   function switchMode()
