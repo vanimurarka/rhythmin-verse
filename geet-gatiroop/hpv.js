@@ -9,37 +9,79 @@
   var chars = [];
   var maxLen = 0;
   var maxLineLen = 0;
-  var compositeLines = [];
+  var compositeLinesMarkingA = [];
 
   // this is where the beauty manifestation starts!
   function visualize()
   {
     splitNprocessPoem();
-    console.log("chars");
-    console.log(chars);
-    prepareCompositeLines();
-    console.log("compositeLines");
-    console.log(compositeLines);
+    //console.log("chars");
+    //console.log(chars);
+    if (fFreeVerse)
+      initializeCompositeLines();
     draw();
     document.getElementById("divControls").style.display = "block";
   }
 
-  function prepareCompositeLines()
+  function initializeCompositeLines()
   {
     for (i = 0; i < chars.length; i++)
     {
-      compositeLines[i] = [];
+      compositeLinesMarkingA[i] = [];
       if (chars[i].length>0)
       {
-        compositeLines[i][0] = chars[i][chars[i].length-1][5];
-        compositeLines[i][1] = false;
+        compositeLinesMarkingA[i][0] = chars[i][chars[i].length-1][5];  // total count of individual line
+        compositeLinesMarkingA[i][1] = false; // is or is not composite
       }
       else
       {
-        compositeLines[i][0] = 0;
-        compositeLines[i][1] = false;
+        compositeLinesMarkingA[i][0] = 0;
+        compositeLinesMarkingA[i][1] = false;
       }
     }
+  }
+
+  function calculateCompositeLines()
+  {
+    var compositeInProgress = false;
+    var compositeLines = [];
+    if (chars.length > 1)
+    {
+      for (i = 1; i < chars.length; i++)
+      {
+        if (compositeLinesMarkingA[i][1])  // is part of composite line
+        {
+          if (!compositeInProgress) // new composite line
+          {
+            compositeInProgress = true;
+            var len = compositeLines.length;
+            compositeLines[len] = [];
+            compositeLines[len][0] = i-1; // starting position, line index is the *previous*
+            compositeLines[len][1] = chars[i-1][chars[i-1].length-1][5];  // total maatraa count of prev (starting) line
+            compositeLines[len][1] += chars[i][chars[i].length-1][5]; // add total maatraa count of current line
+          }
+          else // in progress composite line
+          {
+            // just add to in progress composite line
+            var len = compositeLines.length;
+            //console.log(i);
+            compositeLines[len-1][1] += chars[i][chars[i].length-1][5];
+          }
+        }
+        else  // not part of composite line
+        {
+          if (compositeInProgress)
+          {
+            // stop in progress
+            compositeInProgress = false;
+          }
+        }
+      }
+    }
+    if (compositeLines.length > 0)
+      return compositeLines;
+    else
+      return false;
   }
 
   // separate each line and character
@@ -498,9 +540,9 @@
     
     // if anything before last line
     // if not marked as composite
-    if ((i < compositeLines.length-1) && (!compositeLines[i+1][1]))
+    if ((i < compositeLinesMarkingA.length-1) && (!compositeLinesMarkingA[i+1][1]))
     {
-      compositeLines[i+1][1] = !compositeLines[i+1][1]; 
+      compositeLinesMarkingA[i+1][1] = !compositeLinesMarkingA[i+1][1]; 
       draw();
     } 
   }
@@ -512,8 +554,10 @@
     // toggle composite line setting
     // if true, the line is composite with top
     if (i > 0)
-      compositeLines[i][1] = !compositeLines[i][1]; 
-    draw(); 
+    {
+      compositeLinesMarkingA[i][1] = !compositeLinesMarkingA[i][1]; 
+      draw();
+    } 
   }
 
   // helper for draw function to place text in correct position
@@ -602,14 +646,14 @@
     {
       if (i==0)
         return charW*maxLen+(charW*1.5);
-      if (compositeLines[i][1])
+      if (compositeLinesMarkingA[i][1])
         return charW*maxLen+(charW*1.8);        
       else
         return charW*maxLen+(charW*1.5);
     }
     if (drawWhat == "y1")
     {
-      if (compositeLines[i][1])
+      if (compositeLinesMarkingA[i][1])
       {
         if (lineSpacing)
           return -3;
@@ -622,7 +666,7 @@
     if (drawWhat == "styleSmall")
     {
 
-      if (compositeLines[i][0] == 0)  // empty line
+      if (compositeLinesMarkingA[i][0] == 0)  // empty line
         return "display:none;";
 
       return "stroke:black;stroke-width:4;"
@@ -630,7 +674,7 @@
     if (drawWhat == "styleMain")
     {
 
-      if ((compositeLines[i][0] == 0) || (!compositeLines[i][1]))  // empty line || not composite
+      if ((compositeLinesMarkingA[i][0] == 0) || (!compositeLinesMarkingA[i][1]))  // empty line || not composite
         return "display:none;";
 
       return "stroke:black;stroke-width:4;"
@@ -726,6 +770,12 @@
       .attr("class", "graphText3")
       .text(function(d) { return (d.length > 0) ? d[d.length-1][5] : "";});
     }
+
+    if (fFreeVerse)
+    {
+      console.log("calculated compositeLines");
+      console.log(calculateCompositeLines());
+    }
       
   } // end draw
 
@@ -748,6 +798,12 @@
   function fnFreeVerseSupport()
   {
     fFreeVerse = !fFreeVerse;
+    if (fFreeVerse)
+    {
+      initializeCompositeLines();
+      //console.log("compositeLines");
+      //console.log(compositeLinesMarkingA);
+    }
     draw();
   }
 
