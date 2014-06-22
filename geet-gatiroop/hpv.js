@@ -1,9 +1,11 @@
 ﻿  var charW = 24;
   var charH = 24;
+  var paddingLeft = 10;
+  var lineSpacing = 7;
   var mode = "analyze";
   var showText = true;
   var prevText = "";
-  var lineSpacing = true;
+  var fLineSpacing = true;
   var fFreeVerse = false;
   var selWord = 1;
   var chars = [];
@@ -645,17 +647,17 @@
     if (drawWhat == "x1")
     {
       if (i==0)
-        return charW*maxLen+(charW*1.5);
+        return charW*maxLen+(charW*2);
       if (compositeLinesMarkingA[i][1])
-        return charW*maxLen+(charW*1.8);        
+        return charW*maxLen+(charW*2.3);        
       else
-        return charW*maxLen+(charW*1.5);
+        return charW*maxLen+(charW*2);
     }
     if (drawWhat == "y1")
     {
       if (compositeLinesMarkingA[i][1])
       {
-        if (lineSpacing)
+        if (fLineSpacing)
           return -3;
         else
           return 0;
@@ -691,12 +693,15 @@
                   .attr("height", ((maxLineLen*(charW+7))+(charW+7))+charW)
                   .attr("style","border: solid 1px #ddd;");
 
-    if (lineSpacing)
+    if (fLineSpacing)
     {
       var g = svg.selectAll("g")
         .data(chars)
         .enter().append("svg:g")
-          .attr("transform", function(d,i) { return "translate(" + 10 + "," + ((i*(charW+7))+(charW+7)) + ")" })
+          .attr("transform", function(d,i) 
+            { 
+              return "translate(" + paddingLeft + "," + ((i*(charH+lineSpacing))+(charH+lineSpacing)) + ")"; 
+            })
           .attr("id", function(d,i) { return "gLine"+i});
     }
     else
@@ -704,7 +709,8 @@
       var g = svg.selectAll("g")
         .data(chars)
         .enter().append("svg:g")
-          .attr("transform", function(d,i) { return "translate(" + 10 + "," + ((i*(charW))+(charW)) + ")" })
+          .attr("transform", function(d,i) 
+            { return "translate(" + paddingLeft + "," + ((i*(charH))+(charH)) + ")" })
           .attr("id", function(d,i) { return "gLine"+i});
     }
 
@@ -744,9 +750,9 @@
       // small dash beside maatraa count
       g.append("svg:line")
         //.attr("x1", function(d) {return charW*maxLen+(charW);})
-        .attr("x1", function(d,i) {return charW*maxLen+(charW*1.5);})
+        .attr("x1", function(d,i) {return charW*maxLen+(charW*2);})
         .attr("y1", function(d,i) {return charH+2;})
-        .attr("x2", function(d) {return charW*maxLen+(charW*1.8);})
+        .attr("x2", function(d) {return charW*maxLen+(charW*2.3);})
         .attr("y2", charH+2)
         .attr("style", function(d,i) {return drawCompositeLine("styleSmall",i);})
         .on("click",markCompositeLineTextDash);
@@ -756,7 +762,7 @@
         //.attr("x1", function(d) {return charW*maxLen+(charW);})
         .attr("x1", function(d,i) {return drawCompositeLine("x1",i);})
         .attr("y1", function(d,i) {return drawCompositeLine("y1",i);})
-        .attr("x2", function(d) {return charW*maxLen+(charW*1.8);})
+        .attr("x2", function(d) {return charW*maxLen+(charW*2.3);})
         .attr("y2", charH+2)
         .attr("style", function(d,i) {return drawCompositeLine("styleMain",i);})
         .on("click",unmarkCompositeLine);
@@ -771,10 +777,18 @@
       .text(function(d) { return (d.length > 0) ? d[d.length-1][5] : "";});
     }
 
+    // composite line total maatraa
     if (fFreeVerse)
     {
-      console.log("calculated compositeLines");
-      console.log(calculateCompositeLines());
+      //console.log("calculated compositeLines");
+      //console.log(calculateCompositeLines());
+      var compositeLTotal = svg.selectAll(".compositeCountT")
+        .data(calculateCompositeLines())
+        .enter().append("svg:text")
+        .attr("y", function(d) {return ((d[0]*(charH+lineSpacing))+(charH+lineSpacing)+charH);})
+        .attr("x", function(d) {return paddingLeft + charW*maxLen+(charW*2);})
+        .attr("class", "compositeCountT")
+        .text(function(d) {return d[1];});
     }
       
   } // end draw
@@ -790,7 +804,7 @@
   // toggle Line Spacing control
   function fnLineSpacing()
   {
-    lineSpacing = !lineSpacing;
+    fLineSpacing = !fLineSpacing;
     draw();
   }
 
