@@ -693,6 +693,7 @@
                   .attr("height", ((maxLineLen*(charW+7))+(charW+7))+charW)
                   .attr("style","border: solid 1px #ddd;");
 
+    // create the "g"s (svg groups) for each line
     if (fLineSpacing)
     {
       var g = svg.selectAll("g")
@@ -782,13 +783,26 @@
     {
       //console.log("calculated compositeLines");
       //console.log(calculateCompositeLines());
-      var compositeLTotal = svg.selectAll(".compositeCountT")
-        .data(calculateCompositeLines())
-        .enter().append("svg:text")
-        .attr("y", function(d) {return ((d[0]*(charH+lineSpacing))+(charH+lineSpacing)+charH);})
-        .attr("x", function(d) {return paddingLeft + charW*maxLen+(charW*2);})
-        .attr("class", "compositeCountT")
-        .text(function(d) {return d[1];});
+      if (fLineSpacing)
+      {
+        var compositeLTotal = svg.selectAll(".compositeCountT")
+          .data(calculateCompositeLines())
+          .enter().append("svg:text")
+          .attr("y", function(d) {return ((d[0]*(charH+lineSpacing))+(charH+lineSpacing)+charH);})
+          .attr("x", function(d) {return paddingLeft + 8 + charW*maxLen+(charW*2);})
+          .attr("class", "compositeCountT")
+          .text(function(d) {return d[1];});
+      }
+      else
+      {
+        var compositeLTotal = svg.selectAll(".compositeCountT")
+          .data(calculateCompositeLines())
+          .enter().append("svg:text")
+          .attr("y", function(d) {return ((d[0]*charH)+charH+charH);})
+          .attr("x", function(d) {return paddingLeft + 8 + charW*maxLen+(charW*2);})
+          .attr("class", "compositeCountT")
+          .text(function(d) {return d[1];});  
+      }
     }
       
   } // end draw
@@ -814,9 +828,12 @@
     fFreeVerse = !fFreeVerse;
     if (fFreeVerse)
     {
+      document.getElementById("spanFreeVerse").style.display = "inline";
       initializeCompositeLines();
-      //console.log("compositeLines");
-      //console.log(compositeLinesMarkingA);
+    }
+    else
+    {
+      document.getElementById("spanFreeVerse").style.display = "none";
     }
     draw();
   }

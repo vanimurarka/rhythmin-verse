@@ -10,7 +10,7 @@
 <table style="background-color:white">
 <tr><td valign="top">
 अपनी हिन्दी कविता यहां कापी-पेस्ट करिए<br/>
-<textarea rows="10" cols="45" id="pom" style="font-size: 14px;">
+<textarea rows="15" cols="45" id="pom" style="font-size: 14px;">
 </textarea>
 <br>
 <input type="button" value="Visualize!" onclick="visualize();"></td>
@@ -18,9 +18,11 @@
 	<div id="chart" align="center" style="background-color:white;"></div>
   <div style="display:none" id="divControls">
   <!-- <input type="checkbox" id="chkShowEditables" checked="true" onclick="switchMode();" /> Show Editables -->
+  <input type="checkbox" id="chkFreeVerse" onclick="fnFreeVerseSupport();" /> Free Verse
+  <span id="spanFreeVerse" style="display:none"> | 
+  Base Count: <input type="text" value="16" name="baseCount" size="2"></span><br/>
   <input type="checkbox" id="chkShowText" checked="true" onclick="fnShowText();" /> Show Text 
   <input type="checkbox" id="chkLineSpacing" onclick="fnLineSpacing();" /> Remove Line Spacing
-  <input type="checkbox" id="chkFreeVerse" onclick="fnFreeVerseSupport();" /> Free Verse
   </div>
   </td></tr></table>
   <!-- end software interface -->
