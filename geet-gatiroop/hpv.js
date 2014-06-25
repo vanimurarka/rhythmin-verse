@@ -681,6 +681,22 @@
 
       return "stroke:black;stroke-width:4;"
     }
+    if (drawWhat == "styleCompositeLineMaatraa")
+    {
+      var baseC = parseInt(document.getElementById("baseCount").value);
+      if (baseC > 0)
+      {
+        if ((i[1] % baseC) == 0)
+        {
+          return "fill:black";
+        }
+        else
+        {
+          return "fill:red";
+        }
+      }
+      return "fill:black";
+    }
   }
 
   // the D3 draw dance!
@@ -781,8 +797,8 @@
     // composite line total maatraa
     if (fFreeVerse)
     {
-      //console.log("calculated compositeLines");
-      //console.log(calculateCompositeLines());
+      console.log("calculated compositeLines");
+      console.log(calculateCompositeLines());
       if (fLineSpacing)
       {
         var compositeLTotal = svg.selectAll(".compositeCountT")
@@ -791,6 +807,7 @@
           .attr("y", function(d) {return ((d[0]*(charH+lineSpacing))+(charH+lineSpacing)+charH);})
           .attr("x", function(d) {return paddingLeft + 8 + charW*maxLen+(charW*2);})
           .attr("class", "compositeCountT")
+          .attr("style", function(d) {return drawCompositeLine("styleCompositeLineMaatraa",d);})
           .text(function(d) {return d[1];});
       }
       else
@@ -828,7 +845,6 @@
     fFreeVerse = !fFreeVerse;
     if (fFreeVerse)
     {
-      document.getElementById("spanFreeVerse").style.display = "inline";
       initializeCompositeLines();
     }
     else
