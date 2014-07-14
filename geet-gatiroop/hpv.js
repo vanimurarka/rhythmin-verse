@@ -5,6 +5,7 @@
   var mode = "analyze";
   var showText = true;
   var prevText = "";
+  var prevBaseCount = 1;
   var fLineSpacing = true;
   var fFreeVerse = false;
   var selWord = 1;
@@ -795,10 +796,18 @@
     }
 
     // composite line total maatraa
+    drawCompositeNumbers();
+      
+  } // end draw
+
+  function drawCompositeNumbers()
+  {
     if (fFreeVerse)
     {
-      console.log("calculated compositeLines");
-      console.log(calculateCompositeLines());
+      var chart = d3.select("#chart");
+      var svg = chart.select("svg");
+      //console.log("calculated compositeLines");
+      //console.log(calculateCompositeLines());
       if (fLineSpacing)
       {
         var compositeLTotal = svg.selectAll(".compositeCountT")
@@ -821,8 +830,13 @@
           .text(function(d) {return d[1];});  
       }
     }
-      
-  } // end draw
+  }
+
+  function redrawCompositeNumbers()
+  {
+    d3.select(".compositeCountT").remove();
+    drawCompositeNumbers();
+  }
 
   // toggle ShowText control
   function fnShowText()
@@ -852,6 +866,26 @@
       document.getElementById("spanFreeVerse").style.display = "none";
     }
     draw();
+  }
+
+  function fnBaseCountChange()
+  {
+    var baseC = parseInt(document.getElementById("baseCount").value);
+    if (baseC > 0)
+    {
+      if (baseC != prevBaseCount)
+      {
+        prevBaseCount = baseC;
+        if (fFreeVerse)
+        {
+          redrawCompositeNumbers();
+        }
+      }
+    }
+    else
+    {
+      document.getElementById("baseCount").value = prevBaseCount;
+    }
   }
 
   // minification used: http://jscompress.com/

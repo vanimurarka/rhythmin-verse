@@ -18,8 +18,8 @@
 	<div id="chart" align="center" style="background-color:white;"></div>
   <div style="display:none" id="divControls">
   <!-- <input type="checkbox" id="chkShowEditables" checked="true" onclick="switchMode();" /> Show Editables -->
-  Base Count: <input type="text" value="16" name="baseCount" size="2" id="baseCount"> | 
-  <input type="checkbox" id="chkFreeVerse" onclick="fnFreeVerseSupport();" /> Free Verse<br/>
+  <input type="checkbox" id="chkFreeVerse" onclick="fnFreeVerseSupport();" /> Free Verse | Base Count: <input type="number" name="baseCount" id="baseCount" value="1" min="1" size="20" max="100" step="1" onchange="fnBaseCountChange();">
+  <br/>
   <input type="checkbox" id="chkShowText" checked="true" onclick="fnShowText();" /> Show Text 
   <input type="checkbox" id="chkLineSpacing" onclick="fnLineSpacing();" /> Remove Line Spacing
   </div>
