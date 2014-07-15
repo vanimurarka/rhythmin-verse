@@ -698,6 +698,25 @@
       }
       return "fill:black";
     }
+    if (drawWhat == "compositeRemainderValue")
+    {
+      var baseC = parseInt(document.getElementById("baseCount").value);
+      if (baseC > 1)
+      {
+        var remainder = i[1] % baseC;
+        if (remainder != 0)
+        {
+          var result = i[1]/baseC;
+          var whole = parseInt(result);
+          var remainderInDecimal = result - whole;
+          if (remainderInDecimal <= 0.5)
+            return "+"+remainder;
+          else
+            return "-"+(((whole+1)*baseC)-i[1]);
+        }
+      }
+      return "";
+    }
   }
 
   // the D3 draw dance!
@@ -706,7 +725,7 @@
      var chart = d3.select("#chart");
      chart.select("svg").remove();
      var svg = chart.append("svg")
-                  .attr("width", charW*maxLen+100)
+                  .attr("width", function() {return (fFreeVerse?charW*maxLen+120:charW*maxLen+100);})
                   .attr("height", ((maxLineLen*(charW+7))+(charW+7))+charW)
                   .attr("style","border: solid 1px #ddd;");
 
@@ -804,6 +823,7 @@
   {
     if (fFreeVerse)
     {
+      var dataComposite = calculateCompositeLines();
       var chart = d3.select("#chart");
       var svg = chart.select("svg");
       //console.log("calculated compositeLines");
@@ -811,23 +831,42 @@
       if (fLineSpacing)
       {
         var compositeLTotal = svg.selectAll(".compositeCountT")
-          .data(calculateCompositeLines())
+          .data(dataComposite)
           .enter().append("svg:text")
           .attr("y", function(d) {return ((d[0]*(charH+lineSpacing))+(charH+lineSpacing)+charH);})
           .attr("x", function(d) {return paddingLeft + 8 + charW*maxLen+(charW*2);})
           .attr("class", "compositeCountT")
           .attr("style", function(d) {return drawCompositeLine("styleCompositeLineMaatraa",d);})
           .text(function(d) {return d[1];});
+
+        var compositeLRemainder = svg.selectAll(".compositeCountR")
+          .data(dataComposite)
+          .enter().append("svg:text")
+          .attr("y", function(d) {return ((d[0]*(charH+lineSpacing))+(charH+lineSpacing)+charH)+10;})
+          .attr("x", function(d) {return paddingLeft + 8 + charW*maxLen+(charW*2)+20;})
+          .attr("class", "compositeCountR")
+          .attr("style", function(d) {return "fill:red;font-size:80%";})
+          .text(function(d) {return drawCompositeLine("compositeRemainderValue",d);});
       }
       else
       {
         var compositeLTotal = svg.selectAll(".compositeCountT")
-          .data(calculateCompositeLines())
+          .data(dataComposite)
           .enter().append("svg:text")
           .attr("y", function(d) {return ((d[0]*charH)+charH+charH);})
           .attr("x", function(d) {return paddingLeft + 8 + charW*maxLen+(charW*2);})
           .attr("class", "compositeCountT")
+          .attr("style", function(d) {return drawCompositeLine("styleCompositeLineMaatraa",d);})
           .text(function(d) {return d[1];});  
+
+        var compositeLRemainder = svg.selectAll(".compositeCountR")
+          .data(dataComposite)
+          .enter().append("svg:text")
+          .attr("y", function(d) {return ((d[0]*charH)+charH+charH)+10;})
+          .attr("x", function(d) {return paddingLeft + 8 + charW*maxLen+(charW*2)+20;})
+          .attr("class", "compositeCountR")
+          .attr("style", function(d) {return "fill:red;font-size:80%";})
+          .text(function(d) {return drawCompositeLine("compositeRemainderValue",d);});  
       }
     }
   }
@@ -835,6 +874,7 @@
   function redrawCompositeNumbers()
   {
     d3.select(".compositeCountT").remove();
+    d3.select(".compositeCountR").remove();
     drawCompositeNumbers();
   }
 
@@ -859,6 +899,7 @@
     fFreeVerse = !fFreeVerse;
     if (fFreeVerse)
     {
+      document.getElementById("spanFreeVerse").style.display = "inline";
       initializeCompositeLines();
     }
     else
