@@ -12,7 +12,7 @@ The software is available for use online and does not require and download or in
 
 User's Help
 -----------
-Available at : http://manaskriti.com/geet-gatiroop/help.shtml
+Available at : http://manaskriti.com/geet-gatiroop/help.php
 
 Dependencies
 ------------
