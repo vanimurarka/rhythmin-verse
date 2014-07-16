@@ -7,12 +7,12 @@ This is a visualization technique to visualize the temporal and phonetic pattern
 
 Working Copy
 ------------
-A working of the software is available at http://manaskriti.com/vis/hindi-poem-vis/
+A working of the software is available at http://manaskriti.com/geet-gatiroop/
 The software is available for use online and does not require and download or install. The Hindi implementation of this software is called Geet Gatiroop.
 
 User's Help
 -----------
-Available at : http://manaskriti.com/vis/hindi-poem-vis/help.shtml
+Available at : http://manaskriti.com/geet-gatiroop/help.shtml
 
 Dependencies
 ------------
