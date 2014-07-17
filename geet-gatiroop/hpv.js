@@ -873,8 +873,9 @@
 
   function redrawCompositeNumbers()
   {
-    d3.select(".compositeCountT").remove();
-    d3.select(".compositeCountR").remove();
+    //console.log("redraw composite numbers");
+    d3.selectAll(".compositeCountT").remove();
+    d3.selectAll(".compositeCountR").remove();
     drawCompositeNumbers();
   }
 
