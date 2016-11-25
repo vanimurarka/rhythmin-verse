@@ -329,7 +329,7 @@
   }
 
   // color of shapes determined by vowel
-  function conColor(c)
+  function styleCharBlock(c)
   {
 
     // "c" is the character array
@@ -401,7 +401,6 @@
     // any other examples? 
     if ((c[3] == -1) && (c[4] == 0))
     {
-      //console.log("in special conColor if clause");
       //console.log(c);
       color = "black";
       strokeOp = "1";
@@ -755,7 +754,7 @@
       .data(function(d) {return d;} )
       .enter().append("path")
         .attr("id", function(d,i) {return "char"+i})
-        .attr("style", function(d,i) {return conColor(d);})
+        .attr("style", function(d,i) {return styleCharBlock(d);})
         .attr("d", function(d,i) {return vowPath(d,i);})
         .attr("title", function(d,i) {return d[0]+d[1];})
         .on("click",adjustCharLen);
@@ -988,61 +987,3 @@
   }
 */
 
-// presumably old conColor
-  /*
-  function conColor(c)
-  {
-    if (c[3] === -10) // do not display space, comma
-      return "display: none";
-
-    var color = "";
-    var strokeOp = "";
-    var strokeW = 0;
-    switch(c[2])
-    {
-      case 0:
-        color = "grey";
-        break;
-      case 1:
-        color = "rgb(255,0,0)";
-        break;
-      case 2:
-        color = "rgb(255,165,0)";
-        break;
-      case 3: 
-        color = "rgb(255,255,0)";
-        break;
-      case 4:
-        color = "rgb(0,255,0)";
-        break;
-      case 5:
-        color = "rgb(0,176,240)";
-        break;
-      case 6:
-        color = "rgb(102,0,255)";
-        break;
-      case 7:
-        color = "rgb(153,51,255)";
-        break;
-      default:
-        color = "black";
-    }
-    if (((c[3]%2 == 0) || ((c[3]>6)&&(c[3]<11))) && (mode == "edit"))
-    {
-      strokeOp = "1.0";
-      strokeW = 2;
-    }
-    else
-    {
-      strokeOp = "0.3";
-      strokeW = 1;
-    }
-    if ((c[3] == -1) && (c[4] == 0))
-    {
-      color = "black";
-      strokeOp = "1";
-      
-    }
-      return "fill: "+color+"; fill-opacity: 0.7;stroke:black; stroke-width: "+strokeW+"; stroke-opacity: "+strokeOp;
-  }
-  */
