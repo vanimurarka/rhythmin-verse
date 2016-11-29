@@ -61,6 +61,7 @@
     radeef = '';
 
     var radeef1, radeef2;
+    var radeefArray = [];
     var linelen1,linelen2;
     var linelen1 = chars[0].length;
     var linelen2 = chars[1].length;
@@ -72,23 +73,53 @@
     while ((!foundRadeefEnd) && (i >= 0) && (j >= 0))
     {
       radeef1 = joinCharConsonantVowel(chars[0][i][0],chars[0][i][1]);
-      // console.log(radeef1);
 
       radeef2 = joinCharConsonantVowel(chars[1][j][0],chars[1][j][1]);
-      // console.log(radeef2);
+
       if (radeef1 == radeef2)
       {
         radeef = radeef1 + radeef;
+        radeefArray[radeefArray.length] = [];
+        radeefArray[radeefArray.length - 1][0] = chars[0][i][0];
+        radeefArray[radeefArray.length - 1][1] = chars[0][i][1];
         i--;
         j--;
-        // console.log(radeef);
       }
       else
       {
         foundRadeefEnd = true;
       }
     }
+
+    // cut out the last part of calculated radeef if it has a space and an incomplete word.
+    // eg. for 
+    // कोई उम्मीद बर नहीं आती
+    // कोई सूरत नज़र नहीं आती
+    // sys will calculate radeef as as "र नहीं आती" because that is common between top and bottom line
+    // but radeef is "नहीं आती"
+    var realRadeef = radeef.substr(radeef.indexOf(' ')+1);
     console.log(radeef);
+
+    // truncate radeefArray too
+    // if clause implies a truncation did occur in the above substr code, and hence array has to be truncated 
+    if (radeef !== realRadeef) 
+    {
+      for (i = radeefArray.length - 1; i >= 0 ; i--) 
+      {
+        if (radeefArray[i][0] == " ") break;
+      }
+      console.log(i);
+      radeefArray.length = i;
+    }
+    
+    console.log(radeefArray);
+
+    // now mark radeef chars in all relevant lines
+    // for (var i = 0; i < chars.length; i++) {
+    //   for (var j = radeef.length - 1; j >= 0; j--) {
+    //     radeef[i]
+    //   }
+    // }
   }
 
   function initializeCompositeLines()
