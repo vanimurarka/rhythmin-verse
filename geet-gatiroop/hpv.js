@@ -13,6 +13,8 @@
   var maxLen = 0;
   var maxLineLen = 0;
   var compositeLinesMarkingA = [];
+  var fGhazal = true;
+  var radeef = '';
 
   // this is where the beauty manifestation starts!
   function visualize()
@@ -20,8 +22,16 @@
     splitNprocessPoem();
     //console.log("chars");
     //console.log(chars);
+
+    if (fGhazal)
+    {
+      // calculate radeef
+      // calculate kaafiyaa
+    }
+
     if (fFreeVerse)
       initializeCompositeLines();
+
     draw();
     document.getElementById("divControls").style.display = "block";
   }
@@ -328,25 +338,11 @@
     return -1;
   }
 
-  // color of shapes determined by vowel
-  function styleCharBlock(c)
-  {
-
-    // "c" is the character array
-    // 0: the alphabet
-    // 1: the maatraa
-    // 2: vowel or consonant - if vowel: 0, if consonant, which consonant line
-    // 3: whicheth vowel
-    // 4: individual length
-    // 5: cumulative length
-    if (c[3] === -10) // do not display space, comma
-      return "display: none";
-
+  // color determined by consonant
+  function conColor(c) {
     var color = "";
-    var strokeOp = "";
-    var strokeW = 0;
     var fillOp = "0.7";
-    switch(c[2])  // which consonant
+    switch(c)  // which consonant
     { 
       case 0: // vowel
         color = "grey";
@@ -378,23 +374,37 @@
       default:
         color = "black";
     }
+    return [color,fillOp];
+  }
 
-    // (even vowel or vowel above 6) and mode = edit
-    // make stroke bold
-    // this if clause is defunct right now as 
-    // edit highlighting is not done
-    // only else clause works
-    if (((c[3]%2 == 0) || ((c[3]>6)&&(c[3]<11))) && (mode == "edit"))
-    {
-      strokeOp = "1.0";
-      strokeW = 2;
-    }
-    else
-    {
-      strokeOp = "0.3";
-      strokeW = 1;
-    }
+  // style of char blocks - including color
+  // c - the character to be styled
+  // showConColor - boolean - whether the color is to be displayed or not
+  function styleCharBlock(c,showConColor)
+  {
 
+    // "c" is the character array
+    // 0: the alphabet
+    // 1: the maatraa
+    // 2: vowel or consonant - if vowel: 0, if consonant, which consonant line
+    // 3: whicheth vowel
+    // 4: individual length
+    // 5: cumulative length
+    if (c[3] === -10) // do not display space, comma
+      return "display: none";
+
+    var color = "";
+    var strokeOp = "";
+    var strokeW = 0;
+    var fillOp = "0.7";
+
+    // call conColor to determine color and opacity as per consonant
+    var conColorResult = conColor(c[2]);
+    color = conColorResult[0];
+    fillOp = conColorResult[1];
+    strokeOp = "0.3";
+    strokeW = 1;
+    
     // unknown vowel, individual length unknown/0
     // what are some examples when this occurs?
     // 1 eg. ऋ as in rishi
@@ -406,7 +416,13 @@
       strokeOp = "1";
       fillOp = "0.7";    
     }
-      return "fill: "+color+"; fill-opacity: " + fillOp + ";stroke:black; stroke-width: "+strokeW+"; stroke-opacity: "+strokeOp;
+    showConColor = false;
+    if (!showConColor)
+    {
+      color = "white";
+      fillOp = "0.7";
+    }
+    return "fill: "+color+"; fill-opacity: " + fillOp + ";stroke:black; stroke-width: "+strokeW+"; stroke-opacity: "+strokeOp;
   }
   
   // shapes' shape determined by vowel
