@@ -25,7 +25,7 @@
 
     if (fGhazal)
     {
-      // calculate radeef
+      calculateRadeef();
       // calculate kaafiyaa
     }
 
@@ -34,6 +34,61 @@
 
     draw();
     document.getElementById("divControls").style.display = "block";
+  }
+
+  // sometimes the consonant char may be a pure vowel
+  function joinCharConsonantVowel(c,v) 
+  {
+    if (c==v)
+      return v; // c is also a vowel - like आ आ
+    if (v == 'अ')
+      return c; // could be a case of न अ 
+    return c+v;
+  }
+
+  function calculateRadeef() 
+  {
+    // chars array structure
+    // 1st d: line - array
+    // 2nd d: the alphabet units - array
+    // 3rd d: 6 element info about each alphabet
+    // 0: the alphabet
+    // 1: the maatraa
+    // 2: vowel or consonant - if vowel: 0, if consonant, which consonant line
+    // 3: whicheth vowel
+    // 5: cumulative length
+
+    radeef = '';
+
+    var radeef1, radeef2;
+    var linelen1,linelen2;
+    var linelen1 = chars[0].length;
+    var linelen2 = chars[1].length;
+
+    var foundRadeefEnd = false;
+    var i = linelen1 - 1; // first line index
+    var j = linelen2 - 1; // second line index
+
+    while ((!foundRadeefEnd) && (i >= 0) && (j >= 0))
+    {
+      radeef1 = joinCharConsonantVowel(chars[0][i][0],chars[0][i][1]);
+      // console.log(radeef1);
+
+      radeef2 = joinCharConsonantVowel(chars[1][j][0],chars[1][j][1]);
+      // console.log(radeef2);
+      if (radeef1 == radeef2)
+      {
+        radeef = radeef1 + radeef;
+        i--;
+        j--;
+        // console.log(radeef);
+      }
+      else
+      {
+        foundRadeefEnd = true;
+      }
+    }
+    console.log(radeef);
   }
 
   function initializeCompositeLines()
