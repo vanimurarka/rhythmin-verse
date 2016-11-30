@@ -116,15 +116,26 @@
     console.log(radeefArray);
 
     // now mark radeef chars in all relevant lines
-    for (var i = 0; i <= 1; i++) {
-      var linelen = chars[i].length;
-      for (var j = 0; j < radeefArray.length; j++) {
-        if ((radeefArray[j][0] == chars[i][linelen-1-j][0]) && (radeefArray[j][1] == chars[i][linelen-1-j][1]))
-          chars[i][linelen-1-j][6] = 'r';
+    for (var i = 0; i < chars.length; i++) {
+      console.log(i);
+      var supposedlyRelevantLine = false;
+      // first 2 lines
+      if (i<=1) supposedlyRelevantLine = true;
+      // intermediate line followed by blank line
+      if ((i>1) && (i<(chars.length-1)) && (chars[i+1].length==0)) supposedlyRelevantLine = true;
+      // last line
+      if (i==(chars.length-1)) supposedlyRelevantLine = true;
+      if (supposedlyRelevantLine)
+      {
+        var linelen = chars[i].length;
+        for (var j = 0; j < radeefArray.length; j++) {
+          if ((radeefArray[j][0] == chars[i][linelen-1-j][0]) && (radeefArray[j][1] == chars[i][linelen-1-j][1]))
+            chars[i][linelen-1-j][6] = 'r';
+        }
+        console.log('line '+i);
+        console.log(chars[i]);
+        // break;
       }
-      console.log('line '+i);
-      console.log(chars[i]);
-      // break;
     }
   }
 
