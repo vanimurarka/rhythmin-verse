@@ -108,18 +108,24 @@
       {
         if (radeefArray[i][0] == " ") break;
       }
-      console.log(i);
       radeefArray.length = i;
     }
     
+    // the characters in this radeefArray is in reverse order
+    console.log('radeef array');
     console.log(radeefArray);
 
     // now mark radeef chars in all relevant lines
-    // for (var i = 0; i < chars.length; i++) {
-    //   for (var j = radeef.length - 1; j >= 0; j--) {
-    //     radeef[i]
-    //   }
-    // }
+    for (var i = 0; i <= 1; i++) {
+      var linelen = chars[i].length;
+      for (var j = 0; j < radeefArray.length; j++) {
+        if ((radeefArray[j][0] == chars[i][linelen-1-j][0]) && (radeefArray[j][1] == chars[i][linelen-1-j][1]))
+          chars[i][linelen-1-j][6] = 'r';
+      }
+      console.log('line '+i);
+      console.log(chars[i]);
+      // break;
+    }
   }
 
   function initializeCompositeLines()
