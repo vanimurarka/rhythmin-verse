@@ -15,6 +15,8 @@
   var compositeLinesMarkingA = [];
   var fGhazal = true;
   var radeef = '';
+  var radeefArray = [];
+  var radeefTruncated = 0;
 
   // this is where the beauty manifestation starts!
   function visualize()
@@ -26,7 +28,7 @@
     if (fGhazal)
     {
       calculateRadeef();
-      // calculate kaafiyaa
+      calculateKaafiyaa();
     }
 
     if (fFreeVerse)
@@ -59,9 +61,10 @@
     // 5: cumulative length
 
     radeef = '';
+    radeefArray = [];
+    radeefTruncated = 0;
 
     var radeef1, radeef2;
-    var radeefArray = [];
     var linelen1,linelen2;
     var linelen1 = chars[0].length;
     var linelen2 = chars[1].length;
@@ -98,26 +101,29 @@
     // sys will calculate radeef as as "र नहीं आती" because that is common between top and bottom line
     // but radeef is "नहीं आती"
     var realRadeef = radeef.substr(radeef.indexOf(' ')+1);
-    console.log(radeef);
+    // console.log(radeef);
 
     // truncate radeefArray too
     // if clause implies a truncation did occur in the above substr code, and hence array has to be truncated 
     if (radeef !== realRadeef) 
     {
+      console.log('radeef truncated');
+      radeefTruncated = 1;
       for (i = radeefArray.length - 1; i >= 0 ; i--) 
       {
         if (radeefArray[i][0] == " ") break;
       }
       radeefArray.length = i;
+      radeef = realRadeef;
     }
     
     // the characters in this radeefArray is in reverse order
-    console.log('radeef array');
-    console.log(radeefArray);
+    // console.log('radeef array');
+    // console.log(radeefArray);
     var radeefArrayLen = radeefArray.length;
     // now mark radeef chars in all relevant lines
     for (var i = 0; i < chars.length; i++) {
-      console.log(i);
+      // console.log(i);
       var supposedlyRelevantLine = false;
       // first 2 lines
       if (i<=1) supposedlyRelevantLine = true;
@@ -132,9 +138,120 @@
         for (var j = 0; j < radeefArrayLen; j++) {
           if ((radeefArray[j][0] == chars[i][linelen-1-j][0]) && (radeefArray[j][1] == chars[i][linelen-1-j][1]))
             chars[i][linelen-1-j][6] = 'r';
+          else
+            break;
         }
-        console.log('line '+i);
-        console.log(chars[i]);
+        // console.log('line '+i);
+        // console.log(chars[i]);
+        // break;
+      }
+    }
+  }
+
+  function originalVowel(c)
+  {
+    switch(c)
+    {
+      case " ": case ",":
+        return " ";
+      case "अ": 
+        return "अ";
+        break;
+      case "आ": case "ा":
+        return "आ";
+        break;
+      case "इ": case "ि":
+        return "इ";
+        break;
+      case "ई": case "ी":
+        return "ई";
+        break;
+      case "उ": case "ु":
+       return "उ";
+        break;
+      case "ऊ": case "ू":
+        return "ऊ";
+        break;
+      case "ए": case "े":
+        return "ए";
+        break;
+      case "ऐ": case "ै":
+        return "ऐ";
+        break;
+      case "ओ": case "ो":
+        return "ओ";
+        break;
+      case "औ": case "ौ":
+        return "औ";
+        break;
+      case "ृ":
+        return "ृ";
+        break;
+      default:
+        return -1;
+    }
+    return -1;
+  }
+
+  function calculateKaafiyaa()
+  {
+    var radeefArrayLen = radeefArray.length;
+    var foundKaafiyaaEnd = false;
+    var kaafiyaa,kaafiyaa1, kaafiyaa2;
+    var kaafiyaaArray = [];
+    var linelen1 = chars[0].length;
+    var linelen2 = chars[1].length;
+    var i = linelen1 - 1 - radeefArrayLen; // first line index
+    var j = linelen2 - 1 - radeefArrayLen; // second line index
+
+    while ((!foundKaafiyaaEnd) && (i >= 0) && (j >= 0))
+    {
+      kaafiyaa1 = originalVowel(chars[0][i][1]);
+
+      kaafiyaa2 = originalVowel(chars[1][j][1]);
+      console.log(kaafiyaa1);
+      console.log(kaafiyaa2);
+      if (kaafiyaa1 == kaafiyaa2)
+      {
+        kaafiyaa = kaafiyaa1 + kaafiyaa;
+        kaafiyaaArray[kaafiyaaArray.length] = kaafiyaa1;
+        i--;
+        j--;
+      }
+      else
+      {
+        foundKaafiyaaEnd = true;
+      }
+    }
+    if (kaafiyaaArray[0]==" ")
+      kaafiyaaArray.splice(0,1);
+    console.log(kaafiyaaArray);
+
+    var kaafiyaaArrayLen = kaafiyaaArray.length;
+    var radeefArrayLen = radeefArray.length;
+
+    // now mark kaafiyaa chars in all relevant lines
+    for (var i = 0; i < chars.length; i++) {
+      // console.log(i);
+      var supposedlyRelevantLine = false;
+      // first 2 lines
+      if (i<=1) supposedlyRelevantLine = true;
+      // intermediate line followed by blank line
+      if ((i>1) && (i<(chars.length-1)) && (chars[i+1].length==0)) supposedlyRelevantLine = true;
+      // last line
+      if (i==(chars.length-1)) supposedlyRelevantLine = true;
+      var linelen = chars[i].length;
+      if ((supposedlyRelevantLine) && (linelen > (radeefArrayLen+kaafiyaaArrayLen+radeefTruncated)))
+      {
+        
+        for (var j = 0; j < kaafiyaaArrayLen; j++) {
+          if (kaafiyaaArray[j] == originalVowel(chars[i][linelen-1-radeefArrayLen-radeefTruncated-j][1]))
+            chars[i][linelen-1-radeefArrayLen-radeefTruncated-j][6] = 'k';
+          else
+            break;
+        }
+        // console.log('line '+i);
+        // console.log(chars[i]);
         // break;
       }
     }
@@ -463,7 +580,7 @@
         break;
       case 4: // ta tha da dha ...
         color = "rgb(0,255,0)"; // green
-        fillOp = "1.0"
+        fillOp = "1.0";
         break;
       case 5: // pa pha ba bha
         color = "rgb(0,220,255)"; // blue
@@ -516,6 +633,11 @@
       if (c[6] == 'r') // is a radeef char
       {
         color = "rgb(0,220,255)"; // blue
+        fillOp = "1.0";
+      }
+      if (c[6] == 'k') // is a kaafiyaa char
+      {
+        color = "rgb(0,255,0)"; // green
         fillOp = "1.0";
       }
     }
