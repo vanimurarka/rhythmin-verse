@@ -114,7 +114,7 @@
     // the characters in this radeefArray is in reverse order
     console.log('radeef array');
     console.log(radeefArray);
-
+    var radeefArrayLen = radeefArray.length;
     // now mark radeef chars in all relevant lines
     for (var i = 0; i < chars.length; i++) {
       console.log(i);
@@ -125,10 +125,11 @@
       if ((i>1) && (i<(chars.length-1)) && (chars[i+1].length==0)) supposedlyRelevantLine = true;
       // last line
       if (i==(chars.length-1)) supposedlyRelevantLine = true;
-      if (supposedlyRelevantLine)
+      var linelen = chars[i].length;
+      if ((supposedlyRelevantLine) && (linelen > radeefArrayLen))
       {
-        var linelen = chars[i].length;
-        for (var j = 0; j < radeefArray.length; j++) {
+        
+        for (var j = 0; j < radeefArrayLen; j++) {
           if ((radeefArray[j][0] == chars[i][linelen-1-j][0]) && (radeefArray[j][1] == chars[i][linelen-1-j][1]))
             chars[i][linelen-1-j][6] = 'r';
         }
@@ -483,7 +484,7 @@
   // style of char blocks - including color
   // c - the character to be styled
   // showConColor - boolean - whether the color is to be displayed or not
-  function styleCharBlock(c,showConColor)
+  function styleCharBlock(c,colorBy)
   {
 
     // "c" is the character array
@@ -493,20 +494,31 @@
     // 3: whicheth vowel
     // 4: individual length
     // 5: cumulative length
+    // 6: this index may or may not exist - indicating radeef(r) or kaafiyaa (k)
     if (c[3] === -10) // do not display space, comma
       return "display: none";
 
-    var color = "";
-    var strokeOp = "";
-    var strokeW = 0;
+    var color = "white";
+    var strokeOp = "0.3";
+    var strokeW = 1;
     var fillOp = "0.7";
 
     // call conColor to determine color and opacity as per consonant
-    var conColorResult = conColor(c[2]);
-    color = conColorResult[0];
-    fillOp = conColorResult[1];
-    strokeOp = "0.3";
-    strokeW = 1;
+    if (colorBy == 'consonant')
+    {
+      var conColorResult = conColor(c[2]);
+      color = conColorResult[0];
+      fillOp = conColorResult[1];
+    }
+    colorBy = 'ghazal';
+    if ((colorBy == 'ghazal') && (c.length>6))
+    {
+      if (c[6] == 'r') // is a radeef char
+      {
+        color = "rgb(0,220,255)"; // blue
+        fillOp = "1.0";
+      }
+    }
     
     // unknown vowel, individual length unknown/0
     // what are some examples when this occurs?
@@ -519,12 +531,7 @@
       strokeOp = "1";
       fillOp = "0.7";    
     }
-    showConColor = false;
-    if (!showConColor)
-    {
-      color = "white";
-      fillOp = "0.7";
-    }
+
     return "fill: "+color+"; fill-opacity: " + fillOp + ";stroke:black; stroke-width: "+strokeW+"; stroke-opacity: "+strokeOp;
   }
   
