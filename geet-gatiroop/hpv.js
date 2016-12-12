@@ -13,7 +13,7 @@
   var maxLen = 0;
   var maxLineLen = 0;
   var compositeLinesMarkingA = [];
-  var fGhazal = true;
+  var fGhazal = false;
   var radeef = '';
   var radeefArray = [];
   var radeefTruncated = 0;
@@ -22,14 +22,6 @@
   function visualize()
   {
     splitNprocessPoem();
-    //console.log("chars");
-    //console.log(chars);
-
-    if (fGhazal)
-    {
-      calculateRadeef();
-      calculateKaafiyaa();
-    }
 
     if (fFreeVerse)
       initializeCompositeLines();
@@ -1002,7 +994,12 @@
       .data(function(d) {return d;} )
       .enter().append("path")
         .attr("id", function(d,i) {return "char"+i})
-        .attr("style", function(d,i) {return styleCharBlock(d);})
+        .attr("style", function(d,i) {
+          if (fGhazal)
+            return styleCharBlock(d,'ghazal');
+          else
+            return styleCharBlock(d,'consonant');
+        })
         .attr("d", function(d,i) {return vowPath(d,i);})
         .attr("title", function(d,i) {return d[0]+d[1];})
         .on("click",adjustCharLen);
@@ -1147,13 +1144,32 @@
     fFreeVerse = !fFreeVerse;
     if (fFreeVerse)
     {
+      document.getElementById("chkGhazal").disabled = true;
       document.getElementById("spanFreeVerse").style.display = "inline";
       initializeCompositeLines();
     }
     else
     {
+      document.getElementById("chkGhazal").disabled = false;
       document.getElementById("spanFreeVerse").style.display = "none";
     }
+    draw();
+  }
+
+  function fnGhazal()
+  {
+    fGhazal = !fGhazal;
+    if (fGhazal)
+    {
+      document.getElementById("chkFreeVerse").disabled = true;
+      calculateRadeef();
+      calculateKaafiyaa();
+    }
+    else
+    {
+      document.getElementById("chkFreeVerse").disabled = false;
+    }
+    
     draw();
   }
 
@@ -1180,58 +1196,5 @@
   // minification used: http://jscompress.com/
   // had to fix ग़ ज़ फ़ ड़ ढ़ after that
 
-  // this function is as of now defunct
-  // for the software is always in "analyze" mode
-  // be changed is not highlighted
-  /*
-  function switchMode()
-  {
-    if (mode == "edit")
-    {
-      mode = "analyze";
-      document.getElementById("chkShowEditables").checked = false;
-    }
-    else
-    {
-      mode = "edit";
-      document.getElementById("chkShowEditables").checked = true;
-    }
-    draw();
-  }
-  */
 
-// this function is as of now defunct
-// as coloring is not being done based on vowels
-/*
-  function vowColor(c)
-  {
-    var color = "";
-    switch(c)
-    {
-      case 1:
-      case 2:
-        color = "grey";
-        break;
-      case 3:
-      case 4:
-        color = "rgb(255,0,0)";
-        break;
-      case 5:
-      case 6:
-        color = "rgb(255,165,0)";
-        break;
-      case 7:
-      case 8: 
-        color = "rgb(0,255,0)";
-        break;
-      case 9:
-      case 10:
-        color = "rgb(102,0,255)";
-        break;
-      default:
-        color = "black";
-    }
-    return "fill: "+color+"; fill-opacity: 0.8;stroke:black;stroke-width: 1";
-  }
-*/
 
