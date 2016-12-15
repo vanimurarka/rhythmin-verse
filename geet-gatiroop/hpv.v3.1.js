@@ -26,6 +26,12 @@
     if (fFreeVerse)
       initializeCompositeLines();
 
+    if (fGhazal)
+    {
+      calculateRadeef();
+      calculateKaafiyaa();
+    }
+
     draw();
     document.getElementById("divControls").style.display = "block";
   }
