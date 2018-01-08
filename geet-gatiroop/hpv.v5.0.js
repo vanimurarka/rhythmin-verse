@@ -23,7 +23,7 @@
     this.str = str;
     this.charCode = str.charCodeAt(0);
     this.num = 0;
-    this.vowel = false;
+    this.isVowel = false;
     switch(str) // assign number and set vowel if vowel
     {
       case " ": case ",":
@@ -52,47 +52,47 @@
         break;
       case "अ": 
         this.num = 1;
-        this.vowel = true;
+        this.isVowel = true;
         break;
       case "आ": case "ा":
         this.num = 2;
-        this.vowel = true;
+        this.isVowel = true;
         break;
       case "इ": case "ि":
         this.num = 3;
-        this.vowel = true;
+        this.isVowel = true;
         break;
       case "ई": case "ी":
         this.num = 4;
-        this.vowel = true;
+        this.isVowel = true;
         break;
       case "उ": case "ु":
         this.num = 5;
-        this.vowel = true;
+        this.isVowel = true;
         break;
       case "ऊ": case "ू":
         this.num = 6;
-        this.vowel = true;
+        this.isVowel = true;
         break;
       case "ए": case "े":
         this.num = 7;
-        this.vowel = true;
+        this.isVowel = true;
         break;
       case "ऐ": case "ै":
         this.num = 8;
-        this.vowel = true;
+        this.isVowel = true;
         break;
       case "ओ": case "ो":
         this.num = 9;
-        this.vowel = true;
+        this.isVowel = true;
         break;
       case "औ": case "ौ":
         this.num = 10;
-        this.vowel = true;
+        this.isVowel = true;
         break;
       case "ृ":
         this.num = 11;
-        this.vowel = true;
+        this.isVowel = true;
         break;
       default:
         this.num = -1;
@@ -172,7 +172,7 @@
     // addMeter();
     // console.log(chars);
 
-    // draw();
+    draw();
     // document.getElementById("divControls").style.display = "block";
   }
 
@@ -414,12 +414,11 @@
           { chars[i][k].setCumulativeWidth(chars[i][k-1].cumulativeWidth + chars[i][k].ownWidth); }
         }
 
-        if (chars[i].length > 1)
+        // if last cumulative length greater than currently
+        // saved maxLen, then update maxLen
+        if (chars[i][k-1].cumulativeWidth > maxLen)
         {
-          if (chars[i][k-1][5] > maxLen)
-          {
-            maxLen = chars[i][k-1].cumulativeWidth;
-          }
+          maxLen = chars[i][k-1].cumulativeWidth;
         }
       }
       chars[i].pop();
@@ -430,7 +429,7 @@
     {
       chars.length = lines.length;
     }
-    console.log(chars);
+    // console.log(chars);
     prevText = pom;
   }
 
@@ -522,37 +521,42 @@
   function conColor(c) {
     var color = "";
     var fillOp = "0.7";
-    switch(c)  // which consonant
-    { 
-      case 0: // vowel
-        color = "grey";
-        break;
-      case 1: // ka kha ga ...
-        color = "rgb(255,0,0)"; //red
-        fillOp = "0.65"
-        break;
-      case 2: // cha chha ja jha ...
-        color = "rgb(255,165,0)"; // orange
-        break;
-      case 3: // Ta THa Da Dha ...
-        color = "rgb(255,255,0)"; // yellow
-        break;
-      case 4: // ta tha da dha ...
-        color = "rgb(0,255,0)"; // green
-        fillOp = "1.0";
-        break;
-      case 5: // pa pha ba bha
-        color = "rgb(0,220,255)"; // blue
-        fillOp = "1.0";
-        break;
-      case 6: // ya ra la va
-        color = "rgb(0,64,255)";  // indigo
-        break;
-      case 7: // sha sha sa ha
-        color = "rgb(143,0,255)"; // violet
-        break;
-      default:
-        color = "black";
+    if (c.isVowel)
+      color = "grey";
+    else
+    {
+      switch(c.num)  // which consonant
+      { 
+        case 0: // vowel
+          color = "grey";
+          break;
+        case 1: // ka kha ga ...
+          color = "rgb(255,0,0)"; //red
+          fillOp = "0.65"
+          break;
+        case 2: // cha chha ja jha ...
+          color = "rgb(255,165,0)"; // orange
+          break;
+        case 3: // Ta THa Da Dha ...
+          color = "rgb(255,255,0)"; // yellow
+          break;
+        case 4: // ta tha da dha ...
+          color = "rgb(0,255,0)"; // green
+          fillOp = "1.0";
+          break;
+        case 5: // pa pha ba bha
+          color = "rgb(0,220,255)"; // blue
+          // fillOp = "1.0";
+          break;
+        case 6: // ya ra la va
+          color = "rgb(0,64,255)";  // indigo
+          break;
+        case 7: // sha sha sa ha
+          color = "rgb(143,0,255)"; // violet
+          break;
+        default:
+          color = "black";
+      }
     }
     return [color,fillOp];
   }
@@ -571,7 +575,7 @@
     // 4: individual length
     // 5: cumulative length
     // 6: this index may or may not exist - indicating radeef(r) or kaafiyaa (k)
-    if (c[3] === -10) // do not display space, comma
+    if (c.num === -10) // do not display space, comma
       return "display: none";
 
     var color = "white";
@@ -582,7 +586,7 @@
     // call conColor to determine color and opacity as per consonant
     if (colorBy == 'consonant')
     {
-      var conColorResult = conColor(c[2]);
+      var conColorResult = conColor(c.consonant);
       color = conColorResult[0];
       fillOp = conColorResult[1];
     }
@@ -619,13 +623,13 @@
   function vowPath(d,i)
   {
     var p = "";
-    var x = ((d[5]-d[4])*charW);  // what is x?
-    var w = charW*d[4];
+    var x = ((d.cumulativeWidth-d.ownWidth)*charW);  // what is x?
+    var w = charW*d.ownWidth;
     var h = charH;
-    switch(d[3])  // which vowel
+    switch(d.vowel.num)  // which vowel
     {
       case -1: // unknown
-        if (d[4] == 0)
+        if (d.ownWidth == 0)
         {
           //p = "M"+x+",0m0,3a3,3 0 1,1 0,-6a3,3 0 1,1 0,6z";
           w = 4;  // *** why is this hardcoded
@@ -633,7 +637,7 @@
           x = x-2;  // what is this?
           p = "M"+x+",0 L"+x+",-"+h + " L"+(x+w)+",-"+h+" L"+(x+w)+",0 z";
         }
-        if (d[4] == 1)
+        if (d.ownWidth == 1)
         {
           p = "M"+x+",0 L"+x+","+h + " L"+(x+w)+","+h+" L"+(x+w)+",0 z";
         }
@@ -771,9 +775,9 @@
   // helper for draw function to place text in correct position
   function charTxtPos(d,i)
   {
-    var x = ((d[5]-d[4])*charW);
+    var x = ((d.cumulativeWidth-d.ownWidth)*charW);
     //console.log(d[5]);
-    var w = charW*d[4];
+    var w = charW*d.ownWidth;
     return x+(w/2);
   }
 
@@ -781,15 +785,19 @@
   function charTxt(d)
   {
     var txt = "";
-    if (d[2] != -10)  // non hindi character
+    if (d.consonant.num != -10)  // non hindi character
     {
-      if ((d[2] == 0)||(d[3] == 1))
+      //if ((d[2] == 0)||(d[3] == 1))
+      if (d.consonant.isVowel)
       {
-        txt = d[0];
+        txt = d.consonant.str;
       }
       else
       {
-        txt = d[0]+d[1];
+        if (d.vowel.num == 1)
+          txt = d.consonant.str;
+        else
+          txt = d.consonant.str+d.vowel.str;
       }
     }
     return txt;
@@ -956,6 +964,19 @@
           .attr("id", function(d,i) { return "gLine"+i});
     }
 
+    if (showText)
+    {
+        g.selectAll("text")               // char text
+          .data(function(d) {return d;} )
+          .enter().append("svg:text")
+            .attr("y", charH-2)
+            .attr("x", function(d,i) {return charTxtPos(d);})
+            .attr("class", "graphText3")
+            //.attr("dominant-baseline", "central")
+            .attr("text-anchor", "middle")
+            .text(function(d) {return charTxt(d);});
+    }
+
     g.selectAll("path")
       .data(function(d) {return d;} )
       .enter().append("path")
@@ -970,18 +991,7 @@
         .attr("title", function(d,i) {return d[0]+d[1];})
         .on("click",adjustCharLen);
 
-    if (showText)
-    {
-        g.selectAll("text")               // char text
-          .data(function(d) {return d;} )
-          .enter().append("svg:text")
-            .attr("y", charH-2)
-            .attr("x", function(d,i) {return charTxtPos(d);})
-            .attr("class", "graphText3")
-            //.attr("dominant-baseline", "central")
-            .attr("text-anchor", "middle")
-            .text(function(d) {return charTxt(d);});
-    }
+
     
     // line total maatraa
     if (fFreeVerse) // line maatraa count numbers are clickable
