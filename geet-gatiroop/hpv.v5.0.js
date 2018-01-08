@@ -28,6 +28,7 @@
     {
       case " ": case ",":
         this.num = -10;
+        break;
       case "क": case "ख": case "ख़": case "ग": case "घ": case "ग़": case "ङ":
         this.num = 1;
         break;
@@ -106,7 +107,7 @@
     this.cumulativeWidth = 0;
 
     // set vowel
-    var charc = str.charCodeAt(0);
+    var charC = str.charCodeAt(0);
     // space / comma ---- OR vowel
     if (((charC == 32)||(charC == 44)) || ((charC >= 2309) && (charC <= 2324)))
     {
@@ -137,11 +138,10 @@
           this.ownWidth = 2;
           break;
       }
+    }
 
-      // execute setOwnWidth
-      this.setOwnWidth();
-    }    
-
+    // execute setOwnWidth
+    this.setOwnWidth();
   }
 
   Letter.prototype.changeVowel = function(vowel)
