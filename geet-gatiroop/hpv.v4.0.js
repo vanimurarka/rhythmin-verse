@@ -32,6 +32,9 @@
       calculateKaafiyaa();
     }
 
+    addMeter();
+    console.log(chars);
+
     draw();
     document.getElementById("divControls").style.display = "block";
   }
@@ -42,10 +45,11 @@
     console.log(meter);
     var charslen = chars.length
     chars[charslen] = [];
-    charslen++;
+    // charslen++;
     for (k=0;k<meter.length;k++)
     {
       charCode = meter.charCodeAt(k);
+      console.log(chars[charslen]);
       len = chars[charslen].length; // existing #of-chars - to add the next char
       if ((charCode >= 2366) && (charCode <= 2381)) // maatraa
       {
@@ -68,28 +72,50 @@
         // consonant --------------------------------- OR consonant with dot at bottom
         if (((charCode >= 2325) && (charCode <= 2361)) || ((charCode >= 2392) && (charCode <= 2399)))
         {
-          chars[i][len] = ["",""];
-          chars[i][len][0] = lines[i].substring(k,k+1);
-          chars[i][len][1] = "अ";
+          chars[charslen][len] = ["",""];
+          chars[charslen][len][0] = meter.substring(k,k+1);
+          chars[charslen][len][1] = "अ";
         }
 
-        // anusvaar (the bindi on top) which sometimes is short-cut for half letter
-        if (charCode == 2306) 
-        {
-          chars[i][len] = ["",""];
-          chars[i][len][0] = lines[i].substring(k,k+1);
-          chars[i][len][1] = "्"; // halant
-        }
-
+        
         // now for the newly separated characters, get the number codes
         // of the consonants and vowels
-        len = chars[i].length-1;
-        chars[i][len][2] = getConsData(chars[i][len][0]);
-        chars[i][len][3] = getVowData(chars[i][len][1]);
-        chars[i][len][4] = 0; // len
-        chars[i][len][5] = 0; // cum len  
+        len = chars[charslen].length-1;
+        chars[charslen][len][2] = getConsData(chars[charslen][len][0]);
+        chars[charslen][len][3] = getVowData(chars[charslen][len][1]);
+        chars[charslen][len][4] = 0; // len
+        chars[charslen][len][5] = 0; // cum len  
       }          
     }
+
+        // now iterate through the whole chars structure again 
+    // and assign lengths for new lines
+    // lengths for individual characters and cumulative length
+    // for whole line
+    // this is the place where the default length for half maatraa 
+    // is also determined
+    // refactor note: maybe this loop can be merged with the above loop
+    // to prevent needless iteration - but the code should not become too
+    // unwieldly 
+
+        for (k=0;k<chars[charslen].length;k++)
+        {
+          // assign length as per vowel code
+          switch (chars[charslen][k][3])
+          {
+            case 1: case 3: case 5: case 11:
+              chars[charslen][k][4] = 1;
+              break;
+            case 2: case 4: case 6: case 8: case 10: case 7: case 9: 
+              chars[charslen][k][4] = 2;
+              break;
+          }
+          // assign cumulative length
+          if (k == 0)
+          { chars[charslen][k][5] = chars[charslen][k][4]; }
+          else
+          { chars[charslen][k][5] = chars[charslen][k-1][5] + chars[charslen][k][4]; }
+        }
 
   }
 
