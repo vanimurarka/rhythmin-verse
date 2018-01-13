@@ -170,7 +170,7 @@
     // }
 
     // addMeter();
-    // console.log(chars);
+    console.log(chars);
 
     draw();
     // document.getElementById("divControls").style.display = "block";
@@ -388,22 +388,22 @@
             {
               if (k == chars[i].length-2) // last letter of line
               {
-                // chars[i][k][4] = halfLetterLen(0,chars[i][k],0);
+                chars[i][k].ownWidth = halfLetterLen(0,chars[i][k],0);
               }
               else  // not last letter
               {
-                // chars[i][k][4] = halfLetterLen(0,chars[i][k],chars[i][k+1]); 
+                chars[i][k].ownWidth = halfLetterLen(0,chars[i][k],chars[i][k+1]); 
               }
             }
             else  // not first letter
             {
               if (k == chars[i].length-2) // last letter of line
               {
-                // chars[i][k][4] = halfLetterLen(chars[i][k-1],chars[i][k],0);
+                chars[i][k].ownWidth = halfLetterLen(chars[i][k-1],chars[i][k],0);
               }
               else  // not last letter
               {
-                // chars[i][k][4] = halfLetterLen(chars[i][k-1],chars[i][k],chars[i][k+1]); 
+                chars[i][k].ownWidth = halfLetterLen(chars[i][k-1],chars[i][k],chars[i][k+1]); 
               }
             }
           }
@@ -542,7 +542,7 @@
           break;
         case 4: // ta tha da dha ...
           color = "rgb(0,255,0)"; // green
-          fillOp = "1.0";
+          // fillOp = "1.0";
           break;
         case 5: // pa pha ba bha
           color = "rgb(0,220,255)"; // blue
@@ -695,47 +695,50 @@
   function adjustCharLen()
   {
     //console.log("adj");
-    var k = parseInt(this.getAttribute("id").substring(4));
-    var i = parseInt(this.parentNode.getAttribute("id").substring(5));
+    var k = parseInt(this.getAttribute("id").substring(4)); // whicheth letter in line
+    var i = parseInt(this.parentNode.getAttribute("id").substring(5)); // whicheth line
     var kk = 0;
-    if ((chars[i][k][3]%2 == 0) || ((chars[i][k][3]>6) && (chars[i][k][3]<11)))
+    // if letter has a deergh swar (even vowel number or any vowel above ऊ (num = 6))
+    if ((chars[i][k].vowel.num%2 == 0) || ((chars[i][k].vowel.num>6) && (chars[i][k].vowel.num<11)))
     {
-      if (chars[i][k][4] == 1)
+      if (chars[i][k].ownWidth == 1) //if vowel set to width one, make it two
       {
-        chars[i][k][4] = 2;
-        for (kk = k; kk < chars[i].length; kk++)
-          chars[i][kk][5] = chars[i][kk][5]+1;
-        if (chars[i][kk-1][5] > maxLen)
-            maxLen = chars[i][kk-1][5];
+        chars[i][k].ownWidth = 2;
+        // increase cumulative length of subsequent letters in line by one
+        for (kk = k; kk < chars[i].length; kk++) 
+          chars[i][kk].cumulativeWidth = chars[i][kk].cumulativeWidth+1;
+        if (chars[i][kk-1].cumulativeWidth > maxLen) // adjust maxLen if required
+            maxLen = chars[i][kk-1].cumulativeWidth;
         draw();
         return;
       }
-      if (chars[i][k][4] == 2)
+      if (chars[i][k].ownWidth == 2) //if vowel set to width two, make it one
       {
-        chars[i][k][4] = 1;
+        chars[i][k].ownWidth = 1;
+        // decrease cumulative length of subsequent letters in line by one
         for (kk = k; kk < chars[i].length; kk++)
-          chars[i][kk][5] = chars[i][kk][5]-1;
+          chars[i][kk].cumulativeWidth = chars[i][kk].cumulativeWidth-1;
         draw();
         return;
       }
     }
-    if (chars[i][k][3] == -1) // half letter
+    if (chars[i][k].vowel.num == -1) // half letter
     {
-      if (chars[i][k][4] == 0)
+      if (chars[i][k].ownWidth == 0)
       {
-          chars[i][k][4] = 1;
+          chars[i][k].ownWidth = 1;
           for (kk = k; kk < chars[i].length; kk++)
-            chars[i][kk][5] = chars[i][kk][5]+1;
-          if (chars[i][kk-1][5] > maxLen)
-            maxLen = chars[i][kk-1][5];
+            chars[i][kk].cumulativeWidth = chars[i][kk].cumulativeWidth+1;
+          if (chars[i][kk-1].cumulativeWidth > maxLen)
+            maxLen = chars[i][kk-1].cumulativeWidth;
           draw();
           return;
       }
-      if (chars[i][k][4] == 1)
+      if (chars[i][k].ownWidth == 1)
       {
-          chars[i][k][4] = 0;
+          chars[i][k].ownWidth = 0;
           for (kk = k; kk < chars[i].length; kk++)
-            chars[i][kk][5] = chars[i][kk][5]-1;
+            chars[i][kk].cumulativeWidth = chars[i][kk].cumulativeWidth-1;
           draw();
           return;
       }
@@ -811,21 +814,26 @@
   // n = next letter (consonant+vowel array structure)
   function halfLetterLen(p,c,n)
   {
+
     if (p === 0)  // no previous letter, half maatraa is first letter of line
       return 0;
-    if (p[2] === -10) // no previous letter, half maatraa is first letter of word
+    // no previous letter, half maatraa is first letter of word
+    if (p.consonant.num === -10) 
+    {
       return 0;
-    pLD = ""; // previous is laghu or deergha; 
-    nLD = ""; // next is laghu or deergha;
+    }
 
     // special combinations ----------------
-    if ((c[0] == "म") && (n[0] == "ह"))
+    if ((c.consonant.str == "म") && (n.consonant.str == "ह"))
       return 0;
-    if ((c[0] == "न") && (n[0] == "ह"))
+    if ((c.consonant.str == "न") && (n.consonant.str == "ह"))
       return 0;
     // end special combinations ------------
 
-    switch (p[3]) // previous vowel code
+    pLD = ""; // previous is laghu or deergha; 
+    nLD = ""; // next is laghu or deergha;
+
+    switch (p.vowel.num) // previous vowel code
     {
       case 1: case 3: case 5: case 11: // previous letter is laghu
         pLD = "l";
@@ -838,7 +846,7 @@
     {
       return 1;
     }
-    switch (n[3]) // next vowel code
+    switch (n.vowel.num) // next vowel code
     {
       case 1: case 3: case 5: case 11: // next letter is laghu
         nLD = "l";
