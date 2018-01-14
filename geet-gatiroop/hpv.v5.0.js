@@ -160,8 +160,8 @@
   {
     splitNprocessPoem();
 
-    // if (fFreeVerse)
-    //   initializeCompositeLines();
+    if (fFreeVerse)
+      initializeCompositeLines();
 
     // if (fGhazal)
     // {
@@ -173,7 +173,7 @@
     console.log(chars);
 
     draw();
-    // document.getElementById("divControls").style.display = "block";
+    document.getElementById("divControls").style.display = "block";
   }
 
   function addMeter()
@@ -661,6 +661,67 @@
     }
   }
 
+  function initializeCompositeLines()
+  {
+    for (i = 0; i < chars.length; i++)
+    {
+      compositeLinesMarkingA[i] = [];
+      if (chars[i].length>0)
+      {
+        compositeLinesMarkingA[i][0] = chars[i][chars[i].length-1][5];  // total count of individual line
+        compositeLinesMarkingA[i][1] = false; // is or is not composite
+      }
+      else
+      {
+        compositeLinesMarkingA[i][0] = 0;
+        compositeLinesMarkingA[i][1] = false;
+      }
+    }
+  }
+
+  function calculateCompositeLines()
+  {
+    var compositeInProgress = false;
+    var compositeLines = [];
+    if (chars.length > 1)
+    {
+      for (i = 1; i < chars.length; i++)
+      {
+        if (compositeLinesMarkingA[i][1])  // is part of composite line
+        {
+          if (!compositeInProgress) // new composite line
+          {
+            compositeInProgress = true;
+            var len = compositeLines.length;
+            compositeLines[len] = [];
+            compositeLines[len][0] = i-1; // starting position, line index is the *previous*
+            compositeLines[len][1] = chars[i-1][chars[i-1].length-1].cumulativeWidth;  // total maatraa count of prev (starting) line
+            compositeLines[len][1] += chars[i][chars[i].length-1].cumulativeWidth; // add total maatraa count of current line
+          }
+          else // in progress composite line
+          {
+            // just add to in progress composite line
+            var len = compositeLines.length;
+            //console.log(i);
+            compositeLines[len-1][1] += chars[i][chars[i].length-1].cumulativeWidth;
+          }
+        }
+        else  // not part of composite line
+        {
+          if (compositeInProgress)
+          {
+            // stop in progress
+            compositeInProgress = false;
+          }
+        }
+      }
+    }
+    if (compositeLines.length > 0)
+      return compositeLines;
+    else
+      return false;
+  }
+
   // when free verse suppport is on
   // allows users to join multiple lines together for 
   // getting total maatraa count of a set of lines
@@ -925,7 +986,7 @@
       .attr("x", function(d) {return charW*maxLen+charW;})
       //.attr("dominant-baseline", "central")
       .attr("class", "graphText3")
-      .text(function(d) { return (d.length > 0) ? d[d.length-1][5] : "";})
+      .text(function(d) { return (d.length > 0) ? d[d.length-1].cumulativeWidth : "";})
       .on("click",markCompositeLineTextDash);
 
       // small dash beside maatraa count
@@ -955,7 +1016,7 @@
       .attr("x", function(d) {return charW*maxLen+charW;})
       //.attr("dominant-baseline", "central")
       .attr("class", "graphText3")
-      .text(function(d) { return (d.length > 0) ? d[d.length-1][5] : "";});
+      .text(function(d) { return (d.length > 0) ? d[d.length-1].cumulativeWidth : "";});
     }
 
     // composite line total maatraa
