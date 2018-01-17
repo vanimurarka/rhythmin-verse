@@ -26,7 +26,7 @@
     this.isVowel = false;
     switch(str) // assign number and set vowel if vowel
     {
-      case " ": case ",":
+      case " ": case ",": case "ँ": case "-":
         this.num = -10;
         break;
       case "क": case "ख": case "ख़": case "ग": case "घ": case "ग़": case "ङ":
@@ -105,6 +105,7 @@
     this.vowel = '';
     this.ownWidth = 0;
     this.cumulativeWidth = 0;
+    this.radeefKaafiyaa = '';
 
     // set vowel
     var charC = str.charCodeAt(0);
@@ -144,8 +145,17 @@
     this.setOwnWidth();
   }
 
-  Letter.prototype.changeVowel = function(vowel)
+  Letter.prototype.changeVowel = function(vowel, charcode)
   {
+    if (charcode == 2364) // nukta, not really vowel
+    {
+      this.consonant.str = this.consonant.str + vowel;
+      return;
+    }
+    if (charcode == 2365) // avagraha, not really vowel, just ignore
+    {
+      return;
+    }
     this.vowel = new Alphabet(vowel);
     this.setOwnWidth();
   }
@@ -163,14 +173,14 @@
     if (fFreeVerse)
       initializeCompositeLines();
 
-    // if (fGhazal)
-    // {
-    //   calculateRadeef();
-    //   calculateKaafiyaa();
-    // }
+    if (fGhazal)
+    {
+      calculateRadeef();
+      calculateKaafiyaa();
+    }
 
     // addMeter();
-    console.log(chars);
+    // console.log(chars);
 
     draw();
     document.getElementById("divControls").style.display = "block";
@@ -273,7 +283,8 @@
     switch(c)
     {
       case " ": case ",":
-        return " ";
+        return "";
+        break;
       case "अ": 
         return "अ";
         break;
@@ -346,12 +357,14 @@
         {
           charCode = lines[i].charCodeAt(k);
           len = chars[i].length; // existing #of-chars - to add the next char
-          if ((charCode >= 2366) && (charCode <= 2381)) // maatraa
+          // console.log(charCode);
+          // console.log(lines[i].substring(k,k+1));
+          if ((charCode >= 2364) && (charCode <= 2381)) // maatraa, nukta or avagraha
           {
             // new element not added to array
             // the vowel part of previous element 
             // modified to update maatraa
-            chars[i][len-1].changeVowel(lines[i].substring(k,k+1));
+            chars[i][len-1].changeVowel(lines[i].substring(k,k+1),charCode);
           }
           else // not maatraa - true new char
           {
@@ -416,7 +429,8 @@
 
         // if last cumulative length greater than currently
         // saved maxLen, then update maxLen
-        if (chars[i][k-1].cumulativeWidth > maxLen)
+
+        if ((chars[i][k-1] !== undefined) && (chars[i][k-1].cumulativeWidth > maxLen))
         {
           maxLen = chars[i][k-1].cumulativeWidth;
         }
@@ -506,17 +520,17 @@
       color = conColorResult[0];
       fillOp = conColorResult[1];
     }
-    if ((colorBy == 'ghazal') && (c.length>6))
+    if ((colorBy == 'ghazal') && (c.radeefKaafiyaa !== ''))
     {
-      if (c[6] == 'r') // is a radeef char
+      if (c.radeefKaafiyaa == 'r') // is a radeef char
       {
         color = "rgb(0,220,255)"; // blue
-        fillOp = "1.0";
+        // fillOp = "1.0";
       }
-      if (c[6] == 'k') // is a kaafiyaa char
+      if (c.radeefKaafiyaa == 'k') // is a kaafiyaa char
       {
         color = "rgb(0,255,0)"; // green
-        fillOp = "1.0";
+        // fillOp = "1.0";
       }
     }
     
@@ -750,6 +764,164 @@
       compositeLinesMarkingA[i][1] = !compositeLinesMarkingA[i][1]; 
       draw();
     } 
+  }
+
+  function calculateRadeef() 
+  {
+    radeef = '';
+    radeefArray = [];
+    radeefTruncated = 0;
+
+    var radeef1, radeef2;
+    var linelen1,linelen2;
+    var linelen1 = chars[0].length;
+    var linelen2 = chars[1].length;
+
+    var foundRadeefEnd = false;
+    var i = linelen1 - 1; // first line index
+    var j = linelen2 - 1; // second line index
+
+    while ((!foundRadeefEnd) && (i >= 0) && (j >= 0))
+    {
+      radeef1 = joinCharConsonantVowel(chars[0][i].consonant.str,chars[0][i].vowel.str);
+      radeef2 = joinCharConsonantVowel(chars[1][j].consonant.str,chars[1][j].vowel.str);
+
+      if (radeef1 == radeef2)
+      {
+        radeef = radeef1 + radeef;
+        radeefArray[radeefArray.length] = [];
+        radeefArray[radeefArray.length - 1][0] = chars[0][i].consonant.str;
+        radeefArray[radeefArray.length - 1][1] = chars[0][i].vowel.str;
+        i--;
+        j--;
+      }
+      else
+      {
+        foundRadeefEnd = true;
+      }
+    }
+
+
+    // cut out the last part of calculated radeef if it has a space and an incomplete word.
+    // eg. for 
+    // कोई उम्मीद बर नहीं आती
+    // कोई सूरत नज़र नहीं आती
+    // sys will calculate radeef as as "र नहीं आती" because that is common between top and bottom line
+    // but radeef is "नहीं आती"
+    var realRadeef = radeef.substr(radeef.indexOf(' ')+1);
+    // console.log(radeef);
+
+    // truncate radeefArray too
+    // if clause implies a truncation did occur in the above substr code, and hence array has to be truncated 
+    if (radeef !== realRadeef) 
+    {
+      radeefTruncated = 1;
+      for (i = radeefArray.length - 1; i >= 0 ; i--) 
+      {
+        if (radeefArray[i][0] == " ") break;
+      }
+      radeefArray.length = i;
+      radeef = realRadeef;
+    }
+    
+    // the characters in this radeefArray is in reverse order
+    // console.log('radeef array');
+    // console.log(radeefArray);
+    var radeefArrayLen = radeefArray.length;
+    // now mark radeef chars in all relevant lines
+    for (var i = 0; i < chars.length; i++) {
+      // console.log(i);
+      var supposedlyRelevantLine = false;
+      // first 2 lines
+      if (i<=1) supposedlyRelevantLine = true;
+      // intermediate line followed by blank line
+      if ((i>1) && (i<(chars.length-1)) && (chars[i+1].length==0)) supposedlyRelevantLine = true;
+      // last line
+      if (i==(chars.length-1)) supposedlyRelevantLine = true;
+      var linelen = chars[i].length;
+      if ((supposedlyRelevantLine) && (linelen > radeefArrayLen))
+      {
+        
+        for (var j = 0; j < radeefArrayLen; j++) {
+          if ((radeefArray[j][0] == chars[i][linelen-1-j].consonant.str) && (radeefArray[j][1] == chars[i][linelen-1-j].vowel.str))
+            chars[i][linelen-1-j].radeefKaafiyaa = 'r';
+          else
+            break;
+        }
+        // console.log('line '+i);
+        // console.log(chars[i]);
+        // break;
+      }
+    }
+
+    console.log(radeef);
+    console.log(chars);
+  }
+
+  function calculateKaafiyaa()
+  {
+    var radeefArrayLen = radeefArray.length;
+    var foundKaafiyaaEnd = false;
+    var kaafiyaa,kaafiyaa1, kaafiyaa2;
+    var kaafiyaaArray = [];
+    var linelen1 = chars[0].length;
+    var linelen2 = chars[1].length;
+    var i = linelen1 - 1 - radeefArrayLen; // first line index
+    var j = linelen2 - 1 - radeefArrayLen; // second line index
+    var v1,v2;
+
+    while ((!foundKaafiyaaEnd) && (i >= 0) && (j >= 0))
+    {
+
+      kaafiyaa1 = originalVowel(chars[0][i].vowel.str);
+
+      kaafiyaa2 = originalVowel(chars[1][j].vowel.str);
+      // console.log(kaafiyaa1);
+      // console.log(kaafiyaa2);
+      if (kaafiyaa1 == kaafiyaa2)
+      {
+        kaafiyaa = kaafiyaa1 + kaafiyaa;
+        kaafiyaaArray[kaafiyaaArray.length] = kaafiyaa1;
+        i--;
+        j--;
+      }
+      else
+      {
+        foundKaafiyaaEnd = true;
+      }
+    }
+    if (kaafiyaaArray[0]==" ")
+      kaafiyaaArray.splice(0,1);
+    console.log(kaafiyaaArray);
+
+    var kaafiyaaArrayLen = kaafiyaaArray.length;
+    var radeefArrayLen = radeefArray.length;
+
+    // now mark kaafiyaa chars in all relevant lines
+    for (var i = 0; i < chars.length; i++) {
+      // console.log(i);
+      var supposedlyRelevantLine = false;
+      // first 2 lines
+      if (i<=1) supposedlyRelevantLine = true;
+      // intermediate line followed by blank line
+      if ((i>1) && (i<(chars.length-1)) && (chars[i+1].length==0)) supposedlyRelevantLine = true;
+      // last line
+      if (i==(chars.length-1)) supposedlyRelevantLine = true;
+      var linelen = chars[i].length;
+      if ((supposedlyRelevantLine) && (linelen > (radeefArrayLen+kaafiyaaArrayLen+radeefTruncated)))
+      {
+        
+        for (var j = 0; j < kaafiyaaArrayLen; j++) {
+          if (kaafiyaaArray[j] == originalVowel(chars[i][linelen-1-radeefArrayLen-radeefTruncated-j].vowel.str))
+            chars[i][linelen-1-radeefArrayLen-radeefTruncated-j].radeefKaafiyaa = 'k';
+          else
+            break;
+        }
+        // console.log('line '+i);
+        // console.log(chars[i]);
+        // break;
+      }
+    }
   }
 
   // helper for draw function to place text in correct position
