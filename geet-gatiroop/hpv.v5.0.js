@@ -1088,13 +1088,29 @@
                       return "translate(" + paddingLeft + "," + (charH+lineSpacing) + ")"; 
                     })          
                     .attr("id", "gMeterForm");
-      gMeterForm.selectAll("path")
+      gMeterForm.selectAll("text")               // char text
+          .data(meterForm)
+          .enter().append("svg:text")
+            .attr("y", charH-2)
+            .attr("x", function(d,i) {return charTxtPos(d);})
+            .attr("class", "graphText3")
+            //.attr("dominant-baseline", "central")
+            .attr("text-anchor", "middle")
+            .text(function(d) {return charTxt(d);});
+      gMeterForm.selectAll("path") // assuming only one line in meterForm
         .data(meterForm)
         .enter().append("path")
           .attr("id", function(d,i) {return "char"+i})
-          .attr("style", "stroke:black; stroke-width: 1; stroke-opacity: 0.3;fill:white")
+          .attr("style", "stroke:black; stroke-width: 1; stroke-opacity: 0.3;fill:white; fill-opacity: 0.7")
           .attr("d", function(d,i) {return vowPath(d,i);})
           .attr("title", function(d,i) {return d[0]+d[1];});
+      gMeterForm.append("svg:text")            // line total maatraa
+        .attr("y", charH)
+        .attr("x", function(d) {return charW*maxLen+charW;})
+        //.attr("dominant-baseline", "central")
+        .attr("class", "graphText3")
+        .text(function() { return (meterForm.length > 0) ? meterForm[meterForm.length-1].cumulativeWidth : "";});
+
       gPoem = svg.append("svg:g")
                   .attr("transform", function(d,i) 
                   { 
@@ -1161,6 +1177,19 @@
         .on("click",adjustCharLen);
 
 
+    if (fMeterForm)
+    {
+      svg.selectAll("line")
+        .data(meterForm)
+        .enter().append("line")
+          .attr("x1", function(d,i) {return paddingLeft+((d.cumulativeWidth)*charW);})
+          .attr("y1", function(d,i) {return charH+2;})
+          .attr("x2", function(d) {return paddingLeft+((d.cumulativeWidth)*charW)})
+          .attr("y2", (charH+lineSpacing)*(maxLineLen+3))
+          .attr("style", "stroke:red;stroke-width:1;")
+          .attr("stroke-dasharray","5,3");
+
+    }
     
     // line total maatraa
     if (fFreeVerse) // line maatraa count numbers are clickable
@@ -1192,6 +1221,9 @@
         .attr("y2", charH+2)
         .attr("style", function(d,i) {return drawCompositeLine("styleMain",i);})
         .on("click",unmarkCompositeLine);
+
+      // composite line total maatraa
+      drawCompositeNumbers();
     }    
     else  // normal - numbers are not clickable
     {
@@ -1202,9 +1234,6 @@
       .attr("class", "graphText3")
       .text(function(d) { return (d.length > 0) ? d[d.length-1].cumulativeWidth : "";});
     }
-
-    // composite line total maatraa
-    drawCompositeNumbers();
       
   } // end draw
 
@@ -1342,4 +1371,7 @@
   // had to fix ग़ ज़ फ़ ड़ ढ़ after that
 
 
-
+// Bad + good example for Maapanee
+// हो न हो तुम तो कहो
+// मेरी सुनो या ना सुनो
+// हो कुछ यहाँ गर तुम कहो
