@@ -521,8 +521,10 @@
       strokeOp = "1";
       fillOp = "0.7";    
     }
-
-    return "fill: "+color+"; fill-opacity: " + fillOp + ";stroke:black; stroke-width: "+strokeW+"; stroke-opacity: "+strokeOp;
+    style = "fill: "+color+"; fill-opacity: " + fillOp + ";stroke:black; stroke-width: "+strokeW+"; stroke-opacity: "+strokeOp;
+    if ((c.ownWidth == 0) && (c.vowel.num == -10))
+      style += ";visibility:hidden";
+    return style;
   }
   
   // shapes' shape determined by vowel
@@ -1186,7 +1188,7 @@
           .attr("y1", function(d,i) {return charH+2;})
           .attr("x2", function(d) {return paddingLeft+((d.cumulativeWidth)*charW)})
           .attr("y2", (charH+lineSpacing)*(maxLineLen+3))
-          .attr("style", "stroke:red;stroke-width:1;")
+          .attr("style", "stroke:blue;stroke-width:1;")
           .attr("stroke-dasharray","5,3");
 
     }
