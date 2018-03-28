@@ -92,9 +92,12 @@
         this.num = 10;
         this.isVowel = true;
         break;
-      case "ृ":
+      case "ृ": 
         this.num = 11;
         this.isVowel = true;
+        break;
+      case "1": case "2":
+        this.num = 12;
         break;
       default:
         this.num = -1;
@@ -127,6 +130,18 @@
     if (charC == 2306) 
     {
       this.vowel = new Alphabet("्");
+    }
+
+    // the number 1 - for maapanee
+    if (charC == 49)
+    {
+      this.vowel = new Alphabet("अ");
+    }
+
+    // the number 2 - for maapanee
+    if (charC == 50)
+    {
+      this.vowel = new Alphabet("आ");
     }
 
     // define setOwnWidth function
@@ -459,6 +474,9 @@
           break;
         case 7: // sha sha sa ha
           color = "rgb(143,0,255)"; // violet
+          break;
+        case 11: 
+          color = white;
           break;
         default:
           color = "black";
@@ -930,6 +948,8 @@
           txt = d.consonant.str+d.vowel.str;
       }
     }
+    if (d.consonant.num == 12) // chars "1" or "2"
+      txt = d.consonant.str;
     return txt;
   }
 
