@@ -236,7 +236,7 @@
         var thisC = meter.substring(k,k+1); //this character
         meterForm[charCount] = new Letter(thisC);
         charCount++;
-      }          
+      }       
     }
 
     // now iterate through the line again 
@@ -251,9 +251,43 @@
       { meterForm[k].cumulativeWidth = meterForm[k-1].cumulativeWidth + meterForm[k].ownWidth; }
     }
 
+    // evaluate each line of poem -- is it as per meter?
+    for (line=0;line<chars.length;line++) // poem line
+    {
+      var ltrToStartAt = 0;
+      var ok = '';
+      for (k=0;k<meterForm.length;k++) // meter letter
+      {
+        ok = '';
+        console.log(meterForm[k]);
+        console.log(ltrToStartAt);
+        if (meterForm[k].ownWidth == 1)
+        {
+          var ltr;
+          for (ltr=ltrToStartAt;ltr<chars[line].length;ltr++) // poem letter
+          {
+              console.log('ltr '+ltr);
+              if (chars[line][ltr].ownWidth == 1)
+                ok = 'yes';
+              if (chars[line][ltr].ownWidth == 2)
+                ok = 'no';
+              if (ok !== '') // ok has become yes or no
+              {
+                ltrToStartAt = ltr+1;
+                break;
+              }
+          } // end poem letter
+        }
+        console.log('meter letter '+k+ok);
+        if (ok == 'no') // meter not met for line - break meter loop
+        {
+          break;
+        }
+      } // end meter letter
+      console.log('line '+line+ ok); // print whether meter met for line
+    }
+
     // console.log(meterForm);
-    // chars.unshift(meterForm);
-    // maxLineLen++;
 
   }
 
