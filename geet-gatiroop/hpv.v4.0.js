@@ -1,4 +1,9 @@
-﻿/* primary changes compared to v3
+﻿/* issues with hpv 4
+half letter black square not drawn
+poem text in forefront so clicking box to change box width is tough
+*/
+
+/* primary changes compared to v3
 single color (no different colors as per consonant)
 square or double width rectangle for all vowels
 removed svg border from top, left, right
