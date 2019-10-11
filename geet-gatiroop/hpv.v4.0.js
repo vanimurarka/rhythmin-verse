@@ -1,4 +1,14 @@
-﻿  var charW = 20; // decrease charW to 20 from 24 earlier
+﻿/* primary changes compared to v3
+single color (no different colors as per consonant)
+square or double width rectangle for all vowels
+removed svg border from top, left, right
+decreased 
+1. charW from 24 to 20, 
+2. line spacing from 7 to 5, 
+3. maatraa count position charW/2 after line end instead of charW
+*/
+
+  var charW = 20; // decrease charW to 20 from 24 earlier
   var charH = 20; // decrease charW to 20 from 24 earlier
   var paddingLeft = 10;
   var lineSpacing = 5;
@@ -975,8 +985,8 @@
      chart.select("svg").remove();
      var svg = chart.append("svg")
                   .attr("width", function() {return (fFreeVerse?charW*maxLen+120:charW*maxLen+100);})
-                  .attr("height", ((maxLineLen*(charW+7))+(charW+7))+charW)
-                  .attr("style","border: solid 1px #ddd;");
+                  .attr("height", ((maxLineLen*(charW+lineSpacing))+(charW))+charW)
+                  .attr("style","border-bottom: solid 1px #ddd;");
 
     // create the "g"s (svg groups) for each line
     if (fLineSpacing)
@@ -1062,7 +1072,7 @@
     {
       g.append("svg:text")            // line total maatraa
       .attr("y", charH)
-      .attr("x", function(d) {return charW*maxLen+charW;})
+      .attr("x", function(d) {return charW*maxLen+(charW/2);}) // decreased distance of maatraa count. was charW. is charW/2 now
       //.attr("dominant-baseline", "central")
       .attr("class", "graphText3")
       .text(function(d) { return (d.length > 0) ? d[d.length-1][5] : "";});
