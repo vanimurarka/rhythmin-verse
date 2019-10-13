@@ -660,8 +660,8 @@ decreased
     {
       //console.log(c);
       color = "black";
-      strokeOp = "1";
-      fillOp = "0.7";    
+      strokeOp = "0.3";
+      fillOp = "0.6";    
     }
 
     return "fill: "+color+"; fill-opacity: " + fillOp + ";stroke:black; stroke-width: "+strokeW+"; stroke-opacity: "+strokeOp;
