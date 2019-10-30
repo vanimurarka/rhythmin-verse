@@ -4,51 +4,68 @@ class cChar {
     vowelChar
     consonantNumber
     vowelNumber*/
-    constructor(mainChar) {
-     this.mainChar = mainChar;
-     // this.idx = 0;
-     // setConsonantNumber();
+    constructor(mainChar, mainCharCode) {
+		this.mainChar = mainChar;
+		this.mainCharCode = mainCharCode;
+		this.vowelChar = "";
+		this.vowelNumber = 0;
+		this.index = 0;
+
+		// space / comma OR whole vowel 
+        if (((mainCharCode == 32)||(mainCharCode == 44)) || ((mainCharCode >= 2309) && (mainCharCode <= 2324)))
+          this.vowel = mainChar;
+        
+        // consonant OR consonant with dot at bottom
+        if (((mainCharCode >= 2325) && (mainCharCode <= 2361)) || ((mainCharCode >= 2392) && (mainCharCode <= 2399)))
+          this.vowel = "अ";
+
+        // anusvaar (the bindi on top) which sometimes is short-cut for half letter
+        if (mainCharCode == 2306) 
+          this.vowel = "्";
     }
     set vowel(vowelChar) {
 		this.vowelChar = vowelChar;
 		// set Vowel Number
 		switch(vowelChar)
 		{
-		  case "अ": 
-		    this.vowelNumber = 1;
-		    break;
-		  case "आ": case "ा":
-		    this.vowelNumber = 2;
-		    break;
-		  case "इ": case "ि":
-		    this.vowelNumber = 3;
-		    break;
-		  case "ई": case "ी":
-		    this.vowelNumber = 4;
-		    break;
-		  case "उ": case "ु":
-		   this.vowelNumber = 5;
-		    break;
-		  case "ऊ": case "ू":
-		    this.vowelNumber = 6;
-		    break;
-		  case "ए": case "े":
-		    this.vowelNumber = 7;
-		    break;
-		  case "ऐ": case "ै":
-		    this.vowelNumber = 8;
-		    break;
-		  case "ओ": case "ो":
-		    this.vowelNumber = 9;
-		    break;
-		  case "औ": case "ौ":
-		    this.vowelNumber = 10;
-		    break;
-		  case "ृ":
-		    this.vowelNumber = 11;
-		    break;
-		  default:
-		    this.vowelNumber = -1;
+			case "्":
+				this.vowelNumber = -1;
+				break;
+			case "अ": 
+				this.vowelNumber = 1;
+				break;
+			case "आ": case "ा":
+				this.vowelNumber = 2;
+				break;
+			case "इ": case "ि":
+				this.vowelNumber = 3;
+				break;
+			case "ई": case "ी":
+				this.vowelNumber = 4;
+				break;
+			case "उ": case "ु":
+				this.vowelNumber = 5;
+				break;
+			case "ऊ": case "ू":
+				this.vowelNumber = 6;
+				break;
+			case "ए": case "े":
+				this.vowelNumber = 7;
+				break;
+			case "ऐ": case "ै":
+				this.vowelNumber = 8;
+				break;
+			case "ओ": case "ो":
+				this.vowelNumber = 9;
+				break;
+			case "औ": case "ौ":
+				this.vowelNumber = 10;
+				break;
+			case "ृ":
+				this.vowelNumber = 11;
+				break;
+			default:
+				this.vowelNumber = -10;
 		}
 		// set char maatraa as per vowel
 		switch (this.vowelNumber)
@@ -64,14 +81,9 @@ class cChar {
 				break;
 		}
     }
-    get vowel() {
-    	return this.vowelChar;
-    }
-    set idx(n) {
-    	this.index = n;
-    }
-    get idx() {
-    	return this.index;
+    isHalfLetter()
+    {
+    	return (this.vowelNumber == -1); 
     }
 }
 
@@ -91,11 +103,17 @@ class cLine {
 	}
 	push(newChar)
 	{
-		newChar.idx = this.count;
+		newChar.index = this.count;
 		this.characters.push(newChar);
 		this.count++;
 	}
-	
+	getHalfLetters()
+	{
+		let halfLetters = this.characters.filter(function (thisChar) {
+			return thisChar.isHalfLetter();
+		});
+		return halfLetters;
+	}
 }
 
 class cPoem {
@@ -122,42 +140,30 @@ function visualize()
 
 function splitNprocessPoem()
 {
-	const oPoem = new cPoem(document.getElementById("pom").value);
-    var lines = oPoem.text.split("\n");
-    maxLineLen = lines.length;
-    debugger;
+	let oPoem = new cPoem(document.getElementById("pom").value);
+    let lines = oPoem.text.split("\n");
+    let maxLineLen = lines.length;
     for (i = 0; i < maxLineLen; i++) // process each line - i = line index
     {
-    	const oLine = new cLine();
+    	let oLine = new cLine();
         for (k=0;k<lines[i].length;k++) // process each char: k = char index
         {
         	charCode = lines[i].charCodeAt(k);
         	if ((charCode >= 2366) && (charCode <= 2381)) // maatraa
 			{
-				// new element not added to array
+				// new element not added to line array
 				// the vowel part of previous element 
 				// modified to update maatraa
 				oLine.last.vowel = lines[i].substring(k,k+1);
 			}
 			else // not maatraa - true new char
 			{
-				const oChar = new cChar(lines[i].substring(k,k+1));
-				
-				// space / comma OR vowel
-	            if (((charCode == 32)||(charCode == 44)) || ((charCode >= 2309) && (charCode <= 2324)))
-	              oChar.vowel = oChar.mainChar;
-	            
-	            // consonant OR consonant with dot at bottom
-	            if (((charCode >= 2325) && (charCode <= 2361)) || ((charCode >= 2392) && (charCode <= 2399)))
-	              oChar.vowel = "अ";
-
-	            // anusvaar (the bindi on top) which sometimes is short-cut for half letter
-	            if (charCode == 2306) 
-	              oChar.vowel = "्";
-
+				var thisChar = lines[i].substring(k,k+1);
+				let oChar = new cChar(thisChar,charCode);
 	          	oLine.push(oChar);
 			}
         }
+        console.log(oLine.getHalfLetters());
         oPoem.pushLine(oLine);
     }
     console.log(oPoem);
