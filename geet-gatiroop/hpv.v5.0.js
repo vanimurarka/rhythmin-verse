@@ -161,9 +161,7 @@ class cChar {
 	  	{
 	  		this.maatraa = 1;
 	  		return;
-	  	}
-
-		  	
+	  	}		  	
 	}
 }
 
@@ -172,6 +170,7 @@ class cLine {
 	constructor() {
 		this.characters = new Array();
 		this.count = 0;
+		this.maatraa = 0;
 	}
 	// get last character of line
 	get last()	{
@@ -186,6 +185,7 @@ class cLine {
 	{
 		newChar.index = this.count;
 		this.characters.push(newChar);
+		this.maatraa += newChar.maatraa;
 		this.count++;
 	}
 	// get the nth character of a line
