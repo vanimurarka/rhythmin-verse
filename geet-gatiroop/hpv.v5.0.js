@@ -10,6 +10,7 @@ class cChar {
 		this.vowelChar = "";
 		this.vowelNumber = 0;
 		this.index = 0;
+		this.maatraa = 0;
 
 		// space / comma OR whole vowel 
         if (((mainCharCode == 32)||(mainCharCode == 44)) || ((mainCharCode >= 2309) && (mainCharCode <= 2324)))
@@ -81,10 +82,89 @@ class cChar {
 				break;
 		}
     }
+    // determine if character is half letter
     isHalfLetter()
     {
     	return (this.vowelNumber == -1); 
     }
+    // check if this character is of laghu vowel
+    isLaghu ()
+    {
+    	switch(this.vowelNumber)
+    	{
+    		case 1: case 3: case 5: case 11:
+    			return true;
+    			break;
+    		default:
+    			return false;
+    			break;
+    	}
+    }
+    isDeergha()
+    {
+    	switch(this.vowelNumber)
+    	{
+    		case 2: case 4: case 6: case 8: case 10: case 7: case 9: case 10:
+    			return true;
+    			break;
+    		default:
+    			return false;
+    			break;
+    	}
+    }
+    // determine when a half letter will have 0 or 1 maatraa
+	// the logic for default handling - which the user can always override
+	// p = previous letter (consonant+vowel array structure)
+	// this = current letter (consonant+vowel array structure) - for which the len is to be 
+	// determined
+	// n = next letter (consonant+vowel array structure)	
+	calculateHalfLetterLen(p=false,n=false)
+	{
+		if (!p)  // no previous letter, half maatraa is first letter of line
+		{
+      		this.maatraa = 0;
+      		return;
+		}
+      	if (p.vowelNumber === -10) // no previous letter, half maatraa is first letter of word
+      	{
+      		this.maatraa = 0;
+      		return;
+      	}
+
+      	// special combinations ----------------
+	    if ((this.mainChar == "म") && (n.mainChar == "ह"))
+	    {
+	      this.maatraa = 0;
+	      return;
+	    }
+	    if ((this.mainChar == "न") && (n.mainChar == "ह"))
+	    {
+	      this.maatraa = 0;
+	      return;
+	    }
+	  	// end special combinations ------------
+
+	  	if (p.isLaghu())
+	  	{
+	  		this.maatraa = 1;
+	  		return;
+	  	}
+	  	if (n)
+	  	{
+	  		if (p.isDeergha() && n.isDeergha()) // both side deergha
+		    {
+		    	this.maatraa = 1;
+		      	return;
+		    }
+	  	}
+	  	else	// no next letter meaning this is last letter
+	  	{
+	  		this.maatraa = 1;
+	  		return;
+	  	}
+
+		  	
+	}
 }
 
 
@@ -93,26 +173,67 @@ class cLine {
 		this.characters = new Array();
 		this.count = 0;
 	}
-	get last()
-	{
+	// get last character of line
+	get last()	{
 		return this.characters[this.count-1];
 	}
-	set last(newChar)
-	{
+	// change last character of line
+	set last(newChar) 	{
 		this.characters[this.count-1] = newChar;
 	}
+	// add a new character to line
 	push(newChar)
 	{
 		newChar.index = this.count;
 		this.characters.push(newChar);
 		this.count++;
 	}
+	// get the nth character of a line
+	charByIndex(idx)
+	{
+		return this.characters[idx];
+	}
+	// get previous character w.r.t. given current character
+	previousChar(c) // c = current character
+	{
+		if ((c.index != 0) && (this.count>1))
+			return this.characters[c.index-1];
+		else
+			return false;
+	}
+	// get next character w.r.t. given current character
+	nextChar(c) // c = current character
+	{
+		if ((this.count>1) && (c.index < this.count - 1))
+			return this.characters[c.index+1];
+		else
+			return false;
+	}
+	// return an array of half letters in a line
 	getHalfLetters()
 	{
 		let halfLetters = this.characters.filter(function (thisChar) {
 			return thisChar.isHalfLetter();
 		});
 		return halfLetters;
+	}
+	// calculate default maatraa for half letters in a line based
+	calculateHalfLettersMaatraa()
+	{
+		let halfLetters = this.getHalfLetters();
+		for (i=0;i<halfLetters.length;i++)
+		{
+			let thisHalfLetter = halfLetters[i];
+			if (thisHalfLetter.index == 0) // first character, no previous, next not required
+				thisHalfLetter.calculateHalfLetterLen();
+			else
+			{
+				let previousChar = this.previousChar(thisHalfLetter);
+				let nextChar = this.nextChar(thisHalfLetter.index+1);
+				thisHalfLetter.calculateHalfLetterLen(previousChar, nextChar);
+			}
+			
+		};
 	}
 }
 
@@ -127,8 +248,7 @@ class cPoem {
 		this.lines.push(newLine)
 		this.lineCount++;
 	}
-	get text()
-	{
+	get text() 	{
 		return this.originalText;
 	}
 }
@@ -163,7 +283,8 @@ function splitNprocessPoem()
 	          	oLine.push(oChar);
 			}
         }
-        console.log(oLine.getHalfLetters());
+        // console.log(oLine.getHalfLetters());
+        oLine.calculateHalfLettersMaatraa();
         oPoem.pushLine(oLine);
     }
     console.log(oPoem);
