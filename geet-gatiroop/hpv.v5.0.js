@@ -250,6 +250,7 @@ class cLine {
 				this.maatraa += maatraa;
 				thisHalfLetter.maatraaCumulative += maatraa;
 				let j;
+				// update maatraaCumulative for all subsequent chars in line
 				for (j=thisHalfLetter.index+1;j<this.count;j++)
 					this.characters[j].maatraaCumulative++;
 			}
