@@ -123,45 +123,41 @@ class cChar {
 		if (!p)  // no previous letter, half maatraa is first letter of line
 		{
       		this.maatraa = 0;
-      		return;
+      		return this.maatraa;
 		}
       	if (p.vowelNumber === -10) // no previous letter, half maatraa is first letter of word
       	{
       		this.maatraa = 0;
-      		return;
+      		return this.maatraa;
       	}
 
       	// special combinations ----------------
 	    if ((this.mainChar == "म") && (n.mainChar == "ह"))
 	    {
 	      this.maatraa = 0;
-	      return;
+	      return this.maatraa;
 	    }
 	    if ((this.mainChar == "न") && (n.mainChar == "ह"))
 	    {
 	      this.maatraa = 0;
-	      return;
+	      return this.maatraa;
 	    }
 	  	// end special combinations ------------
 
 	  	if (p.isLaghu())
 	  	{
 	  		this.maatraa = 1;
-	  		return;
+	  		return this.maatraa;
 	  	}
 	  	if (n)
 	  	{
 	  		if (p.isDeergha() && n.isDeergha()) // both side deergha
 		    {
 		    	this.maatraa = 1;
-		      	return;
+		      	return this.maatraa;
 		    }
 	  	}
-	  	else	// no next letter meaning this is last letter
-	  	{
-	  		this.maatraa = 1;
-	  		return;
-	  	}		  	
+	  	return 0;		  	
 	}
 }
 
@@ -172,13 +168,13 @@ class cLine {
 		this.count = 0;
 		this.maatraa = 0;
 	}
-	// get last character of line
-	get last()	{
-		return this.characters[this.count-1];
-	}
-	// change last character of line
-	set last(newChar) 	{
-		this.characters[this.count-1] = newChar;
+	// change the vowel of the last character
+	lastCharVowel(vowelString)
+	{
+		const lastChar = this.characters[this.count-1];
+		const oldMaatraa = lastChar.maatraa;
+		lastChar.vowel = vowelString;
+		this.maatraa += lastChar.maatraa - oldMaatraa;
 	}
 	// add a new character to line
 	push(newChar)
@@ -212,7 +208,7 @@ class cLine {
 	// return an array of half letters in a line
 	getHalfLetters()
 	{
-		let halfLetters = this.characters.filter(function (thisChar) {
+		const halfLetters = this.characters.filter(function (thisChar) {
 			return thisChar.isHalfLetter();
 		});
 		return halfLetters;
@@ -220,19 +216,24 @@ class cLine {
 	// calculate default maatraa for half letters in a line based
 	calculateHalfLettersMaatraa()
 	{
-		let halfLetters = this.getHalfLetters();
+		const halfLetters = this.getHalfLetters();
+		let maatraa = 0;
+		let i;
 		for (i=0;i<halfLetters.length;i++)
 		{
-			let thisHalfLetter = halfLetters[i];
+			const thisHalfLetter = halfLetters[i];
+			maatraa = 0;
+			// debugger;
 			if (thisHalfLetter.index == 0) // first character, no previous, next not required
-				thisHalfLetter.calculateHalfLetterLen();
+				maatraa = thisHalfLetter.calculateHalfLetterLen();
 			else
 			{
-				let previousChar = this.previousChar(thisHalfLetter);
-				let nextChar = this.nextChar(thisHalfLetter.index+1);
-				thisHalfLetter.calculateHalfLetterLen(previousChar, nextChar);
+				const previousChar = this.previousChar(thisHalfLetter);
+				const nextChar = this.nextChar(thisHalfLetter.index+1);
+				maatraa = thisHalfLetter.calculateHalfLetterLen(previousChar, nextChar);
 			}
-			
+			// update cumulative maatraa of line
+			this.maatraa += maatraa;
 		};
 	}
 }
@@ -242,11 +243,14 @@ class cPoem {
 		this.originalText = originalText;
 		this.lines = new Array();
 		this.lineCount = 0;
+		this.maxLineLen = 0;
 	}
 	pushLine(newLine)
 	{
 		this.lines.push(newLine)
 		this.lineCount++;
+		if (this.maxLineLen < newLine.maatraa)
+			this.maxLineLen = newLine.maatraa;
 	}
 	get text() 	{
 		return this.originalText;
@@ -260,26 +264,28 @@ function visualize()
 
 function splitNprocessPoem()
 {
-	let oPoem = new cPoem(document.getElementById("pom").value);
-    let lines = oPoem.text.split("\n");
-    let maxLineLen = lines.length;
-    for (i = 0; i < maxLineLen; i++) // process each line - i = line index
+	const oPoem = new cPoem(document.getElementById("pom").value);
+    const lines = oPoem.text.split("\n");
+    const maxLineLen = lines.length;
+    let iLine;
+    for (iLine = 0; iLine < maxLineLen; iLine++) // process each line - i = line index
     {
-    	let oLine = new cLine();
-        for (k=0;k<lines[i].length;k++) // process each char: k = char index
+    	const oLine = new cLine();
+    	// debugger;
+        for (k=0;k<lines[iLine].length;k++) // process each char: k = char index
         {
-        	charCode = lines[i].charCodeAt(k);
+        	charCode = lines[iLine].charCodeAt(k);
         	if ((charCode >= 2366) && (charCode <= 2381)) // maatraa
 			{
 				// new element not added to line array
 				// the vowel part of previous element 
 				// modified to update maatraa
-				oLine.last.vowel = lines[i].substring(k,k+1);
+				oLine.lastCharVowel(lines[iLine].substring(k,k+1));
 			}
 			else // not maatraa - true new char
 			{
-				var thisChar = lines[i].substring(k,k+1);
-				let oChar = new cChar(thisChar,charCode);
+				var thisChar = lines[iLine].substring(k,k+1);
+				const oChar = new cChar(thisChar,charCode);
 	          	oLine.push(oChar);
 			}
         }
