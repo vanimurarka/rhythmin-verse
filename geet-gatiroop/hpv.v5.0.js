@@ -377,16 +377,16 @@ function draw()
           .data(function(d) {return d.characters;} )
           .enter().append("svg:text")
             .attr("y", charH-2)
-            .attr("x", function(d,i) {return charTxtPos(d);})
+            .attr("x", function(d,i) {return drawCharTxtPos(d);})
             .attr("class", "graphText3")
             //.attr("dominant-baseline", "central")
             .attr("text-anchor", "middle")
-            .text(function(d) {return charTxt(d);});
+            .text(function(d) {return drawCharTxt(d);});
     }
 }
 
 // helper for draw function to place text in correct position
-function charTxtPos(d,i)
+function drawCharTxtPos(d,i)
 {
 	var x = ((d.maatraaCumulative-d.maatraa)*charW);
 	var w = charW*d.maatraa;
@@ -394,7 +394,7 @@ function charTxtPos(d,i)
 }
 
 // helper for draw function to show text
-function charTxt(d)
+function drawCharTxt(d)
 {
 	var txt = "";
 	if ((d.vowelNumber != -10) && (d.vowelNumber != 0))  // hindi character
