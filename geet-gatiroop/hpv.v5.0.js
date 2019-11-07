@@ -88,6 +88,10 @@ class cChar {
     {
     	return (this.vowelNumber == -1); 
     }
+    isPureVowel()
+    {
+    	return (this.mainChar == this.vowelChar);
+    }
     // check if this character is of laghu vowel
     isLaghu ()
     {
@@ -176,6 +180,7 @@ class cLine {
 		const oldMaatraa = lastChar.maatraa;
 		lastChar.vowel = vowelString;
 		this.maatraa += lastChar.maatraa - oldMaatraa;
+		lastChar.maatraaCumulative += lastChar.maatraa - oldMaatraa;
 	}
 	// add a new character to line
 	push(newChar)
@@ -240,7 +245,15 @@ class cLine {
 				maatraa = thisHalfLetter.calculateHalfLetterLen(previousChar, nextChar);
 			}
 			// update cumulative maatraa of line
-			this.maatraa += maatraa;
+			if (maatraa>0)
+			{
+				this.maatraa += maatraa;
+				thisHalfLetter.maatraaCumulative += maatraa;
+				let j;
+				for (j=thisHalfLetter.index+1;j<this.count;j++)
+					this.characters[j].maatraaCumulative++;
+			}
+			
 		};
 	}
 }
@@ -360,7 +373,7 @@ function draw()
 	if (fShowText)
     {
         g.selectAll("text")               // char text
-          .data(function(d) {console.log(d); return d.characters;} )
+          .data(function(d) {return d.characters;} )
           .enter().append("svg:text")
             .attr("y", charH-2)
             .attr("x", function(d,i) {return charTxtPos(d);})
@@ -383,9 +396,9 @@ function charTxtPos(d,i)
 function charTxt(d)
 {
 	var txt = "";
-	if (d.vowelNumber != -10)  // hindi character
+	if ((d.vowelNumber != -10) && (d.vowelNumber != 0))  // hindi character
 	{
-	  if ((d[2] == 0)||(d.vowelNumber == 1))
+	  if (d.isPureVowel()||(d.vowelNumber == 1))
 	  {
 	    txt = d.mainChar;
 	  }
