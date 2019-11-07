@@ -11,6 +11,7 @@ class cChar {
 		this.vowelNumber = 0;
 		this.index = 0;
 		this.maatraa = 0;
+		this.maatraaCumulative = 0;
 
 		// space / comma OR whole vowel 
         if (((mainCharCode == 32)||(mainCharCode == 44)) || ((mainCharCode >= 2309) && (mainCharCode <= 2324)))
@@ -180,6 +181,12 @@ class cLine {
 	push(newChar)
 	{
 		newChar.index = this.count;
+		// assign cumulative maatraa of char as per previous char
+		if (newChar.index == 0)
+			newChar.maatraaCumulative = newChar.maatraa;
+		else
+			newChar.maatraaCumulative = this.characters[this.count-1].maatraaCumulative + newChar.maatraa;
+
 		this.characters.push(newChar);
 		this.maatraa += newChar.maatraa;
 		this.count++;
@@ -257,14 +264,17 @@ class cPoem {
 	}
 }
 
+var oPoem;
+
 function visualize()
 {
 	splitNprocessPoem();
+	draw();
 }
 
 function splitNprocessPoem()
 {
-	const oPoem = new cPoem(document.getElementById("pom").value);
+	oPoem = new cPoem(document.getElementById("pom").value);
     const lines = oPoem.text.split("\n");
     const maxLineLen = lines.length;
     let iLine;
@@ -294,4 +304,95 @@ function splitNprocessPoem()
         oPoem.pushLine(oLine);
     }
     console.log(oPoem);
+}
+
+var charW = 20; // decrease charW to 20 from 24 earlier
+var charH = 20; // decrease charW to 20 from 24 earlier
+var paddingLeft = 10;
+var lineSpacing = 5;
+var mode = "analyze";
+var fShowText = true;
+var prevText = "";
+var prevBaseCount = 1;
+var fLineSpacing = true;
+var fFreeVerse = false;
+var selWord = 1;
+var compositeLinesMarkingA = [];
+var fGhazal = false;
+var radeef = '';
+var radeefArray = [];
+var radeefTruncated = 0;
+
+// the D3 draw dance!
+function draw()
+{
+	const maxLen = oPoem.maxLineLen;
+	const lineCount = oPoem.lineCount;
+	var chart = d3.select("#chart");
+	chart.select("svg").remove();
+	var svg = chart.append("svg")
+	          .attr("width", function() {return (fFreeVerse?charW*maxLen+120:charW*maxLen+100);})
+	          .attr("height", ((lineCount*(charW+lineSpacing))+(charW))+charW)
+	          .attr("style","border-bottom: solid 1px #ddd;");
+
+	// create the "g"s (svg groups) for each line
+	if (fLineSpacing)
+	{
+		var g = svg.selectAll("g")
+		.data(oPoem.lines)
+		.enter().append("svg:g")
+		  .attr("transform", function(d,i) 
+		    { 
+		      return "translate(" + paddingLeft + "," + ((i*(charH+lineSpacing))+(charH+lineSpacing)) + ")"; 
+		    })
+		  .attr("id", function(d,i) { return "gLine"+i});
+	}
+	else
+	{
+		var g = svg.selectAll("g")
+		.data(chars)
+		.enter().append("svg:g")
+		  .attr("transform", function(d,i) 
+		    { return "translate(" + paddingLeft + "," + ((i*(charH))+(charH)) + ")" })
+		  .attr("id", function(d,i) { return "gLine"+i});
+	}
+
+	if (fShowText)
+    {
+        g.selectAll("text")               // char text
+          .data(function(d) {console.log(d); return d.characters;} )
+          .enter().append("svg:text")
+            .attr("y", charH-2)
+            .attr("x", function(d,i) {return charTxtPos(d);})
+            .attr("class", "graphText3")
+            //.attr("dominant-baseline", "central")
+            .attr("text-anchor", "middle")
+            .text(function(d) {return charTxt(d);});
+    }
+}
+
+// helper for draw function to place text in correct position
+function charTxtPos(d,i)
+{
+	var x = ((d.maatraaCumulative-d.maatraa)*charW);
+	var w = charW*d.maatraa;
+	return x+(w/2);
+}
+
+// helper for draw function to show text
+function charTxt(d)
+{
+	var txt = "";
+	if (d.vowelNumber != -10)  // hindi character
+	{
+	  if ((d[2] == 0)||(d.vowelNumber == 1))
+	  {
+	    txt = d.mainChar;
+	  }
+	  else
+	  {
+	    txt = d.mainChar+d.vowelChar;
+	  }
+	}
+	return txt;
 }
