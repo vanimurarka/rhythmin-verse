@@ -377,7 +377,7 @@ function draw()
           .data(function(d) {return d.characters;} )
           .enter().append("svg:text")
             .attr("y", charH-2)
-            .attr("x", function(d,i) {return drawCharTxtPos(d);})
+            .attr("x", function(d) {return drawCharTxtPos(d);})
             .attr("class", "graphText3")
             //.attr("dominant-baseline", "central")
             .attr("text-anchor", "middle")
@@ -386,7 +386,7 @@ function draw()
 }
 
 // helper for draw function to place text in correct position
-function drawCharTxtPos(d,i)
+function drawCharTxtPos(d)
 {
 	var x = ((d.maatraaCumulative-d.maatraa)*charW);
 	var w = charW*d.maatraa;
