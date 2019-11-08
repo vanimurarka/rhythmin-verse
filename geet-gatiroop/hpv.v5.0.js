@@ -36,7 +36,7 @@ class cChar {
 			case "अ": 
 				this.vowelNumber = 1;
 				break;
-			case "आ": case "ा":
+			case "आ": case "ा": case "ॉ":
 				this.vowelNumber = 2;
 				break;
 			case "इ": case "ि":
@@ -285,6 +285,8 @@ class cLine {
 		let i;
 		for (i = charIdx; i < this.count; i++)
 			this.charByIndex(i).maatraaCumulative += diff;
+
+		return this.maatraa;
 	}
 }
 
@@ -304,6 +306,14 @@ class cPoem {
 	}
 	get text() 	{
 		return this.originalText;
+	}
+	adjustCharMaatraa(lineIdx, charIdx)
+	{
+		let newMaatraaOfLine = this.lines[lineIdx].adjustCharMaatraa(charIdx);
+		if (this.maxLineLen < newMaatraaOfLine)
+			this.maxLineLen = newMaatraaOfLine;
+
+		console.log(this.maxLineLen);
 	}
 }
 
@@ -332,6 +342,7 @@ function splitNprocessPoem()
         	charCode = lines[iLine].charCodeAt(k);
         	if ((charCode >= 2366) && (charCode <= 2381)) // maatraa
 			{
+				console.log(lines[iLine].substring(k,k+1));
 				// new element not added to line array
 				// the vowel part of previous element 
 				// modified to update maatraa
@@ -570,10 +581,10 @@ function fnLineSpacing()
 // when user clicks char to reassign length
 function adjustCharLen()
 {
-	var k = parseInt(this.getAttribute("id").substring(4));
-	var i = parseInt(this.parentNode.getAttribute("id").substring(5));
+	var iChr = parseInt(this.getAttribute("id").substring(4));
+	var iLine = parseInt(this.parentNode.getAttribute("id").substring(5));
 	var kk = 0;
-	oPoem.lines[i].adjustCharMaatraa(k);
+	oPoem.adjustCharMaatraa(iLine,iChr);
 	draw();
 	/*if ((chars[i][k][3]%2 == 0) || ((chars[i][k][3]>6) && (chars[i][k][3]<11)))
 	{
