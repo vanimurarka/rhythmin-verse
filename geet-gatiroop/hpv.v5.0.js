@@ -578,7 +578,7 @@ function fnLineSpacing()
 	draw();
 }
 
-// when user clicks char to reassign length
+// when user clicks char to adjust maatraa
 function adjustCharLen()
 {
 	var iChr = parseInt(this.getAttribute("id").substring(4));
@@ -586,47 +586,4 @@ function adjustCharLen()
 	var kk = 0;
 	oPoem.adjustCharMaatraa(iLine,iChr);
 	draw();
-	/*if ((chars[i][k][3]%2 == 0) || ((chars[i][k][3]>6) && (chars[i][k][3]<11)))
-	{
-	  if (chars[i][k][4] == 1)
-	  {
-	    chars[i][k][4] = 2;
-	    for (kk = k; kk < chars[i].length; kk++)
-	      chars[i][kk][5] = chars[i][kk][5]+1;
-	    if (chars[i][kk-1][5] > maxLen)
-	        maxLen = chars[i][kk-1][5];
-	    draw();
-	    return;
-	  }
-	  if (chars[i][k][4] == 2)
-	  {
-	    chars[i][k][4] = 1;
-	    for (kk = k; kk < chars[i].length; kk++)
-	      chars[i][kk][5] = chars[i][kk][5]-1;
-	    draw();
-	    return;
-	  }
-	}
-	if (chars[i][k][3] == -1) // half letter
-	{
-	  if (chars[i][k][4] == 0)
-	  {
-	      chars[i][k][4] = 1;
-	      for (kk = k; kk < chars[i].length; kk++)
-	        chars[i][kk][5] = chars[i][kk][5]+1;
-	      if (chars[i][kk-1][5] > maxLen)
-	        maxLen = chars[i][kk-1][5];
-	      draw();
-	      return;
-	  }
-	  if (chars[i][k][4] == 1)
-	  {
-	      chars[i][k][4] = 0;
-	      for (kk = k; kk < chars[i].length; kk++)
-	        chars[i][kk][5] = chars[i][kk][5]-1;
-	      draw();
-	      return;
-	  }
-	}
-	*/
 }
