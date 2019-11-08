@@ -164,6 +164,25 @@ class cChar {
 	  	}
 	  	return 0;		  	
 	}
+	adjustCharMaatraa()
+	{
+		// whole chars
+		//    aa, ee, oo                        all other deergha
+		if ((this.vowelNumber%2 == 0) || ((this.vowelNumber>6) && (this.vowelNumber<11)))
+		{
+		  if (this.maatraa == 1)
+		    this.maatraa = 2;
+		  else
+		    this.maatraa = 1;
+		}
+		if (this.vowelNumber == -1) // half maatraa
+		{
+			if (this.maatraa == 0)
+				this.maatraa = 1;
+			else
+				this.maatraa = 0;
+		}
+	}
 }
 
 
@@ -255,6 +274,17 @@ class cLine {
 					this.characters[j].maatraaCumulative++;
 			}
 		};
+	}
+	adjustCharMaatraa(charIdx)
+	{
+		let thisChar = this.charByIndex(charIdx);
+		let oldMaatraa = thisChar.maatraa;
+		thisChar.adjustCharMaatraa();
+		let diff = thisChar.maatraa - oldMaatraa;
+		this.maatraa += diff;
+		let i;
+		for (i = charIdx; i < this.count; i++)
+			this.charByIndex(i).maatraaCumulative += diff;
 	}
 }
 
@@ -543,6 +573,8 @@ function adjustCharLen()
 	var k = parseInt(this.getAttribute("id").substring(4));
 	var i = parseInt(this.parentNode.getAttribute("id").substring(5));
 	var kk = 0;
+	oPoem.lines[i].adjustCharMaatraa(k);
+	draw();
 	/*if ((chars[i][k][3]%2 == 0) || ((chars[i][k][3]>6) && (chars[i][k][3]<11)))
 	{
 	  if (chars[i][k][4] == 1)
