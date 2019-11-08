@@ -396,7 +396,8 @@ function draw()
             return drawStyleCharBlock(d,'consonant');
         })
         .attr("d", function(d,i) {return drawVowPath(d,i);})
-        .attr("title", function(d,i) {return d.mainChar+d.vowelChar;});
+        .attr("title", function(d,i) {return d.mainChar+d.vowelChar;})
+        .on("click",adjustCharLen);
 
     // line total maatraa
     if (fFreeVerse) // line maatraa count numbers are clickable
@@ -534,4 +535,55 @@ function fnLineSpacing()
 {
 	fLineSpacing = !fLineSpacing;
 	draw();
+}
+
+// when user clicks char to reassign length
+function adjustCharLen()
+{
+	var k = parseInt(this.getAttribute("id").substring(4));
+	var i = parseInt(this.parentNode.getAttribute("id").substring(5));
+	var kk = 0;
+	/*if ((chars[i][k][3]%2 == 0) || ((chars[i][k][3]>6) && (chars[i][k][3]<11)))
+	{
+	  if (chars[i][k][4] == 1)
+	  {
+	    chars[i][k][4] = 2;
+	    for (kk = k; kk < chars[i].length; kk++)
+	      chars[i][kk][5] = chars[i][kk][5]+1;
+	    if (chars[i][kk-1][5] > maxLen)
+	        maxLen = chars[i][kk-1][5];
+	    draw();
+	    return;
+	  }
+	  if (chars[i][k][4] == 2)
+	  {
+	    chars[i][k][4] = 1;
+	    for (kk = k; kk < chars[i].length; kk++)
+	      chars[i][kk][5] = chars[i][kk][5]-1;
+	    draw();
+	    return;
+	  }
+	}
+	if (chars[i][k][3] == -1) // half letter
+	{
+	  if (chars[i][k][4] == 0)
+	  {
+	      chars[i][k][4] = 1;
+	      for (kk = k; kk < chars[i].length; kk++)
+	        chars[i][kk][5] = chars[i][kk][5]+1;
+	      if (chars[i][kk-1][5] > maxLen)
+	        maxLen = chars[i][kk-1][5];
+	      draw();
+	      return;
+	  }
+	  if (chars[i][k][4] == 1)
+	  {
+	      chars[i][k][4] = 0;
+	      for (kk = k; kk < chars[i].length; kk++)
+	        chars[i][kk][5] = chars[i][kk][5]-1;
+	      draw();
+	      return;
+	  }
+	}
+	*/
 }
