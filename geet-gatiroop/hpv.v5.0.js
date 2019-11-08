@@ -251,10 +251,9 @@ class cLine {
 				thisHalfLetter.maatraaCumulative += maatraa;
 				let j;
 				// update maatraaCumulative for all subsequent chars in line
-				for (j=thisHalfLetter.index+1;j<this.count;j++)
+				for (j = thisHalfLetter.index+1; j < this.count; j++)
 					this.characters[j].maatraaCumulative++;
 			}
-			
 		};
 	}
 }
@@ -284,6 +283,8 @@ function visualize()
 {
 	splitNprocessPoem();
 	draw();
+	// show controls
+	document.getElementById("divControls").style.display = "block";
 }
 
 function splitNprocessPoem()
@@ -346,7 +347,7 @@ function draw()
 	chart.select("svg").remove();
 	var svg = chart.append("svg")
 	          .attr("width", function() {return (fFreeVerse?charW*maxLen+120:charW*maxLen+100);})
-	          .attr("height", ((lineCount*(charW+lineSpacing))+(charW))+charW)
+	          .attr("height", function() {return (fLineSpacing?(lineCount*(charH+lineSpacing))+(charH*2):(lineCount*charH)+(charH*2));})
 	          .attr("style","border-bottom: solid 1px #ddd;");
 
 	// create the "g"s (svg groups) for each line
@@ -364,7 +365,7 @@ function draw()
 	else
 	{
 		var g = svg.selectAll("g")
-		.data(chars)
+		.data(oPoem.lines)
 		.enter().append("svg:g")
 		  .attr("transform", function(d,i) 
 		    { return "translate(" + paddingLeft + "," + ((i*(charH))+(charH)) + ")" })
@@ -374,7 +375,7 @@ function draw()
 	if (fShowText)
     {
         g.selectAll("text")               // char text
-          .data(function(d) {return d.characters;} )
+          .data(function(d) {return d.characters;} )  // d = line, subsequent d = characters
           .enter().append("svg:text")
             .attr("y", charH-2)
             .attr("x", function(d) {return drawCharTxtPos(d);})
@@ -382,6 +383,60 @@ function draw()
             //.attr("dominant-baseline", "central")
             .attr("text-anchor", "middle")
             .text(function(d) {return drawCharTxt(d);});
+    }
+
+    g.selectAll("path")
+      .data(function(d) {return d.characters;} ) // d = line, subsequent d = characters
+      .enter().append("path")
+        .attr("id", function(d,i) {return "char"+i})
+        .attr("style", function(d,i) {
+          if (fGhazal)
+            return drawStyleCharBlock(d,'ghazal');
+          else
+            return drawStyleCharBlock(d,'consonant');
+        })
+        .attr("d", function(d,i) {return drawVowPath(d,i);})
+        .attr("title", function(d,i) {return d.mainChar+d.vowelChar;});
+
+    // line total maatraa
+    if (fFreeVerse) // line maatraa count numbers are clickable
+    {
+      g.append("svg:text")            // line total maatraa
+      .attr("y", charH)
+      .attr("x", function(d) {return charW*maxLen+charW;})
+      //.attr("dominant-baseline", "central")
+      .attr("class", "graphText3")
+      .text(function(d) { return (d.length > 0) ? d[d.length-1][5] : "";})
+      .on("click",markCompositeLineTextDash);
+
+      // small dash beside maatraa count
+      g.append("svg:line")
+        //.attr("x1", function(d) {return charW*maxLen+(charW);})
+        .attr("x1", function(d,i) {return charW*maxLen+(charW*2);})
+        .attr("y1", function(d,i) {return charH+2;})
+        .attr("x2", function(d) {return charW*maxLen+(charW*2.3);})
+        .attr("y2", charH+2)
+        .attr("style", function(d,i) {return drawCompositeLine("styleSmall",i);})
+        .on("click",markCompositeLineTextDash);
+
+      // composite line marker
+      g.append("svg:line")
+        //.attr("x1", function(d) {return charW*maxLen+(charW);})
+        .attr("x1", function(d,i) {return drawCompositeLine("x1",i);})
+        .attr("y1", function(d,i) {return drawCompositeLine("y1",i);})
+        .attr("x2", function(d) {return charW*maxLen+(charW*2.3);})
+        .attr("y2", charH+2)
+        .attr("style", function(d,i) {return drawCompositeLine("styleMain",i);})
+        .on("click",unmarkCompositeLine);
+    }    
+    else  // normal - numbers are not clickable
+    {
+      g.append("svg:text")            // line total maatraa, d = line
+      .attr("y", charH)
+      .attr("x", function(d) {return charW*maxLen+(charW/2);})
+      //.attr("dominant-baseline", "central")
+      .attr("class", "graphText3")
+      .text(function(d) { return (d.maatraa > 0) ? d.maatraa : "";});
     }
 }
 
@@ -409,4 +464,74 @@ function drawCharTxt(d)
 	  }
 	}
 	return txt;
+}
+
+// style of char blocks - including color
+// c - the character to be styled
+// showConColor - boolean - whether the color is to be displayed or not
+function drawStyleCharBlock(c,colorBy)
+{
+
+	if (c.vowelNumber === -10) // do not display space, comma
+	  return "display: none";
+
+	var color = "white";
+	var strokeOp = "0.3";
+	var strokeW = 1;
+	var fillOp = "0.2";
+
+	// call conColor to determine color and opacity as per consonant
+	if (colorBy == 'consonant')
+	{
+	  	color = "rgb(0,220,255)"; // blue 
+	}
+
+	// unknown vowel, individual length unknown/0
+	// what are some examples when this occurs? 
+	// 1 eg. ऋ as in rishi, half maatraas
+	// any other examples? 
+	if ((c.vowelNumber == -1) && (c.maatraa == 0))
+	{
+	  color = "black";
+	  fillOp = "0.6";    
+	}
+
+	return "fill: "+color+"; fill-opacity: " + fillOp + ";stroke:black; stroke-width: "+strokeW+"; stroke-opacity: "+strokeOp;
+}
+
+// shapes' shape determined by vowel
+function drawVowPath(d,i)
+{
+	var p = "";
+	var x = ((d.maatraaCumulative-d.maatraa)*charW);  // where the drawing of this path has to start horizontally
+	var w = charW*d.maatraa;
+	var h = charH;
+	if ((d.vowelNumber == -1) && (d.maatraa == 0)) // half letter of 0 width
+	{
+	  w = 4;  // small black box on top
+	  h = 4;  // small black box on top
+	  x = x-2;  
+	  p = "M"+x+",0 L"+x+",-"+h + " L"+(x+w)+",-"+h+" L"+(x+w)+",0 z";
+	}
+	else
+	{
+	  // set all vowels to a to square or double width rectangle
+	  p = "M"+x+",0 L"+x+","+h + " L"+(x+w)+","+h+" L"+(x+w)+",0 z";
+	}
+	return p;
+}
+
+// toggle ShowText control
+function fnShowText()
+{
+	fShowText = !fShowText;
+	document.getElementById("chkShowText").checked = fShowText;
+	draw();
+}
+
+// toggle Line Spacing control
+function fnLineSpacing()
+{
+	fLineSpacing = !fLineSpacing;
+	draw();
 }
