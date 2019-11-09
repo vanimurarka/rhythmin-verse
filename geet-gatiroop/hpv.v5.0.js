@@ -460,14 +460,14 @@ function draw()
         .on("click",markCompositeLineTextDash);
 
       // composite line marker
-      // g.append("svg:line")
-      //   //.attr("x1", function(d) {return charW*maxLen+(charW);})
-      //   .attr("x1", function(d,i) {return drawCompositeLine("x1",i);})
-      //   .attr("y1", function(d,i) {return drawCompositeLine("y1",i);})
-      //   .attr("x2", function(d) {return charW*maxLen+(charW*2.3);})
-      //   .attr("y2", charH+2)
-      //   .attr("style", function(d,i) {return drawCompositeLine("styleMain",i);})
-      //   .on("click",unmarkCompositeLine);
+      g.append("svg:line")
+        //.attr("x1", function(d) {return charW*maxLen+(charW);})
+        .attr("x1", function(d,i) {return drawCompositeLineMarker("x1",i);})
+        .attr("y1", function(d,i) {return drawCompositeLineMarker("y1",i);})
+        .attr("x2", function(d) {return charW*maxLen+(charW*2.3);})
+        .attr("y2", charH+2)
+        .attr("style", function(d,i) {return drawCompositeLineMarker("style",i);});
+        // .on("click",unmarkCompositeLine);
     }    
     else  // normal - numbers are not clickable
     {
@@ -595,6 +595,39 @@ function drawFreeVerseDashStyle(i)
     draw();
   }
 
+function drawCompositeLineMarker(drawWhat,i)
+  {
+  	const maxLen = oPoem.maxLineLen;
+    if (drawWhat == "x1")
+    {
+      if (i==0)
+        return charW*maxLen+(charW*2);
+      if (oPoem.lines[i].isComposite)
+        return charW*maxLen+(charW*2.3);        
+      else
+        return charW*maxLen+(charW*2);
+    }
+    if (drawWhat == "y1")
+    {
+      if (oPoem.lines[i].isComposite)
+      {
+        if (fLineSpacing)
+          return -3;
+        else
+          return 0;
+      }               
+      else
+        return charH;
+    }
+    if (drawWhat == "style")
+    {
+      if ((oPoem.lines[i].maatraa == 0) || (!oPoem.lines[i].isComposite))  // empty line || not composite
+        return "display:none;";
+
+      return "stroke:black;stroke-width:4;"
+    }
+  }
+
 // toggle Line Spacing control
 function fnLineSpacing()
 {
@@ -624,7 +657,7 @@ function markCompositeLineTextDash()
 	// if not marked as composite
 	if ((i < oPoem.lines.length-1) && (!oPoem.lines[i+1].isComposite))
 	{
-	  oPoem.lines[i+1].isComposite = true; 
+	  oPoem.lines[i+1].isComposite = true; // why is the next line marked composite? 
 	  draw();
 	} 
 	// console.log(oPoem);
