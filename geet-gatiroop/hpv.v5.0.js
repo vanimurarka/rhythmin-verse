@@ -323,9 +323,13 @@ class cPoem {
 		if (this.maxLineLen < newMaatraaOfLine)
 			this.maxLineLen = newMaatraaOfLine;
 	}
+	setComposite(lineIdx)
+	{
+		this.lines[lineIdx].isComposite = !this.lines[lineIdx].isComposite;
+		this.calculateCompositeLines();
+	}
 	calculateCompositeLines()
 	{
-		debugger;
 		let compositeInProgress = false;
 		// reset composite lines array
 		this.compositeLines.length = 0;
@@ -362,10 +366,6 @@ class cPoem {
 				}
 			}
 		}
-		if (this.compositeLines.length > 0)
-		  return this.compositeLines;
-		else
-		  return false;
 	}
 }
 
@@ -422,7 +422,6 @@ var prevText = "";
 var prevBaseCount = 1;
 var fLineSpacing = true;
 var fFreeVerse = false;
-var compositeLinesMarkingA = [];
 var fGhazal = false;
 var radeef = '';
 var radeefArray = [];
@@ -688,21 +687,25 @@ function drawCompositeLineMarker(drawWhat,i)
 
 function drawCompositeNumbers()
 {
-	var dataComposite = oPoem.calculateCompositeLines();
-	var chart = d3.select("#chart");
-	var svg = chart.select("svg");
-	// if (fLineSpacing)
-	// {
-	// var compositeLTotal = svg.selectAll(".compositeCountT")
-	//   .data(dataComposite)
-	//   .enter().append("svg:text")
-	//   .attr("y", function(d) {return ((d[0]*(charH+lineSpacing))+(charH+lineSpacing)+charH);})
-	//   .attr("x", function(d) {return paddingLeft + 8 + charW*maxLen+(charW*2);})
-	//   .attr("class", "compositeCountT")
-	//   .attr("style", function(d) {return drawCompositeLine("styleCompositeLineMaatraa",d);})
-	//   .text(function(d) {return d[1];});
+	const maxLen = oPoem.maxLineLen;
+	let chart = d3.select("#chart");
+	let svg = chart.select("svg");
+	let y = 0;
+	if (fLineSpacing)
+		y = charH + lineSpacing;
+	else
+		y = charH;
+	let compositeLTotal = svg.selectAll(".compositeCountT")
+	  .data(oPoem.compositeLines)
+	  .enter().append("svg:text")
+	  .attr("y", function(d) {return ((d.originalLineIdx*y)+y+charH);})
+	  .attr("x", function(d) {return paddingLeft + 8 + charW*maxLen+(charW*2);})
+	  .attr("class", "compositeCountT")
+	  // .attr("style", function(d) {return drawCompositeLine("styleCompositeLineMaatraa",d);})
+	  .attr("style", function(d) {return "fill:black";})
+	  .text(function(d) {return d.maatraa;});
 
-	// var compositeLRemainder = svg.selectAll(".compositeCountR")
+	// let compositeLRemainder = svg.selectAll(".compositeCountR")
 	//   .data(dataComposite)
 	//   .enter().append("svg:text")
 	//   .attr("y", function(d) {return ((d[0]*(charH+lineSpacing))+(charH+lineSpacing)+charH)+10;})
@@ -710,27 +713,6 @@ function drawCompositeNumbers()
 	//   .attr("class", "compositeCountR")
 	//   .attr("style", function(d) {return "fill:red;font-size:80%";})
 	//   .text(function(d) {return drawCompositeLine("compositeRemainderValue",d);});
-	// }
-	// else
-	// {
-	// var compositeLTotal = svg.selectAll(".compositeCountT")
-	//   .data(dataComposite)
-	//   .enter().append("svg:text")
-	//   .attr("y", function(d) {return ((d[0]*charH)+charH+charH);})
-	//   .attr("x", function(d) {return paddingLeft + 8 + charW*maxLen+(charW*2);})
-	//   .attr("class", "compositeCountT")
-	//   .attr("style", function(d) {return drawCompositeLine("styleCompositeLineMaatraa",d);})
-	//   .text(function(d) {return d[1];});  
-
-	// var compositeLRemainder = svg.selectAll(".compositeCountR")
-	//   .data(dataComposite)
-	//   .enter().append("svg:text")
-	//   .attr("y", function(d) {return ((d[0]*charH)+charH+charH)+10;})
-	//   .attr("x", function(d) {return paddingLeft + 8 + charW*maxLen+(charW*2)+20;})
-	//   .attr("class", "compositeCountR")
-	//   .attr("style", function(d) {return "fill:red;font-size:80%";})
-	//   .text(function(d) {return drawCompositeLine("compositeRemainderValue",d);});  
-	// }
 }
 
 // toggle Line Spacing control
@@ -762,7 +744,7 @@ function markCompositeLine()
 	// if not marked as composite
 	if ((i < oPoem.lines.length-1) && (!oPoem.lines[i+1].isComposite))
 	{
-	  oPoem.lines[i+1].isComposite = !oPoem.lines[i+1].isComposite; // why is the next line marked composite? but it works
+	  oPoem.setComposite(i+1); // why is the next line marked composite? but it works
 	  draw();
 	} 
 }
@@ -775,7 +757,7 @@ function unmarkCompositeLine()
     // if true, the line is composite with top
     if (i > 0)
     {
-      oPoem.lines[i].isComposite = !oPoem.lines[i].isComposite; 
+      oPoem.setComposite(i); 
       draw();
     } 
   }
