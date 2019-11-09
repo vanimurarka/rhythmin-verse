@@ -191,6 +191,7 @@ class cLine {
 		this.characters = new Array();
 		this.count = 0;
 		this.maatraa = 0;
+		this.isComposite = false;
 	}
 	// change the vowel of the last character
 	lastCharVowel(vowelString)
@@ -342,7 +343,6 @@ function splitNprocessPoem()
         	charCode = lines[iLine].charCodeAt(k);
         	if ((charCode >= 2366) && (charCode <= 2381)) // maatraa
 			{
-				console.log(lines[iLine].substring(k,k+1));
 				// new element not added to line array
 				// the vowel part of previous element 
 				// modified to update maatraa
@@ -366,13 +366,11 @@ var charW = 20; // decrease charW to 20 from 24 earlier
 var charH = 20; // decrease charW to 20 from 24 earlier
 var paddingLeft = 10;
 var lineSpacing = 5;
-var mode = "analyze";
 var fShowText = true;
 var prevText = "";
 var prevBaseCount = 1;
 var fLineSpacing = true;
 var fFreeVerse = false;
-var selWord = 1;
 var compositeLinesMarkingA = [];
 var fGhazal = false;
 var radeef = '';
@@ -448,7 +446,7 @@ function draw()
       .attr("x", function(d) {return charW*maxLen+charW;})
       //.attr("dominant-baseline", "central")
       .attr("class", "graphText3")
-      .text(function(d) { return (d.length > 0) ? d[d.length-1][5] : "";})
+      .text(function(d) { return (d.maatraa > 0) ? d.maatraa : "";})
       .on("click",markCompositeLineTextDash);
 
       // small dash beside maatraa count
@@ -458,18 +456,18 @@ function draw()
         .attr("y1", function(d,i) {return charH+2;})
         .attr("x2", function(d) {return charW*maxLen+(charW*2.3);})
         .attr("y2", charH+2)
-        .attr("style", function(d,i) {return drawCompositeLine("styleSmall",i);})
+        .attr("style", function(d,i) {return drawFreeVerseDashStyle(i);})
         .on("click",markCompositeLineTextDash);
 
       // composite line marker
-      g.append("svg:line")
-        //.attr("x1", function(d) {return charW*maxLen+(charW);})
-        .attr("x1", function(d,i) {return drawCompositeLine("x1",i);})
-        .attr("y1", function(d,i) {return drawCompositeLine("y1",i);})
-        .attr("x2", function(d) {return charW*maxLen+(charW*2.3);})
-        .attr("y2", charH+2)
-        .attr("style", function(d,i) {return drawCompositeLine("styleMain",i);})
-        .on("click",unmarkCompositeLine);
+      // g.append("svg:line")
+      //   //.attr("x1", function(d) {return charW*maxLen+(charW);})
+      //   .attr("x1", function(d,i) {return drawCompositeLine("x1",i);})
+      //   .attr("y1", function(d,i) {return drawCompositeLine("y1",i);})
+      //   .attr("x2", function(d) {return charW*maxLen+(charW*2.3);})
+      //   .attr("y2", charH+2)
+      //   .attr("style", function(d,i) {return drawCompositeLine("styleMain",i);})
+      //   .on("click",unmarkCompositeLine);
     }    
     else  // normal - numbers are not clickable
     {
@@ -571,6 +569,32 @@ function fnShowText()
 	draw();
 }
 
+// draw composite line markers if free verse is on
+function drawFreeVerseDashStyle(i)
+  {
+      if (oPoem.lines[i].maatraa == 0)  // empty line
+        return "display:none;";
+
+      return "stroke:black;stroke-width:4;"
+  }
+
+// toggle Free Verse support
+  function fnFreeVerseSupport()
+  {
+    fFreeVerse = !fFreeVerse;
+    if (fFreeVerse)
+    {
+      document.getElementById("chkGhazal").disabled = true;
+      document.getElementById("spanFreeVerse").style.display = "inline";
+    }
+    else
+    {
+      document.getElementById("chkGhazal").disabled = false;
+      document.getElementById("spanFreeVerse").style.display = "none";
+    }
+    draw();
+  }
+
 // toggle Line Spacing control
 function fnLineSpacing()
 {
@@ -586,4 +610,22 @@ function adjustCharLen()
 	var kk = 0;
 	oPoem.adjustCharMaatraa(iLine,iChr);
 	draw();
+}
+
+// when free verse suppport is on
+// allows users to join multiple lines together for 
+// getting total maatraa count of a set of lines
+function markCompositeLineTextDash()
+{
+	// line clicked
+	let i = parseInt(this.parentNode.getAttribute("id").substring(5));
+
+	// if anything before last line
+	// if not marked as composite
+	if ((i < oPoem.lines.length-1) && (!oPoem.lines[i+1].isComposite))
+	{
+	  oPoem.lines[i+1].isComposite = true; 
+	  draw();
+	} 
+	// console.log(oPoem);
 }
