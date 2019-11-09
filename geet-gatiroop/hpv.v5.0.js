@@ -291,12 +291,21 @@ class cLine {
 	}
 }
 
+class compositeLine
+{
+	constructor(originalLineIdx) {
+		this.originalLineIdx = originalLineIdx;
+		this.maatraa = 0;
+	}
+}
+
 class cPoem {
 	constructor(originalText) {
 		this.originalText = originalText;
 		this.lines = new Array();
 		this.lineCount = 0;
 		this.maxLineLen = 0;
+		this.compositeLines = [];
 	}
 	pushLine(newLine)
 	{
@@ -313,8 +322,50 @@ class cPoem {
 		let newMaatraaOfLine = this.lines[lineIdx].adjustCharMaatraa(charIdx);
 		if (this.maxLineLen < newMaatraaOfLine)
 			this.maxLineLen = newMaatraaOfLine;
-
-		console.log(this.maxLineLen);
+	}
+	calculateCompositeLines()
+	{
+		debugger;
+		let compositeInProgress = false;
+		// reset composite lines array
+		this.compositeLines.length = 0;
+		if (this.lineCount > 1)
+		{
+			let i = 0;
+			for (i = 1; i < this.lines.length; i++)
+			{
+			if (this.lines[i].isComposite)  // is part of composite line
+				{
+				  if (!compositeInProgress) // new composite line
+				  {
+				    compositeInProgress = true;
+				    let len = this.compositeLines.length;
+				    this.compositeLines[len] = new compositeLine(i-1); // starting position in poem lines, line index is the *previous*
+				    this.compositeLines[len].maatraa = this.lines[i-1].maatraa;  // total maatraa count of prev (starting) line
+				    this.compositeLines[len].maatraa += this.lines[i].maatraa; // add total maatraa count of current line
+				  }
+				  else // in progress composite line
+				  {
+				    // just add to in progress composite line
+				    let len = this.compositeLines.length;
+				    //console.log(i);
+				    this.compositeLines[len-1].maatraa += this.lines[i].maatraa;
+				  }
+				}
+				else  // not part of composite line
+				{
+				  if (compositeInProgress)
+				  {
+				    // stop in progress
+				    compositeInProgress = false;
+				  }
+				}
+			}
+		}
+		if (this.compositeLines.length > 0)
+		  return this.compositeLines;
+		else
+		  return false;
 	}
 }
 
@@ -447,7 +498,7 @@ function draw()
       //.attr("dominant-baseline", "central")
       .attr("class", "graphText3")
       .text(function(d) { return (d.maatraa > 0) ? d.maatraa : "";})
-      .on("click",markCompositeLineTextDash);
+      .on("click",markCompositeLine);
 
       // small dash beside maatraa count
       g.append("svg:line")
@@ -457,7 +508,7 @@ function draw()
         .attr("x2", function(d) {return charW*maxLen+(charW*2.3);})
         .attr("y2", charH+2)
         .attr("style", function(d,i) {return drawFreeVerseDashStyle(i);})
-        .on("click",markCompositeLineTextDash);
+        .on("click",markCompositeLine);
 
       // composite line marker
       g.append("svg:line")
@@ -466,8 +517,8 @@ function draw()
         .attr("y1", function(d,i) {return drawCompositeLineMarker("y1",i);})
         .attr("x2", function(d) {return charW*maxLen+(charW*2.3);})
         .attr("y2", charH+2)
-        .attr("style", function(d,i) {return drawCompositeLineMarker("style",i);});
-        // .on("click",unmarkCompositeLine);
+        .attr("style", function(d,i) {return drawCompositeLineMarker("style",i);})
+        .on("click",unmarkCompositeLine);
     }    
     else  // normal - numbers are not clickable
     {
@@ -478,6 +529,13 @@ function draw()
       .attr("class", "graphText3")
       .text(function(d) { return (d.maatraa > 0) ? d.maatraa : "";});
     }
+
+    if (fFreeVerse)
+    {
+    	// composite line total maatraa
+    	drawCompositeNumbers();
+    }
+    
 }
 
 // helper for draw function to place text in correct position
@@ -628,6 +686,53 @@ function drawCompositeLineMarker(drawWhat,i)
     }
   }
 
+function drawCompositeNumbers()
+{
+	var dataComposite = oPoem.calculateCompositeLines();
+	var chart = d3.select("#chart");
+	var svg = chart.select("svg");
+	// if (fLineSpacing)
+	// {
+	// var compositeLTotal = svg.selectAll(".compositeCountT")
+	//   .data(dataComposite)
+	//   .enter().append("svg:text")
+	//   .attr("y", function(d) {return ((d[0]*(charH+lineSpacing))+(charH+lineSpacing)+charH);})
+	//   .attr("x", function(d) {return paddingLeft + 8 + charW*maxLen+(charW*2);})
+	//   .attr("class", "compositeCountT")
+	//   .attr("style", function(d) {return drawCompositeLine("styleCompositeLineMaatraa",d);})
+	//   .text(function(d) {return d[1];});
+
+	// var compositeLRemainder = svg.selectAll(".compositeCountR")
+	//   .data(dataComposite)
+	//   .enter().append("svg:text")
+	//   .attr("y", function(d) {return ((d[0]*(charH+lineSpacing))+(charH+lineSpacing)+charH)+10;})
+	//   .attr("x", function(d) {return paddingLeft + 8 + charW*maxLen+(charW*2)+20;})
+	//   .attr("class", "compositeCountR")
+	//   .attr("style", function(d) {return "fill:red;font-size:80%";})
+	//   .text(function(d) {return drawCompositeLine("compositeRemainderValue",d);});
+	// }
+	// else
+	// {
+	// var compositeLTotal = svg.selectAll(".compositeCountT")
+	//   .data(dataComposite)
+	//   .enter().append("svg:text")
+	//   .attr("y", function(d) {return ((d[0]*charH)+charH+charH);})
+	//   .attr("x", function(d) {return paddingLeft + 8 + charW*maxLen+(charW*2);})
+	//   .attr("class", "compositeCountT")
+	//   .attr("style", function(d) {return drawCompositeLine("styleCompositeLineMaatraa",d);})
+	//   .text(function(d) {return d[1];});  
+
+	// var compositeLRemainder = svg.selectAll(".compositeCountR")
+	//   .data(dataComposite)
+	//   .enter().append("svg:text")
+	//   .attr("y", function(d) {return ((d[0]*charH)+charH+charH)+10;})
+	//   .attr("x", function(d) {return paddingLeft + 8 + charW*maxLen+(charW*2)+20;})
+	//   .attr("class", "compositeCountR")
+	//   .attr("style", function(d) {return "fill:red;font-size:80%";})
+	//   .text(function(d) {return drawCompositeLine("compositeRemainderValue",d);});  
+	// }
+}
+
 // toggle Line Spacing control
 function fnLineSpacing()
 {
@@ -648,7 +753,7 @@ function adjustCharLen()
 // when free verse suppport is on
 // allows users to join multiple lines together for 
 // getting total maatraa count of a set of lines
-function markCompositeLineTextDash()
+function markCompositeLine()
 {
 	// line clicked
 	let i = parseInt(this.parentNode.getAttribute("id").substring(5));
@@ -657,8 +762,20 @@ function markCompositeLineTextDash()
 	// if not marked as composite
 	if ((i < oPoem.lines.length-1) && (!oPoem.lines[i+1].isComposite))
 	{
-	  oPoem.lines[i+1].isComposite = true; // why is the next line marked composite? 
+	  oPoem.lines[i+1].isComposite = !oPoem.lines[i+1].isComposite; // why is the next line marked composite? but it works
 	  draw();
 	} 
-	// console.log(oPoem);
 }
+
+function unmarkCompositeLine()
+  {
+    // line clicked
+    var i = parseInt(this.parentNode.getAttribute("id").substring(5));
+    // toggle composite line setting
+    // if true, the line is composite with top
+    if (i > 0)
+    {
+      oPoem.lines[i].isComposite = !oPoem.lines[i].isComposite; 
+      draw();
+    } 
+  }
