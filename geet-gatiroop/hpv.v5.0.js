@@ -690,11 +690,13 @@ function drawCompositeNumbers()
 	const maxLen = oPoem.maxLineLen;
 	let chart = d3.select("#chart");
 	let svg = chart.select("svg");
+	
 	let y = 0;
 	if (fLineSpacing)
 		y = charH + lineSpacing;
 	else
 		y = charH;
+
 	let compositeLTotal = svg.selectAll(".compositeCountT")
 	  .data(oPoem.compositeLines)
 	  .enter().append("svg:text")
