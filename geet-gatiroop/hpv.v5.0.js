@@ -527,6 +527,8 @@ function splitNprocessPoem()
     {
     	const oLine = new cLine();
     	// debugger;
+    	lines[iLine] = lines[iLine].replace(/\s+/g, " "); // remove extra spaces in-between words
+    	lines[iLine] = lines[iLine].trim(); // remove whitespace from both ends
         for (k=0;k<lines[iLine].length;k++) // process each char: k = char index
         {
         	charCode = lines[iLine].charCodeAt(k);
