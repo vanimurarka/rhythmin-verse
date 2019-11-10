@@ -471,7 +471,7 @@ class cPoem {
 	      radeefArray.length = i;
 	      radeef = realRadeef;
 	    }
-	    
+	    // *** seen till here
 	    // the characters in this radeefArray is in reverse order
 	    let radeefArrayLen = radeefArray.length;
 	    // now mark radeef chars in all relevant lines
