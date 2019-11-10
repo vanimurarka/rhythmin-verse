@@ -13,6 +13,7 @@ class cChar {
 		this.maatraa = 0;
 		this.maatraaCumulative = 0;
 		this.isRadeef = false;
+		this.isKaafiyaa = false;
 
 		// space / comma OR whole vowel 
         if (((mainCharCode == 32)||(mainCharCode == 44)) || ((mainCharCode >= 2309) && (mainCharCode <= 2324)))
@@ -200,6 +201,15 @@ class cChar {
 		  }
 		}
 		return txt;
+	}
+	// this is different from get text in that it returns all chars, even non-hindi ones
+	get joinedConsonantVowel() 
+	{
+		if (this.mainChar==this.vowelChar)
+		  return this.vowelChar; // c is also a vowel - like आ आ
+		if (this.vowelChar == 'अ')
+		  return this.mainChar; // could be a case of न अ 
+		return this.mainChar+this.vowelChar;
 	}
 }
 
@@ -418,14 +428,14 @@ class cPoem {
 	}
 	calculateRadeef()
 	{
+		debugger;
 	    let radeef = '';
 	    let radeefArray = [];
 	    let radeefTruncated = 0;
 
 	    let radeef1, radeef2;
-	    let linelen1,linelen2;
 	    let linelen1 = this.lines[0].count;
-	    let linelen2 = this.lines[0].count;
+	    let linelen2 = this.lines[1].count;
 
 	    let foundRadeefEnd = false;
 	    let i = linelen1 - 1; // first line index
@@ -433,8 +443,8 @@ class cPoem {
 
 	    while ((!foundRadeefEnd) && (i >= 0) && (j >= 0))
 	    {
-	      radeef1 = this.lines[0].characters[i].text;
-	      radeef2 = this.lines[1].characters[j].text;
+	      radeef1 = this.lines[0].characters[i].joinedConsonantVowel;
+	      radeef2 = this.lines[1].characters[j].joinedConsonantVowel;
 
 	      if (radeef1 == radeef2)
 	      {
@@ -475,7 +485,7 @@ class cPoem {
 	    // the characters in this radeefArray is in reverse order
 	    let radeefArrayLen = radeefArray.length;
 	    // now mark radeef chars in all relevant lines
-	    for (let i = 0; i < this.lines.length; i++) {
+	    for (i = 0; i < this.lines.length; i++) {
 	      let supposedlyRelevantLine = false;
 	      // first 2 lines
 	      if (i<=1) supposedlyRelevantLine = true;
@@ -483,7 +493,7 @@ class cPoem {
 	      if ((i>1) && (i<(this.lines.length-1)) && (this.lines[i+1].length==0)) supposedlyRelevantLine = true;
 	      // last line
 	      if (i==(this.lines.length-1)) supposedlyRelevantLine = true;
-	      let linelen = this.lines[i].length;
+	      let linelen = this.lines[i].characters.length;
 	      if ((supposedlyRelevantLine) && (linelen > radeefArrayLen))
 	      {
 	        for (let j = 0; j < radeefArrayLen; j++) {
@@ -691,6 +701,19 @@ function drawStyleCharBlock(c,colorBy)
 	{
 	  	color = "rgb(0,220,255)"; // blue 
 	}
+	if (colorBy == 'ghazal')
+    {
+      if (c.isRadeef) // is a radeef char
+      {
+        color = "rgb(0,220,255)"; // blue
+        fillOp = "0.5";
+      }
+      if (c.isKaafiyaa) // is a kaafiyaa char
+      {
+        color = "rgb(0,255,0)"; // green
+        fillOp = "0.5";
+      }
+    }
 
 	// unknown vowel, individual length unknown/0
 	// what are some examples when this occurs? 
@@ -888,4 +911,21 @@ function fnBaseCountChange()
     {
       document.getElementById("baseCount").value = prevBaseCount;
     }
+  }
+
+function fnGhazal()
+  {
+    fGhazal = !fGhazal;
+    if (fGhazal)
+    {
+      document.getElementById("chkFreeVerse").disabled = true;
+      oPoem.calculateRadeef();
+      // calculateKaafiyaa();
+    }
+    else
+    {
+      document.getElementById("chkFreeVerse").disabled = false;
+    }
+    console.log(oPoem);
+    draw();
   }
