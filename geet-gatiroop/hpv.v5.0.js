@@ -417,7 +417,87 @@ class cPoem {
 	}
 	calculateRadeef()
 	{
+	    let radeef = '';
+	    let radeefArray = [];
+	    let radeefTruncated = 0;
 
+	    let radeef1, radeef2;
+	    let linelen1,linelen2;
+	    let linelen1 = this.lines[0].count;
+	    let linelen2 = this.lines[0].count;
+
+	    let foundRadeefEnd = false;
+	    let i = linelen1 - 1; // first line index
+	    let j = linelen2 - 1; // second line index
+
+	    while ((!foundRadeefEnd) && (i >= 0) && (j >= 0))
+	    {
+	      radeef1 = this.lines[0].characters[i].text;
+	      radeef2 = this.lines[1].characters[j].text;
+
+	      if (radeef1 == radeef2)
+	      {
+	        radeef = radeef1 + radeef;
+	        radeefArray[radeefArray.length] = [];
+	        radeefArray[radeefArray.length - 1][0] = this.lines[0].characters[i].mainChar;
+	        radeefArray[radeefArray.length - 1][1] = this.lines[0].characters[i].vowelChar;
+	        i--;
+	        j--;
+	      }
+	      else
+	      {
+	        foundRadeefEnd = true;
+	      }
+	    }
+
+	    // cut out the last part of calculated radeef if it has a space and an incomplete word.
+	    // eg. for 
+	    // कोई उम्मीद बर नहीं आती
+	    // कोई सूरत नज़र नहीं आती
+	    // sys will calculate radeef as as "र नहीं आती" because that is common between top and bottom line
+	    // but radeef is "नहीं आती"
+	    let realRadeef = radeef.substr(radeef.indexOf(' ')+1);
+	    // console.log(radeef);
+
+	    // truncate radeefArray too
+	    // if clause implies a truncation did occur in the above substr code, and hence array has to be truncated 
+	    if (radeef !== realRadeef) 
+	    {
+	      radeefTruncated = 1;
+	      for (i = radeefArray.length - 1; i >= 0 ; i--) 
+	      {
+	        if (radeefArray[i][0] == " ") break;
+	      }
+	      radeefArray.length = i;
+	      radeef = realRadeef;
+	    }
+	    
+	    // the characters in this radeefArray is in reverse order
+	    let radeefArrayLen = radeefArray.length;
+	    // now mark radeef chars in all relevant lines
+	    for (let i = 0; i < chars.length; i++) {
+	      let supposedlyRelevantLine = false;
+	      // first 2 lines
+	      if (i<=1) supposedlyRelevantLine = true;
+	      // intermediate line followed by blank line
+	      if ((i>1) && (i<(chars.length-1)) && (chars[i+1].length==0)) supposedlyRelevantLine = true;
+	      // last line
+	      if (i==(chars.length-1)) supposedlyRelevantLine = true;
+	      let linelen = chars[i].length;
+	      if ((supposedlyRelevantLine) && (linelen > radeefArrayLen))
+	      {
+	        
+	        for (let j = 0; j < radeefArrayLen; j++) {
+	          if ((radeefArray[j][0] == chars[i][linelen-1-j][0]) && (radeefArray[j][1] == chars[i][linelen-1-j][1]))
+	            chars[i][linelen-1-j][6] = 'r';
+	          else
+	            break;
+	        }
+	        // console.log('line '+i);
+	        // console.log(chars[i]);
+	        // break;
+	      }
+	    }
 	}
 }
 
