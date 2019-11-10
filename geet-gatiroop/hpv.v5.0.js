@@ -183,6 +183,23 @@ class cChar {
 				this.maatraa = 0;
 		}
 	}
+	// return full text mainchar + vowelchar
+	get text()
+	{
+		let txt = "";
+		if ((this.vowelNumber != -10) && (this.vowelNumber != 0))  // hindi character
+		{
+		  if (this.isPureVowel()||(this.vowelNumber == 1))
+		  {
+		    txt = this.mainChar;
+		  }
+		  else
+		  {
+		    txt = this.mainChar+this.vowelChar;
+		  }
+		}
+		return txt;
+	}
 }
 
 
@@ -296,6 +313,7 @@ class compositeLine
 	constructor(originalLineIdx) {
 		this.originalLineIdx = originalLineIdx;
 		this.maatraa = 0;
+		this.remainder = 0;
 	}
 }
 
@@ -306,6 +324,7 @@ class cPoem {
 		this.lineCount = 0;
 		this.maxLineLen = 0;
 		this.compositeLines = [];
+		this.baseCount = 1;
 	}
 	pushLine(newLine)
 	{
@@ -326,9 +345,14 @@ class cPoem {
 	setComposite(lineIdx)
 	{
 		this.lines[lineIdx].isComposite = !this.lines[lineIdx].isComposite;
-		this.calculateCompositeLines();
+		this.calculateCompositeMaatraa();
 	}
-	calculateCompositeLines()
+	setBaseCount(baseCount)
+	{
+		this.baseCount = baseCount;
+		this.calculateCompositeMaatraa();
+	}
+	calculateCompositeMaatraa()
 	{
 		let compositeInProgress = false;
 		// reset composite lines array
@@ -340,21 +364,25 @@ class cPoem {
 			{
 			if (this.lines[i].isComposite)  // is part of composite line
 				{
-				  if (!compositeInProgress) // new composite line
-				  {
-				    compositeInProgress = true;
-				    let len = this.compositeLines.length;
-				    this.compositeLines[len] = new compositeLine(i-1); // starting position in poem lines, line index is the *previous*
-				    this.compositeLines[len].maatraa = this.lines[i-1].maatraa;  // total maatraa count of prev (starting) line
-				    this.compositeLines[len].maatraa += this.lines[i].maatraa; // add total maatraa count of current line
-				  }
-				  else // in progress composite line
-				  {
-				    // just add to in progress composite line
-				    let len = this.compositeLines.length;
-				    //console.log(i);
-				    this.compositeLines[len-1].maatraa += this.lines[i].maatraa;
-				  }
+					let len = this.compositeLines.length;
+					if (!compositeInProgress) // new composite line
+					{
+						compositeInProgress = true;
+						this.compositeLines[len] = new compositeLine(i-1); // starting position in poem lines, line index is the *previous*
+						this.compositeLines[len].maatraa = this.lines[i-1].maatraa;  // total maatraa count of prev (starting) line
+						this.compositeLines[len].maatraa += this.lines[i].maatraa; // add total maatraa count of current line
+					}
+					else // in progress composite line
+					{
+						// just add to in progress composite line
+						this.compositeLines[len-1].maatraa += this.lines[i].maatraa;
+					}
+					// set whether the composite maatraa is multiple of base count
+					if ((this.compositeLines[len].maatraa % this.baseCount) == 0)
+					  this.compositeLines[len].multipleOfBaseCount = true;
+					else
+					  this.compositeLines[len].multipleOfBaseCount = false;
+					this.calculateRemainder(len);
 				}
 				else  // not part of composite line
 				{
@@ -366,6 +394,30 @@ class cPoem {
 				}
 			}
 		}
+	}
+	calculateRemainder(compositeIdx)
+	{
+		if (this.baseCount > 1)
+		{
+			let compositeMaatraa = this.compositeLines[compositeIdx].maatraa;
+			let remainder = compositeMaatraa % this.baseCount;
+			if (remainder != 0)
+			{
+				let result = compositeMaatraa/this.baseCount;
+				let whole = parseInt(result);
+				let remainderInDecimal = result - whole;
+				if (remainderInDecimal <= 0.5)
+					this.compositeLines[compositeIdx].remainder = remainder;
+				else
+					this.compositeLines[compositeIdx].remainder = (((whole+1)*this.baseCount)-compositeMaatraa)*-1;
+			}
+		}
+		else
+			this.compositeLines[compositeIdx].remainder = 0;
+	}
+	calculateRadeef()
+	{
+
 	}
 }
 
@@ -419,7 +471,6 @@ var paddingLeft = 10;
 var lineSpacing = 5;
 var fShowText = true;
 var prevText = "";
-var prevBaseCount = 1;
 var fLineSpacing = true;
 var fFreeVerse = false;
 var fGhazal = false;
@@ -471,7 +522,7 @@ function draw()
             .attr("class", "graphText3")
             //.attr("dominant-baseline", "central")
             .attr("text-anchor", "middle")
-            .text(function(d) {return drawCharTxt(d);});
+            .text(function(d) {return d.text;});
     }
 
     g.selectAll("path")
@@ -543,24 +594,6 @@ function drawCharTxtPos(d)
 	var x = ((d.maatraaCumulative-d.maatraa)*charW);
 	var w = charW*d.maatraa;
 	return x+(w/2);
-}
-
-// helper for draw function to show text
-function drawCharTxt(d)
-{
-	var txt = "";
-	if ((d.vowelNumber != -10) && (d.vowelNumber != 0))  // hindi character
-	{
-	  if (d.isPureVowel()||(d.vowelNumber == 1))
-	  {
-	    txt = d.mainChar;
-	  }
-	  else
-	  {
-	    txt = d.mainChar+d.vowelChar;
-	  }
-	}
-	return txt;
 }
 
 // style of char blocks - including color
@@ -703,18 +736,18 @@ function drawCompositeNumbers()
 	  .attr("y", function(d) {return ((d.originalLineIdx*y)+y+charH);})
 	  .attr("x", function(d) {return paddingLeft + 8 + charW*maxLen+(charW*2);})
 	  .attr("class", "compositeCountT")
-	  // .attr("style", function(d) {return drawCompositeLine("styleCompositeLineMaatraa",d);})
-	  .attr("style", function(d) {return "fill:black";})
+	  .attr("style", function(d) {return d.multipleOfBaseCount?"fill:black":"fill:red";})
+	  // .attr("style", function(d) {return "fill:black";})
 	  .text(function(d) {return d.maatraa;});
 
-	// let compositeLRemainder = svg.selectAll(".compositeCountR")
-	//   .data(dataComposite)
-	//   .enter().append("svg:text")
-	//   .attr("y", function(d) {return ((d[0]*(charH+lineSpacing))+(charH+lineSpacing)+charH)+10;})
-	//   .attr("x", function(d) {return paddingLeft + 8 + charW*maxLen+(charW*2)+20;})
-	//   .attr("class", "compositeCountR")
-	//   .attr("style", function(d) {return "fill:red;font-size:80%";})
-	//   .text(function(d) {return drawCompositeLine("compositeRemainderValue",d);});
+	let compositeLRemainder = svg.selectAll(".compositeCountR")
+	  .data(oPoem.compositeLines)
+	  .enter().append("svg:text")
+	  .attr("y", function(d) {return ((d.originalLineIdx*y)+y+charH)+10;})
+	  .attr("x", function(d) {return paddingLeft + 8 + charW*maxLen+(charW*2)+20;})
+	  .attr("class", "compositeCountR")
+	  .attr("style", function(d) {return d.remainder!=0?"fill:red;font-size:80%":"display:none";})
+	  .text(function(d) {return d.remainder>0?"+"+d.remainder:d.remainder;});
 }
 
 // toggle Line Spacing control
@@ -762,4 +795,21 @@ function unmarkCompositeLine()
       oPoem.setComposite(i); 
       draw();
     } 
+  }
+
+function fnBaseCountChange()
+  {
+    let baseC = parseInt(document.getElementById("baseCount").value);
+    if (baseC > 0)
+    {
+      if (baseC != oPoem.baseCount)
+      {
+        oPoem.setBaseCount(baseC);
+        draw();
+      }
+    }
+    else
+    {
+      document.getElementById("baseCount").value = prevBaseCount;
+    }
   }
