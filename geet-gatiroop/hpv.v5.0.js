@@ -12,6 +12,7 @@ class cChar {
 		this.index = 0;
 		this.maatraa = 0;
 		this.maatraaCumulative = 0;
+		this.isRadeef = false;
 
 		// space / comma OR whole vowel 
         if (((mainCharCode == 32)||(mainCharCode == 44)) || ((mainCharCode >= 2309) && (mainCharCode <= 2324)))
@@ -471,31 +472,26 @@ class cPoem {
 	      radeefArray.length = i;
 	      radeef = realRadeef;
 	    }
-	    // *** seen till here
 	    // the characters in this radeefArray is in reverse order
 	    let radeefArrayLen = radeefArray.length;
 	    // now mark radeef chars in all relevant lines
-	    for (let i = 0; i < chars.length; i++) {
+	    for (let i = 0; i < this.lines.length; i++) {
 	      let supposedlyRelevantLine = false;
 	      // first 2 lines
 	      if (i<=1) supposedlyRelevantLine = true;
 	      // intermediate line followed by blank line
-	      if ((i>1) && (i<(chars.length-1)) && (chars[i+1].length==0)) supposedlyRelevantLine = true;
+	      if ((i>1) && (i<(this.lines.length-1)) && (this.lines[i+1].length==0)) supposedlyRelevantLine = true;
 	      // last line
-	      if (i==(chars.length-1)) supposedlyRelevantLine = true;
-	      let linelen = chars[i].length;
+	      if (i==(this.lines.length-1)) supposedlyRelevantLine = true;
+	      let linelen = this.lines[i].length;
 	      if ((supposedlyRelevantLine) && (linelen > radeefArrayLen))
 	      {
-	        
 	        for (let j = 0; j < radeefArrayLen; j++) {
-	          if ((radeefArray[j][0] == chars[i][linelen-1-j][0]) && (radeefArray[j][1] == chars[i][linelen-1-j][1]))
-	            chars[i][linelen-1-j][6] = 'r';
+	          if ((radeefArray[j][0] == this.lines[i].characters[linelen-1-j].mainChar) && (radeefArray[j][1] == this.lines[i].characters[linelen-1-j].vowelChar))
+	            this.lines[i].characters[linelen-1-j].isRadeef = true;
 	          else
 	            break;
 	        }
-	        // console.log('line '+i);
-	        // console.log(chars[i]);
-	        // break;
 	      }
 	    }
 	}
