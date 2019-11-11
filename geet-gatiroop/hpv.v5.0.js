@@ -38,7 +38,7 @@ class cChar {
 			case "अ": 
 				this.vowelNumber = 1;
 				break;
-			case "आ": case "ा": case "ॉ":
+			case "आ": case "ा": 
 				this.vowelNumber = 2;
 				break;
 			case "इ": case "ि":
@@ -65,8 +65,11 @@ class cChar {
 			case "औ": case "ौ":
 				this.vowelNumber = 10;
 				break;
-			case "ृ":
+			case "ऑ": case "ॉ":
 				this.vowelNumber = 11;
+				break;
+			case "ऋ": case "ृ":
+				this.vowelNumber = 12;
 				break;
 			default:
 				this.vowelNumber = -10;
@@ -74,10 +77,10 @@ class cChar {
 		// set char maatraa as per vowel
 		switch (this.vowelNumber)
         {
-			case 1: case 3: case 5: case 11:
+			case 1: case 3: case 5: case 12:
 				this.maatraa = 1;
 				break;
-            case 2: case 4: case 6: case 8: case 10: case 7: case 9: case 10:
+            case 2: case 4: case 6: case 8: case 10: case 7: case 9: case 10: case 11:
 				this.maatraa = 2;
 				break;
 			default:
@@ -99,7 +102,7 @@ class cChar {
     {
     	switch(this.vowelNumber)
     	{
-    		case 1: case 3: case 5: case 11:
+    		case 1: case 3: case 5: case 12:
     			return true;
     			break;
     		default:
@@ -170,7 +173,7 @@ class cChar {
 	{
 		// whole chars
 		//    aa, ee, oo                        all other deergha
-		if ((this.vowelNumber%2 == 0) || ((this.vowelNumber>6) && (this.vowelNumber<11)))
+		if ((this.vowelNumber%2 == 0) || ((this.vowelNumber>6) && (this.vowelNumber<12)))
 		{
 		  if (this.maatraa == 1)
 		    this.maatraa = 2;
