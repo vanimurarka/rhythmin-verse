@@ -562,6 +562,7 @@ class cPoem {
 }
 
 var oPoem;
+var oPrevPoem;
 
 function visualize()
 {
@@ -611,6 +612,8 @@ function splitNprocessPoem()
         oLine.calculateHalfLettersMaatraa();
         oPoem.pushLine(oLine);
     }
+    delete oPrevPoem;
+    oPrevPoem = oPoem;
     console.log(oPoem);
 }
 
@@ -619,13 +622,9 @@ var charH = 20; // decrease charW to 20 from 24 earlier
 var paddingLeft = 10;
 var lineSpacing = 5;
 var fShowText = true;
-var prevText = "";
 var fLineSpacing = true;
 var fFreeVerse = false;
 var fGhazal = false;
-var radeef = '';
-var radeefArray = [];
-var radeefTruncated = 0;
 
 // the D3 draw dance!
 function draw()
