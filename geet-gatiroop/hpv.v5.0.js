@@ -1,9 +1,4 @@
 class cChar {
-    /* MEMBER VARIABLES
-    mainChar
-    vowelChar
-    consonantNumber
-    vowelNumber*/
     constructor(mainChar, mainCharCode) {
 		this.mainChar = mainChar;
 		this.mainCharCode = mainCharCode;
@@ -339,6 +334,7 @@ class cPoem {
 		this.maxLineLen = 0;
 		this.compositeLines = [];
 		this.baseCount = 1;
+		this.radeefArray = [];
 	}
 	pushLine(newLine)
 	{
@@ -433,7 +429,7 @@ class cPoem {
 	{
 		debugger;
 	    let radeef = '';
-	    let radeefArray = [];
+	    this.radeefArray = [];
 	    let radeefTruncated = 0;
 
 	    let radeef1, radeef2;
@@ -452,9 +448,9 @@ class cPoem {
 	      if (radeef1 == radeef2)
 	      {
 	        radeef = radeef1 + radeef;
-	        radeefArray[radeefArray.length] = [];
-	        radeefArray[radeefArray.length - 1][0] = this.lines[0].characters[i].mainChar;
-	        radeefArray[radeefArray.length - 1][1] = this.lines[0].characters[i].vowelChar;
+	        this.radeefArray[this.radeefArray.length] = [];
+	        this.radeefArray[this.radeefArray.length - 1][0] = this.lines[0].characters[i].mainChar;
+	        this.radeefArray[this.radeefArray.length - 1][1] = this.lines[0].characters[i].vowelChar;
 	        i--;
 	        j--;
 	      }
@@ -478,15 +474,15 @@ class cPoem {
 	    if (radeef !== realRadeef) 
 	    {
 	      radeefTruncated = 1;
-	      for (i = radeefArray.length - 1; i >= 0 ; i--) 
+	      for (i = this.radeefArray.length - 1; i >= 0 ; i--) 
 	      {
-	        if (radeefArray[i][0] == " ") break;
+	        if (this.radeefArray[i][0] == " ") break;
 	      }
-	      radeefArray.length = i;
+	      this.radeefArray.length = i;
 	      radeef = realRadeef;
 	    }
 	    // the characters in this radeefArray is in reverse order
-	    let radeefArrayLen = radeefArray.length;
+	    let radeefLen = this.radeefArray.length;
 	    // now mark radeef chars in all relevant lines
 	    for (i = 0; i < this.lines.length; i++) {
 	      let supposedlyRelevantLine = false;
@@ -497,10 +493,10 @@ class cPoem {
 	      // last line
 	      if (i==(this.lines.length-1)) supposedlyRelevantLine = true;
 	      let linelen = this.lines[i].characters.length;
-	      if ((supposedlyRelevantLine) && (linelen > radeefArrayLen))
+	      if ((supposedlyRelevantLine) && (linelen > radeefLen))
 	      {
-	        for (let j = 0; j < radeefArrayLen; j++) {
-	          if ((radeefArray[j][0] == this.lines[i].characters[linelen-1-j].mainChar) && (radeefArray[j][1] == this.lines[i].characters[linelen-1-j].vowelChar))
+	        for (let j = 0; j < radeefLen; j++) {
+	          if ((this.radeefArray[j][0] == this.lines[i].characters[linelen-1-j].mainChar) && (this.radeefArray[j][1] == this.lines[i].characters[linelen-1-j].vowelChar))
 	            this.lines[i].characters[linelen-1-j].isRadeef = true;
 	          else
 	            break;
