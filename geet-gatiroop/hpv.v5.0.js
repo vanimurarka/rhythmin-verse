@@ -490,7 +490,7 @@ class cPoem {
 	      // first 2 lines
 	      if (i<=1) supposedlyRelevantLine = true;
 	      // intermediate line followed by blank line
-	      if ((i>1) && (i<(this.lines.length-1)) && (this.lines[i+1].length==0)) supposedlyRelevantLine = true;
+	      if ((i>1) && (i<(this.lines.length-1)) && (this.lines[i+1].characters.length==0)) supposedlyRelevantLine = true;
 	      // last line
 	      if (i==(this.lines.length-1)) supposedlyRelevantLine = true;
 	      let linelen = this.lines[i].characters.length;
@@ -512,6 +512,11 @@ var oPoem;
 function visualize()
 {
 	splitNprocessPoem();
+	if (fGhazal)
+    {
+      oPoem.calculateRadeef();
+      // calculateKaafiyaa();
+    }
 	draw();
 	// show controls
 	document.getElementById("divControls").style.display = "block";
@@ -527,6 +532,8 @@ function splitNprocessPoem()
     {
     	const oLine = new cLine();
     	// debugger;
+    	lines[iLine] = lines[iLine].replace(/[^\u0900-\u097F ]/g, " "); // replace non-devnagari chars with space
+    	lines[iLine] = lines[iLine].replace("।"," ");
     	lines[iLine] = lines[iLine].replace(/\s+/g, " "); // remove extra spaces in-between words
     	lines[iLine] = lines[iLine].trim(); // remove whitespace from both ends
         for (k=0;k<lines[iLine].length;k++) // process each char: k = char index
