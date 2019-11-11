@@ -334,6 +334,7 @@ class cPoem {
 		this.maxLineLen = 0;
 		this.compositeLines = [];
 		this.baseCount = 1;
+		this.radeefTruncated = 0;
 		this.radeefArray = [];
 	}
 	pushLine(newLine)
@@ -427,10 +428,8 @@ class cPoem {
 	}
 	calculateRadeef()
 	{
-		debugger;
 	    let radeef = '';
 	    this.radeefArray = [];
-	    let radeefTruncated = 0;
 
 	    let radeef1, radeef2;
 	    let linelen1 = this.lines[0].count;
@@ -473,7 +472,7 @@ class cPoem {
 	    // if clause implies a truncation did occur in the above substr code, and hence array has to be truncated 
 	    if (radeef !== realRadeef) 
 	    {
-	      radeefTruncated = 1;
+	      this.radeefTruncated = 1;
 	      for (i = this.radeefArray.length - 1; i >= 0 ; i--) 
 	      {
 	        if (this.radeefArray[i][0] == " ") break;
@@ -504,6 +503,62 @@ class cPoem {
 	      }
 	    }
 	}
+
+	calculateKaafiyaa()
+	{
+		debugger;
+		let radeefLen = this.radeefArray.length;
+		let foundKaafiyaaEnd = false;
+		let kaafiyaa,kaafiyaa1, kaafiyaa2;
+		let kaafiyaaArray = [];
+		let linelen1 = this.lines[0].characters.length;
+		let linelen2 = this.lines[1].characters.length;
+		let i = linelen1 - 1 - radeefLen; // first line index
+		let j = linelen2 - 1 - radeefLen; // second line index
+
+		while ((!foundKaafiyaaEnd) && (i >= 0) && (j >= 0))
+		{
+		  kaafiyaa1 = this.lines[0].characters[i].vowelNumber;
+		  kaafiyaa2 = this.lines[1].characters[j].vowelNumber;
+		  if (kaafiyaa1 == kaafiyaa2)
+		  {
+		    kaafiyaa = kaafiyaa1 + kaafiyaa;
+		    kaafiyaaArray[kaafiyaaArray.length] = kaafiyaa1;
+		    i--;
+		    j--;
+		  }
+		  else
+		  {
+		    foundKaafiyaaEnd = true;
+		  }
+		}
+		if (kaafiyaaArray[0]==-10) // space character kaa vowelNumber
+		  kaafiyaaArray.splice(0,1);
+		// console.log(kaafiyaaArray);
+
+		let kaafiyaaLen = kaafiyaaArray.length;
+
+		// now mark kaafiyaa chars in all relevant lines
+		for (i = 0; i < this.lines.length; i++) {
+		  let supposedlyRelevantLine = false;
+		  // first 2 lines
+		  if (i<=1) supposedlyRelevantLine = true;
+		  // intermediate line followed by blank line
+		  if ((i>1) && (i<(this.lines.length-1)) && (this.lines[i+1].characters.length==0)) supposedlyRelevantLine = true;
+	      // last line
+	      if (i==(this.lines.length-1)) supposedlyRelevantLine = true;
+		  let linelen = this.lines[i].characters.length;
+		  if ((supposedlyRelevantLine) && (linelen > (radeefLen+kaafiyaaLen+this.radeefTruncated)))
+		  {
+		    for (j = 0; j < kaafiyaaLen; j++) {
+		      if (kaafiyaaArray[j] == this.lines[i].characters[linelen-1-radeefLen-this.radeefTruncated-j].vowelNumber)
+		        this.lines[i].characters[linelen-1-radeefLen-this.radeefTruncated-j].isKaafiyaa = true;
+		      else
+		        break;
+		    }
+		  }
+		}
+	}
 }
 
 var oPoem;
@@ -514,7 +569,7 @@ function visualize()
 	if (fGhazal)
     {
       oPoem.calculateRadeef();
-      // calculateKaafiyaa();
+      oPoem.calculateKaafiyaa();
     }
 	draw();
 	// show controls
@@ -928,7 +983,7 @@ function fnGhazal()
     {
       document.getElementById("chkFreeVerse").disabled = true;
       oPoem.calculateRadeef();
-      // calculateKaafiyaa();
+      oPoem.calculateKaafiyaa();
     }
     else
     {
