@@ -579,41 +579,50 @@ function visualize()
 
 function splitNprocessPoem()
 {
+	delete oPrevPoem;
+    oPrevPoem = oPoem;
 	oPoem = new cPoem(document.getElementById("pom").value);
     const lines = oPoem.text.split("\n");
+    let oldLines = []
+    if (typeof oPrevPoem !== 'undefined') oldLines = oPrevPoem.originalText.split("\n");
     const maxLineLen = lines.length;
     let iLine;
     for (iLine = 0; iLine < maxLineLen; iLine++) // process each line - i = line index
     {
-    	const oLine = new cLine();
-    	// debugger;
-    	lines[iLine] = lines[iLine].replace(/[^\u0900-\u097F ]/g, " "); // replace non-devnagari chars with space
-    	lines[iLine] = lines[iLine].replace("।"," ");
-    	lines[iLine] = lines[iLine].replace(/\s+/g, " "); // remove extra spaces in-between words
-    	lines[iLine] = lines[iLine].trim(); // remove whitespace from both ends
-        for (k=0;k<lines[iLine].length;k++) // process each char: k = char index
-        {
-        	charCode = lines[iLine].charCodeAt(k);
-        	if ((charCode >= 2366) && (charCode <= 2381)) // maatraa
-			{
-				// new element not added to line array
-				// the vowel part of previous element 
-				// modified to update maatraa
-				oLine.lastCharVowel(lines[iLine].substring(k,k+1));
-			}
-			else // not maatraa - true new char
-			{
-				var thisChar = lines[iLine].substring(k,k+1);
-				const oChar = new cChar(thisChar,charCode);
-	          	oLine.push(oChar);
-			}
-        }
-        // console.log(oLine.getHalfLetters());
-        oLine.calculateHalfLettersMaatraa();
-        oPoem.pushLine(oLine);
+    	if ((iLine < oldLines.length) && (lines[iLine] == oldLines[iLine]))
+    	{
+    		oPoem.pushLine(oPrevPoem.lines[iLine]);
+    	}
+    	else
+    	{
+	    	const oLine = new cLine();
+	    	// debugger;
+	    	lines[iLine] = lines[iLine].replace(/[^\u0900-\u097F ]/g, " "); // replace non-devnagari chars with space
+	    	lines[iLine] = lines[iLine].replace("।"," ");
+	    	lines[iLine] = lines[iLine].replace(/\s+/g, " "); // remove extra spaces in-between words
+	    	lines[iLine] = lines[iLine].trim(); // remove whitespace from both ends
+	        for (k=0;k<lines[iLine].length;k++) // process each char: k = char index
+	        {
+	        	charCode = lines[iLine].charCodeAt(k);
+	        	if ((charCode >= 2366) && (charCode <= 2381)) // maatraa
+				{
+					// new element not added to line array
+					// the vowel part of previous element 
+					// modified to update maatraa
+					oLine.lastCharVowel(lines[iLine].substring(k,k+1));
+				}
+				else // not maatraa - true new char
+				{
+					var thisChar = lines[iLine].substring(k,k+1);
+					const oChar = new cChar(thisChar,charCode);
+		          	oLine.push(oChar);
+				}
+	        }
+	        // console.log(oLine.getHalfLetters());
+	        oLine.calculateHalfLettersMaatraa();
+	        oPoem.pushLine(oLine);
+	     }
     }
-    delete oPrevPoem;
-    oPrevPoem = oPoem;
     console.log(oPoem);
 }
 
