@@ -579,7 +579,6 @@ function visualize()
 
 function splitNprocessPoem()
 {
-	delete oPrevPoem;
     oPrevPoem = oPoem;
 	oPoem = new cPoem(document.getElementById("pom").value);
     const lines = oPoem.text.split("\n");
