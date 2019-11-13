@@ -375,6 +375,7 @@ class cPoem {
 			{
 			if (this.lines[i].isComposite)  // is part of composite line
 				{
+					// debugger;
 					let len = this.compositeLines.length;
 					if (!compositeInProgress) // new composite line
 					{
@@ -388,12 +389,13 @@ class cPoem {
 						// just add to in progress composite line
 						this.compositeLines[len-1].maatraa += this.lines[i].maatraa;
 					}
+					len = this.compositeLines.length;
 					// set whether the composite maatraa is multiple of base count
-					if ((this.compositeLines[len].maatraa % this.baseCount) == 0)
-					  this.compositeLines[len].multipleOfBaseCount = true;
+					if ((this.compositeLines[len-1].maatraa % this.baseCount) == 0)
+					  this.compositeLines[len-1].multipleOfBaseCount = true;
 					else
-					  this.compositeLines[len].multipleOfBaseCount = false;
-					this.calculateRemainder(len);
+					  this.compositeLines[len-1].multipleOfBaseCount = false;
+					this.calculateRemainder(len-1);
 				}
 				else  // not part of composite line
 				{
