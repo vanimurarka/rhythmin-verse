@@ -119,9 +119,8 @@ class cChar {
     }
     // determine when a half letter will have 0 or 1 maatraa
 	// the logic for default handling - which the user can always override
-	// p = previous letter (consonant+vowel array structure)
-	// this = current letter (consonant+vowel array structure) - for which the len is to be 
-	// determined
+	// p = previous letter 
+	// this = current letter for which the len is to be determined
 	// n = next letter (consonant+vowel array structure)	
 	calculateHalfLetterLen(p=false,n=false)
 	{
@@ -507,7 +506,6 @@ class cPoem {
 	      }
 	    }
 	}
-
 	calculateKaafiyaa()
 	{
 		debugger;
@@ -710,14 +708,12 @@ function draw()
       g.append("svg:text")            // line total maatraa
       .attr("y", charH)
       .attr("x", function(d) {return charW*maxLen+charW;})
-      //.attr("dominant-baseline", "central")
       .attr("class", "graphText3")
       .text(function(d) { return (d.maatraa > 0) ? d.maatraa : "";})
       .on("click",markCompositeLine);
 
       // small dash beside maatraa count
       g.append("svg:line")
-        //.attr("x1", function(d) {return charW*maxLen+(charW);})
         .attr("x1", function(d,i) {return charW*maxLen+(charW*2);})
         .attr("y1", function(d,i) {return charH+2;})
         .attr("x2", function(d) {return charW*maxLen+(charW*2.3);})
@@ -740,7 +736,6 @@ function draw()
       g.append("svg:text")            // line total maatraa, d = line
       .attr("y", charH)
       .attr("x", function(d) {return charW*maxLen+(charW/2);})
-      //.attr("dominant-baseline", "central")
       .attr("class", "graphText3")
       .text(function(d) { return (d.maatraa > 0) ? d.maatraa : "";});
     }
@@ -763,7 +758,6 @@ function drawCharTxtPos(d)
 
 // style of char blocks - including color
 // c - the character to be styled
-// showConColor - boolean - whether the color is to be displayed or not
 function drawStyleCharBlock(c,colorBy)
 {
 
