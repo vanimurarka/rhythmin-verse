@@ -634,8 +634,8 @@ function splitNprocessPoem()
     // console.log(oPoem);
 }
 
-var charW = 20; // decrease charW to 20 from 24 earlier
-var charH = 20; // decrease charW to 20 from 24 earlier
+var charW = 20; 
+var charH = 20; 
 var paddingLeft = 10;
 var lineSpacing = 5;
 var fShowText = true;
