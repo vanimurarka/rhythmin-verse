@@ -395,7 +395,6 @@ class cPoem {
 					  this.compositeLines[len-1].multipleOfBaseCount = true;
 					else
 					  this.compositeLines[len-1].multipleOfBaseCount = false;
-					this.calculateRemainder(len-1);
 				}
 				else  // not part of composite line
 				{
@@ -407,6 +406,9 @@ class cPoem {
 				}
 			}
 		}
+		let i;
+		for (i = 0; i< this.compositeLines.length; i++)
+			this.calculateRemainder(i);
 	}
 	calculateRemainder(compositeIdx)
 	{
@@ -574,6 +576,11 @@ function visualize()
       oPoem.calculateRadeef();
       oPoem.calculateKaafiyaa();
     }
+    if (fFreeVerse)
+    {
+    	let baseC = parseInt(document.getElementById("baseCount").value);
+    	oPoem.setBaseCount(baseC);
+    }
 	draw();
 	// show controls
 	document.getElementById("divControls").style.display = "block";
@@ -624,7 +631,7 @@ function splitNprocessPoem()
 	        oPoem.pushLine(oLine);
 	     }
     }
-    console.log(oPoem);
+    // console.log(oPoem);
 }
 
 var charW = 20; // decrease charW to 20 from 24 earlier
@@ -847,6 +854,8 @@ function drawFreeVerseDashStyle(i)
     {
       document.getElementById("chkGhazal").disabled = true;
       document.getElementById("spanFreeVerse").style.display = "inline";
+      let baseC = parseInt(document.getElementById("baseCount").value);
+      oPoem.setBaseCount(baseC);
     }
     else
     {
@@ -998,6 +1007,9 @@ function fnGhazal()
     {
       document.getElementById("chkFreeVerse").disabled = false;
     }
-    console.log(oPoem);
+    // console.log(oPoem);
     draw();
   }
+
+// used for minification
+// https://javascript-minifier.com/
