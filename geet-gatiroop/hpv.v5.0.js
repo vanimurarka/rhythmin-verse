@@ -124,6 +124,7 @@ class cChar {
 	// n = next letter (consonant+vowel array structure)	
 	calculateHalfLetterLen(p=false,n=false)
 	{
+		// debugger;
 		if (!p)  // no previous letter, half maatraa is first letter of line
 		{
       		this.maatraa = 0;
@@ -286,7 +287,7 @@ class cLine {
 			else
 			{
 				const previousChar = this.previousChar(thisHalfLetter);
-				const nextChar = this.nextChar(thisHalfLetter.index+1);
+				const nextChar = this.nextChar(thisHalfLetter);
 				maatraa = thisHalfLetter.calculateHalfLetterLen(previousChar, nextChar);
 			}
 			// update cumulative maatraa of line
