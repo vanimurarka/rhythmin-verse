@@ -1,0 +1,81 @@
+<!DOCTYPE html> 
+<html> 
+
+<head> 
+	<script type="text/javascript" src="d3.v2.min.js"></script>
+  	<script type="text/javascript" src="hpv.v5.3.js"></script>
+	<title> 
+		Geet Gatiroop 
+	</title> 
+	
+	<!-- Style to fill remaining 
+		horizontal space -->
+	<style> 
+		#main { 
+			/*height: 100px; */
+			border: 1px solid black; 
+		} 
+		#left { 
+			display: inline-block;
+			width: 300px; 
+			/*height: 100%; */
+			/*background-color: green; */
+			border: 1px solid blue;
+			vertical-align: top;
+		} 
+		#right { 
+			display: inline-block;
+			/*height: 100%; */
+			border: 1px solid green;
+			vertical-align: top;
+		} 
+	</style> 
+	<style type="text/css">
+	  .poem-box {
+	    background: #f5f5f5;
+	    border: 1px solid #ddd;
+	    padding: 5px;
+	    white-space: pre-line;
+	    vertical-align: top;
+	  }
+	  .poem-box[placeholder]:empty:before {
+	      content: attr(placeholder);
+	      color: #757474f5; 
+	  }
+	</style>
+	<script type="text/javascript">
+    function callVisualize()
+    {
+      var poem = document.getElementById("pom").innerText;
+      visualize(poem);
+    }
+    function x() {
+    	var w = window.innerWidth;
+ 		document.getElementById("right").style.width = (w-300-50)+"px";
+    }
+  </script>
+</head>	 
+
+<body onload="x();" onresize="x();">		 
+	<div id = "main"> 
+		<div id="left"> 
+			अपनी हिन्दी कविता यहां कापी-पेस्ट करिए<br/>
+			<div contenteditable="true" placeholder="अपनी कविता यहां डालिए..." id='pom' class="poem-box"></div>
+		    <br>
+		    <input type="button" value="Visualize!" onclick="callVisualize();">
+		</div> 
+		
+		<div id="right"> 
+			<div id="chart" align="center"></div>
+			<div style="display:none" id="divControls">
+		      <!-- <input type="checkbox" id="chkShowEditables" checked="true" onclick="switchMode();" /> Show Editables -->
+		      <input type="checkbox" id="chkGhazal" onclick="fnGhazal();" /> Ghazal <input type="checkbox" id="chkFreeVerse" onclick="fnFreeVerseSupport();" /> Free Verse<span id="spanFreeVerse" style="display:none"> | Base Count: <input type="number" name="baseCount" id="baseCount" value="1" min="1" size="20" max="100" step="1" onchange="fnBaseCountChange();"></span>
+		      <br/>
+		      <input type="checkbox" id="chkShowText" checked="true" onclick="fnShowText();" /> Show Text 
+		      <input type="checkbox" id="chkLineSpacing" onclick="fnLineSpacing();" /> Remove Line Spacing
+		    </div>
+		</div> 
+	</div> 
+</body> 
+
+</html>					 
