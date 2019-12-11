@@ -564,8 +564,18 @@ class cPoem {
 	}
 }
 
+class cVisual{
+	constructor(mode,width,ratio) {
+		this.mode = mode; // possible values; flexible, fixed
+		this.width = width;
+		this.ratio = ratio;
+	}
+}
+
 var oPoem;
 var oPrevPoem;
+var oVisual;
+
 
 function visualize(poem)
 {
@@ -653,12 +663,31 @@ function draw()
 	// const svgW = document.getElementById("chart").offsetWidth;
 	const svgH = fLineSpacing?(lineCount*(charH+lineSpacing))+(charH*2):(lineCount*charH)+(charH*2);
 	const svgVB = "0 0 "+svgW+" "+svgH;
-	var svg = chart.append("svg")
-	          // .attr("width", function() {return (fFreeVerse?charW*maxLen+120:charW*maxLen+100);})
-	          // .attr("height", function() {return (fLineSpacing?(lineCount*(charH+lineSpacing))+(charH*2):(lineCount*charH)+(charH*2));})
+	// alert(maxLen+' maxLen');
+	// alert(svgW+' svgW');
+	// alert((svgW/maxLen)+' svgW/maxLen');
+	const availableW = window.innerWidth-300-50;
+	const r = availableW / svgW;
+	alert(r);
+	// alert(window.innerWidth-300-50+' window.innerWidth');
+	// alert(((window.innerWidth-300-50)/maxLen)+' window.innerWidth/maxLen')
+	var svg 
+	if ((r>=0.6)&&(r<=1))
+	{
+		oVisual = new cVisual('flexible', svgW,r);
+		svg = chart.append("svg")
 	          .attr("viewBox",svgVB)
 	          .attr("preserveAspectRatio","xMidYMid meet")
 	          .attr("style","border-bottom: solid 1px #ddd;");
+	}
+	else
+	{
+		oVisual = new cVisual('fixed', svgW,r);
+		svg = chart.append("svg")
+	          .attr("width", function() {return svgW;})
+	          .attr("height", function() {return svgH;})
+	          .attr("style","border-bottom: solid 1px #ddd;");
+	}
 
 	// create the "g"s (svg groups) for each line
 	if (fLineSpacing)

@@ -48,10 +48,21 @@
     {
       var poem = document.getElementById("pom").innerText;
       visualize(poem);
+      console.log(oVisual);
+      if (oVisual.ratio < 0.5)
+      	alert('move div down');
     }
     function x() {
     	var w = window.innerWidth;
- 		document.getElementById("right").style.width = (w-300-50)+"px";
+    	var visDiv = document.getElementById("right");
+ 		visDiv.style.width = (w-300-50)+"px";
+ 		draw();
+    	console.log(oVisual);
+    	if (oVisual.ratio < 0.6)
+    	{
+      		alert('move div down');
+      		visDiv.style.width="100%";
+    	}
     }
   </script>
 </head>	 
