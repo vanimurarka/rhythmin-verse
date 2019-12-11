@@ -565,10 +565,11 @@ class cPoem {
 }
 
 class cVisual{
-	constructor(mode,width,ratio) {
-		this.mode = mode; // possible values; flexible, fixed
-		this.width = width;
-		this.ratio = ratio;
+	constructor(availableW) {
+		this.availableW = availableW;
+		this.mode = 'fixed'; // possible values; flexible, fixed
+		this.width = 0;
+		this.ratio = 1;
 	}
 }
 
@@ -577,7 +578,7 @@ var oPrevPoem;
 var oVisual;
 
 
-function visualize(poem)
+function visualize(poem, availableW)
 {
 	splitNprocessPoem(poem);
 	if (fGhazal)
@@ -590,6 +591,7 @@ function visualize(poem)
     	let baseC = parseInt(document.getElementById("baseCount").value);
     	oPoem.setBaseCount(baseC);
     }
+    oVisual = new cVisual(availableW);
 	draw();
 	// show controls
 	document.getElementById("divControls").style.display = "block";
@@ -653,7 +655,7 @@ var fFreeVerse = false;
 var fGhazal = false;
 
 // the D3 draw dance!
-function draw()
+function draw(availableW)
 {	// debugger;
 	const maxLen = oPoem.maxLineLen;
 	const lineCount = oPoem.lineCount;
@@ -663,18 +665,13 @@ function draw()
 	// const svgW = document.getElementById("chart").offsetWidth;
 	const svgH = fLineSpacing?(lineCount*(charH+lineSpacing))+(charH*2):(lineCount*charH)+(charH*2);
 	const svgVB = "0 0 "+svgW+" "+svgH;
-	// alert(maxLen+' maxLen');
-	// alert(svgW+' svgW');
-	// alert((svgW/maxLen)+' svgW/maxLen');
-	const availableW = window.innerWidth-300-50;
-	const r = availableW / svgW;
-	alert(r);
-	// alert(window.innerWidth-300-50+' window.innerWidth');
-	// alert(((window.innerWidth-300-50)/maxLen)+' window.innerWidth/maxLen')
+	const r = oVisual.availableW / svgW;
 	var svg 
 	if ((r>=0.6)&&(r<=1))
 	{
-		oVisual = new cVisual('flexible', svgW,r);
+		oVisual.mode = "flexible";
+		oVisual.width = svgW;
+		oVisual.ratio = r;
 		svg = chart.append("svg")
 	          .attr("viewBox",svgVB)
 	          .attr("preserveAspectRatio","xMidYMid meet")
@@ -682,7 +679,9 @@ function draw()
 	}
 	else
 	{
-		oVisual = new cVisual('fixed', svgW,r);
+		oVisual.mode = "fixed";
+		oVisual.width = svgW;
+		oVisual.ratio = r;
 		svg = chart.append("svg")
 	          .attr("width", function() {return svgW;})
 	          .attr("height", function() {return svgH;})
