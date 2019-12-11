@@ -2,6 +2,7 @@
 <html> 
 
 <head> 
+	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<script type="text/javascript" src="d3.v2.min.js"></script>
   	<script type="text/javascript" src="hpv.v5.3.js"></script>
 	<title> 
@@ -12,14 +13,11 @@
 		horizontal space -->
 	<style> 
 		#main { 
-			/*height: 100px; */
 			border: 1px solid black; 
 		} 
 		#left { 
 			display: inline-block;
 			width: 300px; 
-			/*height: 100%; */
-			/*background-color: green; */
 			border: 1px solid blue;
 			vertical-align: top;
 		} 
@@ -50,11 +48,13 @@
 		var poem = document.getElementById("pom").innerText;
 		var visDiv = document.getElementById("right");
 		var availableW = visDiv.clientWidth;
+		alert(availableW);
 		visualize(poem, availableW);
 		// debugger;
-		alert(oVisual.ratio);
+		// alert(oVisual.ratio);
 		if ((oVisual.ratio < 0.6) && (visDivBeside))
       	{
+      		alert("moving div down");
       		visDiv.style.width="100%";
       		availableW = visDiv.clientWidth;
       		visualize(poem, availableW);
@@ -62,17 +62,30 @@
     	}
     	else if ((oVisual.ratio > 1 ) && (!visDivBeside))
 		{
+			alert("possibly moving div up");
 			var w = window.innerWidth;
-			visDiv.style.width = (w-300-50)+"px";
-			availableW = visDiv.clientWidth;
-      		visualize(poem, availableW);
-      		visDivBeside = true;
+			var newW = w-300-50;
+			var newRatio = newW / oVisual.width;
+			alert(newRatio);
+			if (newRatio > 1)
+			{
+				visDiv.style.width = (w-300-50)+"px";
+				availableW = visDiv.clientWidth;
+	      		visualize(poem, availableW);
+	      		visDivBeside = true;
+			}
 		}
     }
     function x() {
-    	var w = window.innerWidth;
     	var visDiv = document.getElementById("right");
- 		visDiv.style.width = (w-300-50)+"px";
+    	var w = window.innerWidth;
+    	if (w <= 500)
+    	{
+    		visDiv.style.width = "100%";
+    		visDivBeside = false;
+    	}
+    	if (w > 500)
+ 			visDiv.style.width = (w-300-50)+"px";
     }
   </script>
 </head>	 

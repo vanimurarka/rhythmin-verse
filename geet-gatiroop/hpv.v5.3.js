@@ -655,8 +655,9 @@ var fFreeVerse = false;
 var fGhazal = false;
 
 // the D3 draw dance!
-function draw(availableW)
+function draw()
 {	// debugger;
+	// alert(oVisual.availableW);
 	const maxLen = oPoem.maxLineLen;
 	const lineCount = oPoem.lineCount;
 	var chart = d3.select("#chart");
@@ -666,8 +667,19 @@ function draw(availableW)
 	const svgH = fLineSpacing?(lineCount*(charH+lineSpacing))+(charH*2):(lineCount*charH)+(charH*2);
 	const svgVB = "0 0 "+svgW+" "+svgH;
 	const r = oVisual.availableW / svgW;
-	var svg 
-	if ((r>=0.6)&&(r<=1))
+	var svg;
+	alert(r);
+	if (oVisual.availableW <= 500)
+	{
+		oVisual.mode = "flexible";
+		oVisual.width = svgW;
+		oVisual.ratio = r;
+		svg = chart.append("svg")
+	          .attr("viewBox",svgVB)
+	          .attr("preserveAspectRatio","xMidYMid meet")
+	          .attr("style","border-bottom: solid 1px #ddd;");
+	}
+	else if ((r>=0.6)&&(r<=1))
 	{
 		oVisual.mode = "flexible";
 		oVisual.width = svgW;
