@@ -43,40 +43,43 @@
 	</style>
 	<script type="text/javascript">
 	var visDivBeside = true;
+	function calculateVisBesideWidth()
+    {
+    	var w = window.innerWidth;
+    	return (w-300-50);
+    }
     function callVisualize()
     {
 		var poem = document.getElementById("pom").innerText;
 		var visDiv = document.getElementById("right");
 		var availableW = visDiv.clientWidth;
-		alert(availableW);
+		// alert(availableW);
 		visualize(poem, availableW);
-		// debugger;
-		// alert(oVisual.ratio);
-		if ((oVisual.ratio < 0.6) && (visDivBeside))
+		if ((oVisual.ratio < 0.6) && (visDivBeside)) // move vis down below poem box
       	{
-      		alert("moving div down");
+      		// alert("moving div down");
       		visDiv.style.width="100%";
       		availableW = visDiv.clientWidth;
-      		visualize(poem, availableW);
+      		redraw(availableW);
       		visDivBeside = false;
     	}
-    	else if ((oVisual.ratio > 1 ) && (!visDivBeside))
+    	else if ((oVisual.ratio > 1 ) && (!visDivBeside)) // possibly move visDiv up if space beside poem box enough for poem
 		{
 			alert("possibly moving div up");
-			var w = window.innerWidth;
-			var newW = w-300-50;
+			var newW = calculateVisBesideWidth();
 			var newRatio = newW / oVisual.width;
 			alert(newRatio);
 			if (newRatio > 1)
 			{
-				visDiv.style.width = (w-300-50)+"px";
+				visDiv.style.width = newW + "px";
 				availableW = visDiv.clientWidth;
-	      		visualize(poem, availableW);
+	      		redraw(availableW);
 	      		visDivBeside = true;
 			}
 		}
     }
-    function x() {
+    
+    function setVisDiv() {
     	var visDiv = document.getElementById("right");
     	var w = window.innerWidth;
     	if (w <= 500)
@@ -85,12 +88,12 @@
     		visDivBeside = false;
     	}
     	if (w > 500)
- 			visDiv.style.width = (w-300-50)+"px";
+ 			visDiv.style.width = calculateVisBesideWidth()+"px";
     }
   </script>
 </head>	 
 
-<body onload="x();">		 
+<body onload="setVisDiv();">		 
 	<div id = "main"> 
 		<div id="left"> 
 			अपनी हिन्दी कविता यहां कापी-पेस्ट करिए<br/>

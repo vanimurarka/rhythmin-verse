@@ -597,6 +597,13 @@ function visualize(poem, availableW)
 	document.getElementById("divControls").style.display = "block";
 }
 
+function redraw(availableW)
+{
+	oVisual = new cVisual(availableW)
+	draw();
+}
+
+
 function splitNprocessPoem(poem)
 {
     oPrevPoem = oPoem;
@@ -663,37 +670,35 @@ function draw()
 	var chart = d3.select("#chart");
 	chart.select("svg").remove();
 	const svgW = fFreeVerse?charW*maxLen+120:charW*maxLen+100;
-	// const svgW = document.getElementById("chart").offsetWidth;
 	const svgH = fLineSpacing?(lineCount*(charH+lineSpacing))+(charH*2):(lineCount*charH)+(charH*2);
 	const svgVB = "0 0 "+svgW+" "+svgH;
-	const r = oVisual.availableW / svgW;
+	const ratio = oVisual.availableW / svgW;
 	var svg;
-	alert(r);
-	if (oVisual.availableW <= 500)
+	if (oVisual.availableW <= 500) // in small screen width always make the vis autosized
 	{
 		oVisual.mode = "flexible";
 		oVisual.width = svgW;
-		oVisual.ratio = r;
+		oVisual.ratio = ratio;
 		svg = chart.append("svg")
 	          .attr("viewBox",svgVB)
 	          .attr("preserveAspectRatio","xMidYMid meet")
 	          .attr("style","border-bottom: solid 1px #ddd;");
 	}
-	else if ((r>=0.6)&&(r<=1))
+	else if ((ratio>=0.6)&&(ratio<=1)) // make vis autosized if ratio within a reasonable range (not too small or big) 
 	{
 		oVisual.mode = "flexible";
 		oVisual.width = svgW;
-		oVisual.ratio = r;
+		oVisual.ratio = ratio;
 		svg = chart.append("svg")
 	          .attr("viewBox",svgVB)
 	          .attr("preserveAspectRatio","xMidYMid meet")
 	          .attr("style","border-bottom: solid 1px #ddd;");
 	}
-	else
+	else // make vis fixed size
 	{
 		oVisual.mode = "fixed";
 		oVisual.width = svgW;
-		oVisual.ratio = r;
+		oVisual.ratio = ratio;
 		svg = chart.append("svg")
 	          .attr("width", function() {return svgW;})
 	          .attr("height", function() {return svgH;})
@@ -762,9 +767,9 @@ function draw()
       // small dash beside maatraa count
       g.append("svg:line")
         .attr("x1", function(d,i) {return charW*maxLen+(charW*2);})
-        .attr("y1", function(d,i) {return charH+2;})
+        .attr("y1", function(d,i) {return charH-2;})
         .attr("x2", function(d) {return charW*maxLen+(charW*2.3);})
-        .attr("y2", charH+2)
+        .attr("y2", charH-2)
         .attr("style", function(d,i) {return drawFreeVerseDashStyle(i);})
         .on("click",markCompositeLine);
 
@@ -773,7 +778,7 @@ function draw()
         //.attr("x1", function(d) {return charW*maxLen+(charW);})
         .attr("x1", function(d,i) {return drawCompositeLineMarker("x1",i);})
         .attr("y1", function(d,i) {return drawCompositeLineMarker("y1",i);})
-        .attr("x2", function(d) {return charW*maxLen+(charW*2.3);})
+        .attr("x2", function(d) {return charW*maxLen+(charW*2.45);})
         .attr("y2", charH+2)
         .attr("style", function(d,i) {return drawCompositeLineMarker("style",i);})
         .on("click",unmarkCompositeLine);
@@ -884,7 +889,7 @@ function drawFreeVerseDashStyle(i)
       if (oPoem.lines[i].maatraa == 0)  // empty line
         return "display:none;";
 
-      return "stroke:black;stroke-width:4;"
+      return "stroke:black;stroke-width:8;"
   }
 
 // toggle Free Verse support
@@ -914,7 +919,7 @@ function drawCompositeLineMarker(drawWhat,i)
       if (i==0)
         return charW*maxLen+(charW*2);
       if (oPoem.lines[i].isComposite)
-        return charW*maxLen+(charW*2.3);        
+        return charW*maxLen+(charW*2.45);        
       else
         return charW*maxLen+(charW*2);
     }
@@ -923,19 +928,19 @@ function drawCompositeLineMarker(drawWhat,i)
       if (oPoem.lines[i].isComposite)
       {
         if (fLineSpacing)
-          return -3;
+          return -11;
         else
           return 0;
       }               
       else
-        return charH;
+        return charH-2;
     }
     if (drawWhat == "style")
     {
       if ((oPoem.lines[i].maatraa == 0) || (!oPoem.lines[i].isComposite))  // empty line || not composite
         return "display:none;";
 
-      return "stroke:black;stroke-width:4;"
+      return "stroke:green;stroke-width:6;"
     }
   }
 
@@ -955,7 +960,7 @@ function drawCompositeNumbers()
 	  .data(oPoem.compositeLines)
 	  .enter().append("svg:text")
 	  .attr("y", function(d) {return ((d.originalLineIdx*y)+y+charH);})
-	  .attr("x", function(d) {return paddingLeft + 8 + charW*maxLen+(charW*2);})
+	  .attr("x", function(d) {return paddingLeft + 12 + charW*maxLen+(charW*2);})
 	  .attr("class", "compositeCountT")
 	  .attr("style", function(d) {return d.multipleOfBaseCount?"fill:black":"fill:red";})
 	  // .attr("style", function(d) {return "fill:black";})
