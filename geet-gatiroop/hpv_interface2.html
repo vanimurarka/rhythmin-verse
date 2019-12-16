@@ -4,7 +4,7 @@
 <head> 
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<script type="text/javascript" src="d3.v2.min.js"></script>
-  	<script type="text/javascript" src="hpv.v5.3.js"></script>
+  	<script type="text/javascript" src="hpv.v5.3.min.js"></script>
 	<title> 
 		Geet Gatiroop 
 	</title> 
@@ -65,10 +65,10 @@
     	}
     	else if ((oVisual.ratio > 1 ) && (!visDivBeside)) // possibly move visDiv up if space beside poem box enough for poem
 		{
-			alert("possibly moving div up");
+			// alert("possibly moving div up");
 			var newW = calculateVisBesideWidth();
 			var newRatio = newW / oVisual.width;
-			alert(newRatio);
+			// alert(newRatio);
 			if (newRatio > 1)
 			{
 				visDiv.style.width = newW + "px";
