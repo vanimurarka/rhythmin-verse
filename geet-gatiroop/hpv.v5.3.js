@@ -1,3 +1,5 @@
+// made svg responsive, available width passed as parameter to visualize function
+
 class cChar {
     constructor(mainChar, mainCharCode) {
 		this.mainChar = mainChar;
