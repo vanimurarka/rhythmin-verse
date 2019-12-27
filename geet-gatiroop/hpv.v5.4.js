@@ -835,6 +835,7 @@ function drawStyleCharBlock(c,colorBy)
 	var strokeOp = "0.3";
 	var strokeW = 1;
 	var fillOp = "0.2";
+	var strokeColor = "black";
 
 	// call conColor to determine color and opacity as per consonant
 	if (colorBy == 'consonant')
@@ -875,11 +876,13 @@ function drawStyleCharBlock(c,colorBy)
 	  {
 	  	color = "yellow";
 	  	fillOp = "1";
+	  	strokeColor = "orange";
+	  	strokeOp = "1";
 	  }
 	  	
 	}
 
-	return "fill: "+color+"; fill-opacity: " + fillOp + ";stroke:black; stroke-width: "+strokeW+"; stroke-opacity: "+strokeOp;
+	return "fill: "+color+"; fill-opacity: " + fillOp + ";stroke:"+strokeColor+"; stroke-width: "+strokeW+"; stroke-opacity: "+strokeOp;
 }
 
 // shapes' shape determined by vowel
