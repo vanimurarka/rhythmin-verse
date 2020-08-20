@@ -1,9 +1,4 @@
-// support for dohaa -- incomplete
-/* ---------------------------
-   AUTHOR: VANI MURARKA
-   EMAIL: vani.murarka@gmail.com
-          vanimurarka@manaskriti.com
-------------------------------- */
+// last letter rhyme
 
 class cChar {
     constructor(mainChar, mainCharCode) {
@@ -238,7 +233,6 @@ class cLine {
 		this.count = 0;
 		this.maatraa = 0;
 		this.isComposite = false;
-		this.isDohaaLine = false;
 	}
 	// change the vowel of the last character
 	lastCharVowel(vowelString)
@@ -283,6 +277,11 @@ class cLine {
 			return this.characters[c.index+1];
 		else
 			return false;
+	}
+	// get last Character
+	getLastChar()
+	{
+		return this.characters[this.count-1];
 	}
 	// return an array of half letters in a line
 	getHalfLetters()
@@ -335,6 +334,10 @@ class cLine {
 			this.charByIndex(i).maatraaCumulative += diff;
 
 		return this.maatraa;
+	}
+	doesItRhyme(compareLine)
+	{
+		console.log(this.getLastChar().text == compareLine.getLastChar().text);
 	}
 }
 
@@ -530,7 +533,7 @@ class cPoem {
 	}
 	calculateKaafiyaa()
 	{
-		debugger;
+		// debugger;
 		let radeefLen = this.radeefArray.length;
 		let foundKaafiyaaEnd = false;
 		let kaafiyaa,kaafiyaa1, kaafiyaa2;
@@ -581,16 +584,6 @@ class cPoem {
 		        break;
 		    }
 		  }
-		}
-	}
-	calculateDohaa()
-	{
-		let i = 0;
-		// debugger;
-		for (i = 0; i < this.lines.length; i++) {
-			console.log(this.lines[i].maatraa)
-			if (this.lines[i].maatraa == 24)
-				this.lines[i].isDohaaLine = true;
 		}
 	}
 }
@@ -687,7 +680,6 @@ function splitNprocessPoem(poem)
 	        oPoem.pushLine(oLine);
 	     }
     }
-    oPoem.calculateDohaa();
     console.log(oPoem);
 }
 
@@ -1074,8 +1066,6 @@ function adjustCharLen()
 	var iLine = parseInt(this.parentNode.getAttribute("id").substring(5));
 	var kk = 0;
 	oPoem.adjustCharMaatraa(iLine,iChr);
-	oPoem.calculateDohaa();
-	console.log(oPoem);
 	draw();
 }
 
