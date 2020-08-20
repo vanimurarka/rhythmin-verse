@@ -12,6 +12,7 @@ class cChar {
 		this.maatraaCumulative = 0;
 		this.isRadeef = false;
 		this.isKaafiyaa = false;
+		this.isHindi = false;
 
 		// space / comma OR whole vowel 
         if (((mainCharCode == 32)||(mainCharCode == 44)) || ((mainCharCode >= 2309) && (mainCharCode <= 2324)))
@@ -78,10 +79,12 @@ class cChar {
 			case 1: case 3: case 5: case 12:
 				this.maatraa = 1;
 				this.systemMaatraa = 1;
+				this.isHindi = true;
 				break;
             case 2: case 4: case 6: case 8: case 10: case 7: case 9: case 10: case 11:
 				this.maatraa = 2;
 				this.systemMaatraa = 2;
+				this.isHindi = true;
 				break;
 			default:
 				this.maatraa = 0;
@@ -224,6 +227,15 @@ class cChar {
 		  return this.mainChar; // could be a case of न अ 
 		return this.mainChar+this.vowelChar;
 	}
+	compare(cin)
+	{
+		if (this.text == cin.text)
+			return "all";
+		if ((this.vowelNumber == cin.vowelNumber) && (this.mainChar != cin.mainChar) && (this.isHindi) && (cin.isHindi))
+			return "vowel";
+		else
+			return false;
+	}
 }
 
 
@@ -261,6 +273,11 @@ class cLine {
 	charByIndex(idx)
 	{
 		return this.characters[idx];
+	}
+	// get the nth character from end
+	charByReverseIndex(idx)
+	{
+		return this.characters[this.count-1-idx];
 	}
 	// get previous character w.r.t. given current character
 	previousChar(c) // c = current character
@@ -337,7 +354,41 @@ class cLine {
 	}
 	doesItRhyme(compareLine)
 	{
-		console.log(this.getLastChar().text == compareLine.getLastChar().text);
+		if (this.getLastChar().text != compareLine.getLastChar().text)
+			return 0;
+		let i = 1;
+		let j = 1; // counters
+		let fm = 1; // number of full matching characters
+		let pm = 0; // number of vowel matching characters
+		let loop = true;
+		let c1, c2;
+		while(loop)
+		{
+			c1 = this.charByReverseIndex(i);
+			if (!c1.isHindi)
+			{
+				i++;
+				continue;
+			}
+			c2 = compareLine.charByReverseIndex(j);
+			if (!c2.isHindi)
+			{
+				j++;
+				continue;
+			}
+			let result = c1.compare(c2); 
+			// is the full character matching and no vowel-match found till now
+			if ((result == 'all') && (pm == 0))
+				{ i++; j++; fm++; }
+			else if (result == 'vowel')
+				{ i++; j++; pm++; }
+			else
+			{
+				break;
+			}
+		}
+		console.log(fm);
+		console.log(pm);
 	}
 }
 
