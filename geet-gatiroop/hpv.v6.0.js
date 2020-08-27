@@ -1,4 +1,4 @@
-// last letter rhyme
+// rhyming lines
 
 class cChar {
     constructor(mainChar, mainCharCode) {
@@ -13,6 +13,7 @@ class cChar {
 		this.isRadeef = false;
 		this.isKaafiyaa = false;
 		this.isHindi = false;
+		this.rhymeLevel = 0; // 0 = no rhyme, 1 = vowel rhyme, 2 = full rhyme
 
 		// space / comma OR whole vowel 
         if (((mainCharCode == 32)||(mainCharCode == 44)) || ((mainCharCode >= 2309) && (mainCharCode <= 2324)))
@@ -245,6 +246,8 @@ class cLine {
 		this.count = 0;
 		this.maatraa = 0;
 		this.isComposite = false;
+		this.rhymeFound = false;
+		this.rhymeGroup = 0;
 	}
 	// change the vowel of the last character
 	lastCharVowel(vowelString)
@@ -277,7 +280,11 @@ class cLine {
 	// get the nth character from end
 	charByReverseIndex(idx)
 	{
-		return this.characters[this.count-1-idx];
+		idx = this.count-1-idx;
+		if (idx > 0)
+			return this.characters[idx];
+		else
+			return false;
 	}
 	// get previous character w.r.t. given current character
 	previousChar(c) // c = current character
@@ -298,7 +305,10 @@ class cLine {
 	// get last Character
 	getLastChar()
 	{
-		return this.characters[this.count-1];
+		if (this.count == 0)
+			return false;
+		else
+			return this.characters[this.count-1];
 	}
 	// return an array of half letters in a line
 	getHalfLetters()
@@ -354,23 +364,40 @@ class cLine {
 	}
 	doesItRhyme(compareLine)
 	{
-		if (this.getLastChar().text != compareLine.getLastChar().text)
+		let lc1, lc2; // last chars of respective lines
+		lc1 = this.getLastChar();
+		lc2 = compareLine.getLastChar();
+		if (!lc1)
 			return 0;
+		if (!lc2)
+			return 0;
+		
+		if (lc1.text != lc2.text)
+			return 0;
+
+		lc1.rhymeLevel = 2;
+		lc2.rhymeLevel = 2;
+
 		let i = 1;
 		let j = 1; // counters
 		let fm = 1; // number of full matching characters
 		let pm = 0; // number of vowel matching characters
-		let loop = true;
 		let c1, c2;
+		let loop = true;
+		
 		while(loop)
 		{
 			c1 = this.charByReverseIndex(i);
+			if (!c1)
+				break;
 			if (!c1.isHindi)
 			{
 				i++;
 				continue;
 			}
 			c2 = compareLine.charByReverseIndex(j);
+			if (!c2)
+				break;
 			if (!c2.isHindi)
 			{
 				j++;
@@ -379,16 +406,34 @@ class cLine {
 			let result = c1.compare(c2); 
 			// is the full character matching and no vowel-match found till now
 			if ((result == 'all') && (pm == 0))
-				{ i++; j++; fm++; }
+				{ 
+					i++; j++; fm++; 
+					c1.rhymeLevel = 2;
+					c2.rhymeLevel = 2;
+				}
 			else if (result == 'vowel')
-				{ i++; j++; pm++; }
+				{ i++; j++; pm++; 
+					c1.rhymeLevel = 1;
+					c2.rhymeLevel = 1;
+				}
 			else
 			{
 				break;
 			}
 		}
-		console.log(fm);
-		console.log(pm);
+		if ((fm == 1) && (pm == 0)) // only the last character matches, not a true rhyme
+		{
+			lc1.rhymeLevel = 0; // unmark last character
+			lc2.rhymeLevel = 0; // unmark last character
+			return false;
+		}
+		if ((fm+pm) > 1)
+		{
+			// console.log(fm+pm);
+			return true;
+		}
+		else
+			return false;
 	}
 }
 
@@ -637,6 +682,51 @@ class cPoem {
 		  }
 		}
 	}
+	findRhymingLines()
+	{
+		// alert('in findRhymingLines');
+		
+		if (this.lineCount < 2)
+			return;
+
+		let i = 0;
+		let j = 1;
+		let endReached = false;
+		for (i = 0; i < this.lineCount - 1; i++)
+		{
+			let line1 = this.lines[i];
+			if (line1.rhymeFound)
+				continue;
+
+			console.log("line "+i);
+
+			endReached = false;
+			j = i+1;
+			if (this.lineCount <= j)
+				endReached = true;
+			while (!endReached)
+			{
+				let line2 = this.lines[j];
+				console.log("doesItRhyme with line "+j);
+				if (!line2.rhymeFound)
+				{
+					if (line1.doesItRhyme(line2))
+					{
+						line1.rhymeFound = true;
+						line2.rhymeFound = true;
+						line1.rhymeGroup = i;
+						line2.rhymeGroup = i;
+					}
+				}
+				j++;
+				if (this.lineCount <= j)
+					endReached = true;
+			}
+		}
+		
+
+		
+	}
 }
 
 class cVisual{
@@ -731,6 +821,7 @@ function splitNprocessPoem(poem)
 	        oPoem.pushLine(oLine);
 	     }
     }
+    oPoem.findRhymingLines();
     console.log(oPoem);
 }
 
@@ -926,13 +1017,18 @@ function drawStyleCharBlock(c,colorBy)
 	if (colorBy == 'consonant')
 	{
 		if (c.maatraa == c.systemMaatraa)
-	  		color = "rgb(0,220,255)"; // blue
+		{
+	  		// color = "rgb(0,220,255)"; // blue
+	  		if (c.rhymeLevel > 0)
+	  			color = "rgb(255,100,100)";
+		}
 	  	else // user adjusted maatraa show in diff color
 	  	{
 	  		// color = "rgb(220,45,45)"; //
 	  		color = "yellow";
 	  		fillOp = "0.5";
 	  	}
+
 	}
 	if (colorBy == 'ghazal')
     {
