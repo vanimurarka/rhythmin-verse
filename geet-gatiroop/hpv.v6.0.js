@@ -14,6 +14,7 @@ class cChar {
 		this.isKaafiyaa = false;
 		this.isHindi = false;
 		this.rhymeLevel = 0; // 0 = no rhyme, 1 = vowel rhyme, 2 = full rhyme
+		this.rhymeGroup = -1; // for coloring rhymed letters in diff colors based on diff rhyming lines
 
 		// space / comma OR whole vowel 
         if (((mainCharCode == 32)||(mainCharCode == 44)) || ((mainCharCode >= 2309) && (mainCharCode <= 2324)))
@@ -362,7 +363,7 @@ class cLine {
 
 		return this.maatraa;
 	}
-	doesItRhyme(compareLine)
+	doesItRhyme(compareLine, rg)
 	{
 		let lc1, lc2; // last chars of respective lines
 		lc1 = this.getLastChar();
@@ -377,6 +378,8 @@ class cLine {
 
 		lc1.rhymeLevel = 2;
 		lc2.rhymeLevel = 2;
+		lc1.rhymeGroup = rg;
+		lc2.rhymeGroup = rg;
 
 		let i = 1;
 		let j = 1; // counters
@@ -410,11 +413,15 @@ class cLine {
 					i++; j++; fm++; 
 					c1.rhymeLevel = 2;
 					c2.rhymeLevel = 2;
+					c1.rhymeGroup = rg;
+					c2.rhymeGroup = rg;
 				}
 			else if (result == 'vowel')
 				{ i++; j++; pm++; 
 					c1.rhymeLevel = 1;
 					c2.rhymeLevel = 1;
+					c1.rhymeGroup = rg;
+					c2.rhymeGroup = rg;
 				}
 			else
 			{
@@ -425,6 +432,8 @@ class cLine {
 		{
 			lc1.rhymeLevel = 0; // unmark last character
 			lc2.rhymeLevel = 0; // unmark last character
+			lc1.rhymeGroup = -1; // no special line group
+			lc2.rhymeGroup = -1; // no special line group
 			return false;
 		}
 		if ((fm+pm) > 1)
@@ -692,40 +701,50 @@ class cPoem {
 		let i = 0;
 		let j = 1;
 		let endReached = false;
+		let rhymeGroup = 0;
+		let rhymeFoundForRhymeGroup = false;
 		for (i = 0; i < this.lineCount - 1; i++)
 		{
 			let line1 = this.lines[i];
 			if (line1.rhymeFound)
 				continue;
 
-			console.log("line "+i);
+			// console.log("line "+i);
 
 			endReached = false;
 			j = i+1;
 			if (this.lineCount <= j)
+			{
 				endReached = true;
+			}
+
 			while (!endReached)
 			{
 				let line2 = this.lines[j];
-				console.log("doesItRhyme with line "+j);
+				// console.log("doesItRhyme with line "+j);
 				if (!line2.rhymeFound)
 				{
-					if (line1.doesItRhyme(line2))
+					if (line1.doesItRhyme(line2,rhymeGroup))
 					{
 						line1.rhymeFound = true;
 						line2.rhymeFound = true;
-						line1.rhymeGroup = i;
-						line2.rhymeGroup = i;
+						line1.rhymeGroup = rhymeGroup;
+						line2.rhymeGroup = rhymeGroup;
+						rhymeFoundForRhymeGroup = true;
 					}
 				}
 				j++;
 				if (this.lineCount <= j)
+				{
 					endReached = true;
+					if (rhymeFoundForRhymeGroup)
+					{
+						rhymeFoundForRhymeGroup = false; // reset for next rhymeGroup
+						rhymeGroup++; // increment rhymeGroup counter
+					} 
+				}
 			}
-		}
-		
-
-		
+		}		
 	}
 }
 
@@ -748,6 +767,7 @@ class cVisual{
 var oPoem;
 var oPrevPoem;
 var oVisual;
+var rhymeColors = ["#aec7e8","#ffbb78","#98df8a","#ff9896","#c5b0d5","#c49c94","#f7b6d2","#dbdb8d","#9edae5"];
 
 
 function visualize(poem, availableW)
@@ -1020,7 +1040,10 @@ function drawStyleCharBlock(c,colorBy)
 		{
 	  		// color = "rgb(0,220,255)"; // blue
 	  		if (c.rhymeLevel > 0)
-	  			color = "rgb(255,100,100)";
+	  		{
+	  			color = rhymeColors[c.rhymeGroup];
+	  			fillOp = "0.5";
+	  		}
 		}
 	  	else // user adjusted maatraa show in diff color
 	  	{
