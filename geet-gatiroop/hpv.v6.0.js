@@ -1,4 +1,4 @@
-// rhyming lines
+// rhyming lines identified and shown in color
 
 class cChar {
     constructor(mainChar, mainCharCode) {
@@ -1042,7 +1042,12 @@ function drawStyleCharBlock(c,colorBy)
 	  		if (c.rhymeLevel > 0)
 	  		{
 	  			color = rhymeColors[c.rhymeGroup];
-	  			fillOp = "0.5";
+	  			fillOp = "0.7";
+	  			if (color === undefined) // undo color assignment
+	  			{
+	  				color = "white";
+	  				fillOp = "0.2";
+	  			}
 	  		}
 		}
 	  	else // user adjusted maatraa show in diff color
