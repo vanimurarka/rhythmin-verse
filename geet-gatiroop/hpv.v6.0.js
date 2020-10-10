@@ -430,9 +430,12 @@ class cLine {
 		}
 		if ((fm == 1) && (pm == 0)) // only the last character matches, not a true rhyme
 		{
-			lc1.rhymeLevel = 0; // unmark last character
+			if (!this.rhymeFound) // if this line does not already rhyme with some previous line
+			{
+				lc1.rhymeLevel = 0; // unmark last character
+				lc1.rhymeGroup = -1; // no special line group
+			}
 			lc2.rhymeLevel = 0; // unmark last character
-			lc1.rhymeGroup = -1; // no special line group
 			lc2.rhymeGroup = -1; // no special line group
 			return false;
 		}
