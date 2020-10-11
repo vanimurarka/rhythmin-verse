@@ -1,5 +1,10 @@
 // rhyming lines identified and shown in color
 
+// intermediate state
+// need to check all lines with all following lines because subsequent lines may rhyme better with each other
+// need to modify line.doesItRhyme function to keep char level changes in intermediate array until this is decided so that 
+// previous findings are overwritten only if appropriate
+
 class cChar {
     constructor(mainChar, mainCharCode) {
 		this.mainChar = mainChar;
@@ -249,6 +254,7 @@ class cLine {
 		this.isComposite = false;
 		this.rhymeFound = false;
 		this.rhymeGroup = 0;
+		this.rhymeLength = 0;
 	}
 	// change the vowel of the last character
 	lastCharVowel(vowelString)
@@ -442,7 +448,7 @@ class cLine {
 		if ((fm+pm) > 1)
 		{
 			// console.log(fm+pm);
-			return true;
+			return fm+pm;
 		}
 		else
 			return false;
@@ -727,12 +733,18 @@ class cPoem {
 				// console.log("doesItRhyme with line "+j);
 				if (!line2.rhymeFound)
 				{
-					if (line1.doesItRhyme(line2,rhymeGroup))
+
+					rhymeResult = line1.doesItRhyme(line2, rhymeGroup);
+					if (rhymeResult)
 					{
 						line1.rhymeFound = true;
 						line2.rhymeFound = true;
 						line1.rhymeGroup = rhymeGroup;
 						line2.rhymeGroup = rhymeGroup;
+						if (line1.rhymeLength < rhymeResult)
+							line1.rhymeLength = rhymeResult;
+						if (line2.rhymeLength < rhymeResult)
+							line2.rhymeLength = rhymeResult;
 						rhymeFoundForRhymeGroup = true;
 					}
 				}
