@@ -382,10 +382,12 @@ class cLine {
 		if (lc1.text != lc2.text)
 			return 0;
 
-		lc1.rhymeLevel = 2;
-		lc2.rhymeLevel = 2;
-		lc1.rhymeGroup = rg;
-		lc2.rhymeGroup = rg;
+		let rhymeChars1 = [];
+		let rhymeChars2 = [];
+
+		/*rhymeChars1[rhymeChars1.length] = ["last", 2];
+		rhymeChars2[rhymeChars2.length] = ["last", 2];*/
+		/**/
 
 		let i = 1;
 		let j = 1; // counters
@@ -415,26 +417,32 @@ class cLine {
 			let result = c1.compare(c2); 
 			// is the full character matching and no vowel-match found till now
 			if ((result == 'all') && (pm == 0))
-				{ 
-					i++; j++; fm++; 
-					c1.rhymeLevel = 2;
+			{ 
+				rhymeChars1[rhymeChars1.length] = [i, 2];
+				rhymeChars2[rhymeChars2.length] = [j, 2];
+				i++; j++; fm++; 
+					
+					/*c1.rhymeLevel = 2;
 					c2.rhymeLevel = 2;
 					c1.rhymeGroup = rg;
-					c2.rhymeGroup = rg;
-				}
+					c2.rhymeGroup = rg;*/
+			}
 			else if (result == 'vowel')
-				{ i++; j++; pm++; 
-					c1.rhymeLevel = 1;
+			{
+				rhymeChars1[rhymeChars1.length] = [i, 1];
+				rhymeChars2[rhymeChars2.length] = [j, 1];
+				i++; j++; pm++; 
+					/*c1.rhymeLevel = 1;
 					c2.rhymeLevel = 1;
 					c1.rhymeGroup = rg;
-					c2.rhymeGroup = rg;
-				}
+					c2.rhymeGroup = rg;*/
+			}
 			else
 			{
 				break;
 			}
 		}
-		if ((fm == 1) && (pm == 0)) // only the last character matches, not a true rhyme
+		/*if ((fm == 1) && (pm == 0)) // only the last character matches, not a true rhyme
 		{
 			if (!this.rhymeFound) // if this line does not already rhyme with some previous line
 			{
@@ -444,11 +452,41 @@ class cLine {
 			lc2.rhymeLevel = 0; // unmark last character
 			lc2.rhymeGroup = -1; // no special line group
 			return false;
-		}
+		}*/
 		if ((fm+pm) > 1)
 		{
 			// console.log(fm+pm);
-			return fm+pm;
+			// if these rhyming lines are longer than previous rhyme lengths
+			// mark the rhyming characters in both lines
+			// mark the last character
+			let rhymeLength = fm + pm;
+			if (rhymeLength > this.rhymeLength)
+			{
+				lc1.rhymeLevel = 2;
+				lc1.rhymeGroup = rg;
+				// mark remaining rhyming characters
+				for (i = 0; i < rhymeChars1.length; i++) {
+					// rhymeChars1[i][0] = whicheth char
+					// rhymeChars1[i][1] = rhymeLevel
+					let c1 = this.charByReverseIndex(rhymeChars1[i][0]);
+					c1.rhymeLevel = rhymeChars1[i][1];
+					c1.rhymeGroup = rg;
+				}
+			}
+			if (rhymeLength > compareLine.rhymeLength) {
+				lc2.rhymeLevel = 2;
+				lc2.rhymeGroup = rg;
+				// mark remaining rhyming characters
+				for (i = 0; i < rhymeChars2.length; i++) {
+					// rhymeChars1[i][0] = whicheth char
+					// rhymeChars1[i][1] = rhymeLevel
+					let c1 = compareLine.charByReverseIndex(rhymeChars2[i][0]);
+					c1.rhymeLevel = rhymeChars2[i][1];
+					c1.rhymeGroup = rg;
+				}
+			}
+			return rhymeLength;
+			
 		}
 		else
 			return false;
@@ -715,8 +753,8 @@ class cPoem {
 		for (i = 0; i < this.lineCount - 1; i++)
 		{
 			let line1 = this.lines[i];
-			if (line1.rhymeFound)
-				continue;
+			/*if (line1.rhymeFound)
+				continue;*/
 
 			// console.log("line "+i);
 
@@ -731,23 +769,26 @@ class cPoem {
 			{
 				let line2 = this.lines[j];
 				// console.log("doesItRhyme with line "+j);
-				if (!line2.rhymeFound)
-				{
+				/*if (!line2.rhymeFound)
+				{*/
 
-					rhymeResult = line1.doesItRhyme(line2, rhymeGroup);
+					let rhymeResult = line1.doesItRhyme(line2, rhymeGroup);
 					if (rhymeResult)
 					{
-						line1.rhymeFound = true;
-						line2.rhymeFound = true;
-						line1.rhymeGroup = rhymeGroup;
-						line2.rhymeGroup = rhymeGroup;
-						if (line1.rhymeLength < rhymeResult)
+						if (line1.rhymeLength < rhymeResult) {
 							line1.rhymeLength = rhymeResult;
-						if (line2.rhymeLength < rhymeResult)
+							line1.rhymeFound = true;
+							line1.rhymeGroup = rhymeGroup;
+							rhymeFoundForRhymeGroup = true;
+                        }
+						if (line2.rhymeLength < rhymeResult) {
 							line2.rhymeLength = rhymeResult;
-						rhymeFoundForRhymeGroup = true;
+							line2.rhymeFound = true;
+							line2.rhymeGroup = rhymeGroup;
+							rhymeFoundForRhymeGroup = true;
+                        }
 					}
-				}
+				//}
 				j++;
 				if (this.lineCount <= j)
 				{
