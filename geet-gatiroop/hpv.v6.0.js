@@ -1,9 +1,5 @@
 // rhyming lines identified and shown in color
 
-// intermediate state
-// need to check all lines with all following lines because subsequent lines may rhyme better with each other
-// need to modify line.doesItRhyme function to keep char level changes in intermediate array until this is decided so that 
-// previous findings are overwritten only if appropriate
 
 class cChar {
     constructor(mainChar, mainCharCode) {
@@ -371,31 +367,46 @@ class cLine {
 	}
 	doesItRhyme(compareLine, rg)
 	{
-		let lc1, lc2; // last chars of respective lines
-		lc1 = this.getLastChar();
-		lc2 = compareLine.getLastChar();
-		if (!lc1)
-			return 0;
-		if (!lc2)
-			return 0;
-		
-		if (lc1.text != lc2.text)
-			return 0;
-
+		let i = 0;
+		let j = 0; // counters
 		let rhymeChars1 = [];
 		let rhymeChars2 = [];
+		let loop = true;
+		// first check if last valid chars are truly equal or not
+		while (loop) {
+			let lc1, lc2; // last chars of respective lines
+			lc1 = this.charByReverseIndex(i);
+			if (!lc1)
+				return false;
+			if (!lc1.isHindi) {
+				i++;
+				continue;
+			}
+			lc2 = compareLine.charByReverseIndex(j);
+			if (!lc2)
+				return false;
+			if (!lc2.isHindi) {
+				j++;
+				continue;
+			}
 
-		/*rhymeChars1[rhymeChars1.length] = ["last", 2];
-		rhymeChars2[rhymeChars2.length] = ["last", 2];*/
-		/**/
-
-		let i = 1;
-		let j = 1; // counters
+			let result = lc1.compare(lc2);
+			if (result == "all") {
+				rhymeChars1[rhymeChars1.length] = [i, 2];
+				rhymeChars2[rhymeChars2.length] = [j, 2];
+				i++;
+				j++;
+				break;
+			}
+			else
+				return false;
+        }
+		
 		let fm = 1; // number of full matching characters
 		let pm = 0; // number of vowel matching characters
 		let c1, c2;
-		let loop = true;
-		
+
+		// check for remaining characters
 		while(loop)
 		{
 			c1 = this.charByReverseIndex(i);
@@ -420,50 +431,29 @@ class cLine {
 			{ 
 				rhymeChars1[rhymeChars1.length] = [i, 2];
 				rhymeChars2[rhymeChars2.length] = [j, 2];
-				i++; j++; fm++; 
-					
-					/*c1.rhymeLevel = 2;
-					c2.rhymeLevel = 2;
-					c1.rhymeGroup = rg;
-					c2.rhymeGroup = rg;*/
+				i++; j++; fm++; 					
 			}
 			else if (result == 'vowel')
 			{
 				rhymeChars1[rhymeChars1.length] = [i, 1];
 				rhymeChars2[rhymeChars2.length] = [j, 1];
 				i++; j++; pm++; 
-					/*c1.rhymeLevel = 1;
-					c2.rhymeLevel = 1;
-					c1.rhymeGroup = rg;
-					c2.rhymeGroup = rg;*/
 			}
 			else
 			{
 				break;
 			}
 		}
-		/*if ((fm == 1) && (pm == 0)) // only the last character matches, not a true rhyme
-		{
-			if (!this.rhymeFound) // if this line does not already rhyme with some previous line
-			{
-				lc1.rhymeLevel = 0; // unmark last character
-				lc1.rhymeGroup = -1; // no special line group
-			}
-			lc2.rhymeLevel = 0; // unmark last character
-			lc2.rhymeGroup = -1; // no special line group
-			return false;
-		}*/
 		if ((fm+pm) > 1)
 		{
-			// console.log(fm+pm);
+			//console.log(fm);
+			//console.log(pm);
 			// if these rhyming lines are longer than previous rhyme lengths
 			// mark the rhyming characters in both lines
 			// mark the last character
 			let rhymeLength = fm + pm;
 			if (rhymeLength > this.rhymeLength)
 			{
-				lc1.rhymeLevel = 2;
-				lc1.rhymeGroup = rg;
 				// mark remaining rhyming characters
 				for (i = 0; i < rhymeChars1.length; i++) {
 					// rhymeChars1[i][0] = whicheth char
@@ -474,8 +464,6 @@ class cLine {
 				}
 			}
 			if (rhymeLength > compareLine.rhymeLength) {
-				lc2.rhymeLevel = 2;
-				lc2.rhymeGroup = rg;
 				// mark remaining rhyming characters
 				for (i = 0; i < rhymeChars2.length; i++) {
 					// rhymeChars1[i][0] = whicheth char
@@ -740,7 +728,6 @@ class cPoem {
 	}
 	findRhymingLines()
 	{
-		// alert('in findRhymingLines');
 		
 		if (this.lineCount < 2)
 			return;
@@ -823,7 +810,18 @@ class cVisual{
 var oPoem;
 var oPrevPoem;
 var oVisual;
-var rhymeColors = ["#aec7e8","#ffbb78","#98df8a","#ff9896","#c5b0d5","#c49c94","#f7b6d2","#dbdb8d","#9edae5"];
+var rhymeColors = [
+	"#046ffd", // blue "#aec7e8",
+	"#ff8004", // orange "#ffbb78", 
+	"rgb(0,255,0)", // green "#98df8a",
+	"#fd4c48", // red as pink "#ff9896", 
+	"#9203ff", // purple "#c5b0d5", 
+	"#ff00a0", // magenta "#c49c94", 
+	"#a4ff00", // lemon green
+	//"#f7b6d2", 
+	// "#dbdb8d", 
+	//"#9edae5"
+];
 
 
 function visualize(poem, availableW)
@@ -1083,7 +1081,7 @@ function drawStyleCharBlock(c,colorBy)
 	if (c.vowelNumber === -10) // do not display space, comma
 	  return "display: none";
 
-	var color = "white";
+	var color = "rgb(0,220,255)";
 	var strokeOp = "0.3";
 	var strokeW = 1;
 	var fillOp = "0.2";
@@ -1098,7 +1096,7 @@ function drawStyleCharBlock(c,colorBy)
 	  		if (c.rhymeLevel > 0)
 	  		{
 	  			color = rhymeColors[c.rhymeGroup];
-	  			fillOp = "0.7";
+	  			fillOp = "0.4";
 	  			if (color === undefined) // undo color assignment
 	  			{
 	  				color = "white";
