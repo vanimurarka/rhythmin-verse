@@ -7,7 +7,7 @@
   <script src="https://cdn.rawgit.com/eligrey/FileSaver.js/e9d941381475b5df8b7d7691013401e171014e89/FileSaver.min.js"></script>
   <style type="text/css">
     .surLine {stroke-width: 1px}
-    .raagLine {stroke-width: 2px}
+    .raagLine {stroke-width: 3px}
   </style>
 </head>
 <body>
@@ -31,8 +31,13 @@ var colorsL = ["silver",
             "#ff6aee", // pink
             "#bf6aff", // lavender
             ]
-var s = {_n:30.87, s:32.70, r_:34.65, r:36.71, g_:38.89, g:41.20, m:43.65, m1: 46.25, p:49.00, d_:51.91, d:55.00, n_:58.27, n:61.74, S:65.41};
-var surs = [{name:"_n",freq:30.87, pure:true}, 
+var s = {b: 0, _m:21.83, _m1: 23.12, _p: 24.5, _d_: 25.96, _d: 27.5, _n_: 29.14, _n:30.87, s:32.70, r_:34.65, r:36.71, g_:38.89, g:41.20, m:43.65, m1: 46.25, p:49.00, d_:51.91, d:55.00, n_:58.27, n:61.74, S:65.41, R_:69.3, R:73.42};
+var surs = [{name:"_m", freq:21.83, pure:true},
+            {name:"_p", freq:24.5, pure:true},
+            {name:"_d_", freq:25.96, pure:false},
+            {name: "_d", freq:27.5, pure:true},
+            {name:"_n_", freq:29.14, pure:false},
+            {name:"_n",freq:30.87, pure:true}, 
             {name:"s",freq:32.70, pure:true}, 
             {name:"r",freq:36.71, pure: true}, 
             {name:"g",freq:41.20, pure: true}, 
@@ -42,56 +47,93 @@ var surs = [{name:"_n",freq:30.87, pure:true},
             {name:"d",freq:55.00, pure: true},
             {name:"n_",freq:58.27, pure: false}, 
             {name:"n",freq:61.74, pure: true}, 
-            {name:"S",freq:65.41, pure: true}];
+            {name:"S",freq:65.41, pure: true},
+            {name: "R",freq:73.42, pure:true}];
 function pureSurs(sur)
 {
   return sur.pure;
 }
 var bilaawal = {name:"Bilaawal",
-            aaroh: [s.s,s.r,s.g
-            //,s.m,s.p,s.d,s.n,s.S
-            ],
-            avaroh: [
-            //s.S,s.n,s.d,s.p,s.m,s.g,s.r,s.s
-            ],
-            sthaayee: [s.g, s.p, s.d, s.n, s.S, s.S, s.S, s.S,
+            aaroh: [s.s,s.r,s.g,s.m,s.p,s.d,s.n,s.S],
+            avaroh: [s.S,s.n,s.d,s.p,s.m,s.g,s.r,s.s],
+            sthaayee: [s.g, s.p, s.d, s.n, s.S, s.b, s.S, s.S,
                     s.S, s.R, s.S, s.n, s.d, s.p, s.g, s.r,
                     s.r, s.g, s.m, s.p, s.m, s.p, s.d, s.p,
                     s.m, s.p, s.m, s.g, s.m, s.g, s.m, s.r]};
 var yaman = {name:"Yaman",
           aaroh: [s._n,s.r,s.g,s.m1,s.p,s.d,s.n,s.S],
-          avaroh: [s.S,s.n,s.d,s.p,s.m1,s.g,s.r,s.s]};
+          avaroh: [s.S,s.n,s.d,s.p,s.m1,s.g,s.r,s.s],
+          sthaayee: [s.n, s.d, s.b, s.p, s.m1, s.p, s.g, s.m1,
+                  s.p, s.b, s.b, s.b, s.p, s.m1, s.g, s.r,
+                  s.s, s.r, s.g, s.r, s.g, s.m1, s.p, s.d,
+                  s.p, s.m1, s.g, s.r, s.g, s.r, s.s, s.b,
+                  s._n,s.r,s.g,s.m1,s.p,s.d,s.n,s.S,
+                  s.R, s.S, s.n, s.d, s.p, s.m1, s.g, s.m1]};
 var kaafee = {name:"Kaafee",
           aaroh: [s.s,s.r,s.g_,s.m,s.p,s.d,s.n_,s.S],
-          avaroh: [s.S,s.n_,s.d,s.p,s.m,s.g_,s.r,s.s]};
+          avaroh: [s.S,s.n_,s.d,s.p,s.m,s.g_,s.r,s.s],
+          sthaayee: [s.s, s.s, s.r, s.r, s.g_, s.g_, s.m, s.m,
+                  s.p, s.b, s.b, s.m, s.p, s.d, s.n_, s.S,
+                  s.n_, s.d, s.p, s.m, s.g_, s.g_, s.r, s.r,
+                  s.r, s.p, s.m, s.p, s.m, s.g_, s.r, s.s]};
 var bhairav = {name:"Bhairav",
             aaroh: [s.s,s.r_,s.g,s.m,s.p,s.d_,s.n,s.S],
-            avaroh: [s.S,s.n,s.d_,s.p,s.m,s.g,s.r_,s.s]};
+            avaroh: [s.S,s.n,s.d_,s.p,s.m,s.g,s.r_,s.s],
+            sthaayee: [s.d_, s.p, s.b, s.d_, s.m, s.p, s.g, s.m,
+                  s.d_, s.b, s.p, s.m, s.g, s.m, s.r_, s.s,
+                  s.s, s.r_, s.g, s.m, s.p, s.d_, s.n, s.S,
+                  s.R_, s.S, s.n, s.d_, s.p, s.m, s.g, s.m]};
 var bhairavi = {name:"Bhairavi",
-            aaroh: [s.s,s.r_,s.g_
-            //,s.m,s.p,s.d_,s.n_,s.S
-            ],
-            avaroh: [
-            //s.S,s.n_,s.d_,s.p,s.m,s.g_,s.r_,s.s
-            ]};
+            aaroh: [s.s,s.r_,s.g_,s.m,s.p,s.d_,s.n_,s.S],
+            avaroh: [s.S,s.n_,s.d_,s.p,s.m,s.g_,s.r_,s.s],
+            sthaayee: [s.s, s.r_, s.s, s._n_, s.s, s._d_, s.b, s._n_,
+                    s.s, s.b, s.s, s.s, s.g_, s.b, s.r_, s.s,
+                    s._n_, s.s, s.g_, s.m, s.p, s.d_, s.p, s.m,
+                    s.g_, s.m, s.d_, s.p, s.m, s.g_, s.r_, s.s]};
 var khamaj = {name:"Khamaaj",
           aaroh: [s.s,s.g,s.m,s.p,s.d,s.n,s.S],
-          avaroh: [s.S,s.n_,s.d,s.p,s.m,s.g,s.r,s.s]};
+          avaroh: [s.S,s.n_,s.d,s.p,s.m,s.g,s.r,s.s],
+          sthaayee: [s.g, s.g, s.s, s.g, s.m, s.p, s.g, s.m,
+                  s.n_, s.d, s.b, s.m, s.p, s.d, s.b, s.m,
+                  s.g, s.b, s.b, s.b, s.d, s.n, s.S, s.b,
+                  s.S, s.n_, s.d, s.p, s.m, s.g, s.r, s.s]};
 var aashaavari = {name:"Aashaavari",
           aaroh: [s.s,s.r,s.m,s.p,s.d_,s.S],
-          avaroh: [s.S,s.n_,s.d_,s.p,s.m,s.g_,s.r,s.s]};
+          avaroh: [s.S,s.n_,s.d_,s.p,s.m,s.g_,s.r,s.s],
+          sthaayee: [s.r, s.m, s.p, s.n_, s.d_, s.d_, s.p, s.p,
+                  s.m, s.p, s.d_, s.p, s.g_, s.g_, s.r, s.s,
+                  s.r, s.s, s._d_, s._p, s._m, s._p, s._d_, s.s,
+                  s.r, s.m, s.p, s.d_, s.g_, s.g_, s.r, s.s]};
 var poorvi = {name: "Poorvi",
           aaroh: [s.s, s.r_, s.g, s.m1, s.p, s.d_, s.n, s.S],
-          avaroh: [s.S,s.n,s.d_,s.p,s.m1,s.g,s.m,s.g,s.r_,s.s]};
+          avaroh: [s.S,s.n,s.d_,s.p,s.m1,s.g,s.m,s.g,s.r_,s.s],
+          sthaayee: [s.s, s.d_, s.m1, s.p, s.g, s.m, s.g, s.r_,
+                  s.m, s.g, s.b, s.r_, s.g, s.m1, s.p, s.b,
+                  s.p, s.d_, s.m1, s.p, s.g, s.m, s.g, s.b,
+                  s.r_, s.g, s.b, s.m1, s.g, s.r_, s.s, s.b,
+                  s._n, s._n, s.s, s.r_, s.g, s.b, s.m1, s.g,
+                  s.m1, s.d_, s.R_, s.n, s.d_, s.n, s.d_, s.p,
+                  s.p, s.d_, s.m1, s.p, s.g, s.m, s.g, s.r_,
+                  s.m, s.g, s.b, s.r_, s.g, s.m1, s.p, s.b]};
 var maarwa = {name: "Marwaa",
           aaroh: [s.s,s.r_,s.g,s.m1,s.d,s.n,s.d,s.S],
-          avaroh: [s.S,s.n,s.d,s.m1,s.g,s.r_,s.s]};
+          avaroh: [s.S,s.n,s.d,s.m1,s.g,s.r_,s.s],
+          sthaayee: [s.d, s.m1, s.d, s.m1, s.g, s.r_, s.g, s.m1, s.g, s.r_, s.s, s.b,
+                    s._n, s.r_, s._n, s._d, s._m1, s._d, s.s, s.b, s.r_, s.r_, s.s, s.b,
+                    s._n, s.r_, s.g, s.g, s.m1, s.d, s.m1, s.d, s.S, s.b, s.R_, s.S,
+                    s.n, s.R_, s.n, s.d, s.m1, s.d, s.n, s.d, s.m1, s.g, s.r_, s.s]};
 var todi = {name: "Todi",
           aaroh: [s.s, s.r_, s.g_, s.m1, s.p, s.d_, s.n, s.S],
-          avaroh: [s.S, s.n, s.d_, s.p, s.m1, s.g_, s.r_, s.s]}
+          avaroh: [s.S, s.n, s.d_, s.p, s.m1, s.g_, s.r_, s.s],
+          sthaayee: [s._n, s.s, s.g_, s.m1, s.p, s.m1, s.p, s.d_, 
+                    s.m1, s.b, s.g_, s.r_, s.g_, s.r_, s.s, s.b,
+                    s.m1, s.m1, s.p, s.d_, s.m1, s.m1, s.g_, s.b,
+                    s.r_, s.r_, s.g_, s.r_, s.g_, s.r_, s.s, s.b,
+                    s._n, s.s, s.g_, s.g_, s.m1, s.b, s.d_, s.n,
+                    s.m1, s.b, s.g_, s.r_, s.g_, s.r_, s.s, s.b]}
 // set the dimensions and margins of the graph
 var margin = {top: 10, right: 10, bottom: 0, left: 10},
-    width = 550 - margin.left - margin.right,
+    width = 1200 - margin.left - margin.right,
     height = 400 - margin.top - margin.bottom;
 // append the svg object to the body of the page
 var svg = d3.select("#my_dataviz")
@@ -102,25 +144,36 @@ var svgPlotArea = svg.append("g")
     .attr("transform",
           "translate(" + margin.left + "," + margin.top + ")");
 var x = d3.scaleLinear()
-      .domain([0,20])
+      .domain([0,64])
       .range([ 0, width ]);
 var y = d3.scaleLinear()
-      .domain( [surs[0].freq-1, 70])
+      .domain( [surs[0].freq-1, 75])
       .range([ height, 0 ]);
 drawScale();
-drawRaagAarohAvaroh(bilaawal,0,0);
-drawRaagAarohAvaroh(bhairavi,1,1);
-//drawRaagSthaayee(bilaawal,0,0);
+// drawRaagSthaayee(bilaawal,"fixed",0,0);
+// drawRaagSthaayee(yaman,1,1);
+// drawRaagSthaayee(kaafee,2,2);
+// drawRaagSthaayee(bhairav,2,2);
+// drawRaagSthaayee(bhairavi,3,3);
 // drawRaag(yaman,1,1);
 // drawRaag(kaafee,1,1);
 // drawRaag(bhairav,2,2);
 // drawRaag(bhairavi,3,3);
-// drawRaag(khamaj,1,1);
-// drawRaag(aashaavari,2,2);
-// drawRaag(poorvi,4,1);
-// drawRaag(maarwa,5,2);
-// drawRaag(todi,4,2);
+// drawRaagSthaayee(khamaj,1,1);
+// drawRaagSthaayee(aashaavari,4,2);
+// drawRaagSthaayee(poorvi,5,1);
+// drawRaagSthaayee(maarwa,5,2);
+// drawRaagSthaayee(todi,5,2);
 
+function getBlankFreq(data, blankIndex)
+{
+  currentI = blankIndex;
+  while (data[currentI] == 0)
+  {
+    currentI--;
+  }
+  return data[currentI];
+}
 
 function drawScale()
 {
@@ -197,31 +250,51 @@ function drawRaagAarohAvaroh(raag,color,raagIndex)
         .attr("fill", colorsL[color]);
 };
 
-function drawRaagSthaayee(raag,color,raagIndex)
+setInterval(drawLine,900);
+
+var noteIndex = 0;
+// var drawnLine = 
+function drawLine() {
+  noteIndex++;
+  svgPlotArea.select("path").remove();
+  svgPlotArea.select("#dots").remove();
+  // var chart = d3.select("#chart");
+  // chart.select("svg").remove();
+  drawRaagSthaayee(poorvi ,noteIndex,5,2);
+}
+
+function drawRaagSthaayee(raag,noteindex,color,raagIndex)
 {
-    legendLevel = y(surs[surs.length - raagIndex - 1].freq);
-    data = raag.sthaayee;
+    if (noteindex == "fixed")
+    {
+      data = raag.aaroh.concat(raag.avaroh);
+    }
+    data = raag.sthaayee.slice(0,noteindex);
+    // data = raag.aaroh.concat(raag.avaroh).slice(0, noteindex);
     // Add the line
     svgPlotArea.append("path")
       .datum(data)
       .attr("fill", "none")
+      .attr("id","#path")
       .attr("stroke", colorsL[color])
       // .attr("stroke-width", 2)
       .attr("class","raagLine")
       .attr("d", d3.line()
         .x(function(d, i) { return x(i+1) })
-        .y(function(d) { return y(d) })
+        .y(function(d, i) { if (d == 0) return y(getBlankFreq(data,i)); else return y(d); })
+        .curve(d3.curveMonotoneY) // curveMonotoneY is good
         );
     // Add the points
     svgPlotArea
       .append("g")
+      .attr("id","dots")
       .selectAll("dot")
       .data(data)
       .enter()
       .append("circle")
         .attr("cx", function(d, i) { return x(i + 1) } )
         .attr("cy", function(d) { return y(d) } )
-        .attr("r", 5)
+        .attr("r", 4)
         .attr("fill", colorsL[color]);
 };
 
