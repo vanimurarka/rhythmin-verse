@@ -946,7 +946,7 @@ function splitNprocessPoem(poem)
 	    }
     }
     oPoem.findRhymingLines();
-    console.log(oPoem);
+    // console.log(oPoem);
 }
 
 var charW = 20; 
@@ -1109,18 +1109,6 @@ function draw()
       .attr("class", "graphText3")
       .text(function(d) { return (d.maatraa > 0) ? d.maatraa : "";});
     }
-    
-    // Set-up the export button
-		d3.select('#saveButton').on('click', function() {
-			// debugger;
-		  var svgString = getSVGString(svg.node(), svgW, svgH);
-		  // svgString2Image( svgString, 2*width, 2*height, 'png', save ); // passes Blob and filesize String to the callback
-		  svgString2Image( svgString, 2*svgW, 2*svgH, 'png', save ); // passes Blob and filesize String to the callback
-
-		  function save( dataBlob, filesize ){
-		    saveAs( dataBlob, 'geetgatiroop-output.png' ); // FileSaver.js function
-		  }
-		});
 }
 
 // helper for draw function to place text in correct position
@@ -1422,56 +1410,72 @@ function fnGhazal()
 
 
 
-// Below are the functions that handle actual exporting:
-// getSVGString ( svgNode ) and svgString2Image( svgString, width, height, format, callback )
-function getSVGString( svgNode , svgWidth, svgHeight) {
-	// convert svgNode to string using library
-  const serializer = new XMLSerializer();
-  let svgString = serializer.serializeToString(svgNode);
+// Download SVG as PNG on user's system
+function saveSVG() {
+	var chart = document.getElementById("chart");
+	var svg = chart.querySelector('svg');
+	var canvas = document.createElement("canvas");
+  var data = new XMLSerializer().serializeToString(svg);
 
-  // increase height of svg to include geet gatiroop text
+  // ADD geet-gatiroop.com to bottom of image
+  if (data.search("viewBox") == -1) // not fitscreen
   {
-	  svgStart = '<svg xmlns="http://www.w3.org/2000/svg" width="'+svgWidth+'" height="';
-	  svgString = svgString.substring(svgStart.length+svgHeight.toString().length);
+  	var width = svg.getBoundingClientRect().width;
+		var height = svg.getBoundingClientRect().height;
+		canvas.width = width;
+  	canvas.height = height+10;
+
+	  var svgStart = '<svg xmlns="http://www.w3.org/2000/svg" width="'+width+'" height="';
+	  data = data.substring(svgStart.length+height.toString().length);
 	  // insert new height
-	  svgString = svgStart + (svgHeight+10) + svgString;
+	  data = svgStart + (height+10) + data;
 
 	  // get svg string minus svg closing tag
-	  svgString = svgString.substring(0,svgString.length-6);
+	  data = data.substring(0,data.length-6);
 	  // insert geet gatiroop text at bottom just before closing svg tag
-	  svgString += '<text x="2" y="'+(svgHeight+10-4)+'">geet-gatiroop.com</text></svg>';
-  }
-  return svgString;
-}
+	  data += '<text x="2" y="'+(height+10-4)+'">geet-gatiroop.com</text></svg>';
+	}
+	else
+	{
+		var box = svg.viewBox.baseVal;
+		canvas.width = box.width;
+  	canvas.height = box.height+10;
 
+  	canvas.height += 10;
 
-function svgString2Image( svgString, width, height, format, callback ) {
-  var format = format ? format : 'png';
+	  var svgStart = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+box.width+' ';
+	  data = data.substring(svgStart.length+box.height.toString().length);
 
-  var imgsrc = 'data:image/svg+xml;base64,'+ btoa( unescape( encodeURIComponent( svgString ) ) ); // Convert SVG string to data URL
-  // console.log(imgsrc);
-  var canvas = document.createElement("canvas");
-  var context = canvas.getContext("2d");
+	  // insert new height
+	  data = svgStart + (box.height+10) + data;
 
-  canvas.width = width;
-  canvas.height = height;
+	  // get svg string minus svg closing tag
+	  data = data.substring(0,data.length-6);
+	  // insert geet gatiroop text at bottom just before closing svg tag
+	  data += '<text x="2" y="'+(box.height+10-4)+'">geet-gatiroop.com</text></svg>';
+	}
 
-  var image = new Image();
-  image.onload = function() {
-    context.clearRect ( 0, 0, width, height );
-    context.drawImage(image, 0, 0, width, height);
-
-    canvas.toBlob( function(blob) {
-      var filesize = Math.round( blob.length/1024 ) + ' KB';
-      if ( callback ) callback( blob, filesize );
-    });
-
-    
+  var win = window.URL || window.webkitURL || window;
+  var img = new Image();
+  var blob = new Blob([data], { type: 'image/svg+xml' });
+  var url = win.createObjectURL(blob);
+  img.onload = function () 
+  {
+    canvas.getContext('2d').drawImage(img, 0, 0);
+    win.revokeObjectURL(url);
+    var uri = canvas.toDataURL('image/png').replace('image/png', 'octet/stream');
+    var a = document.createElement('a');
+    document.body.appendChild(a);
+    a.style = 'display: none';
+    a.href = uri
+    a.download = "geetgatiroop-output.png";
+    a.click();
+    window.URL.revokeObjectURL(uri);
+    document.body.removeChild(a);
   };
 
-  image.onerror = function() {alert("image load error " + this.src)};
-  // console.log(imgsrc);
-  image.src = imgsrc;
+  img.src = url;
+
 }
 
 // used for minification
