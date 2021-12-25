@@ -964,7 +964,7 @@ function initSvgFixed(svgW, svgH)
 	var svg = chart.append("svg")
 	          .attr("width", function() {return svgW;})
 	          .attr("height", function() {return svgH;})
-	          .attr("style","border-bottom: solid 1px #ddd;");
+	          .attr("style","border-bottom: solid 1px #ddd;background-color:white");
 	return svg;
 }
 
@@ -974,7 +974,7 @@ function initSvgFlex(svgViewBox)
 	var svg = chart.append("svg")
 	          .attr("viewBox",svgViewBox)
 	          .attr("preserveAspectRatio","xMidYMid meet")
-	          .attr("style","border-bottom: solid 1px #ddd;");
+	          .attr("style","border-bottom: solid 1px #ddd;background-color:white");
 	return svg;
 }
 
@@ -1416,7 +1416,7 @@ function saveSVG() {
 	var svg = chart.querySelector('svg');
 	var canvas = document.createElement("canvas");
   var data = new XMLSerializer().serializeToString(svg);
-
+  //alert(data);
   // ADD geet-gatiroop.com to bottom of image
   if (data.search("viewBox") == -1) // not fitscreen
   {
@@ -1435,7 +1435,7 @@ function saveSVG() {
 	  // insert geet gatiroop text at bottom just before closing svg tag
 	  data += '<text x="2" y="'+(height+10-4)+'">geet-gatiroop.com</text></svg>';
 	}
-	else
+	else // free size as per poem -- no viewbox
 	{
 		var box = svg.viewBox.baseVal;
 		canvas.width = box.width;
