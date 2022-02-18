@@ -12,7 +12,7 @@
 </head>
 <body>
 <!-- Load d3.js -->
-<script src="https://d3js.org/d3.v4.js"></script>
+<script src="https://d3js.org/d3.v6.js"></script>
 
 <!-- Create a div where the graph will take place -->
 <div id="my_dataviz" style="display: inline-block;"></div>
@@ -31,28 +31,93 @@ var colorsL = ["silver",
             "#ff6aee", // pink
             "#bf6aff", // lavender
             ]
-var s = {b: 0, _m:21.83, _m1: 23.12, _p: 24.5, _d_: 25.96, _d: 27.5, _n_: 29.14, _n:30.87, s:32.70, r_:34.65, r:36.71, g_:38.89, g:41.20, m:43.65, m1: 46.25, p:49.00, d_:51.91, d:55.00, n_:58.27, n:61.74, S:65.41, R_:69.3, R:73.42};
-var surs = [{name:"_m", freq:21.83, pure:true},
-            {name:"_p", freq:24.5, pure:true},
+var s = {b: 0, _m:21.83, _m1: 23.12, _p: 24.5, _d_: 25.96, _d: 27.5, _n_: 29.14, _n:30.87, s:32.70, r_:34.65, r:36.71, g_:38.89, g:41.20, m:43.65, m1: 46.25, p:49.00, d_:51.91, d:55.00, n_:58.27, n:61.74, S:65.41, R_:69.3, R:73.42, G:82.41};
+var surs = [{name:"_m", freq:21.83, pure:false},
+            {name:"_p", freq:24.5, pure:false},
             {name:"_d_", freq:25.96, pure:false},
-            {name: "_d", freq:27.5, pure:true},
+            {name: "_d", freq:27.5, pure:false},
             {name:"_n_", freq:29.14, pure:false},
-            {name:"_n",freq:30.87, pure:true}, 
+            {name:"_n",freq:30.87, pure:false}, 
             {name:"s",freq:32.70, pure:true}, 
-            {name:"r",freq:36.71, pure: true}, 
-            {name:"g",freq:41.20, pure: true}, 
-            {name:"m",freq:43.65, pure: true}, 
-            {name:"p",freq:49.00, pure: true}, 
+            {name:"r",freq:36.71, pure: false}, 
+            {name:"g",freq:41.20, pure: false}, 
+            {name:"m",freq:43.65, pure: false}, 
+            {name:"p",freq:49.00, pure: false}, 
             {name:"d_",freq:51.91, pure: false},
-            {name:"d",freq:55.00, pure: true},
+            {name:"d",freq:55.00, pure: false},
             {name:"n_",freq:58.27, pure: false}, 
-            {name:"n",freq:61.74, pure: true}, 
+            {name:"n",freq:61.74, pure: false}, 
             {name:"S",freq:65.41, pure: true},
-            {name: "R",freq:73.42, pure:true}];
+            {name: "R",freq:73.42, pure:false},
+            {name: "G", freq:82.41, pure:false}];
 function pureSurs(sur)
 {
   return sur.pure;
 }
+var bilahari = {name:"Bilahari",
+            aaroh: [s.s,s.r,s.g,s.p,s.d,s.S],
+            avaroh: [s.S,s.n,s.d,s.p,s.m,s.g,s.r,s.s],
+            // sthaayee: [s.s, s.b, s.b, s.r, s.g, s.b, s.p, s.b,  // pallavi
+            //         s.d, s.b, s.S, s.b, s.n, s.b, s.d, s.b,
+            //         s.p, s.b, s.d, s.p, s.m, s.g, s.r, s.s,
+            //         s.r, s.s, s._n, s._d, s.s, s.b, s.b, s.b,
+            // s.s, s.b, s.b, s.r, s.g, s.b, s.p, s.b,             // pallavi
+            //         s.d, s.b, s.S, s.b, s.n, s.b, s.d, s.b,
+            //         s.p, s.b, s.d, s.p, s.m, s.g, s.r, s.s,
+            //         s.r, s.s, s._n, s._d, s.s, s.b, s.b, s.b,
+            // s.s, s.b, s.b, s.r, s.g, s.b, s.p, s.b,             // anupallavi
+            //         s.m, s.b, s.b, s.g, s.p, s.b, s.d, s.b,
+            //         s.R, s.b, s.b, s.S, s.n, s.b, s.d, s.b,
+            //         s.p, s.b, s.b, s.m, s.g, s.b, s.r, s.b,
+            // s.s, s.b, s.b, s.r, s.g, s.b, s.p, s.b,            // pallavi
+            //         s.d, s.b, s.S, s.b, s.n, s.b, s.d, s.b,
+            //         s.p, s.b, s.d, s.p, s.m, s.g, s.r, s.s,
+            //         s.r, s.s, s._n, s._d, s.s, s.b, s.b, s.b,
+            // s.s, s.b, s.b, s.r, s.g, s.b, s.g, s.b,            // charanam1
+            //         s.g, s.b, s.b, s.b, s.b, s.b, s.r, s.g, 
+            //         s.p, s.b, s.b, s.p, s.p, s.b, s.p, s.b,
+            //         s.p, s.b, s.b, s.b, s.b, s.b, s.d, s.p, 
+            //         s.S, s.b, s.b, s.S, s.S, s.b, s.S, s.b,
+            //         s.G, s.R, s.S, s.n, s.n, s.d, s.p, s.b,
+            //         s.p, s.d, s.p, s.m, s.g, s.r, s.r, s.b,
+            //         s.g, s.p, s.m, s.g, s.r, s.s, s.r, s.g,
+            // s.s, s.b, s.b, s.r, s.g, s.b, s.p, s.b,           // pallavi
+            //         s.d, s.b, s.S, s.b, s.n, s.b, s.d, s.b,
+            //         s.p, s.b, s.d, s.p, s.m, s.g, s.r, s.s,
+            //         s.r, s.s, s._n, s._d, s.s, s.b, s.b, s.b]};
+            // sthaayee: [s.p, s.p, s.p, s.b, s.r, s.r, s.r, s.b,    // charanam2
+            //         s.g, s.p, s.m, s.g, s.g, s.b, s.b, s.b,
+            //         s.g, s.p, s.m, s.g, s.m, s.g, s.r, s.s,
+            //         s.r, s.g, s.r, s.s, s.s, s.b, s.b, s.b,
+            //         s.r, s.s, s._n, s._d, s.s, s.b, s.b, s.b,
+            //         s.m, s.g, s.r, s.g, s.p, s.b, s.b, s.b,
+            //         s.d, s.p, s.d, s.R, s.S, s.b, s.b, s.b,
+            //         s.R, s.S, s.n, s.d, s.p, s.m, s.g, s.r,
+            //   s.s, s.b, s.b, s.r, s.g, s.b, s.p, s.b,           // pallavi
+            //         s.d, s.b, s.S, s.b, s.n, s.b, s.d, s.b,
+            //         s.p, s.b, s.d, s.p, s.m, s.g, s.r, s.s,
+            //         s.r, s.s, s._n, s._d, s.s, s.b, s.b, s.b,
+            //   s.p, s.b, s.b, s.b, s.m, s.g, s.r, s.g,
+            //         s.d, s.b, s.b, s.b, s.m, s.g, s.r, s.g,
+            //         s.p, s.b, s.b, s.b, s.m, s.g, s.r, s.g,
+            //         s.p, s.b, s.p, s.b, s.p, s.b, s.b, s.b,
+            //         s.G, s.b, s.b, s.b, s.R, s.S, s.n, s.d,
+            //         s.R, s.b, s.b, s.b, s.R, s.S, s.n, s.d,
+            //         s.S, s.b, s.b, s.b, s.R, s.S, s.n, s.d,
+            //         s.S, s.b, s.S, s.b, s.S, s.b, s.b, s.b,
+            //         s.G, s.b, s.R, s.S, s.R, s.b, s.R, s.b,
+            //         s.R, s.b, s.b, s.b, s.R, s.b, s.S, s.n,
+            //         s.d, s.b, s.d, s.b, s.d, s.b, s.b, s.b,
+            //         s.d, s.b, s.p, s.m, s.g, s.b, s.g, s.b,
+            //         s.g, s.b, s.b, s.b, s.s, s.r, s.g, s.d,
+            //         s.p, s.b, s.b, s.b, s.R, s.S, s.R, s.G,
+            //         s.S, s.b, s.b, s.b, s.G, s.R, s.S, s.n,
+            //         s.d, s.p, s.m, s.g, s.r, s.s, s.r, s.g]};
+            sthaayee: [s.g,
+                    s.s, s.b, s.b, s.r, s.g, s.b, s.p, s.b,           // pallavi
+                    s.d, s.b, s.S, s.b, s.n, s.b, s.d, s.b,
+                    s.p, s.b, s.d, s.p, s.m, s.g, s.r, s.s,
+                    s.r, s.s, s._n, s._d, s.s, s.b, s.b, s.b,]};
 var bilaawal = {name:"Bilaawal",
             aaroh: [s.s,s.r,s.g,s.m,s.p,s.d,s.n,s.S],
             avaroh: [s.S,s.n,s.d,s.p,s.m,s.g,s.r,s.s],
@@ -133,8 +198,8 @@ var todi = {name: "Todi",
                     s.m1, s.b, s.g_, s.r_, s.g_, s.r_, s.s, s.b]}
 // set the dimensions and margins of the graph
 var margin = {top: 10, right: 10, bottom: 0, left: 10},
-    width = 1200 - margin.left - margin.right,
-    height = 400 - margin.top - margin.bottom;
+    width = 1400 - margin.left - margin.right,
+    height = 200 - margin.top - margin.bottom;
 // append the svg object to the body of the page
 var svg = d3.select("#my_dataviz")
   .append("svg")
@@ -144,10 +209,10 @@ var svgPlotArea = svg.append("g")
     .attr("transform",
           "translate(" + margin.left + "," + margin.top + ")");
 var x = d3.scaleLinear()
-      .domain([0,64])
+      .domain([0,240])
       .range([ 0, width ]);
 var y = d3.scaleLinear()
-      .domain( [surs[0].freq-1, 75])
+      .domain( [surs[0].freq-1, 85])
       .range([ height, 0 ]);
 drawScale();
 // drawRaagSthaayee(bilaawal,"fixed",0,0);
@@ -250,7 +315,7 @@ function drawRaagAarohAvaroh(raag,color,raagIndex)
         .attr("fill", colorsL[color]);
 };
 
-setInterval(drawLine,900);
+setInterval(drawLine,100);  // 900 for singing
 
 var noteIndex = 0;
 // var drawnLine = 
@@ -260,7 +325,7 @@ function drawLine() {
   svgPlotArea.select("#dots").remove();
   // var chart = d3.select("#chart");
   // chart.select("svg").remove();
-  drawRaagSthaayee(poorvi ,noteIndex,5,2);
+  drawRaagSthaayee(bilahari,noteIndex,5,2);
 }
 
 function drawRaagSthaayee(raag,noteindex,color,raagIndex)
@@ -282,7 +347,7 @@ function drawRaagSthaayee(raag,noteindex,color,raagIndex)
       .attr("d", d3.line()
         .x(function(d, i) { return x(i+1) })
         .y(function(d, i) { if (d == 0) return y(getBlankFreq(data,i)); else return y(d); })
-        .curve(d3.curveMonotoneY) // curveMonotoneY is good
+        .curve(d3.curveStep) // curveMonotoneY, curveStep is good
         );
     // Add the points
     svgPlotArea
@@ -294,7 +359,7 @@ function drawRaagSthaayee(raag,noteindex,color,raagIndex)
       .append("circle")
         .attr("cx", function(d, i) { return x(i + 1) } )
         .attr("cy", function(d) { return y(d) } )
-        .attr("r", 4)
+        .attr("r", 3)
         .attr("fill", colorsL[color]);
 };
 
