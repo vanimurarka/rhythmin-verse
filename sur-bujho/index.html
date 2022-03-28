@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Sur Bujho | Guess The Musical Notes Game</title>
+  <meta name="description" content="Play and become adept at identifying musical notes." />
+  <meta property="og:title" content="Sur Bujho | Guess The Musical Notes Game" />
+  <meta property="og:url" content="https://manaskriti.com/sur-bujho/" />
+  <meta property="og:description" content="Play and become adept at identifying musical notes. Have fun *and* train your ears." />
+  <meta property="og:image" content="sur-bujho1.png" />
+  <style type="text/css">
+    .surLine {stroke-width: 1px}
+    .raagLine {stroke-width: 3px}
+    .btn {font-size: inherit;font-weight: bold;min-width: 30px;}
+    .disabled {min-width: 30px;min-height: 30px;pointer-events: none;background-color: silver;}
+    a:link {color: violet;}
+    a:visited {color: violet;}
+    /* The Modal (background) */
+    .modal {
+      display: none; /* Hidden by default */
+      position: fixed; /* Stay in place */
+      z-index: 1; /* Sit on top */
+      padding-top: 100px; /* Location of the box */
+      left: 0;
+      top: 0;
+      width: 100%; /* Full width */
+      height: 100%; /* Full height */
+      overflow: auto; /* Enable scroll if needed */
+    }
+
+    /* Modal Content */
+    .modal-content {
+      background-color: black;
+      margin: auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 80%;
+    }
+
+    /* The Close Button */
+    .close {
+      color: #aaaaaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+    }
+
+    .close:hover,
+    .close:focus {
+      color: #000;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+  </style>
+
+  <!-- Load d3.js -->
+  <script src="d3.v6.js"></script>
+  <script src="jquery.min.js"></script>
+  <script src="music.js"></script>
+  <script src="cookie.js"></script>
+</head>
+<body style="text-align: center;background-color: black;color: white;font-size: 150%" onload="onLoad();">
+  <img src="sur-bujho-inside.png" style="width: 100%; max-width: 600px;"><br>
+  <!-- h1 style="color:violet;">Sur Bujho</h1>
+  <h3>Guess The Musical Notes Game</h3 --><br>
+  <select id="selectTest" style="font-size: inherit;background-color:white" onchange="selectTest();">
+    <option value="0">Level 1: s S</option>
+    <option value="1">Level 2: s p S</option>
+    <option value="2">Level 3: s r p S</option>
+    <option value="3">Level 4: s r g p S</option>
+    <option value="4">Level 5: s r g p d S</option>
+    <option value="5">Level 6: s r g p d n S</option>
+    <option value="6">Level 7: s r g m p d n S</option>
+    <option value="7">Level 8: s r g m p d n S R G</option>
+    <option value="8">Level 9: .d .n s r g m p d n S R G</option>
+  </select>
+  <br><br>
+  <input type="button" value="Listen to s" class="btn" onclick="javascript:playS();"><br>
+  <br><br>
+  Round: <span id="stats">0</span><br><br>
+  <div style="display: none">;Correct: <span id="correct">0</span><br>
+  Incorrect: <span id="incorrect">0</span><br></div>
+  Score: <span id="percent">0</span><br><br>
+  <div id="guessButtons" style="text-align: center;"> 
+  </div>
+  <div id="msg" style="display:none">
+    <br><br>What note was played last?<br>Click above on your guess.<br><br>
+  </div>
+  <button id="myBtn" class="btn">Score Card</button>
+  <br><br><br>
+  Scale: <select id="selectScale" style="font-size: inherit;background-color:white" onchange="setSursToScale();">
+    <option value="0">G</option>
+    <option value="1">G#</option>
+    <option value="2">A</option>
+    <option value="3">A#</option>
+    <option value="4">B</option>
+    <option value="5">C</option>
+    <option value="6">C#</option>
+    <option value="7">D</option>
+    <option value="8">D#</option>
+    <option value="9">E</option>
+    <option value="10">F</option>
+    <option value="11">F#</option>
+  </select>
+
+  <!-- The Modal -->
+  <div id="myModal" class="modal">
+
+    <!-- Modal content -->
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h3>Score Card</h3>
+      <p id="modalText" style="display:table;margin:0 auto;text-align: left;">Some text in the Modal..</p>
+    </div>
+
+  </div>
+
+
+<script>
+    // Get the modal
+  var modal = document.getElementById("myModal");
+
+  // Get the button that opens the modal
+  var btn = document.getElementById("myBtn");
+
+  // Get the <span> element that closes the modal
+  var span = document.getElementsByClassName("close")[0];
+
+  // When the user clicks the button, open the modal 
+  btn.onclick = function() {
+    document.getElementById("modalText").innerHTML = showStats();
+    modal.style.display = "block";
+  }
+
+  // When the user clicks on <span> (x), close the modal
+  span.onclick = function() {
+    modal.style.display = "none";
+  }
+
+  // When the user clicks anywhere outside of the modal, close it
+  window.onclick = function(event) {
+    if (event.target == modal) {
+      modal.style.display = "none";
+    }
+  }
+
+  cNotes = [82.41,87.31,92.5,98,103.83,110,116.54,123.47,130.81,138.59,146.83,155.56,164.81,174.61,185,196,207.65,220,233.08,246.94,261.63,277.18,293.66,311.13,329.63,349.23,369.99,392,415.3,440,466.16];
+
+  let surMap = new Map();
+    surMap.set('.d',{freq:82.41,pure:true,hindi:".ध"});
+    surMap.set('._n',{freq:0,pure:false,hindi:"._नी"});
+    surMap.set('.n',{freq:92.50,pure:true,hindi:".नी"});
+    surMap.set('s',{freq:98.00,pure:true,hindi:"सा"});
+    surMap.set('_r',{freq:0,pure:false,hindi:"_रे"});
+    surMap.set('r',{freq:110.00,pure:true,hindi:"रे"});
+    surMap.set('_g',{freq:0,pure:false,hindi:"_गा"});
+    surMap.set('g',{freq:123.47,pure:true,hindi:"गा"});
+    surMap.set('m',{freq:130.81,pure:true,hindi:"मा"});
+    surMap.set('m*',{freq:0,pure:false,hindi:"मा*"});
+    surMap.set('p',{freq:146.83,pure:true,hindi:"पा"});
+    surMap.set('_d',{freq:0,pure:false,hindi:"_धा"});
+    surMap.set('d',{freq:164.81,pure:true,hindi:"धा"});
+    surMap.set('_n',{freq:0,pure:false,hindi:"_नी"});
+    surMap.set('n',{freq:185.00,pure:true,hindi:"नी"});
+    surMap.set('S',{freq:196.00,pure:true,hindi:"सां"});
+    surMap.set('_R',{freq:0,pure:false,hindi:"_रें"});
+    surMap.set('R',{freq:220.00,pure:true,hindi:"रें"});
+    surMap.set('_G',{freq:0,pure:false,hindi:"_गां"});
+    surMap.set('G',{freq:246.94,pure:true,hindi:"गां"});
+
+  let gScale = 0;
+  const cIndexInNotesforGScale = 3;
+  let gTestI = 0;
+  let gTestNoteI = 0;
+  let gInGuessingMode = false;
+
+  function onLoad()
+  {
+    // display last played level from cookie
+    let level = parseInt(getCookie("SBG:Level"));
+    if ((level >= 0) && (level < testCombos.length))
+    {
+      gTestI = level;
+      document.getElementById('selectTest').value = level;
+    }
+
+    // set last set scale from cookie
+    let scale = parseInt(getCookie("SBG:Scale"));
+    if (scale >= 0)
+    {
+      gScale = scale;
+      document.getElementById("selectScale").value = scale;
+    }
+
+    let i = cIndexInNotesforGScale;
+    for (let [key, value] of surMap) {
+      value.freq = cNotes[i-3];  // 0th value in notes array is 3 indexes less than sa
+      surMap.set(key,value);
+      i++;
+    }
+
+    // set keydown event
+    document.addEventListener('keydown', takeNoteViaKeyboard, false);
+  }
+
+  function selectTest()
+  {
+    gTestI = document.getElementById('selectTest').value;
+    setCookie("SBG:Level",gTestI,365);
+  }
+
+  function setSursToScale()
+  {
+    gScale = parseInt(document.getElementById("selectScale").value);
+    let i = cIndexInNotesforGScale + gScale;
+    for (let [key, value] of surMap) {
+      value.freq = cNotes[i-3];  // 0th value in notes array is 3 indexes less than sa
+      surMap.set(key,value);
+      i++;
+    }
+  }
+
+  testCombos = [{notes:["s","S"],btns:["s","b","b","b","b","b","b","S"]},
+                {notes:["s","p","S"],btns:["s","b","b","b","p","b","b","S"]},
+                {notes:["s","r","p","S"],btns:["s","r","b","b","p","b","b","S"]},
+                {notes:["s","r","g","p","S"],btns:["s","r","g","b","p","b","b","S"]},
+                {notes:["s","r","g","p","d","S"],btns:["s","r","g","b","p","d","b","S"]},
+                {notes:["s","r","g","p","d","n","S"],btns:["s","r","g","b","p","d","n","S"]},
+                {notes:["s","r","g","m","p","d","n","S"],btns:["s","r","g","m","p","d","n","S"]},
+                {notes:["s","r","g","m","p","d","n","S","R","G"],btns:["s","r","g","m","p","d","n","S","R","G"]},
+                {notes:[".d",".n","s","r","g","m","p","d","n","S","R","G"],btns:[".d",".n","s","r","g","m","p","d","n","S","R","G"]},
+    ];
+
+  let kbdMap = new Map();
+    kbdMap.set('q','.d');
+    kbdMap.set('w','.n');
+    kbdMap.set('e','s');
+    kbdMap.set('r','r');
+    kbdMap.set('t','g');
+    kbdMap.set('y','m');
+    kbdMap.set('u','p');
+    kbdMap.set('i','d');
+    kbdMap.set('o','n');
+    kbdMap.set('p','S');
+    kbdMap.set('[','R');
+    kbdMap.set(']','G');
+
+  function percent(correct,incorrect)
+  {
+    let tests = parseInt(document.getElementById("stats").innerText);
+    let perc = (incorrect == 0) ? ((correct/tests)*100) : (((correct-incorrect) / tests)*100);
+    perc = perc.toFixed(2);
+    if (perc === 'NaN') perc = 0;
+    setCookie("SBG:Level"+gTestI,perc,365);
+    setCookie("SBG:Level"+gTestI+"Rounds",tests,365);
+    return perc;
+  }
+
+  function takeNoteViaKeyboard(event)
+  {
+    let key = event.key;
+    if (key == " ")
+    {
+      playS();
+      return;
+    }
+    if (gInGuessingMode)
+    {
+      let noteName = kbdMap.get(key);
+      if (typeof noteName !== 'undefined')
+      {
+        let testNoteName = testCombos[gTestI].notes[gTestNoteI];
+        if (noteName == testNoteName)
+        {
+          gInGuessingMode = false;
+          document.getElementById('btn-'+noteName).style.backgroundColor = "green";
+          document.getElementById('btn-'+noteName).style.color = "white";
+
+          let correct = parseInt(document.getElementById("correct").innerHTML);
+          let incorrect = parseInt(document.getElementById("incorrect").innerHTML);
+          correct++;
+
+          document.getElementById("correct").innerHTML = correct;
+          document.getElementById("percent").innerHTML = percent(correct,incorrect);
+          setTimeout(function() { playGuessNote(); }, 1500);
+        }
+        else
+        {
+          let correct = parseInt(document.getElementById("correct").innerHTML);
+          let incorrect = parseInt(document.getElementById("incorrect").innerHTML);
+          incorrect++;
+
+          document.getElementById("incorrect").innerHTML = incorrect;
+          document.getElementById("percent").innerHTML = percent(correct,incorrect);
+
+          document.getElementById('btn-'+noteName).style.backgroundColor = "red";
+          document.getElementById('btn-'+noteName).style.color = "white";
+        }
+      }
+    }
+  }
+
+  function takeNoteViaClick(event,noteName)
+  {
+    if (noteName == "b") return;
+    if (gInGuessingMode)
+    {
+      let testNoteName = testCombos[gTestI].notes[gTestNoteI];
+      if (noteName == testNoteName)
+      {
+        gInGuessingMode = false;
+        
+        let correct = parseInt(document.getElementById("correct").innerHTML);
+        let incorrect = parseInt(document.getElementById("incorrect").innerHTML);
+        correct++;
+
+        document.getElementById("correct").innerHTML = correct;
+        document.getElementById("percent").innerHTML = percent(correct,incorrect);
+        
+        this.style.backgroundColor = "green";
+        this.style.color = "white";
+        setTimeout(function() { playGuessNote(); }, 1500);
+      }
+      else
+      {
+        let correct = parseInt(document.getElementById("correct").innerHTML);
+        let incorrect = parseInt(document.getElementById("incorrect").innerHTML);
+        incorrect++;
+
+        document.getElementById("incorrect").innerHTML = incorrect;
+        document.getElementById("percent").innerHTML = percent(correct,incorrect);
+
+        this.style.backgroundColor = "red";
+        this.style.color = "white";
+      }
+    }
+  }
+
+  function playS() {
+    example4(surMap.get("s").freq,"triangle");
+    setTimeout(function() { playGuessNote(); }, 1500);
+  }
+
+  function playGuessNote()
+  {
+    // whicheth note in the test (gTestI in testCombos) to be guessed
+    gTestNoteI = Math.floor(Math.random() * (testCombos[gTestI].notes.length - 0) + 0);
+    testNoteName = testCombos[gTestI].notes[gTestNoteI];
+
+    // get the note
+    testNote = surMap.get(testCombos[gTestI].notes[gTestNoteI]);
+
+    // console.log(testNoteName + " = " + testNote.freq);
+    // play the note
+    example4(testNote.freq,"triangle");
+    
+    divGuessButtons = d3.select("#guessButtons");
+    divGuessButtons.selectAll("input").remove();
+    divGuessButtons.selectAll("input")
+      .data(testCombos[gTestI].btns)
+      .enter()
+      .append("input")
+        .attr("type","button")
+        .attr("value", function(d,i) {
+          if (d=="b")
+            return " ";
+          else
+            return d;})
+        .attr("class","btn")
+        .attr("id", function(d,i) {return "btn-"+d;})
+        .on("click", takeNoteViaClick);
+
+    document.getElementById("msg").style.display = "block";
+
+    document.getElementById("stats").innerHTML = parseInt(document.getElementById("stats").innerHTML) + 1;
+
+    gInGuessingMode = true;
+  }
+
+  function showStats()
+  {
+    let stats = "";
+    for (i=0; i<=testCombos.length-1; i++)
+    {
+      let score = parseInt(getCookie("SBG:Level"+i));
+      if (isNaN(score)) score = 0;
+      let rounds = parseInt(getCookie("SBG:Level"+i+"Rounds"));
+      if (isNaN(rounds)) rounds = 0;
+      stats += "Level " + (i+1) + ": " + score + " ("+rounds+" Rounds)<br>";
+    }
+    return stats;
+  }
+
+</script>
+
+</body>
+</html>
