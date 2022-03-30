@@ -17,10 +17,18 @@ class cChar {
 		this.isHindi = false;
 		this.rhymeLevel = 0; // 0 = no rhyme, 1 = vowel rhyme, 2 = full rhyme
 		this.rhymeGroup = -1; // for coloring rhymed letters in diff colors based on diff rhyming lines
-
-		// space / comma OR whole vowel 
-        if (((mainCharCode == 32)||(mainCharCode == 44)) || ((mainCharCode >= 2309) && (mainCharCode <= 2324)))
+		console.log(mainChar + " " + mainCharCode);
+		// space / comma
+        if ((mainCharCode == 32)||(mainCharCode == 44))
           this.vowel = mainChar;
+
+        // whole vowel
+        if ((mainCharCode >= 2309) && (mainCharCode <= 2324))
+        	this.vowel = mainChar;
+
+        // "1" or "2" or "१" or "२"
+        if ((mainCharCode == 49)||(mainCharCode == 50)||(mainCharCode == 2407)||(mainCharCode == 2408))
+        	this.vowel = mainChar;
         
         // consonant OR consonant with dot at bottom
         if (((mainCharCode >= 2325) && (mainCharCode <= 2361)) || ((mainCharCode >= 2392) && (mainCharCode <= 2399)))
@@ -112,18 +120,24 @@ class cChar {
 				case "ऋ": case "ृ":
 					this.vowelNumber = 12;
 					break;
+				case "1": case "१":
+					this.vowelNumber = 21;
+					break;
+				case "2": case "२":
+					this.vowelNumber = 22;
+					break;
 				default:
 					this.vowelNumber = -10;
 			}
 			// set char maatraa as per vowel
 			switch (this.vowelNumber)
 	    {
-				case 1: case 3: case 5: case 12:
+				case 1: case 3: case 5: case 12: case 21:
 					this.maatraa = 1;
 					this.systemMaatraa = 1;
 					this.isHindi = true;
 					break;
-	            case 2: case 4: case 6: case 8: case 10: case 7: case 9: case 10: case 11:
+	            case 2: case 4: case 6: case 8: case 10: case 7: case 9: case 10: case 11: case 22:
 					this.maatraa = 2;
 					this.systemMaatraa = 2;
 					this.isHindi = true;
@@ -914,6 +928,7 @@ function splitNprocessPoem(poem, refresh)
     let iLine;
     for (iLine = 0; iLine < maxLineLen; iLine++) // process each line - i = line index
     {
+    	
     	if ((iLine < oldLines.length) && (lines[iLine] == oldLines[iLine]))
     	{
     		oPoem.pushLine(oPrevPoem.lines[iLine]);
@@ -921,14 +936,16 @@ function splitNprocessPoem(poem, refresh)
     	else
     	{
 	    	const oLine = new cLine();
-	    	// debugger;
-	    	lines[iLine] = lines[iLine].replace(/[^\u0900-\u097F ]/g, " "); // replace non-devnagari chars with space
+	    	 // except devnagari chars, 1, 2, and space, replace all others with space
+	    	lines[iLine] = lines[iLine].replace(/[^\u0900-\u097F 12]/g, " ");
 	    	lines[iLine] = lines[iLine].replace("।"," ");
 	    	lines[iLine] = lines[iLine].replace(/\s+/g, " "); // remove extra spaces in-between words
 	    	lines[iLine] = lines[iLine].trim(); // remove whitespace from both ends
+
         for (k=0;k<lines[iLine].length;k++) // process each char: k = char index
         {
         	charCode = lines[iLine].charCodeAt(k);
+        	console.log(charCode);
         	if (charCode == 2364) // nuqta
         	{
         		oLine.changeLastCharConsonant(lines[iLine].substring(k,k+1));
