@@ -4,21 +4,21 @@
 
 class cChar {
     constructor(mainChar, mainCharCode) {
-		this.mainChar = mainChar;
-		this.mainCharCode = mainCharCode;
-		this.vowelChar = "";
-		this.vowelNumber = 0;
-		this.index = 0;
-		this.maatraa = 0;
-		this.systemMaatraa = 0; // maatraa calculated by system. maybe diff from maatraa if user adjusts it
-		this.maatraaCumulative = 0;
-		this.isRadeef = false;
-		this.isKaafiyaa = false;
-		this.isHindi = false;
-		this.rhymeLevel = 0; // 0 = no rhyme, 1 = vowel rhyme, 2 = full rhyme
-		this.rhymeGroup = -1; // for coloring rhymed letters in diff colors based on diff rhyming lines
-		console.log(mainChar + " " + mainCharCode);
-		// space / comma
+			this.mainChar = mainChar;
+			this.mainCharCode = mainCharCode;
+			this.vowelChar = "";
+			this.vowelNumber = 0;
+			this.index = 0;
+			this.maatraa = 0;
+			this.systemMaatraa = 0; // maatraa calculated by system. maybe diff from maatraa if user adjusts it
+			this.maatraaCumulative = 0;
+			this.isRadeef = false;
+			this.isKaafiyaa = false;
+			this.isHindi = false;
+			this.rhymeLevel = 0; // 0 = no rhyme, 1 = vowel rhyme, 2 = full rhyme
+			this.rhymeGroup = -1; // for coloring rhymed letters in diff colors based on diff rhyming lines
+
+				// space / comma
         if ((mainCharCode == 32)||(mainCharCode == 44))
           this.vowel = mainChar;
 
@@ -241,8 +241,10 @@ class cChar {
 	adjustCharMaatraa()
 	{
 		// whole chars
-		//    aa, ee, oo                        all other deergha
-		if ((this.vowelNumber%2 == 0) || ((this.vowelNumber>6) && (this.vowelNumber<12)))
+		//    aa, ee, oo                        
+		if (((this.vowelNumber <= 6) && (this.vowelNumber%2 == 0)) 
+			//all other deergha
+			|| ((this.vowelNumber>6) && (this.vowelNumber<12)))
 		{
 		  if (this.maatraa == 1)
 		    this.maatraa = 2;
@@ -945,7 +947,6 @@ function splitNprocessPoem(poem, refresh)
         for (k=0;k<lines[iLine].length;k++) // process each char: k = char index
         {
         	charCode = lines[iLine].charCodeAt(k);
-        	console.log(charCode);
         	if (charCode == 2364) // nuqta
         	{
         		oLine.changeLastCharConsonant(lines[iLine].substring(k,k+1));
