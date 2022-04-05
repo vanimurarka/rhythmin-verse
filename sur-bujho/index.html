@@ -61,7 +61,7 @@
   <script src="music.js"></script>
   <script src="cookie.js"></script>
 </head>
-<body style="text-align: center;background-color: black;color: white;font-size: 150%" onload="onLoad();">
+<body style="font-family: Aria, Helvetica, sans-serif ;text-align: center;background-color: black;color: white;font-size: 150%" onload="onLoad();">
   <img src="sur-bujho-inside.png" style="width: 100%; max-width: 600px;"><br>
   <!-- h1 style="color:violet;">Sur Bujho</h1>
   <h3>Guess The Musical Notes Game</h3 --><br>
@@ -72,14 +72,15 @@
     <option value="3">Level 4: s r g p S</option>
     <option value="4">Level 5: s r g p d S</option>
     <option value="5">Level 6: s r g p d n S</option>
-    <option value="6">Level 7: s r g m p d n S</option>
-    <option value="7">Level 8: s r g m p d n S R G</option>
-    <option value="8">Level 9: .d .n s r g m p d n S R G</option>
+    <option value="6">Level 7: s r m p d n S</option>
+    <option value="7">Level 8: s r g m p d n S</option>
+    <option value="8">Level 9: s r g m p d n S R G</option>
+    <option value="9">Level 10: .d .n s r g m p d n S R G</option>
   </select>
   <br><br>
   <input type="button" value="Listen to s" class="btn" onclick="javascript:playS();"><br>
   <br><br>
-  Round: <span id="stats">0</span><br><br>
+  Round: <span id="stats">0</span> <span style="color:violet;">|</span> Total Rounds: <span id="roundsTotal">5</span><br><br>
   <div style="display: none">;Correct: <span id="correct">0</span><br>
   Incorrect: <span id="incorrect">0</span><br></div>
   Score: <span id="percent">0</span><br><br>
@@ -88,7 +89,6 @@
   <div id="msg" style="display:none">
     <br><br>What note was played last?<br>Click above on your guess.<br><br>
   </div>
-  <button id="myBtn" class="btn">Score Card</button>
   <br><br><br>
   Scale: <select id="selectScale" style="font-size: inherit;background-color:white" onchange="setSursToScale();">
     <option value="0">G</option>
@@ -103,7 +103,8 @@
     <option value="9">E</option>
     <option value="10">F</option>
     <option value="11">F#</option>
-  </select>
+  </select><br><br>
+  <button id="btnScore" class="btn" style="font-weight: normal;">Score Card</button>
 
   <!-- The Modal -->
   <div id="myModal" class="modal">
@@ -111,7 +112,7 @@
     <!-- Modal content -->
     <div class="modal-content">
       <span class="close">&times;</span>
-      <h3>Score Card</h3>
+      <h3 id="modalTitle">Score Card</h3>
       <p id="modalText" style="display:table;margin:0 auto;text-align: left;">Some text in the Modal..</p>
     </div>
 
@@ -123,13 +124,15 @@
   var modal = document.getElementById("myModal");
 
   // Get the button that opens the modal
-  var btn = document.getElementById("myBtn");
+  var btnScore = document.getElementById("btnScore");
 
   // Get the <span> element that closes the modal
   var span = document.getElementsByClassName("close")[0];
 
   // When the user clicks the button, open the modal 
-  btn.onclick = function() {
+  btnScore.onclick = function() {
+    document.getElementById("modalTitle").innerHTML = "Score Card";
+    document.getElementById("modalTitle").style.display = "block";
     document.getElementById("modalText").innerHTML = showStats();
     modal.style.display = "block";
   }
@@ -180,19 +183,28 @@
   {
     // display last played level from cookie
     let level = parseInt(getCookie("SBG:Level"));
+
     if ((level >= 0) && (level < testCombos.length))
     {
-      gTestI = level;
+      // gTestI = level;
       document.getElementById('selectTest').value = level;
-    }
+      selectTest(false);
 
-    // set last set scale from cookie
-    let scale = parseInt(getCookie("SBG:Scale"));
-    if (scale >= 0)
-    {
-      gScale = scale;
-      document.getElementById("selectScale").value = scale;
+      // set last set scale from cookie
+      let scale = parseInt(getCookie("SBG:Scale"));
+      if (scale >= 0)
+      {
+        gScale = scale;
+        document.getElementById("selectScale").value = scale;
+        setSursToScale();
+      }
     }
+    else
+    {
+      document.getElementById("modalTitle").style.display = "none";
+      document.getElementById("modalText").innerHTML = 'Guess the notes the app plays. Train your ears to recognise notes. Increase your musical literacy.<br><br>Start by clicking "Listen to s". App will play s and then, a note to guess. Options will show up. Click the note button to record your guess.<br><br>Another note for you to guess will play after your correct guess.';
+      modal.style.display = "block";
+    }    
 
     let i = cIndexInNotesforGScale;
     for (let [key, value] of surMap) {
@@ -205,32 +217,17 @@
     document.addEventListener('keydown', takeNoteViaKeyboard, false);
   }
 
-  function selectTest()
-  {
-    gTestI = document.getElementById('selectTest').value;
-    setCookie("SBG:Level",gTestI,365);
-  }
-
-  function setSursToScale()
-  {
-    gScale = parseInt(document.getElementById("selectScale").value);
-    let i = cIndexInNotesforGScale + gScale;
-    for (let [key, value] of surMap) {
-      value.freq = cNotes[i-3];  // 0th value in notes array is 3 indexes less than sa
-      surMap.set(key,value);
-      i++;
-    }
-  }
-
-  testCombos = [{notes:["s","S"],btns:["s","b","b","b","b","b","b","S"]},
-                {notes:["s","p","S"],btns:["s","b","b","b","p","b","b","S"]},
-                {notes:["s","r","p","S"],btns:["s","r","b","b","p","b","b","S"]},
-                {notes:["s","r","g","p","S"],btns:["s","r","g","b","p","b","b","S"]},
-                {notes:["s","r","g","p","d","S"],btns:["s","r","g","b","p","d","b","S"]},
-                {notes:["s","r","g","p","d","n","S"],btns:["s","r","g","b","p","d","n","S"]},
-                {notes:["s","r","g","m","p","d","n","S"],btns:["s","r","g","m","p","d","n","S"]},
-                {notes:["s","r","g","m","p","d","n","S","R","G"],btns:["s","r","g","m","p","d","n","S","R","G"]},
-                {notes:[".d",".n","s","r","g","m","p","d","n","S","R","G"],btns:[".d",".n","s","r","g","m","p","d","n","S","R","G"]},
+  testCombos = [{notes:["s","S"],btns:["s","b","b","b","b","b","b","S"],
+                gameRounds:5,graduationScore:100},
+                {notes:["s","p","S"],btns:["s","b","b","b","p","b","b","S"],gameRounds:10,graduationScore:100},
+                {notes:["s","r","p","S"],btns:["s","r","b","b","p","b","b","S"],gameRounds:15,graduationScore:100},
+                {notes:["s","r","g","p","S"],btns:["s","r","g","b","p","b","b","S"],gameRounds:20,graduationScore:100},
+                {notes:["s","r","g","p","d","S"],btns:["s","r","g","b","p","d","b","S"],gameRounds:20,graduationScore:100},
+                {notes:["s","r","g","p","d","n","S"],btns:["s","r","g","b","p","d","n","S"],gameRounds:50,graduationScore:80},
+                {notes:["s","r","m","p","d","n","S"],btns:["s","r","b","m","p","d","n","S"],gameRounds:50,graduationScore:80},
+                {notes:["s","r","g","m","p","d","n","S"],btns:["s","r","g","m","p","d","n","S"],gameRounds:50,graduationScore:80},
+                {notes:["s","r","g","m","p","d","n","S","R","G"],btns:["s","r","g","m","p","d","n","S","R","G"],gameRounds:50,graduationScore:70},
+                {notes:[".d",".n","s","r","g","m","p","d","n","S","R","G"],btns:[".d",".n","s","r","g","m","p","d","n","S","R","G"],gameRounds:50,graduationScore:70},
     ];
 
   let kbdMap = new Map();
@@ -253,8 +250,6 @@
     let perc = (incorrect == 0) ? ((correct/tests)*100) : (((correct-incorrect) / tests)*100);
     perc = perc.toFixed(2);
     if (perc === 'NaN') perc = 0;
-    setCookie("SBG:Level"+gTestI,perc,365);
-    setCookie("SBG:Level"+gTestI+"Rounds",tests,365);
     return perc;
   }
 
@@ -271,34 +266,86 @@
       let noteName = kbdMap.get(key);
       if (typeof noteName !== 'undefined')
       {
-        let testNoteName = testCombos[gTestI].notes[gTestNoteI];
-        if (noteName == testNoteName)
-        {
-          gInGuessingMode = false;
-          document.getElementById('btn-'+noteName).style.backgroundColor = "green";
-          document.getElementById('btn-'+noteName).style.color = "white";
-
-          let correct = parseInt(document.getElementById("correct").innerHTML);
-          let incorrect = parseInt(document.getElementById("incorrect").innerHTML);
-          correct++;
-
-          document.getElementById("correct").innerHTML = correct;
-          document.getElementById("percent").innerHTML = percent(correct,incorrect);
-          setTimeout(function() { playGuessNote(); }, 1500);
-        }
-        else
-        {
-          let correct = parseInt(document.getElementById("correct").innerHTML);
-          let incorrect = parseInt(document.getElementById("incorrect").innerHTML);
-          incorrect++;
-
-          document.getElementById("incorrect").innerHTML = incorrect;
-          document.getElementById("percent").innerHTML = percent(correct,incorrect);
-
-          document.getElementById('btn-'+noteName).style.backgroundColor = "red";
-          document.getElementById('btn-'+noteName).style.color = "white";
-        }
+        recordGuess(noteName);
       }
+    }
+  }
+
+  function gameOver(percent)
+  {
+    setCookie("SBG:Level"+gTestI,percent,365);
+    document.getElementById("stats").innerText = 0;
+    document.getElementById("correct").innerText = 0;
+    document.getElementById("incorrect").innerText = 0;
+    document.getElementById("percent").innerText = 0;
+    document.getElementById("msg").style.display = "none";
+    let stats = showStats();
+    let level = parseInt(gTestI)+1;
+    let graduated = false;
+    if (percent >= testCombos[gTestI].graduationScore)
+    {
+      document.getElementById("modalTitle").innerHTML = "Congratulations!";
+      document.getElementById("modalText").innerHTML = "You have graduated Level " + level + "<br><br>Final Score: " + percent + "<br><br>" + stats;
+      graduated = true;
+    }
+    else
+    {
+      document.getElementById("modalTitle").innerHTML = "Level " + level + " Game Over";
+      document.getElementById("modalText").innerHTML = "Final Score: " + percent + "<br><br>" + stats;
+    }
+
+    document.getElementById("modalTitle").style.display = "block";
+    modal.style.display = "block";
+
+    // increase level if graduated
+    if (graduated && (gTestI < (testCombos.length-1)))
+    {
+      document.getElementById("selectTest").value = level;
+      selectTest();
+    }
+  }
+
+  function recordGuess(noteName,btnNote)
+  {
+    let testNoteName = testCombos[gTestI].notes[gTestNoteI];
+    if (noteName == testNoteName)
+    {
+      gInGuessingMode = false;
+      
+      let correct = parseInt(document.getElementById("correct").innerHTML);
+      let incorrect = parseInt(document.getElementById("incorrect").innerHTML);
+      correct++;
+
+      document.getElementById("correct").innerHTML = correct;
+      let currentScore = 0;
+      currentScore = percent(correct,incorrect);
+      document.getElementById("percent").innerHTML = currentScore;
+      
+      tests = parseInt(document.getElementById("stats").innerText);
+      if (tests == testCombos[gTestI].gameRounds)
+      {
+        clearButtons();
+        document.getElementById("msg").style.display = "none";
+        gameOver(currentScore);
+      }
+      else
+      {
+        btnNote.style.backgroundColor = "green";
+        btnNote.style.color = "white";
+        setTimeout(function() { playGuessNote(); }, 1500);
+      }
+    }
+    else
+    {
+      let correct = parseInt(document.getElementById("correct").innerHTML);
+      let incorrect = parseInt(document.getElementById("incorrect").innerHTML);
+      incorrect++;
+
+      document.getElementById("incorrect").innerHTML = incorrect;
+      document.getElementById("percent").innerHTML = percent(correct,incorrect);
+
+      btnNote.style.backgroundColor = "red";
+      btnNote.style.color = "white";
     }
   }
 
@@ -307,40 +354,46 @@
     if (noteName == "b") return;
     if (gInGuessingMode)
     {
-      let testNoteName = testCombos[gTestI].notes[gTestNoteI];
-      if (noteName == testNoteName)
-      {
-        gInGuessingMode = false;
-        
-        let correct = parseInt(document.getElementById("correct").innerHTML);
-        let incorrect = parseInt(document.getElementById("incorrect").innerHTML);
-        correct++;
+      recordGuess(noteName,this);
+    }
+  }
 
-        document.getElementById("correct").innerHTML = correct;
-        document.getElementById("percent").innerHTML = percent(correct,incorrect);
-        
-        this.style.backgroundColor = "green";
-        this.style.color = "white";
-        setTimeout(function() { playGuessNote(); }, 1500);
-      }
-      else
-      {
-        let correct = parseInt(document.getElementById("correct").innerHTML);
-        let incorrect = parseInt(document.getElementById("incorrect").innerHTML);
-        incorrect++;
+  function selectTest()
+  {
+    clearButtons();
+    gTestI = document.getElementById('selectTest').value;
+    let totalRounds = testCombos[gTestI].gameRounds
+    document.getElementById("stats").innerHTML = 0;
+    document.getElementById("roundsTotal").innerHTML = totalRounds;
+    document.getElementById("correct").innerText = 0;
+    document.getElementById("incorrect").innerText = 0;
+    document.getElementById("percent").innerHTML = 0;
+    document.getElementById("msg").style.display = "none";
+    setCookie("SBG:Level",gTestI,365);
+  }
 
-        document.getElementById("incorrect").innerHTML = incorrect;
-        document.getElementById("percent").innerHTML = percent(correct,incorrect);
-
-        this.style.backgroundColor = "red";
-        this.style.color = "white";
-      }
+  function setSursToScale()
+  {
+    document.getElementById("stats").innerHTML = 0;
+    document.getElementById("percent").innerHTML = 0;
+    gScale = parseInt(document.getElementById("selectScale").value);
+    let i = cIndexInNotesforGScale + gScale;
+    for (let [key, value] of surMap) {
+      value.freq = cNotes[i-3];  // 0th value in notes array is 3 indexes less than sa
+      surMap.set(key,value);
+      i++;
     }
   }
 
   function playS() {
     example4(surMap.get("s").freq,"triangle");
     setTimeout(function() { playGuessNote(); }, 1500);
+  }
+
+  function clearButtons()
+  {
+    divGuessButtons = d3.select("#guessButtons");
+    divGuessButtons.selectAll("input").remove();
   }
 
   function playGuessNote()
@@ -356,8 +409,8 @@
     // play the note
     example4(testNote.freq,"triangle");
     
+    clearButtons();
     divGuessButtons = d3.select("#guessButtons");
-    divGuessButtons.selectAll("input").remove();
     divGuessButtons.selectAll("input")
       .data(testCombos[gTestI].btns)
       .enter()
@@ -386,9 +439,9 @@
     {
       let score = parseInt(getCookie("SBG:Level"+i));
       if (isNaN(score)) score = 0;
-      let rounds = parseInt(getCookie("SBG:Level"+i+"Rounds"));
-      if (isNaN(rounds)) rounds = 0;
-      stats += "Level " + (i+1) + ": " + score + " ("+rounds+" Rounds)<br>";
+      // let rounds = parseInt(getCookie("SBG:Level"+i+"Rounds"));
+      // if (isNaN(rounds)) rounds = 0;
+      stats += "Level " + (i+1) + ": " + score + "<br>";
     }
     return stats;
   }
