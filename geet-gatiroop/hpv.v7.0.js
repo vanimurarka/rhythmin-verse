@@ -1184,18 +1184,28 @@ function drawStyleCharBlock(c,colorBy)
 
 	}
 	if (colorBy == 'ghazal')
-    {
-      if (c.isRadeef) // is a radeef char
-      {
-        color = "rgb(0,220,255)"; // blue
-        fillOp = "0.5";
-      }
-      if (c.isKaafiyaa) // is a kaafiyaa char
-      {
-        color = "rgb(0,255,0)"; // green
-        fillOp = "0.5";
-      }
-    }
+  {
+  	if (c.maatraa == c.systemMaatraa)
+  	{
+	    if (c.isRadeef) // is a radeef char
+	    {
+	      color = "rgb(0,220,255)"; // blue
+	      fillOp = "0.5";
+	    }
+	    if (c.isKaafiyaa) // is a kaafiyaa char
+	    {
+	      color = "rgb(0,255,0)"; // green
+	      fillOp = "0.5";
+	    }
+	  }
+	  else
+	  {
+	  	// color = "rgb(220,45,45)"; //
+  		color = "yellow";
+  		fillOp = "0.5";
+	  }
+
+  }
 
 	// unknown vowel, individual length unknown/0
 	// what are some examples when this occurs? 
