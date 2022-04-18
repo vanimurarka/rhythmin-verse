@@ -1,0 +1,1 @@
+﻿NDSearch.OnPrefixDataLoaded("glo",["Section"],[["Global",,[[,,,,0,"File:hpv.v7.1.js:Global"]]]]);

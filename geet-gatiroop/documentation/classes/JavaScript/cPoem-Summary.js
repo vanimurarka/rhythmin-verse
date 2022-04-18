@@ -1,0 +1,1 @@
+﻿NDFramePage.OnPageTitleLoaded("JavaScriptClass:cPoem","cPoem");NDSummary.OnSummaryLoaded("JavaScriptClass:cPoem",[["JavaScript","JavaScript"]],[["Classes","Class"]],[[3,0,0,"cPoem"]]);

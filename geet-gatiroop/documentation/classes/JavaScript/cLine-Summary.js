@@ -1,0 +1,1 @@
+﻿NDFramePage.OnPageTitleLoaded("JavaScriptClass:cLine","cLine");NDSummary.OnSummaryLoaded("JavaScriptClass:cLine",[["JavaScript","JavaScript"]],[["Classes","Class"]],[[1,0,0,"cLine"]]);

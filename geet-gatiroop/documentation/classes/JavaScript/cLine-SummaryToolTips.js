@@ -1,0 +1,1 @@
+﻿NDSummary.OnToolTipsLoaded("JavaScriptClass:cLine",{1:"<div class=\"NDToolTip TClass LJavaScript\"><div class=\"TTSummary\">A line of poetry</div></div>"});

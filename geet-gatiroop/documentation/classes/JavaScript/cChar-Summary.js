@@ -1,0 +1,1 @@
+﻿NDFramePage.OnPageTitleLoaded("JavaScriptClass:cChar","cChar");NDSummary.OnSummaryLoaded("JavaScriptClass:cChar",[["JavaScript","JavaScript"]],[["Classes","Class"],["Functions","Function"],["Groups","Group"]],[[2,0,0,"cChar"],[4,0,2,"Functions","Functions"],[5,0,1,"cChar","cChar"],[6,0,1,"replaceMainChar","replaceMainChar"]]);
