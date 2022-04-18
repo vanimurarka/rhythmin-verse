@@ -1,0 +1,1 @@
+﻿NDSearch.OnPrefixDataLoaded("joi",["Function"],[["joinedConsonantVowel",,[["cChar","get joinedConsonantVowel",,,0,"File:hpv.v7.1.js:cChar.get_joinedConsonantVowel","JavaScriptClass:cChar:get_joinedConsonantVowel"]]]]);

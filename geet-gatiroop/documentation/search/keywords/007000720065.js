@@ -1,0 +1,1 @@
+﻿NDSearch.OnPrefixDataLoaded("pre",["Function"],[["previousChar",,[["cLine",,,,0,"File:hpv.v7.1.js:cLine.previousChar","JavaScriptClass:cLine:previousChar"]]]]);

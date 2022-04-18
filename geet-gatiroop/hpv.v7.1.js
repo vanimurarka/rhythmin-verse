@@ -49,6 +49,7 @@ class cChar {
   }
   /* 
 		Function: replaceMainChar
+		When a consonant has a Nuqta or dot below like ड़, it is handled as one character in this s/w but the dot below is a separate character in Unicode. So the dot has to be merged with the existing character.
 
 		Parameter:
 			newMainChar
@@ -91,6 +92,10 @@ class cChar {
   	} 
   }
 
+  /*
+  	Function: Setter vowel
+  	Set the vowel character for this character block
+  */
   set vowel(vowelChar) {
 		this.vowelChar = vowelChar;
 		// set Vowel Number
@@ -163,16 +168,35 @@ class cChar {
 				break;
 		}
   }
-  // determine if character is half letter
+  /*
+	  Function: isHalfLetter
+	  Determine if character is half letter
+
+	  Returns:
+	  	True or False
+	*/
   isHalfLetter()
   {
   	return (this.vowelNumber == -1); 
   }
+  /*
+	  Function: isPureVowel
+	  Determine whether character is a pure vowel with no consonant
+
+	  Returns:
+	  	True or False
+	*/
   isPureVowel()
   {
   	return (this.mainChar == this.vowelChar);
   }
-  // check if this character is of laghu vowel
+  /*
+	  Function: isLaghu
+	  Checks if this character is of laghu vowel
+
+	  Returns:
+	  	True or False
+	*/
   isLaghu ()
   {
   	switch(this.vowelNumber)
@@ -185,6 +209,13 @@ class cChar {
   			break;
   	}
   }
+  /*
+	  Function: isDeergha
+	  Checks if this character is of deergha vowel
+
+	  Returns:
+	  	True or False
+	*/
   isDeergha()
   {
   	switch(this.vowelNumber)
@@ -197,11 +228,14 @@ class cChar {
   			break;
   	}
   }
-  // determine when a half letter will have 0 or 1 maatraa
-	// the logic for default handling - which the user can always override
-	// p = previous letter 
-	// this = current letter for which the len is to be determined
-	// n = next letter (consonant+vowel array structure)	
+  /*
+	  Function: calculateHalfLetterLen
+	  Determine when a half letter will have 0 or 1 maatraa. The logic for default handling - which the user can always override.
+
+	  Parameters:
+			p - previous letter 
+			n - next letter
+	*/  	
 	calculateHalfLetterLen(p=false,n=false)
 	{
 		// all this.maatraa = 0 not really required because its already set to zero,
@@ -252,7 +286,8 @@ class cChar {
 	  	}
 	  	return 0;		  	
 	}
-	// when the user adjusts the maatraa by clicking on the char
+	// Function: adjustCharMaatraa
+	// When the user adjusts the maatraa by clicking on the char, then adjust the maatraa
 	adjustCharMaatraa()
 	{
 		// whole chars
@@ -274,7 +309,8 @@ class cChar {
 				this.maatraa = 0;
 		}
 	}
-	// return full text mainchar + vowelchar
+	// Function: get text
+	// Getter. Return full text of a character, i.e. mainchar + vowelchar
 	get text()
 	{
 		let txt = "";
@@ -291,7 +327,8 @@ class cChar {
 		}
 		return txt;
 	}
-	// this is different from get text in that it returns all chars, even non-hindi ones
+	// Function: get joinedConsonantVowel
+	// Getter. Gets the mainchar+vowelchar. This is different from get text in that it returns all chars, even non-hindi ones.
 	get joinedConsonantVowel() 
 	{
 		if (this.mainChar==this.vowelChar)
@@ -300,6 +337,14 @@ class cChar {
 		  return this.mainChar; // could be a case of न अ 
 		return this.mainChar+this.vowelChar;
 	}
+	/* Function: compare
+		Compares this character with a given cChar object.
+
+		Return:
+			- "all" for full match
+			- true when vowel is the same
+			- false when vowel is not the same (so consonant matching is irrelevant)
+	*/
 	compare(cin)
 	{
 		if (this.text == cin.text)
@@ -314,6 +359,12 @@ class cChar {
 // Class: cLine
 // A line of poetry
 class cLine {
+	/* Constructor
+		Create a new line object using a given line of text
+
+		Parameter:
+			lineText - text of line from which line object is to be creater
+	*/
 	constructor(lineText) {
 		this.originalText = lineText;
 		this.characters = new Array();
@@ -324,10 +375,17 @@ class cLine {
 		this.rhymeGroup = 0;
 		this.rhymeLength = 0;
 	}
+	// Function: get text
+	// Getter. Gets the original text using which the line was created
 	get text() 	{
 		return this.originalText;
 	}
-	// change the vowel of the last character
+	/* Function: lastCharVowel
+		Change the vowel of the last character of the line and recalculate maatraas accordingly. Used when processing a line character by character, and the vowel character comes after the consonant.
+
+		Parameters:
+			vowelString - vowel text
+	*/
 	lastCharVowel(vowelString)
 	{
 		const lastChar = this.characters[this.count-1];
@@ -336,14 +394,23 @@ class cLine {
 		this.maatraa += lastChar.maatraa - oldMaatraa;
 		lastChar.maatraaCumulative += lastChar.maatraa - oldMaatraa;
 	}
-	// change the last char consonant 
-	// probably because it is a nuqta
+	/* Function: lastCharVowel
+		Change the consonant of the last char of line -- probably because it is a nuqta
+
+		Parameters:
+			consonantString - consonant text
+	*/
 	changeLastCharConsonant(consonantString)
 	{
 		const lastChar = this.characters[this.count-1];
 		lastChar.replaceMainChar(consonantString);
 	}
-	// add a new character to line
+	/* Function: push
+		Add a new character to line
+
+		Parameters:
+			newChar - Type: cChar
+	*/
 	push(newChar)
 	{
 		newChar.index = this.count;
@@ -357,12 +424,28 @@ class cLine {
 		this.maatraa += newChar.maatraa;
 		this.count++;
 	}
-	// get the nth character of a line
+	/* Function: charByIndex
+		Get the nth character of a line
+
+		Parameters:
+			idx - index of character being asked for
+
+		Returns:
+			cChar
+	*/
 	charByIndex(idx)
 	{
 		return this.characters[idx];
 	}
-	// get the nth character from end
+	/* Function: charByReverseIndex
+		Get the nth character from the end of line
+
+		Parameters:
+			idx - index from end of line of character being asked for
+
+		Returns:
+			cChar 
+	*/
 	charByReverseIndex(idx)
 	{
 		idx = this.count-1-idx;
@@ -371,7 +454,16 @@ class cLine {
 		else
 			return false;
 	}
-	// get previous character w.r.t. given current character
+	/* Function: previousChar
+		Get previous character w.r.t. given current character - as each cChar has an index private property too
+
+		Parameters:
+			c - current character (cChar)
+
+		Returns:
+			- previous cChar in line
+			- or false if not found
+	*/
 	previousChar(c) // c = current character
 	{
 		if ((c.index != 0) && (this.count>1))
@@ -379,7 +471,16 @@ class cLine {
 		else
 			return false;
 	}
-	// get next character w.r.t. given current character
+	/* Function: nextChar
+		Get next character w.r.t. given current character - as each cChar has an index private property too
+
+		Parameters:
+			c - current character (cChar)
+
+		Returns:
+			- next cChar in line
+			- or false if not found
+	*/
 	nextChar(c) // c = current character
 	{
 		if ((this.count>1) && (c.index < this.count - 1))
@@ -387,7 +488,13 @@ class cLine {
 		else
 			return false;
 	}
-	// get last Character
+	/* Function: getLastChar
+		Get last cChar in line
+
+		Returns:
+			- last cChar in line
+			- or false line has no characters
+	*/
 	getLastChar()
 	{
 		if (this.count == 0)
@@ -395,7 +502,9 @@ class cLine {
 		else
 			return this.characters[this.count-1];
 	}
-	// return an array of half letters in a line
+	/* Function: getHalfLetters
+		Return an array of half letters in a line
+	*/
 	getHalfLetters()
 	{
 		const halfLetters = this.characters.filter(function (thisChar) {
@@ -403,7 +512,9 @@ class cLine {
 		});
 		return halfLetters;
 	}
-	// calculate default maatraa for half letters in a line based
+	/* Function: calculateHalfLettersMaatraa
+		Calculate default maatraa for half letters in a line
+	*/
 	calculateHalfLettersMaatraa()
 	{
 		const halfLetters = this.getHalfLetters();
@@ -434,6 +545,12 @@ class cLine {
 			}
 		};
 	}
+	/* Function: adjustCharMaatraa
+		Adjust maatraa for the character of the given index. Update cumulative maatraas for other subsequent characters in line accordingly
+
+		Parameters:
+			charIdx - index of character whose maatraa is to be adjusted
+	*/
 	adjustCharMaatraa(charIdx)
 	{
 		let thisChar = this.charByIndex(charIdx);
@@ -447,6 +564,12 @@ class cLine {
 
 		return this.maatraa;
 	}
+	/* Function: doesItRhyme
+
+		Parameters:
+			- compareLine
+			- rg
+	*/
 	doesItRhyme(compareLine, rg)
 	{
 		let i = 0;
@@ -577,6 +700,12 @@ class compositeLine
 // Class: cPoem
 // Class for the full processed poem object.
 class cPoem {
+	/* Constructor
+		Create a new poem object with given Text. Processing of text not being done here. Only initializing of private variables.
+
+		Parameter:
+			originalText
+	*/
 	constructor(originalText) {
 		this.originalText = originalText;
 		this.lines = new Array();
@@ -588,6 +717,12 @@ class cPoem {
 		this.radeefArray = [];
 		this.firstLineMaapnee = false;
 	}
+	/* Function: push
+		Add new cLine
+
+		Parameter:
+			newLine - new cLine
+	*/
 	pushLine(newLine)
 	{
 		this.lines.push(newLine)
@@ -597,25 +732,48 @@ class cPoem {
 		if (this.lineCount == 1)
 			this.detectFirstLineMaapnee();
 	}
+	/* Function: get text
+		Getter. Gets original text with which this object was constructed
+	*/
 	get text() 	{
 		return this.originalText;
 	}
+	/* Function: adjustCharMaatraa
+		Adjust maatraa of character of given index, in line of given index. Update other requisite variables accordingly
+
+		Parameters -
+			- lineIdx - index of line where character exists whose maatraa has to be adjusted
+			- charIdx - index of character in line whose maatraa has to be adjusted
+	*/
 	adjustCharMaatraa(lineIdx, charIdx)
 	{
 		let newMaatraaOfLine = this.lines[lineIdx].adjustCharMaatraa(charIdx);
 		if (this.maxLineLen < newMaatraaOfLine)
 			this.maxLineLen = newMaatraaOfLine;
 	}
+	/* Function: setComposite
+		Toggle line of given index as composite line. For Free Verse.
+
+		Parameters -
+			- lineIdx - index of line whose composite flag is to be toggled
+	*/
 	setComposite(lineIdx)
 	{
 		this.lines[lineIdx].isComposite = !this.lines[lineIdx].isComposite;
 		this.calculateCompositeMaatraa();
 	}
+	/* Function: setBaseCount
+		Set base meter count for this poem, and update composite counts accordingly.
+
+		Parameters -
+			- baseCount - Base count integer
+	*/
 	setBaseCount(baseCount)
 	{
 		this.baseCount = baseCount;
 		this.calculateCompositeMaatraa();
 	}
+	// Function: calculateCompositeMaatraa
 	calculateCompositeMaatraa()
 	{
 		let compositeInProgress = false;
@@ -663,6 +821,8 @@ class cPoem {
 		for (i = 0; i< this.compositeLines.length; i++)
 			this.calculateRemainder(i);
 	}
+	// Function: calculateRemainder
+	// Calculate remainder for a given composite index
 	calculateRemainder(compositeIdx)
 	{
 		if (this.baseCount > 1)
@@ -683,6 +843,7 @@ class cPoem {
 		else
 			this.compositeLines[compositeIdx].remainder = 0;
 	}
+	// Function: calculateRadeef
 	calculateRadeef()
 	{
 	    let radeef = '';
@@ -760,6 +921,7 @@ class cPoem {
 	      }
 	    }
 	}
+	// Function: calculateKaafiyaa
 	calculateKaafiyaa()
 	{
 		// debugger;
@@ -815,6 +977,7 @@ class cPoem {
 		  }
 		}
 	}
+	// Function: findRhymingLines
 	findRhymingLines()
 	{
 		
@@ -878,6 +1041,8 @@ class cPoem {
 			}
 		}		
 	}
+	// Function: detectFirstLineMaapnee
+	// Detect if first line of poem text is a Maapnee (1,2 pattern)
 	detectFirstLineMaapnee()
 	{
 		if (this.lineCount < 1) return;

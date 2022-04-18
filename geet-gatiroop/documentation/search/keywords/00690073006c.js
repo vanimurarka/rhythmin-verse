@@ -1,0 +1,1 @@
+﻿NDSearch.OnPrefixDataLoaded("isl",["Function"],[["isLaghu",,[["cChar",,,,0,"File:hpv.v7.1.js:cChar.isLaghu","JavaScriptClass:cChar:isLaghu"]]]]);

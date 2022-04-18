@@ -1,0 +1,1 @@
+﻿NDSearch.OnPrefixDataLoaded("vow",["Function"],[["vowel",,[["cChar","Setter vowel",,,0,"File:hpv.v7.1.js:cChar.Setter_vowel","JavaScriptClass:cChar:Setter_vowel"]]]]);

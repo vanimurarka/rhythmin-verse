@@ -22,15 +22,155 @@
  <div class="CBody"><p>Creates a new character object.</p><div class="CHeading">Parameter</div><p>mainChar - mainCharCode -</p></div>
 </div>
 
-<a name="cChar.replaceMainChar"></a><a name="Topic6"></a><div class="CTopic TFunction LJavaScript">
+<a name="cChar.replaceMainChar"></a><a name="Topic33"></a><div class="CTopic TFunction LJavaScript">
  <div class="CTitle">replaceMainChar</div>
- <div id="NDPrototype6" class="NDPrototype WideForm"><div class="PSection PParameterSection CStyle"><table><tr><td class="PBeforeParameters">replaceMainChar(</td><td class="PParametersParentCell"><table class="PParameters"><tr><td class="PName first last">newMainChar</td></tr></table></td><td class="PAfterParameters">)</td></tr></table></div></div>
- <div class="CBody"><div class="CHeading">Parameter</div><p>newMainChar</p></div>
+ <div id="NDPrototype33" class="NDPrototype WideForm"><div class="PSection PParameterSection CStyle"><table><tr><td class="PBeforeParameters">replaceMainChar(</td><td class="PParametersParentCell"><table class="PParameters"><tr><td class="PName first last">newMainChar</td></tr></table></td><td class="PAfterParameters">)</td></tr></table></div></div>
+ <div class="CBody"><p>When a consonant has a Nuqta or dot below like ड़, it is handled as one character in this s/w but the dot below is a separate character in Unicode. So the dot has to be merged with the existing character.</p><div class="CHeading">Parameter</div><p>newMainChar</p></div>
+</div>
+
+<a name="cChar.Setter_vowel"></a><a name="Topic34"></a><div class="CTopic TFunction LJavaScript">
+ <div class="CTitle">Setter vowel</div>
+ <div class="CBody"><p>Set the vowel character for this character block</p></div>
+</div>
+
+<a name="cChar.isHalfLetter"></a><a name="Topic35"></a><div class="CTopic TFunction LJavaScript">
+ <div class="CTitle">isHalfLetter</div>
+ <div id="NDPrototype35" class="NDPrototype"><div class="PSection PPlainSection">isHalfLetter()</div></div>
+ <div class="CBody"><p>Determine if character is half letter</p><div class="CHeading">Returns</div><p>True or False</p></div>
+</div>
+
+<a name="cChar.isPureVowel"></a><a name="Topic6"></a><div class="CTopic TFunction LJavaScript">
+ <div class="CTitle">isPureVowel</div>
+ <div id="NDPrototype6" class="NDPrototype"><div class="PSection PPlainSection">isPureVowel()</div></div>
+ <div class="CBody"><p>Determine whether character is a pure vowel with no consonant</p><div class="CHeading">Returns</div><p>True or False</p></div>
+</div>
+
+<a name="cChar.isLaghu"></a><a name="Topic36"></a><div class="CTopic TFunction LJavaScript">
+ <div class="CTitle">isLaghu</div>
+ <div id="NDPrototype36" class="NDPrototype"><div class="PSection PPlainSection">isLaghu ()</div></div>
+ <div class="CBody"><p>Checks if this character is of laghu vowel</p><div class="CHeading">Returns</div><p>True or False</p></div>
+</div>
+
+<a name="cChar.isDeergha"></a><a name="Topic37"></a><div class="CTopic TFunction LJavaScript">
+ <div class="CTitle">isDeergha</div>
+ <div id="NDPrototype37" class="NDPrototype"><div class="PSection PPlainSection">isDeergha()</div></div>
+ <div class="CBody"><p>Checks if this character is of deergha vowel</p><div class="CHeading">Returns</div><p>True or False</p></div>
+</div>
+
+<a name="cChar.calculateHalfLetterLen"></a><a name="Topic38"></a><div class="CTopic TFunction LJavaScript">
+ <div class="CTitle">calculateHalfLetterLen</div>
+ <div id="NDPrototype38" class="NDPrototype WideForm"><div class="PSection PParameterSection CStyle"><table><tr><td class="PBeforeParameters">calculateHalfLetterLen(</td><td class="PParametersParentCell"><table class="PParameters"><tr><td class="PName first">p</td><td class="PDefaultValueSeparator">&nbsp;=&nbsp;</td><td class="PDefaultValue last"><span class="SHKeyword">false</span>,</td></tr><tr><td class="PName first">n</td><td class="PDefaultValueSeparator">&nbsp;=&nbsp;</td><td class="PDefaultValue last"><span class="SHKeyword">false</span></td></tr></table></td><td class="PAfterParameters">)</td></tr></table></div></div>
+ <div class="CBody"><table class="CDefinitionList"><tr><td class="CDLEntry">Determine when a half letter will have 0 or 1 maatraa. The logic for default handling</td><td class="CDLDefinition"><p>which the user can always override.</p></td></tr></table><div class="CHeading">Parameters</div><table class="CDefinitionList"><tr><td class="CDLEntry">p</td><td class="CDLDefinition"><p>previous letter</p></td></tr><tr><td class="CDLEntry">n</td><td class="CDLDefinition"><p>next letter</p></td></tr></table></div>
+</div>
+
+<a name="cChar.adjustCharMaatraa"></a><a name="Topic39"></a><div class="CTopic TFunction LJavaScript">
+ <div class="CTitle">adjustCharMaatraa</div>
+ <div id="NDPrototype39" class="NDPrototype"><div class="PSection PPlainSection">adjustCharMaatraa()</div></div>
+ <div class="CBody"><p>When the user adjusts the maatraa by clicking on the char, then adjust the maatraa</p></div>
+</div>
+
+<a name="cChar.get_text"></a><a name="Topic40"></a><div class="CTopic TFunction LJavaScript">
+ <div class="CTitle">get text</div>
+ <div id="NDPrototype40" class="NDPrototype"><div class="PSection PPlainSection"><span class="SHKeyword">get</span> text()</div></div>
+ <div class="CBody"><p>Getter. Return full text of a character, i.e. mainchar + vowelchar</p></div>
+</div>
+
+<a name="cChar.get_joinedConsonantVowel"></a><a name="Topic41"></a><div class="CTopic TFunction LJavaScript">
+ <div class="CTitle">get joinedConsonantVowel</div>
+ <div id="NDPrototype41" class="NDPrototype"><div class="PSection PPlainSection"><span class="SHKeyword">get</span> joinedConsonantVowel()</div></div>
+ <div class="CBody"><p>Getter. Gets the mainchar+vowelchar. This is different from get text in that it returns all chars, even non-hindi ones.</p></div>
+</div>
+
+<a name="cChar.compare"></a><a name="Topic43"></a><div class="CTopic TFunction LJavaScript">
+ <div class="CTitle">compare</div>
+ <div id="NDPrototype43" class="NDPrototype WideForm"><div class="PSection PParameterSection CStyle"><table><tr><td class="PBeforeParameters">compare(</td><td class="PParametersParentCell"><table class="PParameters"><tr><td class="PName first last">cin</td></tr></table></td><td class="PAfterParameters">)</td></tr></table></div></div>
+ <div class="CBody"><p>Compares this character with a given cChar object.</p><div class="CHeading">Return</div><ul><li><p>&quot;all&quot; for full match</p></li><li><p>true when vowel is the same</p></li><li><p>false when vowel is not the same (so consonant matching is irrelevant)</p></li></ul></div>
 </div>
 
 <a name="cLine"></a><a name="Topic1"></a><div class="CTopic TClass LJavaScript">
  <div class="CTitle">cLine</div>
  <div class="CBody"><p>A line of poetry</p></div>
+</div>
+
+<a name="cLine.Functions"></a><a name="Topic42"></a><div class="CTopic TGroup LJavaScript">
+ <div class="CTitle">Functions</div>
+</div>
+
+<a name="cLine.get_text"></a><a name="Topic44"></a><div class="CTopic TFunction LJavaScript">
+ <div class="CTitle">get text</div>
+ <div id="NDPrototype44" class="NDPrototype"><div class="PSection PPlainSection"><span class="SHKeyword">get</span> text()</div></div>
+ <div class="CBody"><p>Getter. Gets the original text using which the line was created</p></div>
+</div>
+
+<a name="cLine.lastCharVowel"></a><a name="Topic45"></a><div class="CTopic TFunction LJavaScript">
+ <div class="CTitle">lastCharVowel</div>
+ <div id="NDPrototype45" class="NDPrototype WideForm"><div class="PSection PParameterSection CStyle"><table><tr><td class="PBeforeParameters">lastCharVowel(</td><td class="PParametersParentCell"><table class="PParameters"><tr><td class="PName first last">vowelString</td></tr></table></td><td class="PAfterParameters">)</td></tr></table></div></div>
+ <div class="CBody"><p>Change the vowel of the last character of the line and recalculate maatraas accordingly. Used when processing a line character by character, and the vowel character comes after the consonant.</p><div class="CHeading">Parameters</div><table class="CDefinitionList"><tr><td class="CDLEntry">vowelString</td><td class="CDLDefinition"><p>vowel text</p></td></tr></table></div>
+</div>
+
+<a name="cLine.lastCharVowel(2)"></a><a name="Topic46"></a><div class="CTopic TFunction LJavaScript">
+ <div class="CTitle">lastCharVowel</div>
+ <div class="CBody"><p>Change the consonant of the last char of line -- probably because it is a nuqta</p><div class="CHeading">Parameters</div><table class="CDefinitionList"><tr><td class="CDLEntry">consonantString</td><td class="CDLDefinition"><p>consonant text</p></td></tr></table></div>
+</div>
+
+<a name="cLine.push"></a><a name="Topic47"></a><div class="CTopic TFunction LJavaScript">
+ <div class="CTitle">push</div>
+ <div id="NDPrototype47" class="NDPrototype WideForm"><div class="PSection PParameterSection CStyle"><table><tr><td class="PBeforeParameters">push(</td><td class="PParametersParentCell"><table class="PParameters"><tr><td class="PName first last">newChar</td></tr></table></td><td class="PAfterParameters">)</td></tr></table></div></div>
+ <div class="CBody"><p>Add a new character to line</p><div class="CHeading">Parameters</div><table class="CDefinitionList"><tr><td class="CDLEntry">newChar</td><td class="CDLDefinition"><p>Type: cChar</p></td></tr></table></div>
+</div>
+
+<a name="cLine.charByIndex"></a><a name="Topic48"></a><div class="CTopic TFunction LJavaScript">
+ <div class="CTitle">charByIndex</div>
+ <div id="NDPrototype48" class="NDPrototype WideForm"><div class="PSection PParameterSection CStyle"><table><tr><td class="PBeforeParameters">charByIndex(</td><td class="PParametersParentCell"><table class="PParameters"><tr><td class="PName first last">idx</td></tr></table></td><td class="PAfterParameters">)</td></tr></table></div></div>
+ <div class="CBody"><p>Get the nth character of a line</p><div class="CHeading">Parameters</div><table class="CDefinitionList"><tr><td class="CDLEntry">idx</td><td class="CDLDefinition"><p>index of character being asked for</p></td></tr></table><div class="CHeading">Returns</div><p>cChar</p></div>
+</div>
+
+<a name="cLine.charByReverseIndex"></a><a name="Topic49"></a><div class="CTopic TFunction LJavaScript">
+ <div class="CTitle">charByReverseIndex</div>
+ <div id="NDPrototype49" class="NDPrototype WideForm"><div class="PSection PParameterSection CStyle"><table><tr><td class="PBeforeParameters">charByReverseIndex(</td><td class="PParametersParentCell"><table class="PParameters"><tr><td class="PName first last">idx</td></tr></table></td><td class="PAfterParameters">)</td></tr></table></div></div>
+ <div class="CBody"><p>Get the nth character from the end of line</p><div class="CHeading">Parameters</div><table class="CDefinitionList"><tr><td class="CDLEntry">idx</td><td class="CDLDefinition"><p>index from end of line of character being asked for</p></td></tr></table><div class="CHeading">Returns</div><p>cChar</p></div>
+</div>
+
+<a name="cLine.previousChar"></a><a name="Topic50"></a><div class="CTopic TFunction LJavaScript">
+ <div class="CTitle">previousChar</div>
+ <div id="NDPrototype50" class="NDPrototype WideForm"><div class="PSection PParameterSection CStyle"><table><tr><td class="PBeforeParameters">previousChar(</td><td class="PParametersParentCell"><table class="PParameters"><tr><td class="PName first last">c</td></tr></table></td><td class="PAfterParameters">)</td></tr></table></div></div>
+ <div class="CBody"><table class="CDefinitionList"><tr><td class="CDLEntry">Get previous character w.r.t. given current character</td><td class="CDLDefinition"><p>as each cChar has an index private property too</p></td></tr></table><div class="CHeading">Parameters</div><table class="CDefinitionList"><tr><td class="CDLEntry">c</td><td class="CDLDefinition"><p>current character (cChar)</p></td></tr></table><div class="CHeading">Returns</div><ul><li><p>previous cChar in line</p></li><li><p>or false if not found</p></li></ul></div>
+</div>
+
+<a name="cLine.nextChar"></a><a name="Topic51"></a><div class="CTopic TFunction LJavaScript">
+ <div class="CTitle">nextChar</div>
+ <div id="NDPrototype51" class="NDPrototype WideForm"><div class="PSection PParameterSection CStyle"><table><tr><td class="PBeforeParameters">nextChar(</td><td class="PParametersParentCell"><table class="PParameters"><tr><td class="PName first last">c</td></tr></table></td><td class="PAfterParameters">)</td></tr></table></div></div>
+ <div class="CBody"><table class="CDefinitionList"><tr><td class="CDLEntry">Get next character w.r.t. given current character</td><td class="CDLDefinition"><p>as each cChar has an index private property too</p></td></tr></table><div class="CHeading">Parameters</div><table class="CDefinitionList"><tr><td class="CDLEntry">c</td><td class="CDLDefinition"><p>current character (cChar)</p></td></tr></table><div class="CHeading">Returns</div><ul><li><p>next cChar in line</p></li><li><p>or false if not found</p></li></ul></div>
+</div>
+
+<a name="cLine.getLastChar"></a><a name="Topic52"></a><div class="CTopic TFunction LJavaScript">
+ <div class="CTitle">getLastChar</div>
+ <div id="NDPrototype52" class="NDPrototype"><div class="PSection PPlainSection">getLastChar()</div></div>
+ <div class="CBody"><p>Get last cChar in line</p><div class="CHeading">Returns</div><ul><li><p>last cChar in line</p></li><li><p>or false line has no characters</p></li></ul></div>
+</div>
+
+<a name="cLine.getHalfLetters"></a><a name="Topic53"></a><div class="CTopic TFunction LJavaScript">
+ <div class="CTitle">getHalfLetters</div>
+ <div id="NDPrototype53" class="NDPrototype"><div class="PSection PPlainSection">getHalfLetters()</div></div>
+ <div class="CBody"><p>Return an array of half letters in a line</p></div>
+</div>
+
+<a name="cLine.calculateHalfLettersMaatraa"></a><a name="Topic54"></a><div class="CTopic TFunction LJavaScript">
+ <div class="CTitle">calculateHalfLettersMaatraa</div>
+ <div id="NDPrototype54" class="NDPrototype"><div class="PSection PPlainSection">calculateHalfLettersMaatraa()</div></div>
+ <div class="CBody"><p>Calculate default maatraa for half letters in a line</p></div>
+</div>
+
+<a name="cLine.adjustCharMaatraa"></a><a name="Topic55"></a><div class="CTopic TFunction LJavaScript">
+ <div class="CTitle">adjustCharMaatraa</div>
+ <div id="NDPrototype55" class="NDPrototype WideForm"><div class="PSection PParameterSection CStyle"><table><tr><td class="PBeforeParameters">adjustCharMaatraa(</td><td class="PParametersParentCell"><table class="PParameters"><tr><td class="PName first last">charIdx</td></tr></table></td><td class="PAfterParameters">)</td></tr></table></div></div>
+ <div class="CBody"><p>Adjust maatraa for the character of the given index. Update cumulative maatraas for other subsequent characters in line accordingly</p><div class="CHeading">Parameters</div><table class="CDefinitionList"><tr><td class="CDLEntry">charIdx</td><td class="CDLDefinition"><p>index of character whose maatraa is to be adjusted</p></td></tr></table></div>
+</div>
+
+<a name="cLine.doesItRhyme"></a><a name="Topic56"></a><div class="CTopic TFunction LJavaScript">
+ <div class="CTitle">doesItRhyme</div>
+ <div id="NDPrototype56" class="NDPrototype WideForm"><div class="PSection PParameterSection CStyle"><table><tr><td class="PBeforeParameters">doesItRhyme(</td><td class="PParametersParentCell"><table class="PParameters"><tr><td class="PName first last">compareLine,</td></tr><tr><td class="PName first last">rg</td></tr></table></td><td class="PAfterParameters">)</td></tr></table></div></div>
+ <div class="CBody"><div class="CHeading">Parameters</div><ul><li><p>compareLine</p></li><li><p>rg</p></li></ul></div>
 </div>
 
 <a name="compositeLine"></a><a name="Topic7"></a><div class="CTopic TClass LJavaScript">
@@ -41,6 +181,72 @@
 <a name="cPoem"></a><a name="Topic3"></a><div class="CTopic TClass LJavaScript">
  <div class="CTitle">cPoem</div>
  <div class="CBody"><p>Class for the full processed poem object.</p></div>
+</div>
+
+<a name="cPoem.Functions"></a><a name="Topic57"></a><div class="CTopic TGroup LJavaScript">
+ <div class="CTitle">Functions</div>
+</div>
+
+<a name="cPoem.push"></a><a name="Topic58"></a><div class="CTopic TFunction LJavaScript">
+ <div class="CTitle">push</div>
+ <div id="NDPrototype58" class="NDPrototype WideForm"><div class="PSection PParameterSection CStyle"><table><tr><td class="PBeforeParameters">pushLine(</td><td class="PParametersParentCell"><table class="PParameters"><tr><td class="PName first last">newLine</td></tr></table></td><td class="PAfterParameters">)</td></tr></table></div></div>
+ <div class="CBody"><p>Add new cLine</p><div class="CHeading">Parameter</div><table class="CDefinitionList"><tr><td class="CDLEntry">newLine</td><td class="CDLDefinition"><p>new cLine</p></td></tr></table></div>
+</div>
+
+<a name="cPoem.get_text"></a><a name="Topic59"></a><div class="CTopic TFunction LJavaScript">
+ <div class="CTitle">get text</div>
+ <div id="NDPrototype59" class="NDPrototype"><div class="PSection PPlainSection"><span class="SHKeyword">get</span> text()</div></div>
+ <div class="CBody"><p>Getter. Gets original text with which this object was constructed</p></div>
+</div>
+
+<a name="cPoem.adjustCharMaatraa"></a><a name="Topic60"></a><div class="CTopic TFunction LJavaScript">
+ <div class="CTitle">adjustCharMaatraa</div>
+ <div id="NDPrototype60" class="NDPrototype WideForm"><div class="PSection PParameterSection CStyle"><table><tr><td class="PBeforeParameters">adjustCharMaatraa(</td><td class="PParametersParentCell"><table class="PParameters"><tr><td class="PName first last">lineIdx,</td></tr><tr><td class="PName first last">charIdx</td></tr></table></td><td class="PAfterParameters">)</td></tr></table></div></div>
+ <div class="CBody"><p>Adjust maatraa of character of given index, in line of given index. Update other requisite variables accordingly</p><p>Parameters - - lineIdx - index of line where character exists whose maatraa has to be adjusted - charIdx - index of character in line whose maatraa has to be adjusted</p></div>
+</div>
+
+<a name="cPoem.setComposite"></a><a name="Topic61"></a><div class="CTopic TFunction LJavaScript">
+ <div class="CTitle">setComposite</div>
+ <div id="NDPrototype61" class="NDPrototype WideForm"><div class="PSection PParameterSection CStyle"><table><tr><td class="PBeforeParameters">setComposite(</td><td class="PParametersParentCell"><table class="PParameters"><tr><td class="PName first last">lineIdx</td></tr></table></td><td class="PAfterParameters">)</td></tr></table></div></div>
+ <div class="CBody"><p>Toggle line of given index as composite line. For Free Verse.</p><p>Parameters - - lineIdx - index of line whose composite flag is to be toggled</p></div>
+</div>
+
+<a name="cPoem.setBaseCount"></a><a name="Topic62"></a><div class="CTopic TFunction LJavaScript">
+ <div class="CTitle">setBaseCount</div>
+ <div id="NDPrototype62" class="NDPrototype WideForm"><div class="PSection PParameterSection CStyle"><table><tr><td class="PBeforeParameters">setBaseCount(</td><td class="PParametersParentCell"><table class="PParameters"><tr><td class="PName first last">baseCount</td></tr></table></td><td class="PAfterParameters">)</td></tr></table></div></div>
+ <div class="CBody"><p>Set base meter count for this poem, and update composite counts accordingly.</p><p>Parameters - - baseCount - Base count integer</p></div>
+</div>
+
+<a name="cPoem.calculateCompositeMaatraa"></a><a name="Topic63"></a><div class="CTopic TFunction LJavaScript">
+ <div class="CTitle">calculateCompositeMaatraa</div>
+ <div id="NDPrototype63" class="NDPrototype"><div class="PSection PPlainSection">calculateCompositeMaatraa()</div></div>
+</div>
+
+<a name="cPoem.calculateRemainder"></a><a name="Topic64"></a><div class="CTopic TFunction LJavaScript">
+ <div class="CTitle">calculateRemainder</div>
+ <div id="NDPrototype64" class="NDPrototype WideForm"><div class="PSection PParameterSection CStyle"><table><tr><td class="PBeforeParameters">calculateRemainder(</td><td class="PParametersParentCell"><table class="PParameters"><tr><td class="PName first last">compositeIdx</td></tr></table></td><td class="PAfterParameters">)</td></tr></table></div></div>
+ <div class="CBody"><p>Calculate remainder for a given composite index</p></div>
+</div>
+
+<a name="cPoem.calculateRadeef"></a><a name="Topic65"></a><div class="CTopic TFunction LJavaScript">
+ <div class="CTitle">calculateRadeef</div>
+ <div id="NDPrototype65" class="NDPrototype"><div class="PSection PPlainSection">calculateRadeef()</div></div>
+</div>
+
+<a name="cPoem.calculateKaafiyaa"></a><a name="Topic66"></a><div class="CTopic TFunction LJavaScript">
+ <div class="CTitle">calculateKaafiyaa</div>
+ <div id="NDPrototype66" class="NDPrototype"><div class="PSection PPlainSection">calculateKaafiyaa()</div></div>
+</div>
+
+<a name="cPoem.findRhymingLines"></a><a name="Topic67"></a><div class="CTopic TFunction LJavaScript">
+ <div class="CTitle">findRhymingLines</div>
+ <div id="NDPrototype67" class="NDPrototype"><div class="PSection PPlainSection">findRhymingLines()</div></div>
+</div>
+
+<a name="cPoem.detectFirstLineMaapnee"></a><a name="Topic68"></a><div class="CTopic TFunction LJavaScript">
+ <div class="CTitle">detectFirstLineMaapnee</div>
+ <div id="NDPrototype68" class="NDPrototype"><div class="PSection PPlainSection">detectFirstLineMaapnee()</div></div>
+ <div class="CBody"><p>Detect if first line of poem text is a Maapnee (1,2 pattern)</p></div>
 </div>
 
 <a name="cVisual"></a><a name="Topic9"></a><div class="CTopic TClass LJavaScript">

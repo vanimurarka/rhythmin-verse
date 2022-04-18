@@ -1,0 +1,1 @@
+﻿NDSearch.OnPrefixDataLoaded("isd",["Function"],[["isDeergha",,[["cChar",,,,0,"File:hpv.v7.1.js:cChar.isDeergha","JavaScriptClass:cChar:isDeergha"]]]]);

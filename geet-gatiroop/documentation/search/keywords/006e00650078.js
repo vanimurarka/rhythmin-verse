@@ -1,0 +1,1 @@
+﻿NDSearch.OnPrefixDataLoaded("nex",["Function"],[["nextChar",,[["cLine",,,,0,"File:hpv.v7.1.js:cLine.nextChar","JavaScriptClass:cLine:nextChar"]]]]);

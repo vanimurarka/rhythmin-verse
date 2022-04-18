@@ -22,10 +22,69 @@
  <div class="CBody"><p>Creates a new character object.</p><div class="CHeading">Parameter</div><p>mainChar - mainCharCode -</p></div>
 </div>
 
-<a name="replaceMainChar"></a><a name="Topic6"></a><div class="CTopic TFunction LJavaScript last">
+<a name="replaceMainChar"></a><a name="Topic33"></a><div class="CTopic TFunction LJavaScript">
  <div class="CTitle">replaceMainChar</div>
- <div id="NDPrototype6" class="NDPrototype WideForm"><div class="PSection PParameterSection CStyle"><table><tr><td class="PBeforeParameters">replaceMainChar(</td><td class="PParametersParentCell"><table class="PParameters"><tr><td class="PName first last">newMainChar</td></tr></table></td><td class="PAfterParameters">)</td></tr></table></div></div>
- <div class="CBody"><div class="CHeading">Parameter</div><p>newMainChar</p></div>
+ <div id="NDPrototype33" class="NDPrototype WideForm"><div class="PSection PParameterSection CStyle"><table><tr><td class="PBeforeParameters">replaceMainChar(</td><td class="PParametersParentCell"><table class="PParameters"><tr><td class="PName first last">newMainChar</td></tr></table></td><td class="PAfterParameters">)</td></tr></table></div></div>
+ <div class="CBody"><p>When a consonant has a Nuqta or dot below like ड़, it is handled as one character in this s/w but the dot below is a separate character in Unicode. So the dot has to be merged with the existing character.</p><div class="CHeading">Parameter</div><p>newMainChar</p></div>
+</div>
+
+<a name="Setter_vowel"></a><a name="Topic34"></a><div class="CTopic TFunction LJavaScript">
+ <div class="CTitle">Setter vowel</div>
+ <div class="CBody"><p>Set the vowel character for this character block</p></div>
+</div>
+
+<a name="isHalfLetter"></a><a name="Topic35"></a><div class="CTopic TFunction LJavaScript">
+ <div class="CTitle">isHalfLetter</div>
+ <div id="NDPrototype35" class="NDPrototype"><div class="PSection PPlainSection">isHalfLetter()</div></div>
+ <div class="CBody"><p>Determine if character is half letter</p><div class="CHeading">Returns</div><p>True or False</p></div>
+</div>
+
+<a name="isPureVowel"></a><a name="Topic6"></a><div class="CTopic TFunction LJavaScript">
+ <div class="CTitle">isPureVowel</div>
+ <div id="NDPrototype6" class="NDPrototype"><div class="PSection PPlainSection">isPureVowel()</div></div>
+ <div class="CBody"><p>Determine whether character is a pure vowel with no consonant</p><div class="CHeading">Returns</div><p>True or False</p></div>
+</div>
+
+<a name="isLaghu"></a><a name="Topic36"></a><div class="CTopic TFunction LJavaScript">
+ <div class="CTitle">isLaghu</div>
+ <div id="NDPrototype36" class="NDPrototype"><div class="PSection PPlainSection">isLaghu ()</div></div>
+ <div class="CBody"><p>Checks if this character is of laghu vowel</p><div class="CHeading">Returns</div><p>True or False</p></div>
+</div>
+
+<a name="isDeergha"></a><a name="Topic37"></a><div class="CTopic TFunction LJavaScript">
+ <div class="CTitle">isDeergha</div>
+ <div id="NDPrototype37" class="NDPrototype"><div class="PSection PPlainSection">isDeergha()</div></div>
+ <div class="CBody"><p>Checks if this character is of deergha vowel</p><div class="CHeading">Returns</div><p>True or False</p></div>
+</div>
+
+<a name="calculateHalfLetterLen"></a><a name="Topic38"></a><div class="CTopic TFunction LJavaScript">
+ <div class="CTitle">calculateHalfLetterLen</div>
+ <div id="NDPrototype38" class="NDPrototype WideForm"><div class="PSection PParameterSection CStyle"><table><tr><td class="PBeforeParameters">calculateHalfLetterLen(</td><td class="PParametersParentCell"><table class="PParameters"><tr><td class="PName first">p</td><td class="PDefaultValueSeparator">&nbsp;=&nbsp;</td><td class="PDefaultValue last"><span class="SHKeyword">false</span>,</td></tr><tr><td class="PName first">n</td><td class="PDefaultValueSeparator">&nbsp;=&nbsp;</td><td class="PDefaultValue last"><span class="SHKeyword">false</span></td></tr></table></td><td class="PAfterParameters">)</td></tr></table></div></div>
+ <div class="CBody"><table class="CDefinitionList"><tr><td class="CDLEntry">Determine when a half letter will have 0 or 1 maatraa. The logic for default handling</td><td class="CDLDefinition"><p>which the user can always override.</p></td></tr></table><div class="CHeading">Parameters</div><table class="CDefinitionList"><tr><td class="CDLEntry">p</td><td class="CDLDefinition"><p>previous letter</p></td></tr><tr><td class="CDLEntry">n</td><td class="CDLDefinition"><p>next letter</p></td></tr></table></div>
+</div>
+
+<a name="adjustCharMaatraa"></a><a name="Topic39"></a><div class="CTopic TFunction LJavaScript">
+ <div class="CTitle">adjustCharMaatraa</div>
+ <div id="NDPrototype39" class="NDPrototype"><div class="PSection PPlainSection">adjustCharMaatraa()</div></div>
+ <div class="CBody"><p>When the user adjusts the maatraa by clicking on the char, then adjust the maatraa</p></div>
+</div>
+
+<a name="get_text"></a><a name="Topic40"></a><div class="CTopic TFunction LJavaScript">
+ <div class="CTitle">get text</div>
+ <div id="NDPrototype40" class="NDPrototype"><div class="PSection PPlainSection"><span class="SHKeyword">get</span> text()</div></div>
+ <div class="CBody"><p>Getter. Return full text of a character, i.e. mainchar + vowelchar</p></div>
+</div>
+
+<a name="get_joinedConsonantVowel"></a><a name="Topic41"></a><div class="CTopic TFunction LJavaScript">
+ <div class="CTitle">get joinedConsonantVowel</div>
+ <div id="NDPrototype41" class="NDPrototype"><div class="PSection PPlainSection"><span class="SHKeyword">get</span> joinedConsonantVowel()</div></div>
+ <div class="CBody"><p>Getter. Gets the mainchar+vowelchar. This is different from get text in that it returns all chars, even non-hindi ones.</p></div>
+</div>
+
+<a name="compare"></a><a name="Topic43"></a><div class="CTopic TFunction LJavaScript last">
+ <div class="CTitle">compare</div>
+ <div id="NDPrototype43" class="NDPrototype WideForm"><div class="PSection PParameterSection CStyle"><table><tr><td class="PBeforeParameters">compare(</td><td class="PParametersParentCell"><table class="PParameters"><tr><td class="PName first last">cin</td></tr></table></td><td class="PAfterParameters">)</td></tr></table></div></div>
+ <div class="CBody"><p>Compares this character with a given cChar object.</p><div class="CHeading">Return</div><ul><li><p>&quot;all&quot; for full match</p></li><li><p>true when vowel is the same</p></li><li><p>false when vowel is not the same (so consonant matching is irrelevant)</p></li></ul></div>
 </div>
 
 </body></html>

@@ -1,0 +1,1 @@
+﻿NDSearch.OnPrefixDataLoaded("cha",["Function"],[["charByIndex",,[["cLine",,,,0,"File:hpv.v7.1.js:cLine.charByIndex","JavaScriptClass:cLine:charByIndex"]]],["charByReverseIndex",,[["cLine",,,,0,"File:hpv.v7.1.js:cLine.charByReverseIndex","JavaScriptClass:cLine:charByReverseIndex"]]]]);

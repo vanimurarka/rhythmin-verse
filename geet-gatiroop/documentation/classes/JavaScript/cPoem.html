@@ -13,4 +13,70 @@
  <div class="CBody"><p>Class for the full processed poem object.</p></div>
 </div>
 
+<a name="Functions"></a><a name="Topic57"></a><div class="CTopic TGroup LJavaScript">
+ <div class="CTitle">Functions</div>
+</div>
+
+<a name="push"></a><a name="Topic58"></a><div class="CTopic TFunction LJavaScript">
+ <div class="CTitle">push</div>
+ <div id="NDPrototype58" class="NDPrototype WideForm"><div class="PSection PParameterSection CStyle"><table><tr><td class="PBeforeParameters">pushLine(</td><td class="PParametersParentCell"><table class="PParameters"><tr><td class="PName first last">newLine</td></tr></table></td><td class="PAfterParameters">)</td></tr></table></div></div>
+ <div class="CBody"><p>Add new cLine</p><div class="CHeading">Parameter</div><table class="CDefinitionList"><tr><td class="CDLEntry">newLine</td><td class="CDLDefinition"><p>new cLine</p></td></tr></table></div>
+</div>
+
+<a name="get_text"></a><a name="Topic59"></a><div class="CTopic TFunction LJavaScript">
+ <div class="CTitle">get text</div>
+ <div id="NDPrototype59" class="NDPrototype"><div class="PSection PPlainSection"><span class="SHKeyword">get</span> text()</div></div>
+ <div class="CBody"><p>Getter. Gets original text with which this object was constructed</p></div>
+</div>
+
+<a name="adjustCharMaatraa"></a><a name="Topic60"></a><div class="CTopic TFunction LJavaScript">
+ <div class="CTitle">adjustCharMaatraa</div>
+ <div id="NDPrototype60" class="NDPrototype WideForm"><div class="PSection PParameterSection CStyle"><table><tr><td class="PBeforeParameters">adjustCharMaatraa(</td><td class="PParametersParentCell"><table class="PParameters"><tr><td class="PName first last">lineIdx,</td></tr><tr><td class="PName first last">charIdx</td></tr></table></td><td class="PAfterParameters">)</td></tr></table></div></div>
+ <div class="CBody"><p>Adjust maatraa of character of given index, in line of given index. Update other requisite variables accordingly</p><p>Parameters - - lineIdx - index of line where character exists whose maatraa has to be adjusted - charIdx - index of character in line whose maatraa has to be adjusted</p></div>
+</div>
+
+<a name="setComposite"></a><a name="Topic61"></a><div class="CTopic TFunction LJavaScript">
+ <div class="CTitle">setComposite</div>
+ <div id="NDPrototype61" class="NDPrototype WideForm"><div class="PSection PParameterSection CStyle"><table><tr><td class="PBeforeParameters">setComposite(</td><td class="PParametersParentCell"><table class="PParameters"><tr><td class="PName first last">lineIdx</td></tr></table></td><td class="PAfterParameters">)</td></tr></table></div></div>
+ <div class="CBody"><p>Toggle line of given index as composite line. For Free Verse.</p><p>Parameters - - lineIdx - index of line whose composite flag is to be toggled</p></div>
+</div>
+
+<a name="setBaseCount"></a><a name="Topic62"></a><div class="CTopic TFunction LJavaScript">
+ <div class="CTitle">setBaseCount</div>
+ <div id="NDPrototype62" class="NDPrototype WideForm"><div class="PSection PParameterSection CStyle"><table><tr><td class="PBeforeParameters">setBaseCount(</td><td class="PParametersParentCell"><table class="PParameters"><tr><td class="PName first last">baseCount</td></tr></table></td><td class="PAfterParameters">)</td></tr></table></div></div>
+ <div class="CBody"><p>Set base meter count for this poem, and update composite counts accordingly.</p><p>Parameters - - baseCount - Base count integer</p></div>
+</div>
+
+<a name="calculateCompositeMaatraa"></a><a name="Topic63"></a><div class="CTopic TFunction LJavaScript">
+ <div class="CTitle">calculateCompositeMaatraa</div>
+ <div id="NDPrototype63" class="NDPrototype"><div class="PSection PPlainSection">calculateCompositeMaatraa()</div></div>
+</div>
+
+<a name="calculateRemainder"></a><a name="Topic64"></a><div class="CTopic TFunction LJavaScript">
+ <div class="CTitle">calculateRemainder</div>
+ <div id="NDPrototype64" class="NDPrototype WideForm"><div class="PSection PParameterSection CStyle"><table><tr><td class="PBeforeParameters">calculateRemainder(</td><td class="PParametersParentCell"><table class="PParameters"><tr><td class="PName first last">compositeIdx</td></tr></table></td><td class="PAfterParameters">)</td></tr></table></div></div>
+ <div class="CBody"><p>Calculate remainder for a given composite index</p></div>
+</div>
+
+<a name="calculateRadeef"></a><a name="Topic65"></a><div class="CTopic TFunction LJavaScript">
+ <div class="CTitle">calculateRadeef</div>
+ <div id="NDPrototype65" class="NDPrototype"><div class="PSection PPlainSection">calculateRadeef()</div></div>
+</div>
+
+<a name="calculateKaafiyaa"></a><a name="Topic66"></a><div class="CTopic TFunction LJavaScript">
+ <div class="CTitle">calculateKaafiyaa</div>
+ <div id="NDPrototype66" class="NDPrototype"><div class="PSection PPlainSection">calculateKaafiyaa()</div></div>
+</div>
+
+<a name="findRhymingLines"></a><a name="Topic67"></a><div class="CTopic TFunction LJavaScript">
+ <div class="CTitle">findRhymingLines</div>
+ <div id="NDPrototype67" class="NDPrototype"><div class="PSection PPlainSection">findRhymingLines()</div></div>
+</div>
+
+<a name="detectFirstLineMaapnee"></a><a name="Topic68"></a><div class="CTopic TFunction LJavaScript last">
+ <div class="CTitle">detectFirstLineMaapnee</div>
+ <div id="NDPrototype68" class="NDPrototype"><div class="PSection PPlainSection">detectFirstLineMaapnee()</div></div>
+ <div class="CBody"><p>Detect if first line of poem text is a Maapnee (1,2 pattern)</p></div>
+</div>
+
 </body></html>

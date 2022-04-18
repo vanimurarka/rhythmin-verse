@@ -1,0 +1,1 @@
+﻿NDSearch.OnPrefixDataLoaded("ish",["Function"],[["isHalfLetter",,[["cChar",,,,0,"File:hpv.v7.1.js:cChar.isHalfLetter","JavaScriptClass:cChar:isHalfLetter"]]]]);
