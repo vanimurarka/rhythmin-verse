@@ -13,18 +13,38 @@ class cChar {
 			mainCharCode -
 	*/
   constructor(mainChar, mainCharCode) {
+  	// Variable: mainChar
 		this.mainChar = mainChar;
+		// Variable: mainCharCode
 		this.mainCharCode = mainCharCode;
+		// Variable: vowelChar
 		this.vowelChar = "";
+		// Variable: vowelNumber
 		this.vowelNumber = 0;
+		// Variable: index
 		this.index = 0;
+		// Variable: maatraa
 		this.maatraa = 0;
-		this.systemMaatraa = 0; // maatraa calculated by system. maybe diff from maatraa if user adjusts it
+		// Variable: systemMaatraa
+		// Maatraa calculated by system. Maybe diff from maatraa if user adjusts it
+		this.systemMaatraa = 0; 
+		// Variable: maatraaCumulative
 		this.maatraaCumulative = 0;
+		// Variable: maapneeType
+		this.maapneeType = 0;
+		// Variable: maapneeIndex
+		// Which element in the Maapnee of the poem does this char map too
+		this.maapneeIndex = 0;
+		// Variable: isRadeef
 		this.isRadeef = false;
+		// Variable: isKaafiyaa
 		this.isKaafiyaa = false;
+		// Variable: isHindi
 		this.isHindi = false;
-		this.rhymeLevel = 0; // 0 = no rhyme, 1 = vowel rhyme, 2 = full rhyme
+		// Variable: rhymeLevel
+		// 0 = no rhyme, 1 = vowel rhyme, 2 = full rhyme
+		this.rhymeLevel = 0; 
+		// Variable: rhymeGroup
 		this.rhymeGroup = -1; // for coloring rhymed letters in diff colors based on diff rhyming lines
 
 			// space / comma
@@ -366,13 +386,22 @@ class cLine {
 			lineText - text of line from which line object is to be creater
 	*/
 	constructor(lineText) {
+		// Variable: originalText
 		this.originalText = lineText;
+		// Variable: characters (cChar Array)
 		this.characters = new Array();
+		// Variable: count (int)
 		this.count = 0;
+		// Variable: maatraa
+		// Probably total maatraa for line
 		this.maatraa = 0;
+		// Variable: isComposite (boolean)
 		this.isComposite = false;
+		// Variable: rhymeFound (boolean)
 		this.rhymeFound = false;
+		// Variable: rhymeGroup (integer)
 		this.rhymeGroup = 0;
+		// Variable: rhymeLength (integer)
 		this.rhymeLength = 0;
 	}
 	// Function: get text
@@ -409,9 +438,11 @@ class cLine {
 		Add a new character to line
 
 		Parameters:
-			newChar - Type: cChar
+			- newChar - Type: cChar
+			- setMaapnee - Type: boolean. Whether this incoming character is to be assessed as per given Maapnee or not
+			- maapneePattern - Type: array
 	*/
-	push(newChar)
+	push(newChar,setMaapnee=false,maapneePattern='')
 	{
 		newChar.index = this.count;
 		// assign cumulative maatraa of char as per previous char
@@ -423,6 +454,23 @@ class cLine {
 		this.characters.push(newChar);
 		this.maatraa += newChar.maatraa;
 		this.count++;
+
+		if (setMaapnee)
+		{
+			newChar.maapneeType = newChar.systemMaatraa;
+			if (newChar.isHindi)
+			{
+				if (newChar.index > 0)
+				{
+					// TILL HERE
+				} 
+			}
+			// if it is a 1-maatraa char, it might combine with another 1-maatraa char and match with 2 in the maapnee
+			if (newChar.systemMaatraa == 1)
+			{
+
+			}
+		}
 	}
 	/* Function: charByIndex
 		Get the nth character of a line
@@ -707,15 +755,26 @@ class cPoem {
 			originalText
 	*/
 	constructor(originalText) {
+		// Variable: originalText
 		this.originalText = originalText;
+		// Variable: lines (cLine Array)
 		this.lines = new Array();
+		// Variable: lineCount (int)
 		this.lineCount = 0;
+		// Variable: maxLineLen (int)
 		this.maxLineLen = 0;
+		// Variable: compositeLines (Array)
 		this.compositeLines = [];
+		// Variable: baseCount (int)
 		this.baseCount = 1;
+		// Variable: radeefTruncated
 		this.radeefTruncated = 0;
+		// Variable: radeefArray
 		this.radeefArray = [];
+		// Variable: firstLineMaapnee (boolean)
 		this.firstLineMaapnee = false;
+		// Variable: maapneePattern (Array)
+		this.maapneePattern = [];
 	}
 	/* Function: push
 		Add new cLine
@@ -730,7 +789,11 @@ class cPoem {
 		if (this.maxLineLen < newLine.maatraa)
 			this.maxLineLen = newLine.maatraa;
 		if (this.lineCount == 1)
+		{
 			this.detectFirstLineMaapnee();
+			if (this.firstLineMaapnee)
+				this.setMaapneePattern();
+		}
 	}
 	/* Function: get text
 		Getter. Gets original text with which this object was constructed
@@ -1050,6 +1113,20 @@ class cPoem {
 		let pattern = /^[12१२\s]+$/;
 		this.firstLineMaapnee = pattern.test(line1.text);
 	}
+	// Function: setMaapneePattern
+	// Sets the Maapnee Pattern for the poem as per the first line so that subsequent lines can be assessed accordingly
+	setMaapneePattern()
+	{
+		let lineMaapnee = this.lines[0];
+		let i = 0;
+		for (i=0;i<lineMaapnee.count;i++)
+		{
+			if ((lineMaapnee.characters[i].systemMaatraa == 1) || (lineMaapnee.characters[i].systemMaatraa == 2))
+			{
+				this.maapneePattern[this.maapneePattern.length] = lineMaapnee.characters[i].systemMaatraa;
+			}
+		}
+	}
 }
 
 // Class: cVisual
@@ -1106,7 +1183,7 @@ function visualize(poem, availableW, poemType=0, refresh=false)
 	if (poemType == 2)	// free-verse
 		fFreeVerse = true;
 	splitNprocessPoem(poem, refresh);
-	if (oPoem.firstLineMaapnee) alert("treat as maapnee");
+	// if (oPoem.firstLineMaapnee) alert("treat as maapnee");
 	if (fGhazal)
   {
     oPoem.calculateRadeef();
@@ -1164,22 +1241,25 @@ function splitNprocessPoem(poem, refresh)
         for (k=0;k<lines[iLine].length;k++) // process each char: k = char index
         {
         	charCode = lines[iLine].charCodeAt(k);
+        	let thisChar = lines[iLine].substring(k,k+1);
         	if (charCode == 2364) // nuqta
         	{
-        		oLine.changeLastCharConsonant(lines[iLine].substring(k,k+1));
+        		oLine.changeLastCharConsonant(thisChar);
         	}
         	else if ((charCode >= 2366) && (charCode <= 2381)) // maatraa
 					{
 						// new element not added to line array
 						// the vowel part of previous element 
 						// modified to update maatraa
-						oLine.lastCharVowel(lines[iLine].substring(k,k+1));
+						oLine.lastCharVowel(thisChar);
 					}
 					else // not maatraa - true new char
 					{
-						var thisChar = lines[iLine].substring(k,k+1);
 						const oChar = new cChar(thisChar,charCode);
-			          	oLine.push(oChar);
+						if (oPoem.firstLineMaapnee)
+			      	oLine.push(oChar,true,oPoem.maapneePattern);
+			      else
+			      	oLine.push(oChar,false);
 					}
         }
         // console.log(oLine.getHalfLetters());

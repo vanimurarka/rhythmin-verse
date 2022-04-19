@@ -1,0 +1,1 @@
+﻿NDSearch.OnPrefixDataLoaded("mai",["Variable"],[["mainChar",,[["cChar",,,,0,"File:hpv.v7.1.js:cChar.mainChar","JavaScriptClass:cChar:mainChar"]]],["mainCharCode",,[["cChar",,,,0,"File:hpv.v7.1.js:cChar.mainCharCode","JavaScriptClass:cChar:mainCharCode"]]]]);

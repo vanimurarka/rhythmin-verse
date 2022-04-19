@@ -1,0 +1,1 @@
+﻿NDSearch.OnPrefixDataLoaded("lin",["Variable"],[["lineCount",,[["cPoem",,,,0,"File:hpv.v7.1.js:cPoem.lineCount","JavaScriptClass:cPoem:lineCount"]]],["lines",,[["cPoem",,,,0,"File:hpv.v7.1.js:cPoem.lines","JavaScriptClass:cPoem:lines"]]]]);

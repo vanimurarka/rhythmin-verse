@@ -1,0 +1,1 @@
+﻿NDSearch.OnPrefixDataLoaded("isc",["Variable"],[["isComposite",,[["cLine",,,,0,"File:hpv.v7.1.js:cLine.isComposite","JavaScriptClass:cLine:isComposite"]]]]);

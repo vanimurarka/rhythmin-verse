@@ -1,1 +1,1 @@
-﻿NDSearch.OnPrefixDataLoaded("vow",["Function"],[["vowel",,[["cChar","Setter vowel",,,0,"File:hpv.v7.1.js:cChar.Setter_vowel","JavaScriptClass:cChar:Setter_vowel"]]]]);
+﻿NDSearch.OnPrefixDataLoaded("vow",["Function","Variable"],[["vowel",,[["cChar","Setter vowel",,,0,"File:hpv.v7.1.js:cChar.Setter_vowel","JavaScriptClass:cChar:Setter_vowel"]]],["vowelChar",,[["cChar",,,,1,"File:hpv.v7.1.js:cChar.vowelChar","JavaScriptClass:cChar:vowelChar"]]],["vowelNumber",,[["cChar",,,,1,"File:hpv.v7.1.js:cChar.vowelNumber","JavaScriptClass:cChar:vowelNumber"]]]]);

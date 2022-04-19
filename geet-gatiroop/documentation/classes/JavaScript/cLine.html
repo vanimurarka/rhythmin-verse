@@ -13,6 +13,51 @@
  <div class="CBody"><p>A line of poetry</p></div>
 </div>
 
+<a name="Variables"></a><a name="Topic72"></a><div class="CTopic TGroup LJavaScript">
+ <div class="CTitle">Variables</div>
+</div>
+
+<a name="originalText"></a><a name="Topic82"></a><div class="CTopic TVariable LJavaScript">
+ <div class="CTitle">originalText</div>
+ <div id="NDPrototype82" class="NDPrototype"><div class="PSection PPlainSection"><span class="SHKeyword">this</span>.originalText</div></div>
+</div>
+
+<a name="characters"></a><a name="Topic83"></a><div class="CTopic TVariable LJavaScript">
+ <div class="CTitle">characters (cChar Array)</div>
+ <div id="NDPrototype83" class="NDPrototype"><div class="PSection PPlainSection"><span class="SHKeyword">this</span>.characters</div></div>
+</div>
+
+<a name="count"></a><a name="Topic84"></a><div class="CTopic TVariable LJavaScript">
+ <div class="CTitle">count (int)</div>
+ <div id="NDPrototype84" class="NDPrototype"><div class="PSection PPlainSection"><span class="SHKeyword">this</span>.count</div></div>
+</div>
+
+<a name="maatraa"></a><a name="Topic85"></a><div class="CTopic TVariable LJavaScript">
+ <div class="CTitle">maatraa</div>
+ <div id="NDPrototype85" class="NDPrototype"><div class="PSection PPlainSection"><span class="SHKeyword">this</span>.maatraa</div></div>
+ <div class="CBody"><p>Probably total maatraa for line</p></div>
+</div>
+
+<a name="isComposite"></a><a name="Topic86"></a><div class="CTopic TVariable LJavaScript">
+ <div class="CTitle">isComposite (boolean)</div>
+ <div id="NDPrototype86" class="NDPrototype"><div class="PSection PPlainSection"><span class="SHKeyword">this</span>.isComposite</div></div>
+</div>
+
+<a name="rhymeFound"></a><a name="Topic87"></a><div class="CTopic TVariable LJavaScript">
+ <div class="CTitle">rhymeFound (boolean)</div>
+ <div id="NDPrototype87" class="NDPrototype"><div class="PSection PPlainSection"><span class="SHKeyword">this</span>.rhymeFound</div></div>
+</div>
+
+<a name="rhymeGroup"></a><a name="Topic88"></a><div class="CTopic TVariable LJavaScript">
+ <div class="CTitle">rhymeGroup (integer)</div>
+ <div id="NDPrototype88" class="NDPrototype"><div class="PSection PPlainSection"><span class="SHKeyword">this</span>.rhymeGroup</div></div>
+</div>
+
+<a name="rhymeLength"></a><a name="Topic89"></a><div class="CTopic TVariable LJavaScript">
+ <div class="CTitle">rhymeLength (integer)</div>
+ <div id="NDPrototype89" class="NDPrototype"><div class="PSection PPlainSection"><span class="SHKeyword">this</span>.rhymeLength</div></div>
+</div>
+
 <a name="Functions"></a><a name="Topic42"></a><div class="CTopic TGroup LJavaScript">
  <div class="CTitle">Functions</div>
 </div>
@@ -34,10 +79,10 @@
  <div class="CBody"><p>Change the consonant of the last char of line -- probably because it is a nuqta</p><div class="CHeading">Parameters</div><table class="CDefinitionList"><tr><td class="CDLEntry">consonantString</td><td class="CDLDefinition"><p>consonant text</p></td></tr></table></div>
 </div>
 
-<a name="push"></a><a name="Topic47"></a><div class="CTopic TFunction LJavaScript">
+<a name="push"></a><a name="Topic105"></a><div class="CTopic TFunction LJavaScript">
  <div class="CTitle">push</div>
- <div id="NDPrototype47" class="NDPrototype WideForm"><div class="PSection PParameterSection CStyle"><table><tr><td class="PBeforeParameters">push(</td><td class="PParametersParentCell"><table class="PParameters"><tr><td class="PName first last">newChar</td></tr></table></td><td class="PAfterParameters">)</td></tr></table></div></div>
- <div class="CBody"><p>Add a new character to line</p><div class="CHeading">Parameters</div><table class="CDefinitionList"><tr><td class="CDLEntry">newChar</td><td class="CDLDefinition"><p>Type: cChar</p></td></tr></table></div>
+ <div id="NDPrototype105" class="NDPrototype WideForm"><div class="PSection PParameterSection CStyle"><table><tr><td class="PBeforeParameters">push(</td><td class="PParametersParentCell"><table class="PParameters"><tr><td class="PName first">newChar,</td><td></td><td class="last"></td></tr><tr><td class="PName first">setMaapnee</td><td class="PDefaultValueSeparator">&nbsp;=&nbsp;</td><td class="PDefaultValue last"><span class="SHKeyword">false</span>,</td></tr><tr><td class="PName first">maapneePattern</td><td class="PDefaultValueSeparator">&nbsp;=&nbsp;</td><td class="PDefaultValue last"><span class="SHString">''</span></td></tr></table></td><td class="PAfterParameters">)</td></tr></table></div></div>
+ <div class="CBody"><p>Add a new character to line</p><div class="CHeading">Parameters</div><table class="CDefinitionList"><tr><td class="CDLEntry">- newChar</td><td class="CDLDefinition"><p>Type: cChar</p></td></tr><tr><td class="CDLEntry">- setMaapnee</td><td class="CDLDefinition"><p>Type: boolean. Whether this incoming character is to be assessed as per given Maapnee or not</p></td></tr><tr><td class="CDLEntry">- maapneePattern</td><td class="CDLDefinition"><p>Type: array</p></td></tr></table></div>
 </div>
 
 <a name="charByIndex"></a><a name="Topic48"></a><div class="CTopic TFunction LJavaScript">
