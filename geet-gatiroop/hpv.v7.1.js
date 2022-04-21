@@ -31,7 +31,7 @@ class cChar {
 		// Variable: maatraaCumulative
 		this.maatraaCumulative = 0;
 		// Variable: maapneeType
-		// Does this character have to be colored as per 2 or 1 when displaying maapnee analysis? Normally will be 2 or 1 as per the character's maatraa but if there are 2 consecutive 1s and they match with a 2 in the maapnee pattern then maapneeType = 2 even of maatraa = 1. maapneeType will be set to 3 for such characters temporarily during analysis but after all characters are pushed for a line, no character should have maapneeType = 3
+		// Does this character have to be colored as per 2 or 1 when displaying maapnee analysis? Normally will be 2 or 1 as per the character's maatraa but if there are 2 consecutive 1s and they match with a 2 in the maapnee pattern then maapneeType = 1.5 even when maatraa = 1 -- indicating like 2, but 1+1 2. 
 		this.maapneeType = 0;
 		// Variable: isRadeef
 		this.isRadeef = false;
