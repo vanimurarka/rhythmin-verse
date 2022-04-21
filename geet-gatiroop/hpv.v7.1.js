@@ -31,10 +31,8 @@ class cChar {
 		// Variable: maatraaCumulative
 		this.maatraaCumulative = 0;
 		// Variable: maapneeType
+		// Does this character have to be colored as per 2 or 1 when displaying maapnee analysis? Normally will be 2 or 1 as per the character's maatraa but if there are 2 consecutive 1s and they match with a 2 in the maapnee pattern then maapneeType = 2 even of maatraa = 1. maapneeType will be set to 3 for such characters temporarily during analysis but after all characters are pushed for a line, no character should have maapneeType = 3
 		this.maapneeType = 0;
-		// Variable: maapneeIndex
-		// Which element in the Maapnee of the poem does this char map too
-		this.maapneeIndex = 0;
 		// Variable: isRadeef
 		this.isRadeef = false;
 		// Variable: isKaafiyaa
@@ -123,6 +121,7 @@ class cChar {
 		{
 			case "्":
 				this.vowelNumber = -1;
+				// this.isHindi = true;
 				break;
 			case "अ": 
 				this.vowelNumber = 1;
@@ -177,7 +176,7 @@ class cChar {
 				this.systemMaatraa = 1;
 				this.isHindi = true;
 				break;
-            case 2: case 4: case 6: case 8: case 10: case 7: case 9: case 10: case 11: case 22:
+      case 2: case 4: case 6: case 8: case 10: case 7: case 9: case 10: case 11: case 22:
 				this.maatraa = 2;
 				this.systemMaatraa = 2;
 				this.isHindi = true;
@@ -413,7 +412,7 @@ class cLine {
 		Change the vowel of the last character of the line and recalculate maatraas accordingly. Used when processing a line character by character, and the vowel character comes after the consonant.
 
 		Parameters:
-			vowelString - vowel text
+			- vowelString - vowel text
 	*/
 	lastCharVowel(vowelString)
 	{
@@ -423,7 +422,7 @@ class cLine {
 		this.maatraa += lastChar.maatraa - oldMaatraa;
 		lastChar.maatraaCumulative += lastChar.maatraa - oldMaatraa;
 	}
-	/* Function: lastCharVowel
+	/* Function: changeLastCharConsonant
 		Change the consonant of the last char of line -- probably because it is a nuqta
 
 		Parameters:
@@ -439,10 +438,8 @@ class cLine {
 
 		Parameters:
 			- newChar - Type: cChar
-			- setMaapnee - Type: boolean. Whether this incoming character is to be assessed as per given Maapnee or not
-			- maapneePattern - Type: array
 	*/
-	push(newChar,setMaapnee=false,maapneePattern='')
+	push(newChar)
 	{
 		newChar.index = this.count;
 		// assign cumulative maatraa of char as per previous char
@@ -454,23 +451,6 @@ class cLine {
 		this.characters.push(newChar);
 		this.maatraa += newChar.maatraa;
 		this.count++;
-
-		if (setMaapnee)
-		{
-			newChar.maapneeType = newChar.systemMaatraa;
-			if (newChar.isHindi)
-			{
-				if (newChar.index > 0)
-				{
-					// TILL HERE
-				} 
-			}
-			// if it is a 1-maatraa char, it might combine with another 1-maatraa char and match with 2 in the maapnee
-			if (newChar.systemMaatraa == 1)
-			{
-
-			}
-		}
 	}
 	/* Function: charByIndex
 		Get the nth character of a line
@@ -572,7 +552,6 @@ class cLine {
 		{
 			const thisHalfLetter = halfLetters[i];
 			maatraa = 0;
-			// debugger;
 			if (thisHalfLetter.index == 0) // first character, no previous, next not required
 				maatraa = thisHalfLetter.calculateHalfLetterLen();
 			else
@@ -731,6 +710,38 @@ class cLine {
 		}
 		else
 			return false;
+	}
+	/* Function: setMaapnee()
+	*/
+	setMaapnee()
+	{
+		let i = 0;
+		for (i = 0; i < this.count; i++)
+		{
+			let currentC = this.characters[i];
+			if (currentC.isHindi)
+			{
+				if (currentC.maapneeType != 1.5)
+					currentC.maapneeType = currentC.maatraa;
+				if ((i < this.count - 1) && (currentC.maatraa == 1) && (currentC.maapneeType != 1.5))
+				{
+					let nextChar = currentC;
+					let nextCharFound = false;
+					while (!nextCharFound)
+					{
+						nextChar = this.nextChar(nextChar);
+						if (nextChar.isHindi)
+							nextCharFound = true;
+					}
+					if ((nextChar.maatraa == 1) && (currentC.maatraa == 1))
+					{
+						nextChar.maapneeType = 1.5;
+						currentC.maapneeType = 1.5;
+					}
+				}
+			}
+		}
+
 	}
 }
 
@@ -1183,7 +1194,6 @@ function visualize(poem, availableW, poemType=0, refresh=false)
 	if (poemType == 2)	// free-verse
 		fFreeVerse = true;
 	splitNprocessPoem(poem, refresh);
-	// if (oPoem.firstLineMaapnee) alert("treat as maapnee");
 	if (fGhazal)
   {
     oPoem.calculateRadeef();
@@ -1251,19 +1261,17 @@ function splitNprocessPoem(poem, refresh)
 						// new element not added to line array
 						// the vowel part of previous element 
 						// modified to update maatraa
+						// NOTE: This also includes the halant character
 						oLine.lastCharVowel(thisChar);
 					}
 					else // not maatraa - true new char
 					{
-						const oChar = new cChar(thisChar,charCode);
-						if (oPoem.firstLineMaapnee)
-			      	oLine.push(oChar,true,oPoem.maapneePattern);
-			      else
-			      	oLine.push(oChar,false);
+						oChar = new cChar(thisChar,charCode);
+						oLine.push(oChar);
 					}
         }
-        // console.log(oLine.getHalfLetters());
         oLine.calculateHalfLettersMaatraa();
+        oLine.setMaapnee();
         oPoem.pushLine(oLine);
 	    }
     }
@@ -1461,7 +1469,7 @@ function drawStyleCharBlock(c,colorBy)
 	var color = "rgb(0,220,255)";
 	var strokeOp = "0.3";
 	var strokeW = 1;
-	var fillOp = "0.2";
+	var fillOp = "0.4";
 	var strokeColor = "black";
 
 	// call conColor to determine color and opacity as per consonant
@@ -1473,6 +1481,12 @@ function drawStyleCharBlock(c,colorBy)
 				{
 					color = "rgb(0,255,0)"; // green
 					fillOp = "0.4";
+				}
+				// c.maapneeType = 1.5 means 1+1 2 type deergh
+				if (c.maapneeType == 1.5)
+				{
+					color = "rgb(0,255,0)"; // green
+					fillOp = "0.2";
 				}
 	  		// color = "rgb(0,220,255)"; // blue
 	  		if (c.rhymeLevel > 0)

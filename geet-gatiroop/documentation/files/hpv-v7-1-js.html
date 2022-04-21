@@ -67,6 +67,12 @@
  <div id="NDPrototype98" class="NDPrototype"><div class="PSection PPlainSection"><span class="SHKeyword">this</span>.maatraaCumulative</div></div>
 </div>
 
+<a name="cChar.maapneeType"></a><a name="Topic47"></a><div class="CTopic TVariable LJavaScript">
+ <div class="CTitle">maapneeType</div>
+ <div id="NDPrototype47" class="NDPrototype"><div class="PSection PPlainSection"><span class="SHKeyword">this</span>.maapneeType</div></div>
+ <div class="CBody"><p>Does this character have to be colored as per 2 or 1 when displaying maapnee analysis? Normally will be 2 or 1 as per the character's maatraa but if there are 2 consecutive 1s and they match with a 2 in the maapnee pattern then maapneeType = 2 even of maatraa = 1. maapneeType will be set to 3 for such characters temporarily during analysis but after all characters are pushed for a line, no character should have maapneeType = 3</p></div>
+</div>
+
 <a name="cChar.isRadeef"></a><a name="Topic99"></a><div class="CTopic TVariable LJavaScript">
  <div class="CTitle">isRadeef</div>
  <div id="NDPrototype99" class="NDPrototype"><div class="PSection PPlainSection"><span class="SHKeyword">this</span>.isRadeef</div></div>
@@ -228,8 +234,9 @@
  <div class="CBody"><p>Change the vowel of the last character of the line and recalculate maatraas accordingly. Used when processing a line character by character, and the vowel character comes after the consonant.</p><div class="CHeading">Parameters</div><table class="CDefinitionList"><tr><td class="CDLEntry">vowelString</td><td class="CDLDefinition"><p>vowel text</p></td></tr></table></div>
 </div>
 
-<a name="cLine.lastCharVowel(2)"></a><a name="Topic46"></a><div class="CTopic TFunction LJavaScript">
- <div class="CTitle">lastCharVowel</div>
+<a name="cLine.changeLastCharConsonant"></a><a name="Topic107"></a><div class="CTopic TFunction LJavaScript">
+ <div class="CTitle">changeLastCharConsonant</div>
+ <div id="NDPrototype107" class="NDPrototype WideForm"><div class="PSection PParameterSection CStyle"><table><tr><td class="PBeforeParameters">changeLastCharConsonant(</td><td class="PParametersParentCell"><table class="PParameters"><tr><td class="PName first last">consonantString</td></tr></table></td><td class="PAfterParameters">)</td></tr></table></div></div>
  <div class="CBody"><p>Change the consonant of the last char of line -- probably because it is a nuqta</p><div class="CHeading">Parameters</div><table class="CDefinitionList"><tr><td class="CDLEntry">consonantString</td><td class="CDLDefinition"><p>consonant text</p></td></tr></table></div>
 </div>
 
