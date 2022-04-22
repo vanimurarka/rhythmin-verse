@@ -33,6 +33,8 @@ class cChar {
 		// Variable: maapneeType
 		// Does this character have to be colored as per 2 or 1 when displaying maapnee analysis? Normally will be 2 or 1 as per the character's maatraa but if there are 2 consecutive 1s and they match with a 2 in the maapnee pattern then maapneeType = 1.5 even when maatraa = 1 -- indicating like 2, but 1+1 2. 
 		this.maapneeType = 0;
+		// Variable: maapneeIndex
+		this.maapneeIndex = 0;
 		// Variable: isRadeef
 		this.isRadeef = false;
 		// Variable: isKaafiyaa
@@ -121,7 +123,7 @@ class cChar {
 		{
 			case "्":
 				this.vowelNumber = -1;
-				// this.isHindi = true;
+				this.isHindi = true;
 				break;
 			case "अ": 
 				this.vowelNumber = 1;
@@ -589,6 +591,10 @@ class cLine {
 		for (i = charIdx; i < this.count; i++)
 			this.charByIndex(i).maatraaCumulative += diff;
 
+		this.clearMaapnee();
+		this.setMaapnee();
+		console.log(this);
+
 		return this.maatraa;
 	}
 	/* Function: doesItRhyme
@@ -711,18 +717,34 @@ class cLine {
 		else
 			return false;
 	}
-	/* Function: setMaapnee()
+	/* Function: setMaapnee
 	*/
-	setMaapnee()
+	setMaapnee(pattern = [])
 	{
 		let i = 0;
+		let pi = 0; // pattern index
+		let withPattern = false;
+		if (pattern.length > 0)
+		{
+			withPattern = true;
+		}
+		let currentC;
+		let currentPattern;
+
+		if (withPattern) debugger;
 		for (i = 0; i < this.count; i++)
 		{
-			let currentC = this.characters[i];
+			currentC = this.characters[i];
+			currentPattern = pattern[pi];
+
 			if (currentC.isHindi)
 			{
 				if (currentC.maapneeType != 1.5)
 					currentC.maapneeType = currentC.maatraa;
+
+				// increment pattern index if currentC was deergh
+				if (withPattern && (currentC.maapneeType == 2)) pi++;
+
 				if ((i < this.count - 1) && (currentC.maatraa == 1) && (currentC.maapneeType != 1.5))
 				{
 					let nextChar = currentC;
@@ -730,18 +752,50 @@ class cLine {
 					while (!nextCharFound)
 					{
 						nextChar = this.nextChar(nextChar);
-						if (nextChar.isHindi)
+						if (nextChar.isHindi && (nextChar.maatraa > 0))
 							nextCharFound = true;
 					}
 					if ((nextChar.maatraa == 1) && (currentC.maatraa == 1))
 					{
-						nextChar.maapneeType = 1.5;
-						currentC.maapneeType = 1.5;
+						if (!withPattern) // do defaut processing
+						{
+							nextChar.maapneeType = 1.5;
+							currentC.maapneeType = 1.5;
+						}
+						else // with pattern so also take pattern into consideration
+						{
+							if (pattern[pi] == 1)
+								pi++;
+							else
+							{
+								nextChar.maapneeType = 1.5;
+								currentC.maapneeType = 1.5;
+								pi++;
+							}
+						}
 					}
+					else 
+					{
+						pi++;
+					}
+				}
+				else if (currentC.maapneeType == 1)
+				{
+					pi++;
 				}
 			}
 		}
 
+	}
+	/* Function: clearMaapnee
+	*/
+	clearMaapnee()
+	{
+		let i = 0;
+		for (i = 0; i < this.count; i++)
+		{
+			this.characters[i].maapneeType = 0;
+		}
 	}
 }
 
@@ -1201,7 +1255,7 @@ function visualize(poem, availableW, poemType=0, refresh=false)
   }
   else
   {
-  	// oPoem.findRhymingLines();
+  	// if (!oPoem.firstLineMaapnee) oPoem.findRhymingLines();
   }
   if (fFreeVerse)
   {
@@ -1271,7 +1325,8 @@ function splitNprocessPoem(poem, refresh)
 					}
         }
         oLine.calculateHalfLettersMaatraa();
-        oLine.setMaapnee();
+        // oLine.setMaapnee();
+        oLine.setMaapnee(oPoem.maapneePattern);
         oPoem.pushLine(oLine);
 	    }
     }

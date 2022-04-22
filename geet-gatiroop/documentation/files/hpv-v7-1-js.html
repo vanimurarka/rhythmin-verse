@@ -67,10 +67,15 @@
  <div id="NDPrototype98" class="NDPrototype"><div class="PSection PPlainSection"><span class="SHKeyword">this</span>.maatraaCumulative</div></div>
 </div>
 
-<a name="cChar.maapneeType"></a><a name="Topic47"></a><div class="CTopic TVariable LJavaScript">
+<a name="cChar.maapneeType"></a><a name="Topic46"></a><div class="CTopic TVariable LJavaScript">
  <div class="CTitle">maapneeType</div>
- <div id="NDPrototype47" class="NDPrototype"><div class="PSection PPlainSection"><span class="SHKeyword">this</span>.maapneeType</div></div>
- <div class="CBody"><p>Does this character have to be colored as per 2 or 1 when displaying maapnee analysis? Normally will be 2 or 1 as per the character's maatraa but if there are 2 consecutive 1s and they match with a 2 in the maapnee pattern then maapneeType = 2 even of maatraa = 1. maapneeType will be set to 3 for such characters temporarily during analysis but after all characters are pushed for a line, no character should have maapneeType = 3</p></div>
+ <div id="NDPrototype46" class="NDPrototype"><div class="PSection PPlainSection"><span class="SHKeyword">this</span>.maapneeType</div></div>
+ <div class="CBody"><p>Does this character have to be colored as per 2 or 1 when displaying maapnee analysis? Normally will be 2 or 1 as per the character's maatraa but if there are 2 consecutive 1s and they match with a 2 in the maapnee pattern then maapneeType = 1.5 even when maatraa = 1 -- indicating like 2, but 1+1 2.</p></div>
+</div>
+
+<a name="cChar.maapneeIndex"></a><a name="Topic45"></a><div class="CTopic TVariable LJavaScript">
+ <div class="CTitle">maapneeIndex</div>
+ <div id="NDPrototype45" class="NDPrototype"><div class="PSection PPlainSection"><span class="SHKeyword">this</span>.maapneeIndex</div></div>
 </div>
 
 <a name="cChar.isRadeef"></a><a name="Topic99"></a><div class="CTopic TVariable LJavaScript">
@@ -228,10 +233,10 @@
  <div class="CBody"><p>Getter. Gets the original text using which the line was created</p></div>
 </div>
 
-<a name="cLine.lastCharVowel"></a><a name="Topic45"></a><div class="CTopic TFunction LJavaScript">
+<a name="cLine.lastCharVowel"></a><a name="Topic106"></a><div class="CTopic TFunction LJavaScript">
  <div class="CTitle">lastCharVowel</div>
- <div id="NDPrototype45" class="NDPrototype WideForm"><div class="PSection PParameterSection CStyle"><table><tr><td class="PBeforeParameters">lastCharVowel(</td><td class="PParametersParentCell"><table class="PParameters"><tr><td class="PName first last">vowelString</td></tr></table></td><td class="PAfterParameters">)</td></tr></table></div></div>
- <div class="CBody"><p>Change the vowel of the last character of the line and recalculate maatraas accordingly. Used when processing a line character by character, and the vowel character comes after the consonant.</p><div class="CHeading">Parameters</div><table class="CDefinitionList"><tr><td class="CDLEntry">vowelString</td><td class="CDLDefinition"><p>vowel text</p></td></tr></table></div>
+ <div id="NDPrototype106" class="NDPrototype WideForm"><div class="PSection PParameterSection CStyle"><table><tr><td class="PBeforeParameters">lastCharVowel(</td><td class="PParametersParentCell"><table class="PParameters"><tr><td class="PName first last">vowelString</td></tr></table></td><td class="PAfterParameters">)</td></tr></table></div></div>
+ <div class="CBody"><p>Change the vowel of the last character of the line and recalculate maatraas accordingly. Used when processing a line character by character, and the vowel character comes after the consonant.</p><div class="CHeading">Parameters</div><table class="CDefinitionList"><tr><td class="CDLEntry">- vowelString</td><td class="CDLDefinition"><p>vowel text</p></td></tr></table></div>
 </div>
 
 <a name="cLine.changeLastCharConsonant"></a><a name="Topic107"></a><div class="CTopic TFunction LJavaScript">
@@ -240,10 +245,10 @@
  <div class="CBody"><p>Change the consonant of the last char of line -- probably because it is a nuqta</p><div class="CHeading">Parameters</div><table class="CDefinitionList"><tr><td class="CDLEntry">consonantString</td><td class="CDLDefinition"><p>consonant text</p></td></tr></table></div>
 </div>
 
-<a name="cLine.push"></a><a name="Topic105"></a><div class="CTopic TFunction LJavaScript">
+<a name="cLine.push"></a><a name="Topic108"></a><div class="CTopic TFunction LJavaScript">
  <div class="CTitle">push</div>
- <div id="NDPrototype105" class="NDPrototype WideForm"><div class="PSection PParameterSection CStyle"><table><tr><td class="PBeforeParameters">push(</td><td class="PParametersParentCell"><table class="PParameters"><tr><td class="PName first">newChar,</td><td></td><td class="last"></td></tr><tr><td class="PName first">setMaapnee</td><td class="PDefaultValueSeparator">&nbsp;=&nbsp;</td><td class="PDefaultValue last"><span class="SHKeyword">false</span>,</td></tr><tr><td class="PName first">maapneePattern</td><td class="PDefaultValueSeparator">&nbsp;=&nbsp;</td><td class="PDefaultValue last"><span class="SHString">''</span></td></tr></table></td><td class="PAfterParameters">)</td></tr></table></div></div>
- <div class="CBody"><p>Add a new character to line</p><div class="CHeading">Parameters</div><table class="CDefinitionList"><tr><td class="CDLEntry">- newChar</td><td class="CDLDefinition"><p>Type: cChar</p></td></tr><tr><td class="CDLEntry">- setMaapnee</td><td class="CDLDefinition"><p>Type: boolean. Whether this incoming character is to be assessed as per given Maapnee or not</p></td></tr><tr><td class="CDLEntry">- maapneePattern</td><td class="CDLDefinition"><p>Type: array</p></td></tr></table></div>
+ <div id="NDPrototype108" class="NDPrototype WideForm"><div class="PSection PParameterSection CStyle"><table><tr><td class="PBeforeParameters">push(</td><td class="PParametersParentCell"><table class="PParameters"><tr><td class="PName first last">newChar</td></tr></table></td><td class="PAfterParameters">)</td></tr></table></div></div>
+ <div class="CBody"><p>Add a new character to line</p><div class="CHeading">Parameters</div><table class="CDefinitionList"><tr><td class="CDLEntry">- newChar</td><td class="CDLDefinition"><p>Type: cChar</p></td></tr></table></div>
 </div>
 
 <a name="cLine.charByIndex"></a><a name="Topic48"></a><div class="CTopic TFunction LJavaScript">
@@ -298,6 +303,16 @@
  <div class="CTitle">doesItRhyme</div>
  <div id="NDPrototype56" class="NDPrototype WideForm"><div class="PSection PParameterSection CStyle"><table><tr><td class="PBeforeParameters">doesItRhyme(</td><td class="PParametersParentCell"><table class="PParameters"><tr><td class="PName first last">compareLine,</td></tr><tr><td class="PName first last">rg</td></tr></table></td><td class="PAfterParameters">)</td></tr></table></div></div>
  <div class="CBody"><div class="CHeading">Parameters</div><ul><li><p>compareLine</p></li><li><p>rg</p></li></ul></div>
+</div>
+
+<a name="cLine.setMaapnee"></a><a name="Topic47"></a><div class="CTopic TFunction LJavaScript">
+ <div class="CTitle">setMaapnee</div>
+ <div id="NDPrototype47" class="NDPrototype WideForm"><div class="PSection PParameterSection CStyle"><table><tr><td class="PBeforeParameters">setMaapnee(</td><td class="PParametersParentCell"><table class="PParameters"><tr><td class="PName first">pattern</td><td class="PDefaultValueSeparator">&nbsp;=&nbsp;</td><td class="PDefaultValue last">[]</td></tr></table></td><td class="PAfterParameters">)</td></tr></table></div></div>
+</div>
+
+<a name="cLine.clearMaapnee"></a><a name="Topic105"></a><div class="CTopic TFunction LJavaScript">
+ <div class="CTitle">clearMaapnee</div>
+ <div id="NDPrototype105" class="NDPrototype"><div class="PSection PPlainSection">clearMaapnee()</div></div>
 </div>
 
 <a name="compositeLine"></a><a name="Topic7"></a><div class="CTopic TClass LJavaScript">
