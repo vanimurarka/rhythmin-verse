@@ -1,0 +1,1 @@
+﻿NDSearch.OnPrefixDataLoaded("max",["Variable"],[["maxLineLen",,[["cPoem",,,,0,"File:hpv.v7.1.js:cPoem.maxLineLen","JavaScriptClass:cPoem:maxLineLen"]]]]);

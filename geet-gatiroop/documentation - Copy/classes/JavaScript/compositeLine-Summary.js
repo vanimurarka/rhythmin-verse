@@ -1,0 +1,1 @@
+﻿NDFramePage.OnPageTitleLoaded("JavaScriptClass:compositeLine","compositeLine");NDSummary.OnSummaryLoaded("JavaScriptClass:compositeLine",[["JavaScript","JavaScript"]],[["Classes","Class"]],[[7,0,0,"compositeLine"]]);

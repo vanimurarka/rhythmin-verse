@@ -1,0 +1,1 @@
+﻿NDSearch.OnPrefixDataLoaded("com",["Function","Class","Variable"],[["compare",,[["cChar",,,,0,"File:hpv.v7.1.js:cChar.compare","JavaScriptClass:cChar:compare"]]],["compositeLine",,[[,,,,1,"File:hpv.v7.1.js:compositeLine","JavaScriptClass:compositeLine"]]],["compositeLines",,[["cPoem",,,,2,"File:hpv.v7.1.js:cPoem.compositeLines","JavaScriptClass:cPoem:compositeLines"]]]]);

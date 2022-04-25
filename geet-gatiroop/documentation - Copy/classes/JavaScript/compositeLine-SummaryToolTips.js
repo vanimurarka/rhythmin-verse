@@ -1,0 +1,1 @@
+﻿NDSummary.OnToolTipsLoaded("JavaScriptClass:compositeLine",{7:"<div class=\"NDToolTip TClass LJavaScript\"><div class=\"TTSummary\">This class is probably not used</div></div>"});

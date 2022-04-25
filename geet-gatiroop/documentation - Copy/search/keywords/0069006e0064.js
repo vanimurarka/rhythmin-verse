@@ -1,0 +1,1 @@
+﻿NDSearch.OnPrefixDataLoaded("ind",["Variable"],[["index",,[["cChar",,,,0,"File:hpv.v7.1.js:cChar.index","JavaScriptClass:cChar:index"]]]]);

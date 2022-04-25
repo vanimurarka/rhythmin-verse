@@ -1,0 +1,1 @@
+﻿NDSearch.OnPrefixDataLoaded("isk",["Variable"],[["isKaafiyaa",,[["cChar",,,,0,"File:hpv.v7.1.js:cChar.isKaafiyaa","JavaScriptClass:cChar:isKaafiyaa"]]]]);

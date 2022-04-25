@@ -1,0 +1,1 @@
+﻿NDSearch.OnPrefixDataLoaded("red",["Function"],[["redraw",,[[,,,,0,"File:hpv.v7.1.js:redraw"]]]]);

@@ -1,0 +1,1 @@
+﻿NDSearch.OnPrefixDataLoaded("fin",["Function"],[["findRhymingLines",,[["cPoem",,,,0,"File:hpv.v7.1.js:cPoem.findRhymingLines","JavaScriptClass:cPoem:findRhymingLines"]]]]);

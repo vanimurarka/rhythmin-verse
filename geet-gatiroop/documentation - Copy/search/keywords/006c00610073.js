@@ -1,0 +1,1 @@
+﻿NDSearch.OnPrefixDataLoaded("las",["Function"],[["lastCharVowel",,[["cLine",,,,0,"File:hpv.v7.1.js:cLine.lastCharVowel","JavaScriptClass:cLine:lastCharVowel"]]]]);

@@ -1,0 +1,1 @@
+﻿NDSearch.OnPrefixDataLoaded("bas",["Variable"],[["baseCount",,[["cPoem",,,,0,"File:hpv.v7.1.js:cPoem.baseCount","JavaScriptClass:cPoem:baseCount"]]]]);

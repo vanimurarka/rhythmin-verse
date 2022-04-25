@@ -1,0 +1,1 @@
+﻿NDSearch.OnPrefixDataLoaded("isp",["Function"],[["isPureVowel",,[["cChar",,,,0,"File:hpv.v7.1.js:cChar.isPureVowel","JavaScriptClass:cChar:isPureVowel"]]]]);

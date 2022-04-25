@@ -1,0 +1,1 @@
+﻿NDSearch.OnPrefixDataLoaded("rep",["Function"],[["replaceMainChar",,[["cChar",,,,0,"File:hpv.v7.1.js:cChar.replaceMainChar","JavaScriptClass:cChar:replaceMainChar"]]]]);

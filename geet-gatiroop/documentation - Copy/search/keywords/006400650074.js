@@ -1,0 +1,1 @@
+﻿NDSearch.OnPrefixDataLoaded("det",["Function"],[["detectFirstLineMaapnee",,[["cPoem",,,,0,"File:hpv.v7.1.js:cPoem.detectFirstLineMaapnee","JavaScriptClass:cPoem:detectFirstLineMaapnee"]]]]);
