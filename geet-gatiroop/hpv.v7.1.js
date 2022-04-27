@@ -1655,9 +1655,14 @@ function drawFreeVerseDashStyle(i)
       return "stroke:black;stroke-width:8;"
   }
 
-// Function: fnFreeVerseSupport
-// Toggle Free Verse support
-function fnFreeVerseSupport(baseCount)
+/* 
+Function: fnFreeVerseSupport
+Toggle Free Verse support
+
+Parameter: 
+	baseCount
+*/
+function fnFreeVerseSupport(baseCount = 1)
 {
   fFreeVerse = !fFreeVerse;
   if (fFreeVerse)
@@ -1802,9 +1807,12 @@ function unmarkCompositeLine()
   }
 
 /*
-	Function: fnBaseCountChange
+Function: fnBaseCountChange
+
+Parameter: 
+	baseCount
 */
-function fnBaseCountChange(baseCount)
+function fnBaseCountChange(baseCount = 1)
   {
     if ((baseCount > 0) && (baseCount != oPoem.baseCount))
     {
