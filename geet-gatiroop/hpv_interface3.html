@@ -69,6 +69,38 @@
     	if (w > 500)
  			visDiv.style.width = calculateVisBesideWidth()+"px";
     }
+    function myFnGhazal(chkbox)
+    {
+    	if (chkbox.checked)
+    	{
+    		document.getElementById("chkRhyme").disabled = true;
+    		document.getElementById("chkFreeVerse").disabled = true;
+    	}
+    	else
+    	{
+    		document.getElementById("chkRhyme").disabled = false;
+    		document.getElementById("chkFreeVerse").disabled = false;
+    	}
+
+    	fnGhazal()
+    }
+    function myFnFreeVerseSupport(chkbox)
+    {
+    	let baseC = 1;
+    	if (chkbox.checked)
+    	{
+    		document.getElementById("chkGhazal").disabled = true;
+    		document.getElementById("spanFreeVerse").style.display = "inline"
+    		baseC = parseInt(document.getElementById("baseCount").value);
+    	}
+    	else
+    	{
+    		document.getElementById("chkGhazal").disabled = false;
+    		document.getElementById("spanFreeVerse").style.display = "none"
+    	}
+
+    	fnFreeVerseSupport(baseC)
+    }
   </script>
 </head>	 
 
@@ -89,12 +121,13 @@
 		<div id="right"> 
 			<div id="chart"></div>
 			<div style="display:none" id="divControls">
-		      <!-- <input type="checkbox" id="chkShowEditables" checked="true" onclick="switchMode();" /> Show Editables -->
-		      <input type="checkbox" id="chkGhazal" onclick="fnGhazal();" /> Ghazal <input type="checkbox" id="chkFreeVerse" onclick="fnFreeVerseSupport();" /> Free Verse<span id="spanFreeVerse" style="display:none"> | Base Count: <input type="number" name="baseCount" id="baseCount" value="1" min="1" size="20" max="100" step="1" onchange="fnBaseCountChange();"></span>
+		      <input type="checkbox" id="chkGhazal" onclick="myFnGhazal(this);" /> Ghazal <input type="checkbox" id="chkFreeVerse" onclick="myFnFreeVerseSupport(this);" /> Free Verse<span id="spanFreeVerse" style="display:none"> | Base Count: <input type="number" name="baseCount" id="baseCount" value="1" min="1" size="20" max="100" step="1" onchange="fnBaseCountChange(this.value);"></span>
 		      <br/>
-		      <input type="checkbox" id="chkShowText" checked="true" onclick="fnShowText();" /> Show Text 
+		      <input type="checkbox" id="chkShowText" checked="true" onclick="fnShowText(this);" /> Show Text 
 		      <input type="checkbox" id="chkLineSpacing" onclick="fnLineSpacing();" /> Remove Line Spacing
-		      <input type="checkbox" id="chkFit" onclick="fnFit(this);" /> Fit Vis in Screen<br>
+		      <input type="checkbox" id="chkFit" onclick="fnFit(this);" /> Fit Vis in Screen
+		      <input type="checkbox" id="chkRhyme" onclick="fnRhymingLines(this);" /> Show Rhyming Lines
+		      <br>
 		      <button id='saveButton' onclick="saveSVG();">🎨👇</button>
 		    </div>
 		</div> 

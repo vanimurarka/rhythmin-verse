@@ -729,7 +729,6 @@ class cLine {
 		let currentC;
 		let currentPattern;
 
-		if (withPattern) debugger;
 		for (i = 0; i < this.count; i++)
 		{
 			currentC = this.characters[i];
@@ -1251,10 +1250,6 @@ function visualize(poem, availableW, poemType=0, refresh=false)
     oPoem.calculateRadeef();
     oPoem.calculateKaafiyaa();
   }
-  else
-  {
-  	// if (!oPoem.firstLineMaapnee) oPoem.findRhymingLines();
-  }
   if (fFreeVerse)
   {
   	let baseC = parseInt(document.getElementById("baseCount").value);
@@ -1340,6 +1335,7 @@ var fShowText = true;
 var fLineSpacing = true;
 var fFreeVerse = false;
 var fGhazal = false;
+var fRhymingLines = false;
 
 // Function: initSvgFixed
 function initSvgFixed(svgW, svgH)
@@ -1542,7 +1538,7 @@ function drawStyleCharBlock(c,colorBy)
 					fillOp = "0.2";
 				}
 	  		// color = "rgb(0,220,255)"; // blue
-	  		if (c.rhymeLevel > 0)
+	  		if ((c.rhymeLevel > 0) && (fRhymingLines))
 	  		{
 	  			color = rhymeColors[c.rhymeGroup];
 	  			fillOp = "0.4";
@@ -1633,10 +1629,19 @@ function drawVowPath(d,i)
 
 // Function: fnShowText
 // Toggle function to show or hide text in the visualization
-function fnShowText()
+function fnShowText(chkbox)
 {
 	fShowText = !fShowText;
-	document.getElementById("chkShowText").checked = fShowText;
+	draw();
+}
+
+// Function: fnRhymingLines
+// Toggle function to calculate and show rhyming lines in the visualization
+function fnRhymingLines(chkbox)
+{
+	fRhymingLines = !fRhymingLines
+	if (fRhymingLines && (!fGhazal))
+		oPoem.findRhymingLines();
 	draw();
 }
 
@@ -1652,20 +1657,13 @@ function drawFreeVerseDashStyle(i)
 
 // Function: fnFreeVerseSupport
 // Toggle Free Verse support
-function fnFreeVerseSupport()
+function fnFreeVerseSupport(baseCount)
 {
   fFreeVerse = !fFreeVerse;
   if (fFreeVerse)
   {
-    document.getElementById("chkGhazal").disabled = true;
-    document.getElementById("spanFreeVerse").style.display = "inline";
     let baseC = parseInt(document.getElementById("baseCount").value);
-    oPoem.setBaseCount(baseC);
-  }
-  else
-  {
-    document.getElementById("chkGhazal").disabled = false;
-    document.getElementById("spanFreeVerse").style.display = "none";
+    oPoem.setBaseCount(baseCount);
   }
   draw();
 }
@@ -1806,20 +1804,12 @@ function unmarkCompositeLine()
 /*
 	Function: fnBaseCountChange
 */
-function fnBaseCountChange()
+function fnBaseCountChange(baseCount)
   {
-    let baseC = parseInt(document.getElementById("baseCount").value);
-    if (baseC > 0)
+    if ((baseCount > 0) && (baseCount != oPoem.baseCount))
     {
-      if (baseC != oPoem.baseCount)
-      {
-        oPoem.setBaseCount(baseC);
-        draw();
-      }
-    }
-    else
-    {
-      document.getElementById("baseCount").value = prevBaseCount;
+      oPoem.setBaseCount(baseCount);
+      draw();
     }
   }
 
@@ -1832,15 +1822,9 @@ function fnGhazal()
     fGhazal = !fGhazal;
     if (fGhazal)
     {
-      document.getElementById("chkFreeVerse").disabled = true;
       oPoem.calculateRadeef();
       oPoem.calculateKaafiyaa();
     }
-    else
-    {
-      document.getElementById("chkFreeVerse").disabled = false;
-    }
-    // console.log(oPoem);
     draw();
   }
 
