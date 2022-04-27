@@ -1629,7 +1629,7 @@ function drawVowPath(d,i)
 
 // Function: fnShowText
 // Toggle function to show or hide text in the visualization
-function fnShowText(chkbox)
+function fnShowText()
 {
 	fShowText = !fShowText;
 	draw();
@@ -1637,7 +1637,7 @@ function fnShowText(chkbox)
 
 // Function: fnRhymingLines
 // Toggle function to calculate and show rhyming lines in the visualization
-function fnRhymingLines(chkbox)
+function fnRhymingLines()
 {
 	fRhymingLines = !fRhymingLines
 	if (fRhymingLines && (!fGhazal))
