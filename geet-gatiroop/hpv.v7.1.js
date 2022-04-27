@@ -591,7 +591,6 @@ class cLine {
 
 		this.clearMaapnee();
 		this.setMaapnee();
-		console.log(this);
 
 		return this.maatraa;
 	}
@@ -1324,7 +1323,7 @@ function splitNprocessPoem(poem, refresh)
 	    }
     }
     
-    console.log(oPoem);
+    // console.log(oPoem);
 }
 
 var charW = 20; 
