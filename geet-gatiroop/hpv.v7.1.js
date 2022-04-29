@@ -741,6 +741,8 @@ class cLine {
 				// increment pattern index if currentC was deergh
 				if (withPattern && (currentC.maapneeType == 2)) pi++;
 
+				if ((currentC.mainChar == "1") || (currentC == "१"))
+					continue;
 				if ((i < this.count - 1) && (currentC.maatraa == 1) && (currentC.maapneeType != 1.5))
 				{
 					let nextChar = currentC;
@@ -1317,13 +1319,12 @@ function splitNprocessPoem(poem, refresh)
 					}
         }
         oLine.calculateHalfLettersMaatraa();
-        // oLine.setMaapnee();
         oLine.setMaapnee(oPoem.maapneePattern);
         oPoem.pushLine(oLine);
 	    }
     }
     
-    // console.log(oPoem);
+    console.log(oPoem);
 }
 
 var charW = 20; 
