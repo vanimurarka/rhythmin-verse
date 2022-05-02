@@ -741,7 +741,7 @@ class cLine {
 				// increment pattern index if currentC was deergh
 				if (withPattern && (currentC.maapneeType == 2)) pi++;
 
-				if ((currentC.mainChar == "1") || (currentC == "१"))
+				if ((currentC.mainChar == "1") || (currentC.mainChar == "१"))
 					continue;
 				if ((i < this.count - 1) && (currentC.maatraa == 1) && (currentC.maapneeType != 1.5))
 				{
