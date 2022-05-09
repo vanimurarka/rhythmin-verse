@@ -750,6 +750,9 @@ class cLine {
 					while (!nextCharFound)
 					{
 						nextChar = this.nextChar(nextChar);
+						if (nextChar === false) // no more chars
+							break;
+
 						if (nextChar.isHindi && (nextChar.maatraa > 0))
 							nextCharFound = true;
 					}
