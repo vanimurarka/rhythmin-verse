@@ -65,6 +65,10 @@
   <img src="sur-bujho-inside.png" style="width: 100%; max-width: 600px;"><br>
   <!-- h1 style="color:violet;">Sur Bujho</h1>
   <h3>Guess The Musical Notes Game</h3 --><br>
+  <div>
+    <label for="volume">Volume</label>
+    <input type="range" id="volume" name="volume" min="1" max="20" value="1" onchange="setVolume();">
+  </div><br>
   <select id="selectTest" style="font-size: inherit;background-color:white" onchange="selectTest();">
     <option value="0">Level 1: s S</option>
     <option value="1">Level 2: s p S</option>
@@ -78,7 +82,7 @@
     <option value="9">Level 10: .d .n s r g m p d n S R G</option>
   </select>
   <br><br>
-  <input type="button" value="Listen to s" class="btn" onclick="javascript:playS();"><br>
+  <input type="button" value="Start" class="btn" onclick="javascript:playS();"><br>
   <br><br>
   Round: <span id="stats">0</span> <span style="color:violet;">|</span> Total Rounds: <span id="roundsTotal">5</span><br><br>
   <div style="display: none">;Correct: <span id="correct">0</span><br>
@@ -129,6 +133,7 @@
   // Get the <span> element that closes the modal
   var span = document.getElementsByClassName("close")[0];
 
+
   // When the user clicks the button, open the modal 
   btnScore.onclick = function() {
     document.getElementById("modalTitle").innerHTML = "Score Card";
@@ -147,6 +152,14 @@
     if (event.target == modal) {
       modal.style.display = "none";
     }
+  }
+
+  
+
+  function setVolume()
+  {
+    vol = document.getElementById("volume").value;
+    setCookie("SBG:Vol",vol);
   }
 
   cNotes = [82.41,87.31,92.5,98,103.83,110,116.54,123.47,130.81,138.59,146.83,155.56,164.81,174.61,185,196,207.65,220,233.08,246.94,261.63,277.18,293.66,311.13,329.63,349.23,369.99,392,415.3,440,466.16];
@@ -178,6 +191,7 @@
   let gTestI = 0;
   let gTestNoteI = 0;
   let gInGuessingMode = false;
+  let vol = 1;
 
   function onLoad()
   {
@@ -213,12 +227,16 @@
       i++;
     }
 
+    if (getCookie("SBG:Vol") == "")
+      vol = 1;
+    else
+      vol = getCookie("SBG:Vol");
+    document.getElementById("volume").value = vol;
+
     // set keydown event
     document.addEventListener('keydown', takeNoteViaKeyboard, false);
   }
-
-  testCombos = [{notes:["s","S"],btns:["s","b","b","b","b","b","b","S"],
-                gameRounds:5,graduationScore:100},
+  testCombos = [{notes:["s","S"],btns:["s","b","b","b","b","b","b","S"],gameRounds:5,graduationScore:100},
                 {notes:["s","p","S"],btns:["s","b","b","b","p","b","b","S"],gameRounds:10,graduationScore:100},
                 {notes:["s","r","p","S"],btns:["s","r","b","b","p","b","b","S"],gameRounds:15,graduationScore:100},
                 {notes:["s","r","g","p","S"],btns:["s","r","g","b","p","b","b","S"],gameRounds:20,graduationScore:100},
@@ -386,7 +404,7 @@
   }
 
   function playS() {
-    example4(surMap.get("s").freq,"triangle");
+    playNote(surMap.get("s").freq,"triangle", vol);
     setTimeout(function() { playGuessNote(); }, 1500);
   }
 
@@ -407,7 +425,7 @@
 
     // console.log(testNoteName + " = " + testNote.freq);
     // play the note
-    example4(testNote.freq,"triangle");
+    playNote(testNote.freq,"triangle", vol);
     
     clearButtons();
     divGuessButtons = d3.select("#guessButtons");
