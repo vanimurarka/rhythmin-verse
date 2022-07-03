@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta property="og:image" content="sur-bujho1.png" />
+	<title>Sur Bujho | Guess The Musical Notes Game and Train Your Ears To Recognise Notes</title>
+	<style type="text/css">
+		.big {font-size: 150%;}
+		.bold {font-weight: bold;}
+		.noteBtn {background-color: #000; color: white; border: 1px solid grey;}
+		.dot {
+			height: 10px;
+			width: 10px;
+			background-color: green;
+			border-radius: 50%;
+			display: inline-block;
+			visibility: hidden;
+		}
+		    /* The Modal (background) */
+	    .modal {
+	      display: none; /* Hidden by default */
+	      position: fixed; /* Stay in place */
+	      z-index: 1; /* Sit on top */
+	      padding-top: 100px; /* Location of the box */
+	      left: 0;
+	      top: 0;
+	      width: 100%; /* Full width */
+	      height: 100%; /* Full height */
+	      overflow: auto; /* Enable scroll if needed */
+	    }
+
+	    /* Modal Content */
+	    .modal-content {
+	      background-color: black;
+	      margin: auto;
+	      padding: 20px;
+	      border: 1px solid #888;
+	      width: 80%;
+	    }
+
+	    /* The Close Button */
+	    .close {
+	      color: #aaaaaa;
+	      float: right;
+	      font-size: 28px;
+	      font-weight: bold;
+	    }
+
+	    .close:hover,
+	    .close:focus {
+	      color: #000;
+	      text-decoration: none;
+	      cursor: pointer;
+	    }
+	</style>
+	<script src="cookie.js"></script>
+	<script src="music.js"></script>
+	<script src="d3.v6.js"></script>
+</head>
+<body style="font-family: sans-serif;text-align: center;background-color: black;color: white;">
+	<img src="sur-bujho-inside.png" style="width: 100%; max-width: 600px;">
+	<br>
+	<br>
+	Scale: <select id="selectScale" style="font-size: inherit;background-color:white">
+	    <option value="0" selected>G</option>
+	    <option value="1">G#</option>
+	    <option value="2">A</option>
+	    <option value="3">A#</option>
+	    <option value="4">B</option>
+	    <option value="5">C</option>
+	    <option value="6">C#</option>
+	    <option value="7">D</option>
+	    <option value="8">D#</option>
+	    <option value="9">E</option>
+	    <option value="10">F</option>
+	    <option value="11">F#</option>
+	  </select><br><br>
+	<div>
+	    <label for="volume">Volume</label>
+	    <input type="range" id="volume" name="volume" min="0.5" max="15" value="5">
+  	</div><br>
+  	<select id="selectTest" class="big" style="background-color: black; color:white;">
+	    <option value="0">L1: SS''</option>
+	    <option value="1">L2: SPS''</option>
+	    <option value="2">L3: SRPS''</option>
+	    <option value="3">L4: SRGPS''</option>
+	    <option value="4">L5: SRGPDS''</option>
+		<option value="5">L6: SRGPDS'' 2 notes</option>
+		<option value="6">L7: SRGPDS'' 4 notes</option>
+	    <option value="7">L8: SRGPDNS''</option>
+	    <option value="8">L9: SRMPDNS''</option>
+	    <option value="9">L10: SRGMPDNS''</option>
+	    <option value="10">L11: SRGMPDNS''R''G''</option>
+	    <option value="11">L12: D'N'SRGMPDNS''R''G''</option>
+		<option value="12">L13: D'SRGPDS''R''G'' 4 notes</option>
+		<option value="13">L14: D'SRGPDS''R''G'' 8 notes</option>
+  	</select>
+  	<br>
+  	<input type="button" class="big bold" value="Start" id="btnStart">
+  	<br>
+  	<br>
+  	<div>
+  		Round: <span id="txtRound">0</span> | Total Rounds: <span id="txtTotalRounds">0</span>
+  	</div>
+  	<div class="big">
+  		Score: <span id="txtScore">0</span>
+  	</div>
+  	<div id="guessButtons" style="text-align: center;"> 
+	</div>
+	<div id="playAgainBtns" style="text-align:center;display: none;">
+		<br>
+	    <input id="SAgain" type="button" value="🔁 S" onclick="fPlaySAgain();"> <input type="button" value="🔁 Guess Note" onclick="fPlayGuessNoteAgain();"> <input id="playTuneAgain" type="button" value="🔁 Tune" onclick="fTuneAgain();" style="display: none;">
+	</div>
+	<div id="notePattern" style="text-align: left;"><span class="dot" id="myDot1"></span><span class="dot" id="myDot2"></span><span class="dot" id="myDot3"></span><span class="dot" id="myDot4"></span><span class="dot" id="myDot5"></span><span class="dot" id="myDot6"></span><span class="dot" id="myDot7"></span><span class="dot" id="myDot8"></span>
+	</div>
+	<br>
+	<br>
+	<br>
+	<br>
+	<br>
+	<br>
+	<button id="btnScore" style="border:1px solid grey;padding:5px;background-color: black;color: white;">Score Card</button>
+	<br>
+	<br>
+	<br>
+	<a href="mailto:vani.murarka@gmail.com">Contact</a>
+	<!-- The Modal -->
+	<div id="myModal" class="modal" style="display:none">
+
+		<!-- Modal content -->
+		<div class="modal-content">
+		  <span class="close">&times;</span>
+		  <h3 id="modalTitle">Score Card</h3>
+		  <p id="modalText" style="display:table;margin:0 auto;text-align: left;">Some text in the Modal..</p>
+		</div>
+
+	</div>
+	<script type="text/javascript" src="sur-bujho-setup3.js"></script>
+  	<script type="text/javascript" src="sur-bujho4.js"></script>
+</body>
+</html>
