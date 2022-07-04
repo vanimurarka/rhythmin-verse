@@ -577,8 +577,9 @@ class cLine {
 
 		Parameters:
 			charIdx - index of character whose maatraa is to be adjusted
+			maapneePattern - if the poem has a maapnee, it will be used to set maapnee again
 	*/
-	adjustCharMaatraa(charIdx)
+	adjustCharMaatraa(charIdx, maapneePattern)
 	{
 		let thisChar = this.charByIndex(charIdx);
 		let oldMaatraa = thisChar.maatraa;
@@ -590,7 +591,7 @@ class cLine {
 			this.charByIndex(i).maatraaCumulative += diff;
 
 		this.clearMaapnee();
-		this.setMaapnee();
+		this.setMaapnee(maapneePattern);
 
 		return this.maatraa;
 	}
@@ -719,7 +720,7 @@ class cLine {
 	*/
 	setMaapnee(pattern = [])
 	{
-		// debugger;
+		debugger;
 		let i = 0;
 		let pi = 0; // pattern index
 		let withPattern = false;
@@ -789,7 +790,7 @@ class cLine {
 			}
 			else
 			{
-				if (currentPattern == 0)
+				if (withPattern && (currentPattern == 0))
 				{
 					currentC.maapneeType = 0;
 					pi++;
@@ -805,7 +806,7 @@ class cLine {
 		let i = 0;
 		for (i = 0; i < this.count; i++)
 		{
-			this.characters[i].maapneeType = 0;
+			this.characters[i].maapneeType = -1; // default value
 		}
 	}
 }
@@ -886,7 +887,7 @@ class cPoem {
 	*/
 	adjustCharMaatraa(lineIdx, charIdx)
 	{
-		let newMaatraaOfLine = this.lines[lineIdx].adjustCharMaatraa(charIdx);
+		let newMaatraaOfLine = this.lines[lineIdx].adjustCharMaatraa(charIdx,this.maapneePattern);
 		if (this.maxLineLen < newMaatraaOfLine)
 			this.maxLineLen = newMaatraaOfLine;
 	}
@@ -1532,7 +1533,7 @@ function drawStyleCharBlock(c,colorBy)
 	if (c.vowelNumber === -10)
 	{
 		if (c.maapneeType == 0) // yati
-			return "stroke:black;stroke-width:3";
+			return "stroke:rgb(0,118,255);stroke-width:3";
 		else // do not display normal space, comma
 			return "display: none";
 	}
@@ -1630,7 +1631,7 @@ function drawStyleCharBlock(c,colorBy)
 // Shapes of character blocks determined by vowel. This function is probably defunct.
 function drawVowPath(d,i)
 {
-	console.log(d);
+	// console.log(d);
 	var p = "";
 	var x = ((d.maatraaCumulative-d.maatraa)*charW);  // where the drawing of this path has to start horizontally
 	var w = charW*d.maatraa;
@@ -1788,6 +1789,7 @@ function fnLineSpacing()
 // When user clicks char to adjust maatraa
 function adjustCharLen()
 {
+	debugger;
 	var iChr = parseInt(this.getAttribute("id").substring(4));
 	var iLine = parseInt(this.parentNode.getAttribute("id").substring(5));
 	var kk = 0;
