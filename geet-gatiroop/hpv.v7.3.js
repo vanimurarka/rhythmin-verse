@@ -61,6 +61,10 @@ class cChar {
       if (((mainCharCode >= 2325) && (mainCharCode <= 2361)) || ((mainCharCode >= 2392) && (mainCharCode <= 2399)))
         this.vowel = "अ";
 
+		// chandrabindu
+	  if (mainCharCode == 2305)
+		this.vowel = "ँ";
+
       // anusvaar (the bindi on top) which sometimes is short-cut for half letter
       if (mainCharCode == 2306) 
         this.vowel = "्";
@@ -119,6 +123,9 @@ class cChar {
 		// set Vowel Number
 		switch(vowelChar)
 		{
+			case "ँ":
+				this.isHindi = true;
+				break;
 			case "्":
 				this.vowelNumber = -1;
 				this.isHindi = true;
@@ -720,7 +727,7 @@ class cLine {
 	*/
 	setMaapnee(pattern = [])
 	{
-		debugger;
+		// debugger;
 		let i = 0;
 		let pi = 0; // pattern index
 		let withPattern = false;
@@ -1289,6 +1296,7 @@ function redraw(availableW)
 // Function: splitNprocessPoem
 function splitNprocessPoem(poem, refresh)
 {
+	// debugger;
     if (!refresh) oPrevPoem = oPoem;
 		oPoem = new cPoem(poem);
     const lines = oPoem.text.split("\n");
@@ -1342,7 +1350,7 @@ function splitNprocessPoem(poem, refresh)
 	    }
     }
     
-    console.log(oPoem);
+    // console.log(oPoem);
 }
 
 var charW = 20; 
@@ -1789,7 +1797,7 @@ function fnLineSpacing()
 // When user clicks char to adjust maatraa
 function adjustCharLen()
 {
-	debugger;
+	// debugger;
 	var iChr = parseInt(this.getAttribute("id").substring(4));
 	var iLine = parseInt(this.parentNode.getAttribute("id").substring(5));
 	var kk = 0;
