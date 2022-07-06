@@ -727,7 +727,7 @@ class cLine {
 	*/
 	setMaapnee(pattern = [])
 	{
-		// debugger;
+		//debugger;
 		let i = 0;
 		let pi = 0; // pattern index
 		let withPattern = false;
@@ -749,10 +749,17 @@ class cLine {
 					currentC.maapneeType = currentC.maatraa;
 
 				// increment pattern index if currentC was deergh
-				if (withPattern && (currentC.maapneeType == 2)) pi++;
+				if (withPattern && (currentC.maapneeType == 2)) 
+				{
+					pi++;
+					continue;
+				}
 
 				if ((currentC.mainChar == "1") || (currentC.mainChar == "१"))
+				{
+					pi++;
 					continue;
+				}
 				if ((i < this.count - 1) && (currentC.maatraa == 1) && (currentC.maapneeType != 1.5))
 				{
 					let nextChar = currentC;
@@ -1344,9 +1351,10 @@ function splitNprocessPoem(poem, refresh)
 						oLine.push(oChar);
 					}
         }
-        oLine.calculateHalfLettersMaatraa();
-        oLine.setMaapnee(oPoem.maapneePattern);
-        oPoem.pushLine(oLine);
+			oLine.calculateHalfLettersMaatraa();
+			// oLine.setMaapnee(oPoem.maapneePattern);
+			oPoem.pushLine(oLine);
+			oPoem.lines[oPoem.lineCount - 1].setMaapnee(oPoem.maapneePattern);
 	    }
     }
     
