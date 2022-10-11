@@ -7,40 +7,41 @@
 	<script src="./hpv.v8.0.js"></script>
 </head>
 <body>
-
+<textarea id="pom">किसका रस्ता देखे</textarea>
+<button onclick="processPoem();"></button>
 </body>
 <script type="text/javascript">
 	"use strict";
 
-	let poem = "ग़ज़ल";
-	let units = [];
-	let i = 0;
-	for (let k = 0; k < poem.length; k++)
+	function processPoem()
 	{
-		let charCode = poem.charCodeAt(k);
-    	let thisChar = poem[k];
-    	if (charCode == 2364) // nuqta
-    	{
-    		units[i-1].replaceMainChar(thisChar);
-    	}
-		else if ((charCode >= 2366) && (charCode <= 2381)) // maatraa
+		let poem = document.getElementById("pom").value;
+		let i = 0;
+		let units = [];
+		for (let k = 0; k < poem.length; k++)
 		{
-			// new element not added to line array
-			// the vowel part of previous element 
-			// modified to update maatraa
-			// NOTE: This also includes the halant character
-			units[i-1].setVowel(thisChar, true);
+			let charCode = poem.charCodeAt(k);
+	    	let thisChar = poem[k];
+	    	if (charCode == 2364) // nuqta
+	    	{
+	    		units[i-1].replaceFirstChar(thisChar);
+	    	}
+			else if ((charCode >= 2366) && (charCode <= 2381)) // maatraa
+			{
+				// new element not added to line array
+				// the vowel part of previous element 
+				// modified to update maatraa
+				// NOTE: This also includes the halant character
+				units[i-1].setVowel(thisChar, true);
+			}
+			else // not maatraa - true new char
+			{
+				units[i] = new cMaatraaUnit(thisChar,charCode);
+				i++;
+			}
 		}
-		else // not maatraa - true new char
-		{
-			units[i] = new cMaatraaUnit(thisChar,charCode);
-			i++;
-		}
+		let line = new cRhythmUnit(units,unitType.line);
+		console.log(line);
 	}
-	debugger;
-	let line = new cRhythmUnit(units[0],unitType.line);
-	console.log(units);
-	console.log(line);
-	console.log(line.kind);
 </script>
 </html>

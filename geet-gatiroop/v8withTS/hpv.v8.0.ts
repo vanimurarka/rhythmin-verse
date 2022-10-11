@@ -29,37 +29,33 @@ class cRhythmUnit {
 	systemRhythmAmt : number; 
 	rhythmAmtCumulative : number;
 
-	constructor();
-	constructor(subUnit:cRhythmUnit, unitType:unitType );
 	constructor(mainChar: string, mainCharCode: number); 
+	constructor(subUnits:cRhythmUnit[], unitType:unitType );
 	constructor(...argsArray : any[])
 	{
+		this.chars = [];
+		this.subUnits = [];
+		this.kind = unitType.unknown;
+		this.index = 0;
+		this.rhythmAmt = 0;
+		this.systemRhythmAmt = 0;
+		this.rhythmAmtCumulative = 0;
 		if ((typeof argsArray[0] === 'string') && (typeof argsArray[1] === 'number'))
 		{
 			let mainChar = argsArray[0];
 			let mainCharCode = argsArray[1];
-			this.chars = [new cChar(mainChar, mainCharCode)];
-			this.kind = unitType.unknown;
-			this.index = 0;
-			this.rhythmAmt = 0;
-			this.systemRhythmAmt = 0;
-			this.rhythmAmtCumulative = 0;
+			this.chars[0] = new cChar(mainChar, mainCharCode);
 		}
-		else if (argsArray[0] instanceof cRhythmUnit)
+		else if ((argsArray.length == 2) && Array.isArray(argsArray[0]))
 		{
-			let subUnit = argsArray[0];
+			this.subUnits = argsArray[0];
 			let unitType = argsArray[1];
-			this.chars = [];
-			this.subUnits = [];
-			this.subUnits[0] = subUnit;
 			this.kind = unitType;
-			this.index = 0;
-			this.rhythmAmt = 0;
-			this.systemRhythmAmt = 0; 
-			this.rhythmAmtCumulative = 0;
+			for (let i = 0; i < this.subUnits.length; i++)
+				this.rhythmAmtCumulative += this.subUnits[i].rhythmAmtCumulative;
 		}
 	}
-	replaceMainChar(newMainChar, newMainCharCode)
+	replaceFirstChar(newMainChar: string, newMainCharCode: number)
 	{
 		this.chars[0].char = newMainChar;
 		this.chars[0].charCode = newMainCharCode;
@@ -75,6 +71,10 @@ class cMaatraaUnit extends cRhythmUnit {
 		this.vowelChar = "";
 		this.vowelNumber = 0;
 		this.kind = unitType.maatraa;
+
+		// space / comma
+      	if ((mainCharCode == 32)||(mainCharCode == 44))
+        	this.setVowel(mainChar);
 
 		// whole vowel
 		if ((mainCharCode >= 2309) && (mainCharCode <= 2324))
@@ -159,34 +159,34 @@ class cMaatraaUnit extends cRhythmUnit {
 				this.systemRhythmAmt = 0;
 				break;
 		}
-		this.rhythmAmt = this.systemRhythmAmt;
+		this.rhythmAmtCumulative = this.rhythmAmt = this.systemRhythmAmt;
   	}
-  	replaceMainChar(newMainChar: string)
+  	replaceFirstChar(newMainChar: string)
 	{
 		if (newMainChar == '़')	// nuqta
 		{
 			switch(this.chars[0].char)
 			{
 				case 'क':
-					super.replaceMainChar('क़',2392);
+					super.replaceFirstChar('क़',2392);
 					break;
 				case 'ख':
-					super.replaceMainChar('ख़',2393);
+					super.replaceFirstChar('ख़',2393);
 					break;
 				case 'ग':
-					super.replaceMainChar('ग़',2394);
+					super.replaceFirstChar('ग़',2394);
 					break;
 				case 'ज':
-					super.replaceMainChar('ज़',2395);
+					super.replaceFirstChar('ज़',2395);
 					break;
 				case 'ड':
-					super.replaceMainChar('ड़',2396);
+					super.replaceFirstChar('ड़',2396);
 					break;
 				case 'ढ':
-					super.replaceMainChar('ढ़',2397);
+					super.replaceFirstChar('ढ़',2397);
 					break;
 				case 'फ':
-					super.replaceMainChar('फ़',2398);
+					super.replaceFirstChar('फ़',2398);
 					break;
 			}
 		}
