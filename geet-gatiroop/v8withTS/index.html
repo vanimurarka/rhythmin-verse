@@ -3,45 +3,21 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title></title>
+	<title>GG with TS</title>
 	<script src="./hpv.v8.0.js"></script>
 </head>
 <body>
-<textarea id="pom">किसका रस्ता देखे</textarea>
-<button onclick="processPoem();"></button>
+<textarea id="pom" cols="40" rows="5">कल्पना
+चमत्कार</textarea>
+<button onclick="myProcessPoem();">Process</button>
 </body>
 <script type="text/javascript">
 	"use strict";
 
-	function processPoem()
+	function myProcessPoem()
 	{
-		let poem = document.getElementById("pom").value;
-		let i = 0;
-		let units = [];
-		for (let k = 0; k < poem.length; k++)
-		{
-			let charCode = poem.charCodeAt(k);
-	    	let thisChar = poem[k];
-	    	if (charCode == 2364) // nuqta
-	    	{
-	    		units[i-1].replaceFirstChar(thisChar);
-	    	}
-			else if ((charCode >= 2366) && (charCode <= 2381)) // maatraa
-			{
-				// new element not added to line array
-				// the vowel part of previous element 
-				// modified to update maatraa
-				// NOTE: This also includes the halant character
-				units[i-1].setVowel(thisChar, true);
-			}
-			else // not maatraa - true new char
-			{
-				units[i] = new cMaatraaUnit(thisChar,charCode);
-				i++;
-			}
-		}
-		let line = new cRhythmUnit(units,unitType.line);
-		console.log(line);
+		let pom = document.getElementById("pom").value;
+		processPoem(pom);
 	}
 </script>
 </html>

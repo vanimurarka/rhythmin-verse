@@ -33,8 +33,6 @@ class cRhythmUnit {
             this.subUnits = argsArray[0];
             let unitType = argsArray[1];
             this.kind = unitType;
-            for (let i = 0; i < this.subUnits.length; i++)
-                this.rhythmAmtCumulative += this.subUnits[i].rhythmAmtCumulative;
         }
     }
     replaceFirstChar(newMainChar, newMainCharCode) {
@@ -43,10 +41,12 @@ class cRhythmUnit {
     }
 }
 class cMaatraaUnit extends cRhythmUnit {
-    constructor(mainChar, mainCharCode) {
+    constructor(mainChar, mainCharCode, firstLetter = false) {
         super(mainChar, mainCharCode);
         this.vowelChar = "";
         this.vowelNumber = 0;
+        this.isHalfLetter = false;
+        this.isFirstLetterOfWord = firstLetter;
         this.kind = unitType.maatraa;
         // space / comma
         if ((mainCharCode == 32) || (mainCharCode == 44))
@@ -71,6 +71,10 @@ class cMaatraaUnit extends cRhythmUnit {
         this.vowelChar = vowelChar;
         // set Vowel Number
         switch (vowelChar) {
+            case "्":
+                this.vowelNumber = -1;
+                this.isHalfLetter = true;
+                break;
             case "अ":
                 this.vowelNumber = 1;
                 break;
@@ -184,4 +188,47 @@ class cMaatraaUnit extends cRhythmUnit {
             }
         }
     }
+}
+function processPoem(poem) {
+    let lines = poem.split("\n");
+    let processedLines = [];
+    for (let iLine = 0; iLine < lines.length; iLine++) // process each line - i = line index
+     {
+        lines[iLine] = lines[iLine].replace(/[^\u0900-\u097F 12]/g, " ");
+        lines[iLine] = lines[iLine].replace("।", " ");
+        lines[iLine] = lines[iLine].replace(/\s+/g, " "); // remove extra spaces in-between words
+        lines[iLine] = lines[iLine].trim(); // remove whitespace from both ends
+        let words = lines[iLine].split(" ");
+        let i = 0;
+        let units = [];
+        // debugger;
+        for (let wc = 0; wc < words.length; wc++) {
+            for (let k = 0; k < words[wc].length; k++) {
+                let charCode = words[wc].charCodeAt(k);
+                let thisChar = words[wc][k];
+                if (charCode == 2364) // nuqta
+                 {
+                    units[i - 1].replaceFirstChar(thisChar);
+                }
+                else if ((charCode >= 2366) && (charCode <= 2381)) // maatraa
+                 {
+                    // new element not added to line array
+                    // the vowel part of previous element 
+                    // modified to update maatraa
+                    // NOTE: This also includes the halant character
+                    units[i - 1].setVowel(thisChar, true);
+                }
+                else // not maatraa - true new char
+                 {
+                    if (k == 0)
+                        units[i] = new cMaatraaUnit(thisChar, charCode, true);
+                    else
+                        units[i] = new cMaatraaUnit(thisChar, charCode);
+                    i++;
+                }
+            }
+        }
+        processedLines[iLine] = new cRhythmUnit(units, unitType.line);
+    }
+    console.log(processedLines);
 }
