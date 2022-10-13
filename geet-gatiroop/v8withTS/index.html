@@ -4,12 +4,16 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>GG with TS</title>
+	<script type="text/javascript" src="d3.v2.min.js"></script>
 	<script src="./hpv.v8.0.js"></script>
+	<script src="./hpv-draw.v8.0.js"></script>
 </head>
 <body>
-<textarea id="pom" cols="40" rows="5">कल्पना
-चमत्कार</textarea>
+<textarea id="pom" cols="40" rows="5">प्यार हिन्दी
+आत्म आत्मा
+तुम्ही</textarea>
 <button onclick="myProcessPoem();">Process</button>
+<div id="chart"></div>
 </body>
 <script type="text/javascript">
 	"use strict";
@@ -17,7 +21,9 @@
 	function myProcessPoem()
 	{
 		let pom = document.getElementById("pom").value;
-		processPoem(pom);
+		let processedLines = processPoem(pom);
+		let processedPoem = new cPoem(processedLines);
+		draw(processedPoem);
 	}
 </script>
 </html>

@@ -28,6 +28,7 @@ class cRhythmUnit {
 	rhythmAmt : number;
 	systemRhythmAmt : number; 
 	rhythmAmtCumulative : number;
+	text : string;
 
 	constructor(mainChar: string, mainCharCode: number); 
 	constructor(subUnits:cRhythmUnit[], unitType:unitType );
@@ -40,6 +41,7 @@ class cRhythmUnit {
 		this.rhythmAmt = 0;
 		this.systemRhythmAmt = 0;
 		this.rhythmAmtCumulative = 0;
+		this.text = '';
 		if ((typeof argsArray[0] === 'string') && (typeof argsArray[1] === 'number'))
 		{
 			let mainChar = argsArray[0];
@@ -73,6 +75,7 @@ class cMaatraaUnit extends cRhythmUnit {
 		this.isHalfLetter = false;
 		this.isFirstLetterOfWord = firstLetter;
 		this.kind = unitType.maatraa;
+		this.text = mainChar;
 
 		// space / comma
       	if ((mainCharCode == 32)||(mainCharCode == 44))
@@ -98,6 +101,7 @@ class cMaatraaUnit extends cRhythmUnit {
 		if (isNew)
 		{
 			this.chars[this.chars.length] = new cChar(vowelChar, vowelChar.charCodeAt(0));
+			this.text += vowelChar;
 		}
 		this.vowelChar = vowelChar;
 		// set Vowel Number
@@ -197,9 +201,68 @@ class cMaatraaUnit extends cRhythmUnit {
 			}
 		}
 	}
+	calculateHalfLetterMaatraa(p?:cMaatraaUnit, n?:cMaatraaUnit)
+	{
+		if (this.isFirstLetterOfWord && this.isHalfLetter)
+			return;
+
+		if (typeof n !== 'undefined')
+		{
+			if ((this.chars[0].char == "म") && (n.chars[0].char == "ह"))
+				return;
+			if ((this.chars[0].char == "न") && (n.chars[0].char == "ह"))
+				return;
+		}
+
+		if (p.systemRhythmAmt == 1 && (!p.isHalfLetter))
+		{
+			this.rhythmAmt = this.systemRhythmAmt = 1;
+			return;
+		}
+
+		if (typeof n !== 'undefined')
+		{
+			if ((p.systemRhythmAmt == 2) && (n.systemRhythmAmt == 2))
+			{
+				this.rhythmAmt = this.systemRhythmAmt = 1;
+				return;
+			}
+		}
+	}
 }
 
-function processPoem(poem:string)
+class cMaatraaLine extends cRhythmUnit {
+	subUnits : cMaatraaUnit[];
+	constructor(subUnits:cMaatraaUnit[])
+	{
+		super(subUnits, unitType.line);
+	}
+	calculateHalfLetterMaatraa()
+	{
+		for (let i = 0; i < this.subUnits.length; i++)
+		{
+			if (this.subUnits[i].isHalfLetter)
+			{
+				if (i==0)
+					this.subUnits[i].calculateHalfLetterMaatraa();
+				else if (i == (this.subUnits.length - 1))
+					this.subUnits[i].calculateHalfLetterMaatraa(this.subUnits[i-1]);
+				else
+					this.subUnits[i].calculateHalfLetterMaatraa(this.subUnits[i-1], this.subUnits[i+1]);
+			}
+		}
+	}
+}
+
+class cPoem {
+	lines : cRhythmUnit[];
+	constructor(lines : cRhythmUnit[])
+	{
+		this.lines = lines;
+	}
+}
+
+function processPoem(poem:string) : any[]
 {
 	let lines = poem.split("\n");
 	let processedLines = [];
@@ -243,7 +306,11 @@ function processPoem(poem:string)
 				}
 			}
 		}
-		processedLines[iLine] = new cRhythmUnit(units,unitType.line);
+		processedLines[iLine] = new cMaatraaLine(units);
+		processedLines[iLine].calculateHalfLetterMaatraa();
 	}
 	console.log(processedLines);
+	return processedLines;	
 }
+
+
