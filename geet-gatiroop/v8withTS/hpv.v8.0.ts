@@ -203,6 +203,7 @@ class cMaatraaUnit extends cRhythmUnit {
 	}
 	calculateHalfLetterMaatraa(p?:cMaatraaUnit, n?:cMaatraaUnit)
 	{
+		// debugger;
 		if (this.isFirstLetterOfWord && this.isHalfLetter)
 			return;
 
@@ -256,9 +257,11 @@ class cMaatraaLine extends cRhythmUnit {
 
 class cPoem {
 	lines : cRhythmUnit[];
-	constructor(lines : cRhythmUnit[])
+	maxLineLen : number
+	constructor(lines : cRhythmUnit[], maxLineLen : number)
 	{
 		this.lines = lines;
+		this.maxLineLen = maxLineLen;
 	}
 }
 
@@ -266,8 +269,10 @@ function processPoem(poem:string) : any[]
 {
 	let lines = poem.split("\n");
 	let processedLines = [];
+	let maxLineLen = 0;
     for (let iLine = 0; iLine < lines.length; iLine++) // process each line - i = line index
     {
+    	let lineLen = 0;
     	lines[iLine] = lines[iLine].replace(/[^\u0900-\u097F 12]/g, " ");
     	lines[iLine] = lines[iLine].replace("।"," ");
     	lines[iLine] = lines[iLine].replace(/\s+/g, " "); // remove extra spaces in-between words
@@ -295,6 +300,8 @@ function processPoem(poem:string) : any[]
 					// modified to update maatraa
 					// NOTE: This also includes the halant character
 					units[i-1].setVowel(thisChar, true);
+					if (units[i-1].rhythmAmt == 2)
+						lineLen++;
 				}
 				else // not maatraa - true new char
 				{
@@ -302,15 +309,18 @@ function processPoem(poem:string) : any[]
 						units[i] = new cMaatraaUnit(thisChar,charCode,true);
 					else
 						units[i] = new cMaatraaUnit(thisChar,charCode);
+					lineLen += units[i].rhythmAmt;
 					i++;
 				}
 			}
 		}
+		if (lineLen > maxLineLen) maxLineLen = lineLen;
 		processedLines[iLine] = new cMaatraaLine(units);
 		processedLines[iLine].calculateHalfLetterMaatraa();
 	}
-	console.log(processedLines);
-	return processedLines;	
+	let oPoem = new cPoem(processedLines, maxLineLen);
+	console.log(oPoem);
+	return oPoem;	
 }
 
 

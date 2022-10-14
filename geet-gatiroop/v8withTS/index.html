@@ -11,9 +11,11 @@
 <body>
 <textarea id="pom" cols="40" rows="5">प्यार हिन्दी
 आत्म आत्मा
-तुम्ही</textarea>
+तुम्ही संसार</textarea>
 <button onclick="myProcessPoem();">Process</button>
-<div id="chart"></div>
+<div id="right">
+	<div id="chart"></div>
+</div>
 </body>
 <script type="text/javascript">
 	"use strict";
@@ -21,9 +23,11 @@
 	function myProcessPoem()
 	{
 		let pom = document.getElementById("pom").value;
-		let processedLines = processPoem(pom);
-		let processedPoem = new cPoem(processedLines);
-		draw(processedPoem);
+		let visDiv = document.getElementById("right");
+		let availableW = visDiv.clientWidth;
+		// debugger;
+		let processedPoem = processPoem(pom);
+		visualize(processedPoem, availableW);
 	}
 </script>
 </html>

@@ -192,6 +192,7 @@ class cMaatraaUnit extends cRhythmUnit {
         }
     }
     calculateHalfLetterMaatraa(p, n) {
+        // debugger;
         if (this.isFirstLetterOfWord && this.isHalfLetter)
             return;
         if (typeof n !== 'undefined') {
@@ -230,15 +231,18 @@ class cMaatraaLine extends cRhythmUnit {
     }
 }
 class cPoem {
-    constructor(lines) {
+    constructor(lines, maxLineLen) {
         this.lines = lines;
+        this.maxLineLen = maxLineLen;
     }
 }
 function processPoem(poem) {
     let lines = poem.split("\n");
     let processedLines = [];
+    let maxLineLen = 0;
     for (let iLine = 0; iLine < lines.length; iLine++) // process each line - i = line index
      {
+        let lineLen = 0;
         lines[iLine] = lines[iLine].replace(/[^\u0900-\u097F 12]/g, " ");
         lines[iLine] = lines[iLine].replace("।", " ");
         lines[iLine] = lines[iLine].replace(/\s+/g, " "); // remove extra spaces in-between words
@@ -262,6 +266,8 @@ function processPoem(poem) {
                     // modified to update maatraa
                     // NOTE: This also includes the halant character
                     units[i - 1].setVowel(thisChar, true);
+                    if (units[i - 1].rhythmAmt == 2)
+                        lineLen++;
                 }
                 else // not maatraa - true new char
                  {
@@ -269,13 +275,17 @@ function processPoem(poem) {
                         units[i] = new cMaatraaUnit(thisChar, charCode, true);
                     else
                         units[i] = new cMaatraaUnit(thisChar, charCode);
+                    lineLen += units[i].rhythmAmt;
                     i++;
                 }
             }
         }
+        if (lineLen > maxLineLen)
+            maxLineLen = lineLen;
         processedLines[iLine] = new cMaatraaLine(units);
         processedLines[iLine].calculateHalfLetterMaatraa();
     }
-    console.log(processedLines);
-    return processedLines;
+    let oPoem = new cPoem(processedLines, maxLineLen);
+    console.log(oPoem);
+    return oPoem;
 }
