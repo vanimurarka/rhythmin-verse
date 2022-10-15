@@ -29,10 +29,12 @@ class cRhythmUnit {
             let mainChar = argsArray[0];
             let mainCharCode = argsArray[1];
             this.chars[0] = new cChar(mainChar, mainCharCode);
+            this.isHindi = this.chars[0].isHindi;
         }
-        else if ((argsArray.length == 2) && Array.isArray(argsArray[0])) {
+        else if ((argsArray.length == 3) && Array.isArray(argsArray[0])) {
             this.subUnits = argsArray[0];
-            let unitType = argsArray[1];
+            this.text = argsArray[1];
+            let unitType = argsArray[2];
             this.kind = unitType;
         }
     }
@@ -57,6 +59,8 @@ class cMaatraaUnit extends cRhythmUnit {
             this.setVowel(mainChar);
         // whole vowel
         if ((mainCharCode >= 2309) && (mainCharCode <= 2324))
+            this.setVowel(mainChar);
+        if ((mainCharCode == 49) || (mainCharCode == 50) || (mainCharCode == 2407) || (mainCharCode == 2408))
             this.setVowel(mainChar);
         // consonant OR consonant with dot at bottom
         if (((mainCharCode >= 2325) && (mainCharCode <= 2361)) || ((mainCharCode >= 2392) && (mainCharCode <= 2399)))
@@ -217,8 +221,8 @@ class cMaatraaUnit extends cRhythmUnit {
     }
 }
 class cLine extends cRhythmUnit {
-    constructor(subUnits) {
-        super(subUnits, unitType.line);
+    constructor(subUnits, lineText) {
+        super(subUnits, lineText, unitType.line);
     }
 }
 class cMaatraaLine extends cLine {
@@ -263,53 +267,61 @@ class cMaatraaLine extends cLine {
         for (i = 0; i < subUnitsCount; i++) {
             currentC = this.subUnits[i];
             currentPattern = pattern[pi];
-            // debugger;
-            if (currentC.maapneeType != 1.5)
-                currentC.maapneeType = currentC.rhythmAmt;
-            // increment pattern index if currentC was deergh
-            if (withPattern && (currentC.maapneeType == 2)) {
-                pi++;
-                continue;
-            }
-            if ((currentC.mainChar == "1") || (currentC.mainChar == "१")) {
-                pi++;
-                continue;
-            }
-            if ((i < subUnitsCount - 1) && (currentC.rhythmAmt == 1) && (currentC.maapneeType != 1.5)) {
-                let nextChar = currentC;
-                let nextCharFound = false;
-                let j = i;
-                while (!nextCharFound) {
-                    j++;
-                    nextChar = this.subUnits[j];
-                    if (typeof nextChar === 'undefined') // no more chars
-                        break;
-                    if (nextChar.rhythmAmt > 0)
-                        nextCharFound = true;
+            if (currentC.isHindi) {
+                // debugger;
+                if (currentC.maapneeType != 1.5)
+                    currentC.maapneeType = currentC.rhythmAmt;
+                // increment pattern index if currentC was deergh
+                if (withPattern && (currentC.maapneeType == 2)) {
+                    pi++;
+                    continue;
                 }
-                if ((nextChar.rhythmAmt == 1) && (currentC.rhythmAmt == 1)) {
-                    if (!withPattern) // do defaut processing
-                     {
-                        nextChar.maapneeType = 1.5;
-                        currentC.maapneeType = 1.5;
+                if ((currentC.mainChar == "1") || (currentC.mainChar == "१")) {
+                    pi++;
+                    continue;
+                }
+                if ((i < subUnitsCount - 1) && (currentC.rhythmAmt == 1) && (currentC.maapneeType != 1.5)) {
+                    let nextChar = currentC;
+                    let nextCharFound = false;
+                    let j = i;
+                    while (!nextCharFound) {
+                        j++;
+                        nextChar = this.subUnits[j];
+                        if (typeof nextChar === 'undefined') // no more chars
+                            break;
+                        if (nextChar.rhythmAmt > 0)
+                            nextCharFound = true;
                     }
-                    else // with pattern so also take pattern into consideration
-                     {
-                        if (pattern[pi] == 1)
-                            pi++;
-                        else {
+                    if ((nextChar.rhythmAmt == 1) && (currentC.rhythmAmt == 1)) {
+                        if (!withPattern) // do defaut processing
+                         {
                             nextChar.maapneeType = 1.5;
                             currentC.maapneeType = 1.5;
-                            pi++;
+                        }
+                        else // with pattern so also take pattern into consideration
+                         {
+                            if (pattern[pi] == 1)
+                                pi++;
+                            else {
+                                nextChar.maapneeType = 1.5;
+                                currentC.maapneeType = 1.5;
+                                pi++;
+                            }
                         }
                     }
+                    else {
+                        pi++;
+                    }
                 }
-                else {
+                else if (currentC.maapneeType == 1) {
                     pi++;
                 }
             }
-            else if (currentC.maapneeType == 1) {
-                pi++;
+            else {
+                if (withPattern && (currentPattern == 0)) {
+                    currentC.maapneeType = 0;
+                    pi++;
+                }
             }
         }
     }
@@ -318,14 +330,41 @@ class cPoem {
     constructor() {
         this.lines = [];
         this.maxLineLen = 0;
+        this.firstLineMaapnee = false;
+        this.maapneePattern = [];
     }
     addLine(line) {
         this.lines[this.lines.length] = line;
         if (this.maxLineLen < line.rhythmAmtCumulative)
             this.maxLineLen = line.rhythmAmtCumulative;
+        if (this.lines.length == 1) {
+            this.detectFirstLineMaapnee();
+            if (this.firstLineMaapnee)
+                this.setMaapneePattern();
+        }
     }
     adjustUnitRhythm(iLine, iUnit) {
         this.lines[iLine].adjustUnitRhythm(iUnit);
+    }
+    detectFirstLineMaapnee() {
+        if (this.lines.length < 1)
+            return;
+        let line1 = this.lines[0];
+        let pattern = /^[12१२\s]+$/;
+        this.firstLineMaapnee = pattern.test(line1.text);
+    }
+    setMaapneePattern() {
+        let lineMaapnee = this.lines[0];
+        let i = 0;
+        for (i = 0; i < lineMaapnee.subUnits.length; i++) {
+            if ((lineMaapnee.subUnits[i].systemRhythmAmt == 1) || (lineMaapnee.subUnits[i].systemRhythmAmt == 2)) {
+                this.maapneePattern[this.maapneePattern.length] = lineMaapnee.subUnits[i].systemRhythmAmt;
+            }
+            else {
+                this.maapneePattern[this.maapneePattern.length] = 0;
+                lineMaapnee.subUnits[i].maapneeType = 0;
+            }
+        }
     }
 }
 function processPoem(poem) {
@@ -344,6 +383,10 @@ function processPoem(poem) {
         let units = [];
         // debugger;
         for (let wc = 0; wc < words.length; wc++) {
+            if (wc > 0) {
+                units[i] = new cMaatraaUnit(' ', 32, true);
+                i++;
+            }
             for (let k = 0; k < words[wc].length; k++) {
                 let charCode = words[wc].charCodeAt(k);
                 let thisChar = words[wc][k];
@@ -375,10 +418,10 @@ function processPoem(poem) {
                 }
             }
         }
-        let processedLine = new cMaatraaLine(units);
+        let processedLine = new cMaatraaLine(units, lines[iLine]);
         processedLine.rhythmAmtCumulative = lineLen;
         processedLine.calculateHalfLetterMaatraa();
-        processedLine.setMaapnee();
+        processedLine.setMaapnee(oPoem.maapneePattern);
         oPoem.addLine(processedLine);
     }
     console.log(oPoem);
