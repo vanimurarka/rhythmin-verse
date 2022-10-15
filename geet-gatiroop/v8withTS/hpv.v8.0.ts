@@ -60,6 +60,7 @@ class cRhythmUnit {
 		this.chars[0].char = newMainChar;
 		this.chars[0].charCode = newMainCharCode;
 	}
+	adjustUnitRhythm(iUnit:number) {}
 }
 
 class cMaatraaUnit extends cRhythmUnit {
@@ -67,6 +68,7 @@ class cMaatraaUnit extends cRhythmUnit {
 	vowelNumber : number;
 	isHalfLetter : boolean;
 	isFirstLetterOfWord : boolean;
+	maapneeType : number;
 	constructor(mainChar: string, mainCharCode: number, firstLetter:boolean = false)
 	{
 		super(mainChar, mainCharCode);
@@ -76,6 +78,7 @@ class cMaatraaUnit extends cRhythmUnit {
 		this.isFirstLetterOfWord = firstLetter;
 		this.kind = unitType.maatraa;
 		this.text = mainChar;
+		this.maapneeType = -1;
 
 		// space / comma
       	if ((mainCharCode == 32)||(mainCharCode == 44))
@@ -234,12 +237,15 @@ class cMaatraaUnit extends cRhythmUnit {
 	}
 }
 
-class cMaatraaLine extends cRhythmUnit {
-	subUnits : cMaatraaUnit[];
-	constructor(subUnits:cMaatraaUnit[])
+class cLine extends cRhythmUnit {
+	constructor(subUnits:cRhythmUnit[])
 	{
 		super(subUnits, unitType.line);
 	}
+}
+
+class cMaatraaLine extends cLine {
+	subUnits : cMaatraaUnit[];
 	calculateHalfLetterMaatraa()
 	{
 		for (let i = 0; i < this.subUnits.length; i++)
@@ -273,10 +279,88 @@ class cMaatraaLine extends cRhythmUnit {
 		this.subUnits[iUnit].rhythmAmt = newRhythmAmt;
 		this.rhythmAmtCumulative += diff;
 	}
+	setMaapnee(pattern = [])
+	{
+		//debugger;
+		let i = 0;
+		let pi = 0; // pattern index
+		let withPattern = false;
+		if (pattern.length > 0)
+		{
+			withPattern = true;
+		}
+		let currentC;
+		let currentPattern;
+		let subUnitsCount = this.subUnits.length;
+		for (i = 0; i < subUnitsCount; i++)
+		{
+			currentC = this.subUnits[i];
+			currentPattern = pattern[pi];
+			// debugger;
+			if (currentC.maapneeType != 1.5)
+				currentC.maapneeType = currentC.rhythmAmt;
+
+			// increment pattern index if currentC was deergh
+			if (withPattern && (currentC.maapneeType == 2)) 
+			{
+				pi++;
+				continue;
+			}
+
+			if ((currentC.mainChar == "1") || (currentC.mainChar == "१"))
+			{
+				pi++;
+				continue;
+			}
+			if ((i < subUnitsCount - 1) && (currentC.rhythmAmt == 1) && (currentC.maapneeType != 1.5))
+			{
+				let nextChar = currentC;
+				let nextCharFound = false;
+				let j = i;
+				while (!nextCharFound)
+				{
+					j++;
+					nextChar = this.subUnits[j];
+					if (typeof nextChar === 'undefined') // no more chars
+						break;
+
+					if (nextChar.rhythmAmt > 0)
+						nextCharFound = true;
+				}
+				if ((nextChar.rhythmAmt == 1) && (currentC.rhythmAmt == 1))
+				{
+					if (!withPattern) // do defaut processing
+					{
+						nextChar.maapneeType = 1.5;
+						currentC.maapneeType = 1.5;
+					}
+					else // with pattern so also take pattern into consideration
+					{
+						if (pattern[pi] == 1)
+							pi++;
+						else
+						{
+							nextChar.maapneeType = 1.5;
+							currentC.maapneeType = 1.5;
+							pi++;
+						}
+					}
+				}
+				else 
+				{
+					pi++;
+				}
+			}
+			else if (currentC.maapneeType == 1)
+			{
+				pi++;
+			}
+		}
+	}
 }
 
 class cPoem {
-	lines : cRhythmUnit[];
+	lines : cLine[];
 	maxLineLen : number
 	constructor()
 	{
@@ -351,6 +435,7 @@ function processPoem(poem:string) : cPoem
 		let processedLine = new cMaatraaLine(units);
 		processedLine.rhythmAmtCumulative = lineLen;
 		processedLine.calculateHalfLetterMaatraa();
+		processedLine.setMaapnee();
 		oPoem.addLine(processedLine);
 	}
 	console.log(oPoem);
