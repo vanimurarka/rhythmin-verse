@@ -194,23 +194,24 @@ class cMaatraaUnit extends cRhythmUnit {
     calculateHalfLetterMaatraa(p, n) {
         // debugger;
         if (this.isFirstLetterOfWord && this.isHalfLetter)
-            return;
+            return 0;
         if (typeof n !== 'undefined') {
             if ((this.chars[0].char == "म") && (n.chars[0].char == "ह"))
-                return;
+                return 0;
             if ((this.chars[0].char == "न") && (n.chars[0].char == "ह"))
-                return;
+                return 0;
         }
         if (p.systemRhythmAmt == 1 && (!p.isHalfLetter)) {
             this.rhythmAmt = this.systemRhythmAmt = 1;
-            return;
+            return 1;
         }
         if (typeof n !== 'undefined') {
             if ((p.systemRhythmAmt == 2) && (n.systemRhythmAmt == 2)) {
                 this.rhythmAmt = this.systemRhythmAmt = 1;
-                return;
+                return 1;
             }
         }
+        return 0;
     }
 }
 class cMaatraaLine extends cRhythmUnit {
@@ -220,25 +221,33 @@ class cMaatraaLine extends cRhythmUnit {
     calculateHalfLetterMaatraa() {
         for (let i = 0; i < this.subUnits.length; i++) {
             if (this.subUnits[i].isHalfLetter) {
+                debugger;
+                let result = 0;
                 if (i == 0)
-                    this.subUnits[i].calculateHalfLetterMaatraa();
+                    result = this.subUnits[i].calculateHalfLetterMaatraa();
                 else if (i == (this.subUnits.length - 1))
-                    this.subUnits[i].calculateHalfLetterMaatraa(this.subUnits[i - 1]);
+                    result = this.subUnits[i].calculateHalfLetterMaatraa(this.subUnits[i - 1]);
                 else
-                    this.subUnits[i].calculateHalfLetterMaatraa(this.subUnits[i - 1], this.subUnits[i + 1]);
+                    result = this.subUnits[i].calculateHalfLetterMaatraa(this.subUnits[i - 1], this.subUnits[i + 1]);
+                this.rhythmAmtCumulative += result;
             }
         }
     }
 }
 class cPoem {
-    constructor(lines, maxLineLen) {
-        this.lines = lines;
-        this.maxLineLen = maxLineLen;
+    constructor() {
+        this.lines = [];
+        this.maxLineLen = 0;
+    }
+    addLine(line) {
+        this.lines[this.lines.length] = line;
+        if (this.maxLineLen < line.rhythmAmtCumulative)
+            this.maxLineLen = line.rhythmAmtCumulative;
     }
 }
 function processPoem(poem) {
     let lines = poem.split("\n");
-    let processedLines = [];
+    let oPoem = new cPoem();
     let maxLineLen = 0;
     for (let iLine = 0; iLine < lines.length; iLine++) // process each line - i = line index
      {
@@ -265,9 +274,12 @@ function processPoem(poem) {
                     // the vowel part of previous element 
                     // modified to update maatraa
                     // NOTE: This also includes the halant character
+                    let earlierCharLen = units[i - 1].rhythmAmt;
                     units[i - 1].setVowel(thisChar, true);
-                    if (units[i - 1].rhythmAmt == 2)
-                        lineLen++;
+                    if (earlierCharLen !== units[i - 1].rhythmAmt) {
+                        let diff = units[i - 1].rhythmAmt - earlierCharLen;
+                        lineLen += diff;
+                    }
                 }
                 else // not maatraa - true new char
                  {
@@ -280,12 +292,11 @@ function processPoem(poem) {
                 }
             }
         }
-        if (lineLen > maxLineLen)
-            maxLineLen = lineLen;
-        processedLines[iLine] = new cMaatraaLine(units);
-        processedLines[iLine].calculateHalfLetterMaatraa();
+        let processedLine = new cMaatraaLine(units);
+        processedLine.rhythmAmtCumulative = lineLen;
+        processedLine.calculateHalfLetterMaatraa();
+        oPoem.addLine(processedLine);
     }
-    let oPoem = new cPoem(processedLines, maxLineLen);
     console.log(oPoem);
     return oPoem;
 }

@@ -186,7 +186,7 @@ function draw(oPoem)
       .attr("y", charH)
       .attr("x", function(d) {return charW*maxLen+(5);})
       .attr("class", "graphText3")
-      .text(function(d) { return (d.maatraa > 0) ? d.maatraa : "";});
+      .text(function(d) { return (d.rhythmAmtCumulative > 0) ? d.rhythmAmtCumulative : "";});
     }
 }
 
