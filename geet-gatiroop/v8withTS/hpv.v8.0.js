@@ -221,7 +221,6 @@ class cMaatraaLine extends cRhythmUnit {
     calculateHalfLetterMaatraa() {
         for (let i = 0; i < this.subUnits.length; i++) {
             if (this.subUnits[i].isHalfLetter) {
-                debugger;
                 let result = 0;
                 if (i == 0)
                     result = this.subUnits[i].calculateHalfLetterMaatraa();
@@ -233,6 +232,19 @@ class cMaatraaLine extends cRhythmUnit {
             }
         }
     }
+    adjustUnitRhythm(iUnit) {
+        let unit = this.subUnits[iUnit];
+        let newRhythmAmt = 0;
+        if (unit.isHalfLetter) {
+            newRhythmAmt = (unit.rhythmAmt == 1) ? 0 : 1;
+        }
+        else {
+            newRhythmAmt = (unit.rhythmAmt == 1) ? 2 : 1;
+        }
+        let diff = newRhythmAmt - unit.rhythmAmt;
+        this.subUnits[iUnit].rhythmAmt = newRhythmAmt;
+        this.rhythmAmtCumulative += diff;
+    }
 }
 class cPoem {
     constructor() {
@@ -243,6 +255,9 @@ class cPoem {
         this.lines[this.lines.length] = line;
         if (this.maxLineLen < line.rhythmAmtCumulative)
             this.maxLineLen = line.rhythmAmtCumulative;
+    }
+    adjustUnitRhythm(iLine, iUnit) {
+        this.lines[iLine].adjustUnitRhythm(iUnit);
     }
 }
 function processPoem(poem) {

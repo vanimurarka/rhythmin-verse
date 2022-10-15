@@ -9,7 +9,17 @@ let fGhazal = false;
 let fRhymingLines = false;
 
 let lineRhythmTotal = 0;
-let oVisual;
+
+var oPoem;
+var oPrevPoem;
+var oVisual;
+var rhymeColors = [
+	"#ff8004", // orange "#ffbb78", 
+	"#fd4c48", // red as pink "#ff9896", 
+	"#9203ff", // purple "#c5b0d5", 
+	"#ff00a0", // magenta "#c49c94", 
+	"#a4ff00", // lemon green
+];
 
 // Class: cVisual
 // Class for setting the visual display
@@ -54,12 +64,13 @@ function initSvgFlex(svgViewBox)
 function visualize(poem, availableW)
 {
 	oVisual = new cVisual(availableW);
-	draw(poem);	
+	oPoem = poem;
+	draw();	
 }
 
 // Function: draw
 // The D3 draw dance!
-function draw(oPoem)
+function draw()
 {	
 	const maxLen = oPoem.maxLineLen;
 	const lineCount = oPoem.lines.length;
@@ -342,9 +353,8 @@ function drawStyleCharBlock(c,colorBy)
 function adjustCharLen()
 {
 	// debugger;
-	var iChr = parseInt(this.getAttribute("id").substring(4));
-	var iLine = parseInt(this.parentNode.getAttribute("id").substring(5));
-	var kk = 0;
-	oPoem.adjustCharMaatraa(iLine,iChr);
+	let iChr = parseInt(this.getAttribute("id").substring(4));
+	let iLine = parseInt(this.parentNode.getAttribute("id").substring(5));
+	oPoem.adjustUnitRhythm(iLine,iChr);
 	draw();
 }
