@@ -29,6 +29,7 @@ class cRhythmUnit {
 	rhythmAmt : number;
 	systemRhythmAmt : number; 
 	rhythmAmtCumulative : number;
+	rhythmPatternValue: number;
 	text : string;
 
 	constructor(mainChar: string, mainCharCode: number); 
@@ -63,7 +64,8 @@ class cRhythmUnit {
 		this.chars[0].char = newMainChar;
 		this.chars[0].charCode = newMainCharCode;
 	}
-	adjustUnitRhythm(iUnit:number) {}
+	adjustUnitRhythm(iUnit:number,pattern) {}
+	setRhythmPatternVal(patternVal:number) {this.rhythmPatternValue = patternVal;}
 }
 
 class cMaatraaUnit extends cRhythmUnit {
@@ -71,7 +73,6 @@ class cMaatraaUnit extends cRhythmUnit {
 	vowelNumber : number;
 	isHalfLetter : boolean;
 	isFirstLetterOfWord : boolean;
-	maapneeType : number;
 	constructor(mainChar: string, mainCharCode: number, firstLetter:boolean = false)
 	{
 		super(mainChar, mainCharCode);
@@ -81,7 +82,7 @@ class cMaatraaUnit extends cRhythmUnit {
 		this.isFirstLetterOfWord = firstLetter;
 		this.kind = unitType.maatraa;
 		this.text = mainChar;
-		this.maapneeType = -1;
+		this.rhythmPatternValue = -1;
 
 		// space / comma
       	if ((mainCharCode == 32)||(mainCharCode == 44))
@@ -269,7 +270,7 @@ class cMaatraaLine extends cLine {
 			}
 		}
 	}
-	adjustUnitRhythm(iUnit:number)
+	adjustUnitRhythm(iUnit:number, pattern)
 	{
 		let unit = this.subUnits[iUnit];
 		let newRhythmAmt = 0;
@@ -284,8 +285,19 @@ class cMaatraaLine extends cLine {
 		let diff = newRhythmAmt - unit.rhythmAmt;
 		this.subUnits[iUnit].rhythmAmt = newRhythmAmt;
 		this.rhythmAmtCumulative += diff;
+
+		this.clearPattern();
+		this.matchRhythmPattern(pattern);
 	}
-	setMaapnee(pattern = [])
+	clearPattern()
+	{
+		let i = 0;
+		for (i = 0; i < this.subUnits.length; i++)
+		{
+			this.subUnits[i].rhythmPatternValue = -1; // default value
+		}
+	}
+	matchRhythmPattern(pattern = [])
 	{
 		//debugger;
 		let i = 0;
@@ -306,11 +318,11 @@ class cMaatraaLine extends cLine {
 			if (currentC.isHindi)
 			{
 				// debugger;
-				if (currentC.maapneeType != 1.5)
-					currentC.maapneeType = currentC.rhythmAmt;
+				if (currentC.rhythmPatternValue != 1.5)
+					currentC.rhythmPatternValue = currentC.rhythmAmt;
 
 				// increment pattern index if currentC was deergh
-				if (withPattern && (currentC.maapneeType == 2)) 
+				if (withPattern && (currentC.rhythmPatternValue == 2)) 
 				{
 					pi++;
 					continue;
@@ -321,7 +333,7 @@ class cMaatraaLine extends cLine {
 					pi++;
 					continue;
 				}
-				if ((i < subUnitsCount - 1) && (currentC.rhythmAmt == 1) && (currentC.maapneeType != 1.5))
+				if ((i < subUnitsCount - 1) && (currentC.rhythmAmt == 1) && (currentC.rhythmPatternValue != 1.5))
 				{
 					let nextChar = currentC;
 					let nextCharFound = false;
@@ -340,8 +352,8 @@ class cMaatraaLine extends cLine {
 					{
 						if (!withPattern) // do defaut processing
 						{
-							nextChar.maapneeType = 1.5;
-							currentC.maapneeType = 1.5;
+							nextChar.rhythmPatternValue = 1.5;
+							currentC.rhythmPatternValue = 1.5;
 						}
 						else // with pattern so also take pattern into consideration
 						{
@@ -349,8 +361,8 @@ class cMaatraaLine extends cLine {
 								pi++;
 							else
 							{
-								nextChar.maapneeType = 1.5;
-								currentC.maapneeType = 1.5;
+								nextChar.rhythmPatternValue = 1.5;
+								currentC.rhythmPatternValue = 1.5;
 								pi++;
 							}
 						}
@@ -360,7 +372,7 @@ class cMaatraaLine extends cLine {
 						pi++;
 					}
 				}
-				else if (currentC.maapneeType == 1)
+				else if (currentC.rhythmPatternValue == 1)
 				{
 					pi++;
 				}
@@ -369,7 +381,7 @@ class cMaatraaLine extends cLine {
 			{
 				if (withPattern && (currentPattern == 0))
 				{
-					currentC.maapneeType = 0;
+					currentC.rhythmPatternValue = 0;
 					pi++;
 				}
 			}
@@ -380,14 +392,14 @@ class cMaatraaLine extends cLine {
 class cPoem {
 	lines : cLine[];
 	maxLineLen : number;
-	firstLineMaapnee : boolean;
-	maapneePattern;
+	firstLinePattern : boolean;
+	rhythmPattern;
 	constructor()
 	{
 		this.lines = [];
 		this.maxLineLen = 0;
-		this.firstLineMaapnee = false;
-		this.maapneePattern = [];
+		this.firstLinePattern = false;
+		this.rhythmPattern = [];
 	}
 	addLine(line : cRhythmUnit)
 	{
@@ -397,23 +409,26 @@ class cPoem {
 
 		if (this.lines.length == 1)
 		{
-			this.detectFirstLineMaapnee();
-			if (this.firstLineMaapnee)
-				this.setMaapneePattern();
+			this.isFirstLinePattern();
+			if (this.firstLinePattern)
+				this.setRhythmPattern();
 		}
 	}
 	adjustUnitRhythm(iLine, iUnit)
 	{
-		this.lines[iLine].adjustUnitRhythm(iUnit);
+		if ((iLine == 0) && this.firstLinePattern) return;
+		this.lines[iLine].adjustUnitRhythm(iUnit, this.rhythmPattern)
+		if (this.lines[iLine].rhythmAmtCumulative > this.maxLineLen)
+			this.maxLineLen = this.lines[iLine].rhythmAmtCumulative;
 	}
-	detectFirstLineMaapnee()
+	isFirstLinePattern()
 	{
 		if (this.lines.length < 1) return;
 		let line1 = this.lines[0];
 		let pattern = /^[12१२\s]+$/;
-		this.firstLineMaapnee = pattern.test(line1.text);
+		this.firstLinePattern = pattern.test(line1.text);
 	}
-	setMaapneePattern()
+	setRhythmPattern()
 	{
 		let lineMaapnee = this.lines[0];
 		let i = 0;
@@ -421,12 +436,12 @@ class cPoem {
 		{
 			if ((lineMaapnee.subUnits[i].systemRhythmAmt == 1) || (lineMaapnee.subUnits[i].systemRhythmAmt == 2))
 			{
-				this.maapneePattern[this.maapneePattern.length] = lineMaapnee.subUnits[i].systemRhythmAmt;
+				this.rhythmPattern[this.rhythmPattern.length] = lineMaapnee.subUnits[i].systemRhythmAmt;
 			}
 			else
 			{
-				this.maapneePattern[this.maapneePattern.length] = 0;
-				lineMaapnee.subUnits[i].maapneeType = 0;
+				this.rhythmPattern[this.rhythmPattern.length] = 0;
+				this.lines[0].subUnits[i].setRhythmPatternVal(0);
 			}
 		}
 	}
@@ -492,7 +507,7 @@ function processPoem(poem:string) : cPoem
 		let processedLine = new cMaatraaLine(units, lines[iLine]);
 		processedLine.rhythmAmtCumulative = lineLen;
 		processedLine.calculateHalfLetterMaatraa();
-		processedLine.setMaapnee(oPoem.maapneePattern);
+		processedLine.matchRhythmPattern(oPoem.rhythmPattern);
 		oPoem.addLine(processedLine);
 	}
 	console.log(oPoem);

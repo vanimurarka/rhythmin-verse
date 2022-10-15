@@ -253,7 +253,7 @@ function drawStyleCharBlock(c,colorBy)
 	// space, comma
 	if (c.vowelNumber === -10)
 	{
-		if (c.maapneeType == 0) // yati
+		if (c.rhythmPatternValue == 0) // yati
 			return "stroke:rgb(0,118,255);stroke-width:3";
 		else // do not display normal space, comma
 			return "display: none";
@@ -275,8 +275,8 @@ function drawStyleCharBlock(c,colorBy)
 					color = "rgb(0,255,0)"; // green
 					fillOp = "0.4";
 				}
-				// c.maapneeType = 1.5 means 1+1 2 type deergh
-				if (c.maapneeType == 1.5)
+				// c.rhythmPatternValue = 1.5 means 1+1 2 type deergh
+				if (c.rhythmPatternValue == 1.5)
 				{
 					color = "rgb(0,255,0)"; // green
 					fillOp = "0.2";
