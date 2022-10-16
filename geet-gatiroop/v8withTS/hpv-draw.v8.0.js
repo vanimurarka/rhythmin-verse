@@ -61,8 +61,10 @@ function initSvgFlex(svgViewBox)
 	return svg;
 }
 
-function visualize(poem, availableW)
+function visualize(poem, availableW, type = poemType.generic)
 {
+	if (type == poemType.ghazal)
+		fGhazal = true;
 	oVisual = new cVisual(availableW);
 	oPoem = poem;
 	draw();	
@@ -262,7 +264,7 @@ function drawStyleCharBlock(c,colorBy)
 	var color = "rgb(0,220,255)";
 	var strokeOp = "0.3";
 	var strokeW = 1;
-	var fillOp = "0.4";
+	var fillOp = "0.1";
 	var strokeColor = "black";
 
 	// call conColor to determine color and opacity as per consonant
@@ -304,18 +306,18 @@ function drawStyleCharBlock(c,colorBy)
 	}
 	if (colorBy == 'ghazal')
     {
-  		if (c.maatraa == c.systemMaatraa)
-  	{
-	    if (c.isRadeef) // is a radeef char
-	    {
-	      color = "rgb(0,220,255)"; // blue
-	      fillOp = "0.5";
-	    }
-	    if (c.isKaafiyaa) // is a kaafiyaa char
-	    {
-	      color = "rgb(0,255,0)"; // green
-	      fillOp = "0.5";
-	    }
+  		if (c.rhythmAmt == c.systemRhythmAmt)
+  		{
+		    if (c.isRadeef) // is a radeef char
+		    {
+		      color = "rgb(0,220,255)"; // blue
+		      fillOp = "0.5";
+		    }
+		    if (c.isKaafiyaa) // is a kaafiyaa char
+		    {
+		      color = "rgb(0,255,0)"; // green
+		      fillOp = "0.5";
+		    }
 		}
 		else
 		{

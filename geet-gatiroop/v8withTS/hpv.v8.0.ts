@@ -20,6 +20,12 @@ enum unitType {
 	line = "line"
 }
 
+enum poemType {
+	generic = 0,
+	ghazal = 1,
+	freeverse = 2
+}
+
 class cRhythmUnit {
 	chars : cChar[];
 	isHindi : boolean;
@@ -242,6 +248,12 @@ class cMaatraaUnit extends cRhythmUnit {
 
 		return 0;
 	}
+	mainChar() { return this.chars[0].char; }
+}
+
+class cGhazalUnit extends cMaatraaUnit {
+	isRadeef : boolean = false;
+	isKaafiyaa : boolean = false;
 }
 
 class cLine extends cRhythmUnit {
@@ -389,6 +401,11 @@ class cMaatraaLine extends cLine {
 	}
 }
 
+// ghazal line
+class cMisraa extends cMaatraaLine {
+	subUnits : cGhazalUnit[];
+}
+
 class cPoem {
 	lines : cLine[];
 	maxLineLen : number;
@@ -447,10 +464,169 @@ class cPoem {
 	}
 }
 
-function processPoem(poem:string) : cPoem
+class cGhazal extends cPoem {
+	lines : cMisraa[];
+	radeefTruncated = 0;
+	radeefArray = [];
+	calculateRadeef()
+	{
+	    let radeef = '';
+	    this.radeefArray = [];
+
+	    let radeef1, radeef2;
+	    let linelen1 = this.lines[0].subUnits.length;
+	    let linelen2 = this.lines[1].subUnits.length;
+
+	    let foundRadeefEnd = false;
+	    let i = linelen1 - 1; // first line index
+	    let j = linelen2 - 1; // second line index
+
+	    // debugger;
+
+	    while ((!foundRadeefEnd) && (i >= 0) && (j >= 0))
+	    {
+	      radeef1 = this.lines[0].subUnits[i].text;
+	      radeef2 = this.lines[1].subUnits[j].text;
+
+	      if (radeef1 == radeef2)
+	      {
+	        radeef = radeef1 + radeef;
+	        this.radeefArray[this.radeefArray.length] = [];
+	        this.radeefArray[this.radeefArray.length - 1][0] = this.lines[0].subUnits[i].mainChar();
+	        this.radeefArray[this.radeefArray.length - 1][1] = this.lines[0].subUnits[i].vowelChar;
+	        i--;
+	        j--;
+	      }
+	      else
+	      {
+	        foundRadeefEnd = true;
+	      }
+	    }
+
+	    // cut out the last part of calculated radeef if it has a space and an incomplete word.
+	    // eg. for 
+	    // कोई उम्मीद बर नहीं आती
+	    // कोई सूरत नज़र नहीं आती
+	    // sys will calculate radeef as as "र नहीं आती" because that is common between top and bottom line
+	    // but radeef is "नहीं आती"
+	    let realRadeef = radeef.substr(radeef.indexOf(' ')+1);
+
+	    // truncate radeefArray too
+	    // if clause implies a truncation did occur in the above substr code, and hence array has to be truncated 
+	    if (radeef !== realRadeef) 
+	    {
+	      this.radeefTruncated = 1;
+	      let i;
+	      for (i = this.radeefArray.length - 1; i >= 0 ; i--) 
+	      {
+	        if (this.radeefArray[i][0] == " ") break;
+	      }
+	      this.radeefArray.length = i;
+	      radeef = realRadeef;
+	    }
+	    // the characters in this radeefArray is in reverse order
+	    let radeefLen = this.radeefArray.length;
+	    // now mark radeef chars in all relevant lines
+	    for (i = 0; i < this.lines.length; i++) {
+	      let supposedlyRelevantLine = false;
+	      // first 2 lines
+	      if (i<=1) supposedlyRelevantLine = true;
+	      // intermediate line followed by blank line
+	      if ((i>1) && (i<(this.lines.length-1)) && (this.lines[i+1].subUnits.length==0)) supposedlyRelevantLine = true;
+	      // last line
+	      if (i==(this.lines.length-1)) supposedlyRelevantLine = true;
+	      let linelen = this.lines[i].subUnits.length;
+	      if ((supposedlyRelevantLine) && (linelen > radeefLen))
+	      {
+	        for (let j = 0; j < radeefLen; j++) {
+	          if ((this.radeefArray[j][0] == this.lines[i].subUnits[linelen-1-j].mainChar()) && (this.radeefArray[j][1] == this.lines[i].subUnits[linelen-1-j].vowelChar))
+	            this.lines[i].subUnits[linelen-1-j].isRadeef = true;
+	          else
+	            break;
+	        }
+	      }
+	    }
+	}
+	// Function: calculateKaafiyaa
+	calculateKaafiyaa()
+	{
+		// debugger;
+		let radeefLen = this.radeefArray.length;
+		let foundKaafiyaaEnd = false;
+		let kaafiyaa,kaafiyaa1, kaafiyaa2;
+		let kaafiyaaArray = [];
+		let linelen1 = this.lines[0].subUnits.length;
+		let linelen2 = this.lines[1].subUnits.length;
+		let i = linelen1 - 1 - radeefLen; // first line index
+		let j = linelen2 - 1 - radeefLen; // second line index
+
+		while ((!foundKaafiyaaEnd) && (i >= 0) && (j >= 0))
+		{
+		  kaafiyaa1 = this.lines[0].subUnits[i].vowelNumber;
+		  kaafiyaa2 = this.lines[1].subUnits[j].vowelNumber;
+		  if (kaafiyaa1 == kaafiyaa2)
+		  {
+		    kaafiyaa = kaafiyaa1 + kaafiyaa;
+		    kaafiyaaArray[kaafiyaaArray.length] = kaafiyaa1;
+		    i--;
+		    j--;
+		  }
+		  else
+		  {
+		    foundKaafiyaaEnd = true;
+		  }
+		}
+		if (kaafiyaaArray[0]==-10) // space character kaa vowelNumber
+		  kaafiyaaArray.splice(0,1);
+		// console.log(kaafiyaaArray);
+
+		let kaafiyaaLen = kaafiyaaArray.length;
+
+		// now mark kaafiyaa chars in all relevant lines
+		for (i = 0; i < this.lines.length; i++) {
+		  let supposedlyRelevantLine = false;
+		  // first 2 lines
+		  if (i<=1) supposedlyRelevantLine = true;
+		  // intermediate line followed by blank line
+		  if ((i>1) && (i<(this.lines.length-1)) && (this.lines[i+1].subUnits.length==0)) supposedlyRelevantLine = true;
+	      // last line
+	      if (i==(this.lines.length-1)) supposedlyRelevantLine = true;
+		  let linelen = this.lines[i].subUnits.length;
+		  if ((supposedlyRelevantLine) && (linelen > (radeefLen+kaafiyaaLen+this.radeefTruncated)))
+		  {
+		    for (j = 0; j < kaafiyaaLen; j++) {
+		      if (kaafiyaaArray[j] == this.lines[i].subUnits[linelen-1-radeefLen-this.radeefTruncated-j].vowelNumber)
+		        this.lines[i].subUnits[linelen-1-radeefLen-this.radeefTruncated-j].isKaafiyaa = true;
+		      else
+		        break;
+		    }
+		  }
+		}
+	}
+}
+
+function initUnit(char, charCode, firstLetter = true, type : poemType = poemType.generic) : any
+{
+	if (type == poemType.ghazal)
+		return new cGhazalUnit(char, charCode, firstLetter);
+	else
+		return new cMaatraaUnit(char,charCode,firstLetter);
+}
+
+function initLine(subUnits,lineText,type : poemType = poemType.generic) : any
+{
+	if (type == poemType.ghazal)
+		return new cMisraa(subUnits,lineText);
+	else
+		return new cMaatraaLine(subUnits, lineText);
+}
+
+function processPoem(poem:string,thisPoemType:poemType = poemType.generic) : cPoem
 {
 	let lines = poem.split("\n");
-	let oPoem = new cPoem();
+	let oPoem;
+	if (thisPoemType == poemType.ghazal) oPoem = new cGhazal();
+	else oPoem = new cPoem();
 	let maxLineLen = 0;
     for (let iLine = 0; iLine < lines.length; iLine++) // process each line - i = line index
     {
@@ -468,7 +644,7 @@ function processPoem(poem:string) : cPoem
 		{
 			if (wc > 0)
 			{
-				units[i] = new cMaatraaUnit(' ',32,true);
+				units[i] = initUnit(' ',32,true,thisPoemType);
 				i++;
 			}
 			for (let k = 0; k < words[wc].length; k++)
@@ -496,19 +672,24 @@ function processPoem(poem:string) : cPoem
 				else // not maatraa - true new char
 				{
 					if (k == 0)
-						units[i] = new cMaatraaUnit(thisChar,charCode,true);
+						units[i] = initUnit(thisChar,charCode,true,thisPoemType);
 					else
-						units[i] = new cMaatraaUnit(thisChar,charCode);
+						units[i] = initUnit(thisChar,charCode,false,thisPoemType);
 					lineLen += units[i].rhythmAmt;
 					i++;
 				}
 			}
 		}
-		let processedLine = new cMaatraaLine(units, lines[iLine]);
+		let processedLine = initLine(units, lines[iLine]);
 		processedLine.rhythmAmtCumulative = lineLen;
 		processedLine.calculateHalfLetterMaatraa();
-		processedLine.matchRhythmPattern(oPoem.rhythmPattern);
+		if (thisPoemType == poemType.generic) processedLine.matchRhythmPattern(oPoem.rhythmPattern);
 		oPoem.addLine(processedLine);
+	}
+	if (thisPoemType == poemType.ghazal)
+	{
+		oPoem.calculateRadeef();
+		oPoem.calculateKaafiyaa();
 	}
 	console.log(oPoem);
 	return oPoem;	
