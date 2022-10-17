@@ -65,6 +65,9 @@ function visualize(poem, availableW, type = poemType.generic)
 {
 	if (type == poemType.ghazal)
 		fGhazal = true;
+	else if (type == poemType.freeverse)
+		fFreeVerse= true;
+
 	oVisual = new cVisual(availableW);
 	oPoem = poem;
 	draw();	
@@ -168,7 +171,7 @@ function draw()
       .attr("y", charH)
       .attr("x", function(d) {return charW*maxLen+5;})
       .attr("class", "graphText3")
-      .text(function(d) { return (d.maatraa > 0) ? d.maatraa : "";})
+      .text(function(d) { return (d.rhythmAmtCumulative > 0) ? d.rhythmAmtCumulative : "";})
       .on("click",markCompositeLine);
 
       // small dash beside maatraa count
@@ -189,7 +192,6 @@ function draw()
         .attr("y2", charH+2)
         .attr("style", function(d,i) {return drawCompositeLineMarker("style",i);})
         .on("click",unmarkCompositeLine);
-
       // composite line total maatraa
     	drawCompositeNumbers();
     }    
@@ -198,7 +200,6 @@ function draw()
       g.append("svg:text")            // line total maatraa, d = line
       .attr("y", charH)
       .attr("x", function(d) {return charW*maxLen+(5);})
-      .attr("class", "graphText3")
       .text(function(d) { return (d.rhythmAmtCumulative > 0) ? d.rhythmAmtCumulative : "";});
     }
 }
@@ -264,7 +265,7 @@ function drawStyleCharBlock(c,colorBy)
 	var color = "rgb(0,220,255)";
 	var strokeOp = "0.3";
 	var strokeW = 1;
-	var fillOp = "0.1";
+	var fillOp = "0.2";
 	var strokeColor = "black";
 
 	// call conColor to determine color and opacity as per consonant
@@ -359,4 +360,116 @@ function adjustCharLen()
 	let iLine = parseInt(this.parentNode.getAttribute("id").substring(5));
 	oPoem.adjustUnitRhythm(iLine,iChr);
 	draw();
+}
+
+/*
+	Function: markCompositeLine
+	Allows users to join multiple lines together for getting total maatraa count of a set of lines. When free verse suppport is on.
+*/
+function markCompositeLine()
+{
+	// line clicked
+	let i = parseInt(this.parentNode.getAttribute("id").substring(5));
+
+	// if anything before last line
+	// if not marked as composite
+	if ((i < oPoem.lines.length-1) && (!oPoem.lines[i+1].isComposite))
+	{
+	  oPoem.setComposite(i+1); // why is the next line marked composite? but it works
+	  draw();
+	} 
+}
+
+// Function: drawFreeVerseDashStyle
+// Draw composite line markers if free verse is on
+function drawFreeVerseDashStyle(i)
+  {
+      if (oPoem.lines[i].maatraa == 0)  // empty line
+        return "display:none;";
+
+      return "stroke:black;stroke-width:8;"
+  }
+
+// Function: drawCompositeLineMarker
+// What is the difference between this function and drawFreeVerseDashStyle
+function drawCompositeLineMarker(drawWhat,i)
+  {
+  	const maxLen = oPoem.maxLineLen;
+    if (drawWhat == "x1")
+    {
+      if (i==0)
+        return charW*maxLen+(charW*2);
+      if (oPoem.lines[i].isComposite)
+        return charW*maxLen+(charW+12);        
+      else
+        return charW*maxLen+(charW*2);
+    }
+    if (drawWhat == "y1")
+    {
+      if (oPoem.lines[i].isComposite)
+      {
+        if (fLineSpacing)
+          return -11;
+        else
+          return 0;
+      }               
+      else
+        return charH-2;
+    }
+    if (drawWhat == "style")
+    {
+      if ((oPoem.lines[i].maatraa == 0) || (!oPoem.lines[i].isComposite))  // empty line || not composite
+        return "display:none;";
+
+      return "stroke:green;stroke-width:6;"
+    }
+  }
+
+/*
+	Function: unmarkCompositeLine
+*/
+function unmarkCompositeLine()
+  {
+    // line clicked
+    var i = parseInt(this.parentNode.getAttribute("id").substring(5));
+    // toggle composite line setting
+    // if true, the line is composite with top
+    if (i > 0)
+    {
+      oPoem.setComposite(i); 
+      draw();
+    } 
+  }
+
+// Function: drawCompositeNumbers
+function drawCompositeNumbers()
+{
+	const maxLen = oPoem.maxLineLen;
+	let chart = d3.select("#chart");
+	let svg = chart.select("svg");
+	
+	let y = 0;
+	if (fLineSpacing)
+		y = charH + lineSpacing;
+	else
+		y = charH;
+
+	let compositeLTotal = svg.selectAll(".compositeCountT")
+	  .data(oPoem.compositeLines)
+	  .enter().append("svg:text")
+	  .attr("y", function(d) {return ((d.originalLineIdx*y)+y+charH);})
+	  .attr("x", function(d) {return paddingLeft + (charW*maxLen)+(charW+20);})
+	  .attr("class", "compositeCountT")
+	  .attr("style", function(d) {return d.multipleOfBaseCount?"fill:black":"fill:red";})
+	  // .attr("style", function(d) {return "fill:black";})
+	  .text(function(d) {return d.rhythmAmtCumulative;});
+
+	let compositeLRemainder = svg.selectAll(".compositeCountR")
+	  .data(oPoem.compositeLines)
+	  .enter().append("svg:text")
+	  .attr("y", function(d) {return ((d.originalLineIdx*y)+y+charH)+10;})
+	  .attr("x", function(d) {return paddingLeft + (charW*maxLen)+(charW+20+10);})
+	  .attr("class", "compositeCountR")
+	  .attr("style", function(d) {return d.remainder!=0?"fill:red;font-size:80%":"display:none";})
+	  .text(function(d) {return d.remainder>0?"+"+d.remainder:d.remainder;});
 }

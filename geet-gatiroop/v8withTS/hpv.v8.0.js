@@ -352,12 +352,25 @@ class cMaatraaLine extends cLine {
 // ghazal line
 class cMisraa extends cMaatraaLine {
 }
+class cFreeVerseLine extends cMaatraaLine {
+    constructor() {
+        super(...arguments);
+        this.isComposite = false;
+    }
+}
 class cPoem {
     constructor() {
         this.lines = [];
         this.maxLineLen = 0;
         this.firstLinePattern = false;
         this.rhythmPattern = [];
+        this.type = poemType.generic;
+    }
+    giveNewUnit(char, charCode, firstLetter = true) {
+        return new cMaatraaUnit(char, charCode, firstLetter);
+    }
+    giveNewLine(subUnits, lineText) {
+        return new cMaatraaLine(subUnits, lineText);
     }
     addLine(line) {
         this.lines[this.lines.length] = line;
@@ -399,9 +412,16 @@ class cPoem {
 }
 class cGhazal extends cPoem {
     constructor() {
-        super(...arguments);
+        super();
         this.radeefTruncated = 0;
         this.radeefArray = [];
+        this.type = poemType.ghazal;
+    }
+    giveNewUnit(char, charCode, firstLetter = true) {
+        return new cGhazalUnit(char, charCode, firstLetter);
+    }
+    giveNewLine(subUnits, lineText) {
+        return new cMisraa(subUnits, lineText);
     }
     calculateRadeef() {
         let radeef = '';
@@ -524,25 +544,105 @@ class cGhazal extends cPoem {
         }
     }
 }
-function initUnit(char, charCode, firstLetter = true, type = poemType.generic) {
-    if (type == poemType.ghazal)
-        return new cGhazalUnit(char, charCode, firstLetter);
-    else
-        return new cMaatraaUnit(char, charCode, firstLetter);
+class cCompositeLine {
+    constructor(originalLineIdx) {
+        this.originalLineIdx = originalLineIdx;
+        this.rhythmAmtCumulative = 0;
+        this.remainder = 0;
+        this.multipleOfBaseCount = true;
+    }
 }
-function initLine(subUnits, lineText, type = poemType.generic) {
+class cFreeVerse extends cPoem {
+    constructor() {
+        super();
+        this.type = poemType.freeverse;
+        this.compositeLines = [];
+        this.baseCount = 1;
+    }
+    giveNewLine(subUnits, lineText) {
+        return new cFreeVerseLine(subUnits, lineText);
+    }
+    setComposite(lineIdx) {
+        this.lines[lineIdx].isComposite = !this.lines[lineIdx].isComposite;
+        this.calculateCompositeRhythmAmt();
+    }
+    calculateCompositeRhythmAmt() {
+        let compositeInProgress = false;
+        // reset composite lines array
+        this.compositeLines.length = 0;
+        if (this.lines.length > 1) {
+            let i = 0;
+            for (i = 1; i < this.lines.length; i++) {
+                if (this.lines[i].isComposite) // is part of composite line
+                 {
+                    // debugger;
+                    let len = this.compositeLines.length;
+                    if (!compositeInProgress) // new composite line
+                     {
+                        compositeInProgress = true;
+                        this.compositeLines[len] = new cCompositeLine(i - 1); // starting position in poem lines, line index is the *previous*
+                        this.compositeLines[len].rhythmAmtCumulative = this.lines[i - 1].rhythmAmtCumulative; // total maatraa count of prev (starting) line
+                        this.compositeLines[len].rhythmAmtCumulative += this.lines[i].rhythmAmtCumulative; // add total maatraa count of current line
+                    }
+                    else // in progress composite line
+                     {
+                        // just add to in progress composite line
+                        this.compositeLines[len - 1].rhythmAmtCumulative += this.lines[i].rhythmAmtCumulative;
+                    }
+                    len = this.compositeLines.length;
+                    // set whether the composite maatraa is multiple of base count
+                    if ((this.compositeLines[len - 1].rhythmAmtCumulative % this.baseCount) == 0)
+                        this.compositeLines[len - 1].multipleOfBaseCount = true;
+                    else
+                        this.compositeLines[len - 1].multipleOfBaseCount = false;
+                }
+                else // not part of composite line
+                 {
+                    if (compositeInProgress) {
+                        // stop in progress
+                        compositeInProgress = false;
+                    }
+                }
+            }
+        }
+        let i;
+        for (i = 0; i < this.compositeLines.length; i++)
+            this.calculateRemainder(i);
+    }
+    calculateRemainder(compositeIdx) {
+        if (this.baseCount > 1) {
+            let compositeMaatraa = this.compositeLines[compositeIdx].rhythmAmtCumulative;
+            let remainder = compositeMaatraa % this.baseCount;
+            if (remainder != 0) {
+                let result = compositeMaatraa / this.baseCount;
+                let whole = Math.trunc(result);
+                let remainderInDecimal = result - whole;
+                if (remainderInDecimal <= 0.5)
+                    this.compositeLines[compositeIdx].remainder = remainder;
+                else
+                    this.compositeLines[compositeIdx].remainder = (((whole + 1) * this.baseCount) - compositeMaatraa) * -1;
+            }
+        }
+        else
+            this.compositeLines[compositeIdx].remainder = 0;
+    }
+    setBaseCount(baseCount) {
+        this.baseCount = baseCount;
+        this.calculateCompositeRhythmAmt();
+    }
+}
+function initPoem(type = poemType.generic) {
     if (type == poemType.ghazal)
-        return new cMisraa(subUnits, lineText);
+        return new cGhazal();
+    else if (type == poemType.freeverse)
+        return new cFreeVerse();
     else
-        return new cMaatraaLine(subUnits, lineText);
+        return new cPoem();
 }
 function processPoem(poem, thisPoemType = poemType.generic) {
     let lines = poem.split("\n");
     let oPoem;
-    if (thisPoemType == poemType.ghazal)
-        oPoem = new cGhazal();
-    else
-        oPoem = new cPoem();
+    oPoem = initPoem(thisPoemType);
     let maxLineLen = 0;
     for (let iLine = 0; iLine < lines.length; iLine++) // process each line - i = line index
      {
@@ -557,7 +657,7 @@ function processPoem(poem, thisPoemType = poemType.generic) {
         // debugger;
         for (let wc = 0; wc < words.length; wc++) {
             if (wc > 0) {
-                units[i] = initUnit(' ', 32, true, thisPoemType);
+                units[i] = oPoem.giveNewUnit(' ', 32, true);
                 i++;
             }
             for (let k = 0; k < words[wc].length; k++) {
@@ -583,15 +683,15 @@ function processPoem(poem, thisPoemType = poemType.generic) {
                 else // not maatraa - true new char
                  {
                     if (k == 0)
-                        units[i] = initUnit(thisChar, charCode, true, thisPoemType);
+                        units[i] = oPoem.giveNewUnit(thisChar, charCode, true);
                     else
-                        units[i] = initUnit(thisChar, charCode, false, thisPoemType);
+                        units[i] = oPoem.giveNewUnit(thisChar, charCode, false);
                     lineLen += units[i].rhythmAmt;
                     i++;
                 }
             }
         }
-        let processedLine = initLine(units, lines[iLine]);
+        let processedLine = oPoem.giveNewLine(units, lines[iLine]);
         processedLine.rhythmAmtCumulative = lineLen;
         processedLine.calculateHalfLetterMaatraa();
         if (thisPoemType == poemType.generic)
