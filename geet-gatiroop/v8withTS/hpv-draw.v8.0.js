@@ -10,8 +10,6 @@ let fRhymingLines = false;
 
 let lineRhythmTotal = 0;
 
-var oPoem;
-var oPrevPoem;
 var oVisual;
 var rhymeColors = [
 	"#ff8004", // orange "#ffbb78", 
@@ -61,15 +59,14 @@ function initSvgFlex(svgViewBox)
 	return svg;
 }
 
-function visualize(poem, availableW, type = poemType.generic)
+function visualize(availableW)
 {
-	if (type == poemType.ghazal)
+	if (oPoem.type == poemType.ghazal)
 		fGhazal = true;
-	else if (type == poemType.freeverse)
+	else if (oPoem.type == poemType.freeverse)
 		fFreeVerse= true;
 
 	oVisual = new cVisual(availableW);
-	oPoem = poem;
 	draw();	
 }
 
@@ -294,6 +291,57 @@ function drawStyleCharBlock(c,colorBy)
 	  				color = "white";
 	  				fillOp = "0.2";
 	  			}
+	  		}
+	  		if (c.belongsToGan.length > 0)
+	  		{
+	  			switch (c.belongsToGan)
+	  			{
+	  				case ganType.y:
+	  					color = "#FF99FF";
+	  					fillOp = "0.4";
+	  					break;
+	  				case ganType.m:
+	  					color = "#00aa00";
+	  					fillOp = "0.4";
+	  					break;
+	  				case ganType.t:
+	  					color = "#bd7ebe";
+	  					fillOp = "0.4";
+	  					break;
+	  				case ganType.r:
+	  					color = "rgb(255,0,0)";
+	  					fillOp = "0.4";
+	  					break;
+	  				case ganType.j:
+	  					color = "#ffb55a";
+	  					fillOp = "0.4";
+	  					break;
+	  				case ganType.b:
+	  					color = "#7eb0d5";
+	  					fillOp = "0.4";
+	  					break;
+	  				case ganType.n:
+	  					color = "rgb(0,0,255)";
+	  					fillOp = "0.4";
+	  					break;
+	  				case ganType.s:
+	  					color = "#CC9900";
+	  					fillOp = "0.4";
+	  					break;
+	  				case ganType.l:
+	  					color: "rgb(0,220,255)";
+	  					fillOp = "0.5";
+	  					break;
+	  				case ganType.g:
+	  					color: "rgb(0,255,0)";
+	  					fillOp: "0.5";
+	  					break;
+	  				default:
+	  					color = "rgb(255,255,255)";
+	  					fillOp = "0.4";
+	  					break;
+	  			}
+	  			
 	  		}
 
 		}

@@ -17,30 +17,35 @@ class cChar {
 enum unitType {
 	unknown = "unknown",
 	maatraa = "maatraa",
-	line = "line"
+	line = "line",
+	varna = "varna"
 }
 
 enum poemType {
 	generic = 0,
 	ghazal = 1,
-	freeverse = 2
+	freeverse = 2,
+	vaarnik = 3
+}
+
+enum ganType {
+	y = "122",
+	m = "222",
+	t = "221",
+	r = "212",
+	j = "121",
+	b = "211",
+	n = "111",
+	s = "112",
+	l = "1",
+	g = "2",
+	o = ""
 }
 
 class cRhythmUnit {
-	chars : cChar[];
-	isHindi : boolean;
-	subUnits : cRhythmUnit[];
-	kind : unitType;
-	index : number;
-	rhythmAmt : number;
-	systemRhythmAmt : number; 
-	rhythmAmtCumulative : number;
-	rhythmPatternValue: number;
-	text : string;
-
-	constructor(mainChar: string, mainCharCode: number); 
-	constructor(subUnits:cRhythmUnit[], text:string, unitType:unitType );
-	constructor(...argsArray : any[])
+	chars : cChar[]; 	isHindi : boolean;	subUnits : cRhythmUnit[];	kind : unitType;	index : number;	rhythmAmt : number;	systemRhythmAmt : number; 	rhythmAmtCumulative : number;	rhythmPatternValue: number;	text : string;
+	vowelChar : string; 	vowelNumber : number;	isHalfLetter : boolean;	isFirstLetterOfWord : boolean;
+	constructor(mainChar: string, mainCharCode: number, firstLetter:boolean = false)
 	{
 		this.chars = [];
 		this.subUnits = [];
@@ -49,44 +54,14 @@ class cRhythmUnit {
 		this.rhythmAmt = 0;
 		this.systemRhythmAmt = 0;
 		this.rhythmAmtCumulative = 0;
-		this.text = '';
-		if ((typeof argsArray[0] === 'string') && (typeof argsArray[1] === 'number'))
-		{
-			let mainChar = argsArray[0];
-			let mainCharCode = argsArray[1];
-			this.chars[0] = new cChar(mainChar, mainCharCode);
-			this.isHindi = this.chars[0].isHindi;
-		}
-		else if ((argsArray.length == 3) && Array.isArray(argsArray[0]))
-		{
-			this.subUnits = argsArray[0];
-			this.text = argsArray[1];
-			let unitType = argsArray[2];
-			this.kind = unitType;
-		}
-	}
-	replaceFirstChar(newMainChar: string, newMainCharCode: number)
-	{
-		this.chars[0].char = newMainChar;
-		this.chars[0].charCode = newMainCharCode;
-	}
-	adjustUnitRhythm(iUnit:number,pattern) {}
-	setRhythmPatternVal(patternVal:number) {this.rhythmPatternValue = patternVal;}
-}
 
-class cMaatraaUnit extends cRhythmUnit {
-	vowelChar : string;
-	vowelNumber : number;
-	isHalfLetter : boolean;
-	isFirstLetterOfWord : boolean;
-	constructor(mainChar: string, mainCharCode: number, firstLetter:boolean = false)
-	{
-		super(mainChar, mainCharCode);
+		this.chars[0] = new cChar(mainChar, mainCharCode);
+		this.isHindi = this.chars[0].isHindi;
 		this.vowelChar = "";
 		this.vowelNumber = 0;
 		this.isHalfLetter = false;
 		this.isFirstLetterOfWord = firstLetter;
-		this.kind = unitType.maatraa;
+
 		this.text = mainChar;
 		this.rhythmPatternValue = -1;
 
@@ -187,35 +162,51 @@ class cMaatraaUnit extends cRhythmUnit {
 		}
 		this.rhythmAmtCumulative = this.rhythmAmt = this.systemRhythmAmt;
   	}
-  	replaceFirstChar(newMainChar: string)
+	_replaceFirstChar(newMainChar: string, newMainCharCode: number)
+	{
+		this.chars[0].char = newMainChar;
+		this.chars[0].charCode = newMainCharCode;
+	}
+	replaceFirstChar(newMainChar: string, newMainCharCode: number)
 	{
 		if (newMainChar == '़')	// nuqta
 		{
 			switch(this.chars[0].char)
 			{
 				case 'क':
-					super.replaceFirstChar('क़',2392);
+					this._replaceFirstChar('क़',2392);
 					break;
 				case 'ख':
-					super.replaceFirstChar('ख़',2393);
+					this._replaceFirstChar('ख़',2393);
 					break;
 				case 'ग':
-					super.replaceFirstChar('ग़',2394);
+					this._replaceFirstChar('ग़',2394);
 					break;
 				case 'ज':
-					super.replaceFirstChar('ज़',2395);
+					this._replaceFirstChar('ज़',2395);
 					break;
 				case 'ड':
-					super.replaceFirstChar('ड़',2396);
+					this._replaceFirstChar('ड़',2396);
 					break;
 				case 'ढ':
-					super.replaceFirstChar('ढ़',2397);
+					this._replaceFirstChar('ढ़',2397);
 					break;
 				case 'फ':
-					super.replaceFirstChar('फ़',2398);
+					this._replaceFirstChar('फ़',2398);
 					break;
 			}
 		}
+	}
+	setRhythmPatternVal(patternVal:number) {this.rhythmPatternValue = patternVal;}
+	mainChar() { return this.chars[0].char; }
+}
+
+class cMaatraaUnit extends cRhythmUnit {
+	
+	constructor(mainChar: string, mainCharCode: number, firstLetter:boolean = false)
+	{
+		super(mainChar, mainCharCode, firstLetter);
+		this.kind = unitType.maatraa;
 	}
 	calculateHalfLetterMaatraa(p?:cMaatraaUnit, n?:cMaatraaUnit) : number
 	{
@@ -248,7 +239,60 @@ class cMaatraaUnit extends cRhythmUnit {
 
 		return 0;
 	}
-	mainChar() { return this.chars[0].char; }
+	
+}
+
+class cVarna extends cRhythmUnit {
+	belongsToGan : ganType;
+	constructor(mainChar: string, mainCharCode: number, firstLetter:boolean = false)
+	{
+		super(mainChar, mainCharCode, firstLetter);
+		this.kind = unitType.varna;
+		this.belongsToGan = ganType.o;
+	}
+	calculateHalfLetterMaatraa(p?:cVarna, n?:cVarna) : number
+	{
+		return 0;
+	}
+	setGan(sig : string)
+	{
+		switch (sig)
+		{
+			case ganType.y:
+				this.belongsToGan = ganType.y;
+				break;
+			case ganType.m:
+				this.belongsToGan = ganType.m;
+				break;
+			case ganType.t:
+				this.belongsToGan = ganType.t;
+				break;
+			case ganType.r:
+				this.belongsToGan = ganType.r;
+				break;
+			case ganType.j:
+				this.belongsToGan = ganType.j;
+				break;
+			case ganType.b:
+				this.belongsToGan = ganType.b;
+				break;
+			case ganType.n:
+				this.belongsToGan = ganType.n;
+				break;
+			case ganType.s:
+				this.belongsToGan = ganType.s;
+				break;
+			case ganType.l:
+				this.belongsToGan = ganType.l;
+				break;
+			case ganType.g:
+				this.belongsToGan = ganType.g;
+				break;
+			default:
+				this.belongsToGan = ganType.o;
+				break;
+		}
+	}
 }
 
 class cGhazalUnit extends cMaatraaUnit {
@@ -256,11 +300,15 @@ class cGhazalUnit extends cMaatraaUnit {
 	isKaafiyaa : boolean = false;
 }
 
-class cLine extends cRhythmUnit {
+class cLine {
+	subUnits : cRhythmUnit[];	kind : unitType; rhythmAmtCumulative : number; text : string;
 	constructor(subUnits:cRhythmUnit[], lineText: string)
 	{
-		super(subUnits, lineText, unitType.line);
+		this.subUnits = subUnits;
+		this.text = lineText;
+		this.kind = unitType.line;
 	}
+	adjustUnitRhythm(iUnit:number,pattern) { }	
 }
 
 class cMaatraaLine extends cLine {
@@ -401,6 +449,77 @@ class cMaatraaLine extends cLine {
 	}
 }
 
+class cVaarnikLine extends cLine {
+	subUnits : cVarna[];
+	_findNextRealVarna(i : number = 0) : number
+	{
+		// debugger;
+		while ((i >= 0) && (i < this.subUnits.length))
+		{
+			if (this.subUnits[i].rhythmAmtCumulative > 0)
+			{
+				return i;
+			}
+			else 
+			{
+				i++;
+				while ((i < this.subUnits.length) && (this.subUnits[i].rhythmAmtCumulative == 0))
+					i++;
+
+				return i;
+			}
+		}
+		return -1;
+	} 
+	setGan()
+	{
+		let i = 0;
+		// debugger;
+		let ganSig = "";
+		let ganIs : number[];
+		while ((i >= 0) && (i < this.subUnits.length))
+		{
+			ganSig = "";
+			ganIs = [];
+			i = this._findNextRealVarna(i);
+			if (i >= 0)
+			{
+				ganSig += this.subUnits[i].rhythmAmtCumulative;
+				ganIs[ganIs.length] = i;
+				i++;
+			}
+			i = this._findNextRealVarna(i);
+			if (i >= 0)
+			{
+				ganSig += this.subUnits[i].rhythmAmtCumulative;
+				ganIs[ganIs.length] = i;
+				i++;
+			}
+			i = this._findNextRealVarna(i);
+			if (i >= 0)
+			{
+				ganSig += this.subUnits[i].rhythmAmtCumulative;
+				ganIs[ganIs.length] = i;
+				i++;
+			}
+			if (ganSig.length == 3)
+			{
+				this.subUnits[ganIs[0]].setGan(ganSig);
+				this.subUnits[ganIs[1]].setGan(ganSig);
+				this.subUnits[ganIs[2]].setGan(ganSig);
+			}
+			else if (ganSig.length > 0)
+			{
+				for (let j = 0; j < ganIs.length; j++)
+				{
+					let individualGan = this.subUnits[ganIs[j]].rhythmAmtCumulative.toString();
+					this.subUnits[ganIs[j]].setGan(individualGan);
+				}
+			}			
+		}
+	}
+}
+
 // ghazal line
 class cMisraa extends cMaatraaLine {
 	subUnits : cGhazalUnit[];
@@ -428,11 +547,11 @@ class cPoem {
 	{
 		return new cMaatraaUnit(char,charCode,firstLetter);
 	}
-	giveNewLine(subUnits,lineText)
+	giveNewLine(subUnits,lineText) : any
 	{
 		return new cMaatraaLine(subUnits, lineText);	
 	}
-	addLine(line : cRhythmUnit)
+	addLine(line : cLine)
 	{
 		this.lines[this.lines.length] = line;
 		if (this.maxLineLen < line.rhythmAmtCumulative)
@@ -741,21 +860,47 @@ class cFreeVerse extends cPoem {
 	}
 }
 
+class cVaarnikPoem extends cPoem {
+	lines : cVaarnikLine[];
+	giveNewUnit(char, charCode, firstLetter = true) : cVarna
+	{
+		return new cVarna(char,charCode,firstLetter);
+	}
+	giveNewLine(subUnits,lineText) : cVaarnikLine
+	{
+		return new cVaarnikLine(subUnits, lineText);	
+	}
+}
+
 function initPoem(type : poemType = poemType.generic) : any
 {
-	if (type == poemType.ghazal)
-		return new cGhazal();
-	else if (type == poemType.freeverse)
-		return new cFreeVerse();
-	else
-		return new cPoem();
+	switch (type)
+	{
+		case poemType.ghazal:
+			return new cGhazal();
+		case poemType.freeverse:
+			return new cFreeVerse();
+		case poemType.vaarnik:
+			return new cVaarnikPoem();
+		default:
+			return new cPoem();
+	}
 }
+
+let oPoem;
+let oPrevPoem;
 
 function processPoem(poem:string,thisPoemType:poemType = poemType.generic) : cPoem
 {
 	let lines = poem.split("\n");
-	let oPoem;
-	oPoem = initPoem(thisPoemType);
+	if (typeof oPoem === 'undefined')
+		oPoem = initPoem(thisPoemType);
+	else
+	{
+		oPrevPoem = oPoem;
+		oPoem = initPoem(thisPoemType);
+	}
+
 	let maxLineLen = 0;
     for (let iLine = 0; iLine < lines.length; iLine++) // process each line - i = line index
     {
@@ -764,6 +909,12 @@ function processPoem(poem:string,thisPoemType:poemType = poemType.generic) : cPo
     	lines[iLine] = lines[iLine].replace("।"," ");
     	lines[iLine] = lines[iLine].replace(/\s+/g, " "); // remove extra spaces in-between words
     	lines[iLine] = lines[iLine].trim(); // remove whitespace from both ends
+
+    	if ((typeof oPrevPoem !== 'undefined') && (iLine < oPrevPoem.lines.length) && (lines[iLine] == oPrevPoem.lines[iLine].text))
+    	{ 
+    		oPoem.addLine(oPrevPoem.lines[iLine]);
+    		continue;
+    	}
 
     	let words = lines[iLine].split(" ");
 		let i = 0;
@@ -811,7 +962,10 @@ function processPoem(poem:string,thisPoemType:poemType = poemType.generic) : cPo
 		}
 		let processedLine = oPoem.giveNewLine(units, lines[iLine]);
 		processedLine.rhythmAmtCumulative = lineLen;
-		processedLine.calculateHalfLetterMaatraa();
+		if (processedLine instanceof cMaatraaLine)
+			processedLine.calculateHalfLetterMaatraa();
+		if (processedLine instanceof cVaarnikLine)
+			processedLine.setGan();
 		if (thisPoemType == poemType.generic) processedLine.matchRhythmPattern(oPoem.rhythmPattern);
 		oPoem.addLine(processedLine);
 	}
@@ -823,5 +977,4 @@ function processPoem(poem:string,thisPoemType:poemType = poemType.generic) : cPo
 	console.log(oPoem);
 	return oPoem;	
 }
-
 
