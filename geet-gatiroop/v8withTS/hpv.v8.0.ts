@@ -208,7 +208,7 @@ class cMaatraaUnit extends cRhythmUnit {
 		super(mainChar, mainCharCode, firstLetter);
 		this.kind = unitType.maatraa;
 	}
-	calculateHalfLetterMaatraa(p?:cMaatraaUnit, n?:cMaatraaUnit) : number
+	calculateHalfLetterRhythmAmt(p?:cMaatraaUnit, n?:cMaatraaUnit) : number
 	{
 		// debugger;
 		if (this.isFirstLetterOfWord && this.isHalfLetter)
@@ -250,8 +250,34 @@ class cVarna extends cRhythmUnit {
 		this.kind = unitType.varna;
 		this.belongsToGan = ganType.o;
 	}
-	calculateHalfLetterMaatraa(p?:cVarna, n?:cVarna) : number
+	calculateHalfLetterRhythmAmt(p?:cVarna, n?:cVarna) : number
 	{
+		if (this.isFirstLetterOfWord && this.isHalfLetter)
+			return 0;
+
+		if (typeof n !== 'undefined')
+		{
+			if ((this.chars[0].char == "म") && (n.chars[0].char == "ह"))
+				return 0;
+			if ((this.chars[0].char == "न") && (n.chars[0].char == "ह"))
+				return 0;
+		}
+
+		if (p.systemRhythmAmt == 1 && (!p.isHalfLetter))
+		{
+			this.rhythmAmt = this.systemRhythmAmt = 1;
+			return 1;
+		}
+
+		if (typeof n !== 'undefined')
+		{
+			if ((p.systemRhythmAmt == 2) && (n.systemRhythmAmt == 2))
+			{
+				this.rhythmAmt = this.systemRhythmAmt = 1;
+				return 1;
+			}
+		}
+
 		return 0;
 	}
 	setGan(sig : string)
@@ -313,7 +339,7 @@ class cLine {
 
 class cMaatraaLine extends cLine {
 	subUnits : cMaatraaUnit[];
-	calculateHalfLetterMaatraa()
+	calculateHalfLetterRhythmAmt()
 	{
 		for (let i = 0; i < this.subUnits.length; i++)
 		{
@@ -321,11 +347,11 @@ class cMaatraaLine extends cLine {
 			{
 				let result = 0;
 				if (i==0)
-					result = this.subUnits[i].calculateHalfLetterMaatraa();
+					result = this.subUnits[i].calculateHalfLetterRhythmAmt();
 				else if (i == (this.subUnits.length - 1))
-					result = this.subUnits[i].calculateHalfLetterMaatraa(this.subUnits[i-1]);
+					result = this.subUnits[i].calculateHalfLetterRhythmAmt(this.subUnits[i-1]);
 				else
-					result = this.subUnits[i].calculateHalfLetterMaatraa(this.subUnits[i-1], this.subUnits[i+1]);
+					result = this.subUnits[i].calculateHalfLetterRhythmAmt(this.subUnits[i-1], this.subUnits[i+1]);
 				this.rhythmAmtCumulative += result;
 			}
 		}
@@ -466,12 +492,12 @@ class cVaarnikLine extends cLine {
 				while ((i < this.subUnits.length) && (this.subUnits[i].rhythmAmtCumulative == 0))
 					i++;
 
-				return i;
+				if (i < this.subUnits.length) return i; else return -1;
 			}
 		}
 		return -1;
 	} 
-	setGan()
+	_setGan()
 	{
 		let i = 0;
 		// debugger;
@@ -517,6 +543,66 @@ class cVaarnikLine extends cLine {
 				}
 			}			
 		}
+	}
+	_mergeSubUnit(c:cVarna, p:cVarna) : cVarna
+	{
+		console.log(c);
+		console.log(p);
+		let newVarna = new cVarna(p.mainChar(),p.chars[0].charCode,p.isFirstLetterOfWord);
+		newVarna.chars = p.chars;
+		newVarna.chars = newVarna.chars.concat(c.chars);
+		newVarna.text = p.text + c.text;
+		newVarna.rhythmAmt = p.rhythmAmt + c.rhythmAmt;
+		newVarna.systemRhythmAmt = p.systemRhythmAmt + c.systemRhythmAmt;
+		newVarna.rhythmAmtCumulative = p.rhythmAmtCumulative + c.rhythmAmt;
+		newVarna.vowelChar = p.vowelChar;
+		newVarna.vowelNumber = p.vowelNumber;
+		console.log(newVarna);
+
+		return newVarna;
+
+	}
+	calculateHalfLetterRhythm()
+	{
+		for (let i = 0; i < this.subUnits.length; i++)
+		{
+			if (this.subUnits[i].isHalfLetter)
+			{
+				let result = 0;
+				if (i==0)
+					result = this.subUnits[i].calculateHalfLetterRhythmAmt();
+				else if (i == (this.subUnits.length - 1))
+					result = this.subUnits[i].calculateHalfLetterRhythmAmt(this.subUnits[i-1]);
+				else
+					result = this.subUnits[i].calculateHalfLetterRhythmAmt(this.subUnits[i-1], this.subUnits[i+1]);
+				this.rhythmAmtCumulative += result;
+			}
+		}
+		let tempUnits : cVarna[] = [];
+		let j : number = 0;
+		for (let i = 0; i < this.subUnits.length; i++)
+		{
+			if (this.subUnits[i].isHalfLetter)
+			{
+				if ((this.subUnits[i].rhythmAmt == 1)  && (this.subUnits[i-1].rhythmAmt == 1))
+				{
+					tempUnits[j-1] = this._mergeSubUnit(this.subUnits[i],this.subUnits[i-1]);
+					// j++;
+				}
+			}
+			else 
+			{
+				tempUnits[j] = this.subUnits[i];
+				j++;
+			}
+		}
+		this.subUnits = [];
+		this.subUnits = tempUnits;
+	}
+	setGan()
+	{
+		this.calculateHalfLetterRhythm();
+		this._setGan();
 	}
 }
 
@@ -963,7 +1049,7 @@ function processPoem(poem:string,thisPoemType:poemType = poemType.generic) : cPo
 		let processedLine = oPoem.giveNewLine(units, lines[iLine]);
 		processedLine.rhythmAmtCumulative = lineLen;
 		if (processedLine instanceof cMaatraaLine)
-			processedLine.calculateHalfLetterMaatraa();
+			processedLine.calculateHalfLetterRhythmAmt();
 		if (processedLine instanceof cVaarnikLine)
 			processedLine.setGan();
 		if (thisPoemType == poemType.generic) processedLine.matchRhythmPattern(oPoem.rhythmPattern);
