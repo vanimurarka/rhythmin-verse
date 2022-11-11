@@ -292,13 +292,13 @@ function drawStyleCharBlock(c,colorBy)
 	  				fillOp = "0.2";
 	  			}
 	  		}
-	  		if (c.belongsToGan.length > 0)
+	  		if ((typeof c.belongsToGan !== 'undefined') && (c.belongsToGan.length > 0))
 	  		{
 	  			switch (c.belongsToGan)
 	  			{
 	  				case ganType.y:
 	  					color = "#FF99FF";
-	  					fillOp = "0.4";
+	  					fillOp = "0.5";
 	  					break;
 	  				case ganType.m:
 	  					color = "#00aa00";
@@ -306,7 +306,7 @@ function drawStyleCharBlock(c,colorBy)
 	  					break;
 	  				case ganType.t:
 	  					color = "#bd7ebe";
-	  					fillOp = "0.4";
+	  					fillOp = "0.5";
 	  					break;
 	  				case ganType.r:
 	  					color = "rgb(255,0,0)";
@@ -314,15 +314,15 @@ function drawStyleCharBlock(c,colorBy)
 	  					break;
 	  				case ganType.j:
 	  					color = "#ffb55a";
-	  					fillOp = "0.4";
+	  					fillOp = "0.5";
 	  					break;
 	  				case ganType.b:
 	  					color = "#7eb0d5";
-	  					fillOp = "0.4";
+	  					fillOp = "0.5";
 	  					break;
 	  				case ganType.n:
 	  					color = "rgb(0,0,255)";
-	  					fillOp = "0.4";
+	  					fillOp = "0.3";
 	  					break;
 	  				case ganType.s:
 	  					color = "#CC9900";

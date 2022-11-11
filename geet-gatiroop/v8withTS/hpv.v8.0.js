@@ -247,13 +247,13 @@ class cVarna extends cRhythmUnit {
             if ((this.chars[0].char == "न") && (n.chars[0].char == "ह"))
                 return 0;
         }
-        if (p.systemRhythmAmt == 1 && (!p.isHalfLetter)) {
+        if ((p.systemRhythmAmt == 1) && (!p.isHalfLetter)) {
             this.rhythmAmt = this.systemRhythmAmt = 1;
             return 1;
         }
         if (typeof n !== 'undefined') {
             if ((p.systemRhythmAmt == 2) && (n.systemRhythmAmt == 2)) {
-                this.rhythmAmt = this.systemRhythmAmt = 1;
+                this.rhythmAmtCumulative = this.rhythmAmt = this.systemRhythmAmt = 1;
                 return 1;
             }
         }
@@ -442,9 +442,9 @@ class cVaarnikLine extends cLine {
     }
     _setGan() {
         let i = 0;
-        // debugger;
         let ganSig = "";
         let ganIs;
+        // debugger;
         while ((i >= 0) && (i < this.subUnits.length)) {
             ganSig = "";
             ganIs = [];
@@ -480,8 +480,8 @@ class cVaarnikLine extends cLine {
         }
     }
     _mergeSubUnit(c, p) {
-        console.log(c);
-        console.log(p);
+        // console.log(c);
+        // console.log(p);
         let newVarna = new cVarna(p.mainChar(), p.chars[0].charCode, p.isFirstLetterOfWord);
         newVarna.chars = p.chars;
         newVarna.chars = newVarna.chars.concat(c.chars);
@@ -491,10 +491,11 @@ class cVaarnikLine extends cLine {
         newVarna.rhythmAmtCumulative = p.rhythmAmtCumulative + c.rhythmAmt;
         newVarna.vowelChar = p.vowelChar;
         newVarna.vowelNumber = p.vowelNumber;
-        console.log(newVarna);
+        // console.log(newVarna);
         return newVarna;
     }
     calculateHalfLetterRhythm() {
+        debugger;
         for (let i = 0; i < this.subUnits.length; i++) {
             if (this.subUnits[i].isHalfLetter) {
                 let result = 0;
@@ -504,16 +505,22 @@ class cVaarnikLine extends cLine {
                     result = this.subUnits[i].calculateHalfLetterRhythmAmt(this.subUnits[i - 1]);
                 else
                     result = this.subUnits[i].calculateHalfLetterRhythmAmt(this.subUnits[i - 1], this.subUnits[i + 1]);
-                this.rhythmAmtCumulative += result;
+                this.rhythmAmtCumulative = this.rhythmAmtCumulative + result;
             }
         }
         let tempUnits = [];
         let j = 0;
         for (let i = 0; i < this.subUnits.length; i++) {
             if (this.subUnits[i].isHalfLetter) {
-                if ((this.subUnits[i].rhythmAmt == 1) && (this.subUnits[i - 1].rhythmAmt == 1)) {
-                    tempUnits[j - 1] = this._mergeSubUnit(this.subUnits[i], this.subUnits[i - 1]);
-                    // j++;
+                if (this.subUnits[i].rhythmAmt == 1) {
+                    if (this.subUnits[i - 1].rhythmAmt == 1) {
+                        tempUnits[j - 1] = this._mergeSubUnit(this.subUnits[i], this.subUnits[i - 1]);
+                        // j++;
+                    }
+                    else {
+                        tempUnits[j] = this.subUnits[i];
+                        j++;
+                    }
                 }
             }
             else {
@@ -525,8 +532,70 @@ class cVaarnikLine extends cLine {
         this.subUnits = tempUnits;
     }
     setGan() {
+        console.log(this);
         this.calculateHalfLetterRhythm();
+        // console.log(this);
         this._setGan();
+        // console.log(this);
+    }
+    matchRhythmPattern(pattern = []) {
+        //debugger;
+        let i = 0;
+        let pi = 0; // pattern index
+        let withPattern = false;
+        if (pattern.length > 0) {
+            withPattern = true;
+        }
+        let currentC;
+        let currentPattern;
+        let subUnitsCount = this.subUnits.length;
+        for (i = 0; i < subUnitsCount; i++) {
+            currentC = this.subUnits[i];
+            currentPattern = pattern[pi];
+            if (currentC.isHindi) {
+                // debugger;
+                if (currentC.rhythmPatternValue != 1.5)
+                    currentC.rhythmPatternValue = currentC.rhythmAmt;
+                // increment pattern index if currentC was deergh
+                if (withPattern && (currentC.rhythmPatternValue == 2)) {
+                    pi++;
+                    continue;
+                }
+                if ((currentC.mainChar == "1") || (currentC.mainChar == "१")) {
+                    pi++;
+                    continue;
+                }
+                if ((i < subUnitsCount - 1) && (currentC.rhythmAmt == 1) && (currentC.rhythmPatternValue != 1.5)) {
+                    let nextChar = currentC;
+                    let nextCharFound = false;
+                    let j = i;
+                    while (!nextCharFound) {
+                        j++;
+                        nextChar = this.subUnits[j];
+                        if (typeof nextChar === 'undefined') // no more chars
+                            break;
+                        if (nextChar.rhythmAmt > 0)
+                            nextCharFound = true;
+                    }
+                    if ((nextChar.rhythmAmt == 1) && (currentC.rhythmAmt == 1)) {
+                        if (withPattern)
+                            pi++;
+                    }
+                    else {
+                        pi++;
+                    }
+                }
+                else if (currentC.rhythmPatternValue == 1) {
+                    pi++;
+                }
+            }
+            else {
+                if (withPattern && (currentPattern == 0)) {
+                    currentC.rhythmPatternValue = 0;
+                    pi++;
+                }
+            }
+        }
     }
 }
 // ghazal line
@@ -899,6 +968,8 @@ function processPoem(poem, thisPoemType = poemType.generic) {
             processedLine.calculateHalfLetterRhythmAmt();
         if (processedLine instanceof cVaarnikLine)
             processedLine.setGan();
+        if ((thisPoemType == poemType.vaarnik) && (oPoem.firstLinePattern))
+            processedLine.matchRhythmPattern(oPoem.rhythmPattern);
         if (thisPoemType == poemType.generic)
             processedLine.matchRhythmPattern(oPoem.rhythmPattern);
         oPoem.addLine(processedLine);
