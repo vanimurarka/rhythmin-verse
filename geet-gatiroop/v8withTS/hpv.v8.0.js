@@ -21,7 +21,7 @@ var poemType;
     poemType[poemType["generic"] = 0] = "generic";
     poemType[poemType["ghazal"] = 1] = "ghazal";
     poemType[poemType["freeverse"] = 2] = "freeverse";
-    poemType[poemType["vaarnik"] = 3] = "vaarnik";
+    poemType[poemType["varnik"] = 3] = "varnik";
 })(poemType || (poemType = {}));
 var ganType;
 (function (ganType) {
@@ -427,7 +427,7 @@ class cMaatraaLine extends cLine {
         }
     }
 }
-class cVaarnikLine extends cLine {
+class cVarnikLine extends cLine {
     _findNextRealVarna(i = 0) {
         // debugger;
         while ((i >= 0) && (i < this.subUnits.length)) {
@@ -889,12 +889,12 @@ class cFreeVerse extends cPoem {
         this.calculateCompositeRhythmAmt();
     }
 }
-class cVaarnikPoem extends cPoem {
+class cVarnikPoem extends cPoem {
     giveNewUnit(char, charCode, firstLetter = true) {
         return new cVarna(char, charCode, firstLetter);
     }
     giveNewLine(subUnits, lineText) {
-        return new cVaarnikLine(subUnits, lineText);
+        return new cVarnikLine(subUnits, lineText);
     }
 }
 function initPoem(type = poemType.generic) {
@@ -903,8 +903,8 @@ function initPoem(type = poemType.generic) {
             return new cGhazal();
         case poemType.freeverse:
             return new cFreeVerse();
-        case poemType.vaarnik:
-            return new cVaarnikPoem();
+        case poemType.varnik:
+            return new cVarnikPoem();
         default:
             return new cPoem();
     }
@@ -975,9 +975,9 @@ function processPoem(poem, thisPoemType = poemType.generic) {
         processedLine.rhythmAmtCumulative = lineLen;
         if (processedLine instanceof cMaatraaLine)
             processedLine.calculateHalfLetterRhythmAmt();
-        if (processedLine instanceof cVaarnikLine)
+        if (processedLine instanceof cVarnikLine)
             processedLine.setGan();
-        if ((thisPoemType == poemType.vaarnik) && (oPoem.firstLinePattern))
+        if ((thisPoemType == poemType.varnik) && (oPoem.firstLinePattern))
             processedLine.matchRhythmPattern(oPoem.rhythmPattern);
         if (thisPoemType == poemType.generic)
             processedLine.matchRhythmPattern(oPoem.rhythmPattern);

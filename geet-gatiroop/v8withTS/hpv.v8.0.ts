@@ -25,7 +25,7 @@ enum poemType {
 	generic = 0,
 	ghazal = 1,
 	freeverse = 2,
-	vaarnik = 3
+	varnik = 3
 }
 
 enum ganType {
@@ -483,7 +483,7 @@ class cMaatraaLine extends cLine {
 	}
 }
 
-class cVaarnikLine extends cLine {
+class cVarnikLine extends cLine {
 	subUnits : cVarna[];
 	_findNextRealVarna(i : number = 0) : number
 	{
@@ -1047,15 +1047,15 @@ class cFreeVerse extends cPoem {
 	}
 }
 
-class cVaarnikPoem extends cPoem {
-	lines : cVaarnikLine[];
+class cVarnikPoem extends cPoem {
+	lines : cVarnikLine[];
 	giveNewUnit(char, charCode, firstLetter = true) : cVarna
 	{
 		return new cVarna(char,charCode,firstLetter);
 	}
-	giveNewLine(subUnits,lineText) : cVaarnikLine
+	giveNewLine(subUnits,lineText) : cVarnikLine
 	{
-		return new cVaarnikLine(subUnits, lineText);	
+		return new cVarnikLine(subUnits, lineText);	
 	}
 }
 
@@ -1067,8 +1067,8 @@ function initPoem(type : poemType = poemType.generic) : any
 			return new cGhazal();
 		case poemType.freeverse:
 			return new cFreeVerse();
-		case poemType.vaarnik:
-			return new cVaarnikPoem();
+		case poemType.varnik:
+			return new cVarnikPoem();
 		default:
 			return new cPoem();
 	}
@@ -1151,9 +1151,9 @@ function processPoem(poem:string,thisPoemType:poemType = poemType.generic) : cPo
 		processedLine.rhythmAmtCumulative = lineLen;
 		if (processedLine instanceof cMaatraaLine)
 			processedLine.calculateHalfLetterRhythmAmt();
-		if (processedLine instanceof cVaarnikLine)
+		if (processedLine instanceof cVarnikLine)
 			processedLine.setGan();
-		if ((thisPoemType == poemType.vaarnik) && (oPoem.firstLinePattern))
+		if ((thisPoemType == poemType.varnik) && (oPoem.firstLinePattern))
 			processedLine.matchRhythmPattern(oPoem.rhythmPattern);
 		if (thisPoemType == poemType.generic) processedLine.matchRhythmPattern(oPoem.rhythmPattern);
 		oPoem.addLine(processedLine);

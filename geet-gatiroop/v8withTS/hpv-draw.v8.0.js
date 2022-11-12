@@ -343,6 +343,11 @@ function drawStyleCharBlock(c,colorBy)
 	  			}
 	  			
 	  		}
+	  		if (c.isHalfLetter && (c.rhythmAmt == 0))
+	  		{
+	  			color = "black";
+	  			fillOp = "0.5";
+	  		}
 
 		}
 	  	else // user adjusted maatraa show in diff color
