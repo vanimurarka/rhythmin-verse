@@ -262,7 +262,7 @@ function drawStyleCharBlock(c,colorBy)
 	var color = "rgb(0,220,255)";
 	var strokeOp = "0.3";
 	var strokeW = 1;
-	var fillOp = "0.2";
+	var fillOp = "0.4";
 	var strokeColor = "black";
 
 	// call conColor to determine color and opacity as per consonant

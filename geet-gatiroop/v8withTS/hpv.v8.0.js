@@ -201,7 +201,13 @@ class cRhythmUnit {
             }
         }
     }
-    setRhythmPatternVal(patternVal) { this.rhythmPatternValue = patternVal; }
+    setRhythmPatternVal(patternVal) {
+        // test for chandrabindu
+        // chandrabindu will never match a pattern
+        if (this.isHindi && (this.vowelNumber == -10))
+            return;
+        this.rhythmPatternValue = patternVal;
+    }
     mainChar() { return this.chars[0].char; }
 }
 class cMaatraaUnit extends cRhythmUnit {
@@ -365,7 +371,7 @@ class cMaatraaLine extends cLine {
             if (currentC.isHindi) {
                 // debugger;
                 if (currentC.rhythmPatternValue != 1.5)
-                    currentC.rhythmPatternValue = currentC.rhythmAmt;
+                    currentC.setRhythmPatternVal(currentC.rhythmAmt);
                 // increment pattern index if currentC was deergh
                 if (withPattern && (currentC.rhythmPatternValue == 2)) {
                     pi++;
@@ -543,7 +549,6 @@ class cVaarnikLine extends cLine {
         // console.log(this);
     }
     matchRhythmPattern(pattern = []) {
-        debugger;
         let i = 0;
         let pi = 0; // pattern index
         let withPattern = false;
@@ -557,40 +562,16 @@ class cVaarnikLine extends cLine {
             currentC = this.subUnits[i];
             currentPattern = pattern[pi];
             if (currentC.isHindi) {
-                // debugger;
                 if (currentC.rhythmPatternValue != 1.5)
-                    currentC.rhythmPatternValue = currentC.rhythmAmt;
+                    currentC.setRhythmPatternVal(currentC.rhythmAmt);
                 // increment pattern index if currentC was deergh
-                if (withPattern && (currentC.rhythmPatternValue == 2)) {
+                if (withPattern && (currentC.rhythmPatternValue > 0)) {
                     pi++;
                     continue;
                 }
                 if ((currentC.mainChar == "1") || (currentC.mainChar == "१")) {
                     pi++;
                     continue;
-                }
-                if ((i < subUnitsCount - 1) && (currentC.rhythmAmt == 1) && (currentC.rhythmPatternValue != 1.5)) {
-                    let nextChar = currentC;
-                    let nextCharFound = false;
-                    let j = i;
-                    while (!nextCharFound) {
-                        j++;
-                        nextChar = this.subUnits[j];
-                        if (typeof nextChar === 'undefined') // no more chars
-                            break;
-                        if (nextChar.rhythmAmt > 0)
-                            nextCharFound = true;
-                    }
-                    if ((nextChar.rhythmAmt == 1) && (currentC.rhythmAmt == 1)) {
-                        if (withPattern)
-                            pi++;
-                    }
-                    else {
-                        pi++;
-                    }
-                }
-                else if (currentC.rhythmPatternValue == 1) {
-                    pi++;
                 }
             }
             else {
