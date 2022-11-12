@@ -158,7 +158,7 @@ function draw()
             return drawStyleCharBlock(d,'consonant');
         })
         .attr("d", function(d,i) {return drawCharBlock(d,i);})
-        .attr("title", function(d,i) {return d.mainChar+d.vowelChar;})
+        .attr("title", function(d,i) {return d.mainChar()+d.vowelChar;})
         .on("click",adjustCharLen);
 
     // line total maatraa

@@ -543,7 +543,7 @@ class cVaarnikLine extends cLine {
         // console.log(this);
     }
     matchRhythmPattern(pattern = []) {
-        //debugger;
+        debugger;
         let i = 0;
         let pi = 0; // pattern index
         let withPattern = false;
