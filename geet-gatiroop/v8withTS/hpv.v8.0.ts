@@ -564,7 +564,7 @@ class cVaarnikLine extends cLine {
 	}
 	calculateHalfLetterRhythm()
 	{
-		debugger;
+		// debugger;
 		for (let i = 0; i < this.subUnits.length; i++)
 		{
 			if (this.subUnits[i].isHalfLetter)
@@ -600,6 +600,11 @@ class cVaarnikLine extends cLine {
 						j++;
 					}
 				}
+				else
+				{
+					tempUnits[j] = this.subUnits[i];
+					j++;
+				}
 			}
 			else 
 			{
@@ -612,7 +617,7 @@ class cVaarnikLine extends cLine {
 	}
 	setGan()
 	{
-		console.log(this);
+		// console.log(this);
 		this.calculateHalfLetterRhythm();
 		// console.log(this);
 		this._setGan();
@@ -693,6 +698,35 @@ class cVaarnikLine extends cLine {
 				}
 			}
 		}
+	}
+	clearPattern()
+	{
+		let i = 0;
+		for (i = 0; i < this.subUnits.length; i++)
+		{
+			this.subUnits[i].rhythmPatternValue = -1; // default value
+		}
+	}
+	adjustUnitRhythm(iUnit:number, pattern)
+	{
+		let unit = this.subUnits[iUnit];
+		let newRhythmAmt = 0;
+		if (unit.isHalfLetter)
+		{
+			newRhythmAmt = (unit.rhythmAmt == 1) ? 0 : 1;
+		}
+		else
+		{
+			newRhythmAmt = (unit.rhythmAmt == 1) ? 2 : 1;
+		}
+		let diff = newRhythmAmt - unit.rhythmAmt;
+		this.subUnits[iUnit].rhythmAmt = newRhythmAmt;
+		this.subUnits[iUnit].rhythmAmtCumulative += diff;
+		this.rhythmAmtCumulative += diff;
+		// debugger;
+		this._setGan();
+		this.clearPattern();
+		this.matchRhythmPattern(pattern);
 	}
 }
 
