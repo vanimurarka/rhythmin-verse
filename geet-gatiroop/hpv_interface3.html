@@ -5,6 +5,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<script type="text/javascript" src="d3.v2.min.js"></script>
   	<script type="text/javascript" src="hpv.v8.0.js"></script>
+  	<script type="text/javascript" src="hpv-draw.v8.0.js"></script>
 	<title> 
 		Geet Gatiroop 
 	</title> 
@@ -50,12 +51,20 @@
     }
     function callVisualize()
     {
-		var poem = document.getElementById("pom").innerText;
-		var visDiv = document.getElementById("right");
-		var availableW = visDiv.clientWidth;
-		// alert(availableW);
-		visualize(poem, availableW);
-		document.getElementById("divControls").style.display = "block";
+		// var poem = document.getElementById("pom").innerText;
+		// var visDiv = document.getElementById("right");
+		// var availableW = visDiv.clientWidth;
+		// // alert(availableW);
+		// visualize(poem, availableW);
+		// document.getElementById("divControls").style.display = "block";
+
+		let pom = document.getElementById("pom").innerText;
+		let visDiv = document.getElementById("right");
+		let availableW = visDiv.clientWidth;
+		let myPoemType = poemType.generic;
+		// debugger;
+		processedPoem = processPoem(pom, myPoemType);
+		visualize(processedPoem, availableW, myPoemType);
     }
     
     function setVisDiv() {
