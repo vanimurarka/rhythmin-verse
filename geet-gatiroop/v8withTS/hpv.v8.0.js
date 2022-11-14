@@ -911,7 +911,7 @@ function initPoem(type = poemType.generic) {
 }
 let oPoem;
 let oPrevPoem;
-function processPoem(poem, thisPoemType = poemType.generic) {
+function hpvProcessPoem(poem, thisPoemType = poemType.generic) {
     let lines = poem.split("\n");
     if (typeof oPoem === 'undefined')
         oPoem = initPoem(thisPoemType);
@@ -989,4 +989,8 @@ function processPoem(poem, thisPoemType = poemType.generic) {
     }
     console.log(oPoem);
     return oPoem;
+}
+function hpvBaseCountChange(baseCount = 1) {
+    if ((baseCount > 0) && (baseCount != oPoem.baseCount))
+        oPoem.setBaseCount(baseCount);
 }

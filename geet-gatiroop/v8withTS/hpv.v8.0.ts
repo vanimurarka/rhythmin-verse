@@ -1077,7 +1077,7 @@ function initPoem(type : poemType = poemType.generic) : any
 let oPoem;
 let oPrevPoem;
 
-function processPoem(poem:string,thisPoemType:poemType = poemType.generic) : cPoem
+function hpvProcessPoem(poem:string,thisPoemType:poemType = poemType.generic) : cPoem
 {
 	let lines = poem.split("\n");
 	if (typeof oPoem === 'undefined')
@@ -1167,3 +1167,8 @@ function processPoem(poem:string,thisPoemType:poemType = poemType.generic) : cPo
 	return oPoem;	
 }
 
+function hpvBaseCountChange(baseCount = 1)
+{
+	if ((baseCount > 0) && (baseCount != oPoem.baseCount))
+	  oPoem.setBaseCount(baseCount);
+}

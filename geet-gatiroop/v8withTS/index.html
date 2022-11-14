@@ -21,24 +21,21 @@ Base Count: <input type="number" name="baseCount" id="baseCount" value="1" min="
 <script type="text/javascript">
 	"use strict";
 
-	let processedPoem;
+	let pxrocessedPoem;
 	function myProcessPoem()
 	{
 		let pom = document.getElementById("pom").value;
 		let visDiv = document.getElementById("right");
-		let availableW = visDiv.clientWidth;
-		let myPoemType = poemType.varnik;
+		let axvailableW = visDiv.clientWidth;
+		let myPoemType = poemType.freeverse;
 		// debugger;
-		processedPoem = processPoem(pom, myPoemType);
-		visualize(processedPoem, availableW, myPoemType);
+		pxrocessedPoem = hpvProcessPoem(pom, myPoemType);
+		visualize(pxrocessedPoem, axvailableW, myPoemType);
 	}
 	function fnBaseCountChange(baseCount = 1)
 	{
-		if ((baseCount > 0) && (baseCount != oPoem.baseCount))
-		{
-		  processedPoem.setBaseCount(baseCount);
-		  draw();
-		}
+		pxrocessedPoem = hpvBaseCountChange(baseCount);
+		draw();
 	}
 </script>
 </html>

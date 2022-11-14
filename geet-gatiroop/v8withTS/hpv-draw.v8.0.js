@@ -7,6 +7,7 @@ let fLineSpacing = true;
 let fFreeVerse = false;
 let fGhazal = false;
 let fRhymingLines = false;
+let dPoem;
 
 let lineRhythmTotal = 0;
 
@@ -59,14 +60,17 @@ function initSvgFlex(svgViewBox)
 	return svg;
 }
 
-function visualize(availableW)
+
+
+function visualize(givenPoem, dAvailableW, dPoemType)
 {
-	if (oPoem.type == poemType.ghazal)
+	dPoem = givenPoem;
+	if (dPoem.type == poemType.ghazal)
 		fGhazal = true;
-	else if (oPoem.type == poemType.freeverse)
+	else if (dPoem.type == poemType.freeverse)
 		fFreeVerse= true;
 
-	oVisual = new cVisual(availableW);
+	oVisual = new cVisual(dAvailableW);
 	draw();	
 }
 
@@ -74,8 +78,8 @@ function visualize(availableW)
 // The D3 draw dance!
 function draw()
 {	
-	const maxLen = oPoem.maxLineLen;
-	const lineCount = oPoem.lines.length;
+	const maxLen = dPoem.maxLineLen;
+	const lineCount = dPoem.lines.length;
 	var chart = d3.select("#chart");
 	chart.select("svg").remove();
 	const svgW = fFreeVerse?(charW*maxLen)+70:(charW*maxLen)+30;
@@ -116,7 +120,7 @@ function draw()
 	if (fLineSpacing)
 	{
 		var g = svg.selectAll("g")
-		.data(oPoem.lines)
+		.data(dPoem.lines)
 		.enter().append("svg:g")
 		  .attr("transform", function(d,i) 
 		    { 
@@ -127,7 +131,7 @@ function draw()
 	else
 	{
 		var g = svg.selectAll("g")
-		.data(oPoem.lines)
+		.data(dPoem.lines)
 		.enter().append("svg:g")
 		  .attr("transform", function(d,i) 
 		    { return "translate(" + paddingLeft + "," + ((i*(charH))+(charH)) + ")" })
@@ -411,7 +415,7 @@ function adjustCharLen()
 	// debugger;
 	let iChr = parseInt(this.getAttribute("id").substring(4));
 	let iLine = parseInt(this.parentNode.getAttribute("id").substring(5));
-	oPoem.adjustUnitRhythm(iLine,iChr);
+	dPoem.adjustUnitRhythm(iLine,iChr);
 	draw();
 }
 
@@ -426,9 +430,9 @@ function markCompositeLine()
 
 	// if anything before last line
 	// if not marked as composite
-	if ((i < oPoem.lines.length-1) && (!oPoem.lines[i+1].isComposite))
+	if ((i < dPoem.lines.length-1) && (!dPoem.lines[i+1].isComposite))
 	{
-	  oPoem.setComposite(i+1); // why is the next line marked composite? but it works
+	  dPoem.setComposite(i+1); // why is the next line marked composite? but it works
 	  draw();
 	} 
 }
@@ -437,7 +441,7 @@ function markCompositeLine()
 // Draw composite line markers if free verse is on
 function drawFreeVerseDashStyle(i)
   {
-      if (oPoem.lines[i].maatraa == 0)  // empty line
+      if (dPoem.lines[i].maatraa == 0)  // empty line
         return "display:none;";
 
       return "stroke:black;stroke-width:8;"
@@ -447,19 +451,19 @@ function drawFreeVerseDashStyle(i)
 // What is the difference between this function and drawFreeVerseDashStyle
 function drawCompositeLineMarker(drawWhat,i)
   {
-  	const maxLen = oPoem.maxLineLen;
+  	const maxLen = dPoem.maxLineLen;
     if (drawWhat == "x1")
     {
       if (i==0)
         return charW*maxLen+(charW*2);
-      if (oPoem.lines[i].isComposite)
+      if (dPoem.lines[i].isComposite)
         return charW*maxLen+(charW+12);        
       else
         return charW*maxLen+(charW*2);
     }
     if (drawWhat == "y1")
     {
-      if (oPoem.lines[i].isComposite)
+      if (dPoem.lines[i].isComposite)
       {
         if (fLineSpacing)
           return -11;
@@ -471,7 +475,7 @@ function drawCompositeLineMarker(drawWhat,i)
     }
     if (drawWhat == "style")
     {
-      if ((oPoem.lines[i].maatraa == 0) || (!oPoem.lines[i].isComposite))  // empty line || not composite
+      if ((dPoem.lines[i].maatraa == 0) || (!dPoem.lines[i].isComposite))  // empty line || not composite
         return "display:none;";
 
       return "stroke:green;stroke-width:6;"
@@ -489,7 +493,7 @@ function unmarkCompositeLine()
     // if true, the line is composite with top
     if (i > 0)
     {
-      oPoem.setComposite(i); 
+      dPoem.setComposite(i); 
       draw();
     } 
   }
@@ -497,7 +501,7 @@ function unmarkCompositeLine()
 // Function: drawCompositeNumbers
 function drawCompositeNumbers()
 {
-	const maxLen = oPoem.maxLineLen;
+	const maxLen = dPoem.maxLineLen;
 	let chart = d3.select("#chart");
 	let svg = chart.select("svg");
 	
@@ -508,7 +512,7 @@ function drawCompositeNumbers()
 		y = charH;
 
 	let compositeLTotal = svg.selectAll(".compositeCountT")
-	  .data(oPoem.compositeLines)
+	  .data(dPoem.compositeLines)
 	  .enter().append("svg:text")
 	  .attr("y", function(d) {return ((d.originalLineIdx*y)+y+charH);})
 	  .attr("x", function(d) {return paddingLeft + (charW*maxLen)+(charW+20);})
@@ -518,7 +522,7 @@ function drawCompositeNumbers()
 	  .text(function(d) {return d.rhythmAmtCumulative;});
 
 	let compositeLRemainder = svg.selectAll(".compositeCountR")
-	  .data(oPoem.compositeLines)
+	  .data(dPoem.compositeLines)
 	  .enter().append("svg:text")
 	  .attr("y", function(d) {return ((d.originalLineIdx*y)+y+charH)+10;})
 	  .attr("x", function(d) {return paddingLeft + (charW*maxLen)+(charW+20+10);})
