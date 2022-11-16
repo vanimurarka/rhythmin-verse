@@ -1077,11 +1077,14 @@ function initPoem(type : poemType = poemType.generic) : any
 let oPoem;
 let oPrevPoem;
 
-function hpvProcessPoem(poem:string,thisPoemType:poemType = poemType.generic) : cPoem
+function hpvProcessPoem(poem:string, thisPoemType:poemType = poemType.generic, refresh:boolean = false) : cPoem
 {
 	let lines = poem.split("\n");
-	if (typeof oPoem === 'undefined')
+	if (refresh || (typeof oPoem === 'undefined'))
+	{
 		oPoem = initPoem(thisPoemType);
+		oPrevPoem = undefined;
+	}
 	else
 	{
 		oPrevPoem = oPoem;

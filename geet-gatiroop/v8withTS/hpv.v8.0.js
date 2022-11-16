@@ -911,10 +911,12 @@ function initPoem(type = poemType.generic) {
 }
 let oPoem;
 let oPrevPoem;
-function hpvProcessPoem(poem, thisPoemType = poemType.generic) {
+function hpvProcessPoem(poem, thisPoemType = poemType.generic, refresh = false) {
     let lines = poem.split("\n");
-    if (typeof oPoem === 'undefined')
+    if (refresh || (typeof oPoem === 'undefined')) {
         oPoem = initPoem(thisPoemType);
+        oPrevPoem = undefined;
+    }
     else {
         oPrevPoem = oPoem;
         oPoem = initPoem(thisPoemType);
