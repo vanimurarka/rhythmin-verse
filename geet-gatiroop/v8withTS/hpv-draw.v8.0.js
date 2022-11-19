@@ -64,6 +64,7 @@ function initSvgFlex(svgViewBox)
 
 function visualize(givenPoem, dAvailableW, dPoemType)
 {
+	fGhazal = fFreeVerse = false;
 	dPoem = givenPoem;
 	if (dPoem.type == poemType.ghazal)
 		fGhazal = true;
