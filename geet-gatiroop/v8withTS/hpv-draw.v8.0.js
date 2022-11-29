@@ -531,3 +531,100 @@ function drawCompositeNumbers()
 	  .attr("style", function(d) {return d.remainder!=0?"fill:red;font-size:80%":"display:none";})
 	  .text(function(d) {return d.remainder>0?"+"+d.remainder:d.remainder;});
 }
+
+// Function: fnFit
+// Toggle Screen Fit
+function fnFit(chkbox)
+{
+	var checked = chkbox.checked;
+	if (checked)
+		oVisual.userMode = "flexible";
+	else
+		oVisual.userMode = "fixed";
+	draw();
+}
+
+// Function: fnLineSpacing
+// Toggle Line Spacing control
+function fnLineSpacing()
+{
+	fLineSpacing = !fLineSpacing;
+	draw();
+}
+
+// Function: fnShowText
+// Toggle function to show or hide text in the visualization
+function fnShowText()
+{
+	fShowText = !fShowText;
+	draw();
+}
+
+// Function: saveSVG
+// Download SVG as PNG on user's system
+function saveSVG() {
+	var chart = document.getElementById("chart");
+	var svg = chart.querySelector('svg');
+	var canvas = document.createElement("canvas");
+  var data = new XMLSerializer().serializeToString(svg);
+  //alert(data);
+  // ADD geet-gatiroop.com to bottom of image
+  if (data.search("viewBox") == -1) // not fitscreen
+  {
+  	var width = svg.getBoundingClientRect().width;
+		var height = svg.getBoundingClientRect().height;
+		canvas.width = width;
+  	canvas.height = height+10;
+
+	  var svgStart = '<svg xmlns="http://www.w3.org/2000/svg" width="'+width+'" height="';
+	  data = data.substring(svgStart.length+height.toString().length);
+	  // insert new height
+	  data = svgStart + (height+10) + data;
+
+	  // get svg string minus svg closing tag
+	  data = data.substring(0,data.length-6);
+	  // insert geet gatiroop text at bottom just before closing svg tag
+	  data += '<text x="2" y="'+(height+10-4)+'">geet-gatiroop.com</text></svg>';
+	}
+	else // free size as per poem -- no viewbox
+	{
+		var box = svg.viewBox.baseVal;
+		canvas.width = box.width;
+  	canvas.height = box.height+10;
+
+  	canvas.height += 10;
+
+	  var svgStart = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+box.width+' ';
+	  data = data.substring(svgStart.length+box.height.toString().length);
+
+	  // insert new height
+	  data = svgStart + (box.height+10) + data;
+
+	  // get svg string minus svg closing tag
+	  data = data.substring(0,data.length-6);
+	  // insert geet gatiroop text at bottom just before closing svg tag
+	  data += '<text x="2" y="'+(box.height+10-4)+'">geet-gatiroop.com</text></svg>';
+	}
+
+  var win = window.URL || window.webkitURL || window;
+  var img = new Image();
+  var blob = new Blob([data], { type: 'image/svg+xml' });
+  var url = win.createObjectURL(blob);
+  img.onload = function () 
+  {
+    canvas.getContext('2d').drawImage(img, 0, 0);
+    win.revokeObjectURL(url);
+    var uri = canvas.toDataURL('image/png').replace('image/png', 'octet/stream');
+    var a = document.createElement('a');
+    document.body.appendChild(a);
+    a.style = 'display: none';
+    a.href = uri
+    a.download = "geetgatiroop-output.png";
+    a.click();
+    window.URL.revokeObjectURL(uri);
+    document.body.removeChild(a);
+  };
+
+  img.src = url;
+
+}
