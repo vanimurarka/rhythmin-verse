@@ -138,7 +138,7 @@ processPoem pom =
   let
     pPoemLines = List.map String.toList (String.split "\r\n" pom)
   in 
-    List.map processLine pPoemLines
+    Array.fromList (List.map processLine pPoemLines)
 
 -- -- Call processPoem --
 
