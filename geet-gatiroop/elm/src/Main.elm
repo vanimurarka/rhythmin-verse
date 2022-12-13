@@ -1,152 +1,136 @@
-module Main exposing (..)
+port module Main exposing (..)
 
-import Html
-import Array 
+import Browser
+import Html exposing (..)
+import Html.Attributes exposing (..)
+import Html.Events exposing (..)
+import Json.Decode as D
+import Json.Encode as E
 
-type AksharType  = PureVowel | Maatraa | Consonant | Other | Empty
 
-type alias Akshar =
-  { str : String,
-    code : Int,
-    aksharType : AksharType,
-    vowel : Char,
-    rhythm : Int
-  }
-  
-emptyAkshar = Akshar " " 0 Empty ' ' 0
-  
-isHindi c =
-  let 
-    cd = Char.toCode c
-  in
-    if (cd >= 2304) && (cd <= 2431) then
-      True
-    else
-      False
-      
-isPureVowel c =
-  let 
-    cd = Char.toCode c
-  in
-    if (cd >= 2309) && (cd <= 2324) then
-      True
-    else
-      False
-      
-isMaatraaVowel c =
-  let 
-    cd = Char.toCode c
-  in
-    if (cd >= 2366) && (cd <= 2381) then
-      True
-    else
-      False
 
-vowelRhythm c =
-  case c of
-    'अ' -> 1
-    'आ' -> 2
-    'इ' -> 1
-    'ई' -> 2
-    'उ' -> 1
-    'ऊ' -> 2
-    'ए' -> 2
-    'ऐ' -> 2
-    'ओ' -> 2
-    'औ' -> 2
-    'ऑ' -> 2
-    'ऋ' -> 1
-    _ -> 0
-    
-maatraaToVowel c =
-  case c of
-    'ा' -> 'आ'
-    'ि' -> 'इ'
-    'ी' -> 'ई'
-    'ु' -> 'उ'
-    'ू' -> 'ऊ'
-    'े' ->'ए'
-    'ै' -> 'ऐ'
-    'ो' -> 'ओ'
-    'ौ' ->'औ'
-    'ॉ' ->'ऑ'
-    'ृ' -> 'ऋ'
-    _ -> c
+-- MAIN
 
-setRhythm a =
-  {a | rhythm = vowelRhythm a.vowel}
 
-processChar c =
-  let 
-    cd = Char.toCode c
-    m = 0
-    a = { str = String.fromChar c,
-        code = cd,
-        aksharType = Other,
-        vowel = c,
-        rhythm = 0}
-  in
-  if isHindi c then
-    if isPureVowel c then
-      {a | aksharType = PureVowel, rhythm = vowelRhythm a.vowel}
-    else if isMaatraaVowel c then
-        {a | aksharType = Maatraa, rhythm = vowelRhythm (maatraaToVowel a.vowel)}
-      else
-        {a | aksharType = Consonant, vowel = 'अ', rhythm = vowelRhythm 'अ'}
-  else
-    a
-
-mrgMCakshar aL aM =
-  let 
-    aC = {aM | rhythm = aL.rhythm, str = aM.str ++ aL.str, vowel = aL.vowel}
-  in
-    if (aM.aksharType == Consonant) && (aL.aksharType == Maatraa) then
-      (True, aC)
-    else
-      (False, aL)
-
-mrgMChelper list iStart mList =
-  let
-   mListLen = Array.length mList
-   aL = Maybe.withDefault emptyAkshar (Array.get iStart list)
-   aM = Maybe.withDefault emptyAkshar (Array.get (mListLen - 1) mList)
-   mrgResult = mrgMCakshar aL aM
-   aC = Tuple.second mrgResult
-   iNext = iStart + 1
-  in
-    if (iStart == Array.length list) then
-      mList
-    else if Array.length list == 1 then
-      mrgMChelper list iNext (Array.push aL mList)
-    else
-      if (Tuple.first mrgResult) then
-        mrgMChelper list iNext (Array.set (mListLen - 1) aC mList)
-      else
-        mrgMChelper list iNext (Array.push aC mList)
-
-mrgMCline list =
- mrgMChelper list 0 Array.empty
- 
-processLine pomLine =
-  let
-    pPoem = List.map processChar pomLine -- list of akshars
-    pPoemA = Array.fromList pPoem -- as array
-  in
-    mrgMCline pPoemA -- merge Maatraa and Consonant akshars
-  
-processPoem pom =
-  let
-    pPoemLines = List.map String.toList (String.split "\r\n" pom)
-  in 
-    Array.fromList (List.map processLine pPoemLines)
-
--- -- Call processPoem --
-
-poem = """एक
-है"""
-pPoemAMerged = processPoem poem
-
-newstr = Debug.toString pPoemAMerged
-
+main : Program E.Value Model Msg
 main =
-  Html.text newstr
+  Browser.element
+    { init = init
+    , view = view
+    , update = updateWithStorage
+    , subscriptions = \_ -> Sub.none
+    }
+
+
+
+-- MODEL
+
+
+type alias Model =
+  { poem : String
+  , email : String
+  }
+
+
+-- Here we use "flags" to load information in from localStorage. The
+-- data comes in as a JS value, so we define a `decoder` at the bottom
+-- of this file to turn it into an Elm value.
+--
+-- Check out index.html to see the corresponding code on the JS side.
+--
+init : E.Value -> ( Model, Cmd Msg )
+init flags =
+  (
+    case D.decodeValue decoder flags of
+      Ok model -> model
+      Err _ -> { poem = "", email = "" }
+  ,
+    Cmd.none
+  )
+
+
+
+-- UPDATE
+
+
+type Msg
+  = PoemChanged String
+  | EmailChanged String
+
+
+update : Msg -> Model -> ( Model, Cmd Msg )
+update msg model =
+  case msg of
+    PoemChanged poem ->
+      ( { model | poem = poem }
+      , Cmd.none
+      )
+
+    EmailChanged email ->
+      ( { model | email = email }
+      , Cmd.none
+      )
+
+
+
+-- VIEW
+
+
+view : Model -> Html Msg
+view model =
+  div []
+    [ input
+        [ type_ "text"
+        , placeholder "Poem"
+        , onInput PoemChanged
+        , value model.poem
+        ]
+        []
+    , input
+        [ type_ "text"
+        , placeholder "Poem Processed"
+        , value model.poem
+        ]
+        []
+    ]
+
+
+
+-- PORTS
+
+
+port setStorage : E.Value -> Cmd msg
+
+
+-- We want to `setStorage` on every update, so this function adds
+-- the setStorage command on each step of the update function.
+--
+-- Check out index.html to see how this is handled on the JS side.
+--
+updateWithStorage : Msg -> Model -> ( Model, Cmd Msg )
+updateWithStorage msg oldModel =
+  let
+    ( newModel, cmds ) = update msg oldModel
+  in
+  ( newModel
+  , Cmd.batch [ setStorage (encode newModel), cmds ]
+  )
+
+
+
+-- JSON ENCODE/DECODE
+
+
+encode : Model -> E.Value
+encode model =
+  E.object
+    [ ("poem", E.string model.poem)
+    , ("email", E.string model.email)
+    ]
+
+
+decoder : D.Decoder Model
+decoder =
+  D.map2 Model
+    (D.field "poem" D.string)
+    (D.field "email" D.string)

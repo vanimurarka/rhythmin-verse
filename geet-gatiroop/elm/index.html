@@ -1,17 +1,35 @@
+<!DOCTYPE HTML>
 <html>
+
 <head>
   <meta charset="UTF-8">
-  <title>Main</title>
-  <script src="main.js"></script>
+  <title>GG Elm</title>
+  <script type="text/javascript" src="main.js"></script>
 </head>
 
 <body>
-  <div id="poem">Something</div>
   <div id="myapp"></div>
-  <script>
-  var app = Elm.Main.init({
-    node: document.getElementById('myapp')
-  });
-  </script>
 </body>
+
+<script type="text/javascript">
+// Extract the stored data from previous sessions.
+var storedData = localStorage.getItem('gg-elm-js-interop');
+console.log(storedData);
+var flags = storedData ? JSON.parse(storedData) : null;
+console.log(flags);
+
+// Load the Elm app, passing in the stored data.
+var app = Elm.Main.init({
+	node: document.getElementById('myapp'),
+	flags: flags
+});
+
+// Listen for commands from the `setStorage` port.
+// Turn the data to a string and put it in localStorage.
+app.ports.setStorage.subscribe(function(state) {
+    alert("in subscribe");
+    localStorage.setItem('gg-elm-js-interop', JSON.stringify(state));
+});
+</script>
+
 </html>
