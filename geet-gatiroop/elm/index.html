@@ -7,16 +7,16 @@
   <script type="text/javascript" src="main.js"></script>
 </head>
 
-<body>
+<body style="background-color: black;">
   <div id="myapp"></div>
 </body>
 
 <script type="text/javascript">
 // Extract the stored data from previous sessions.
 var storedData = localStorage.getItem('gg-elm-js-interop');
-console.log(storedData);
+// console.log(storedData);
 var flags = storedData ? JSON.parse(storedData) : null;
-console.log(flags);
+// console.log(flags);
 
 // Load the Elm app, passing in the stored data.
 var app = Elm.Main.init({
@@ -27,7 +27,7 @@ var app = Elm.Main.init({
 // Listen for commands from the `setStorage` port.
 // Turn the data to a string and put it in localStorage.
 app.ports.setStorage.subscribe(function(state) {
-    alert("in subscribe");
+    console.log(state);
     localStorage.setItem('gg-elm-js-interop', JSON.stringify(state));
 });
 </script>

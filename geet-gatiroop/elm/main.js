@@ -5160,17 +5160,19 @@ var $elm$core$Task$perform = F2(
 	});
 var $elm$browser$Browser$element = _Browser_element;
 var $elm$json$Json$Decode$decodeValue = _Json_run;
-var $author$project$Main$Model = F2(
-	function (poem, email) {
-		return {email: email, poem: poem};
+var $author$project$Main$Model = F3(
+	function (poem, processedPoem, lastAction) {
+		return {lastAction: lastAction, poem: poem, processedPoem: processedPoem};
 	});
 var $elm$json$Json$Decode$field = _Json_decodeField;
+var $elm$json$Json$Decode$map3 = _Json_map3;
 var $elm$json$Json$Decode$string = _Json_decodeString;
-var $author$project$Main$decoder = A3(
-	$elm$json$Json$Decode$map2,
+var $author$project$Main$decoder = A4(
+	$elm$json$Json$Decode$map3,
 	$author$project$Main$Model,
 	A2($elm$json$Json$Decode$field, 'poem', $elm$json$Json$Decode$string),
-	A2($elm$json$Json$Decode$field, 'email', $elm$json$Json$Decode$string));
+	A2($elm$json$Json$Decode$field, 'processedPoem', $elm$json$Json$Decode$string),
+	A2($elm$json$Json$Decode$field, 'lastAction', $elm$json$Json$Decode$string));
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $author$project$Main$init = function (flags) {
@@ -5181,7 +5183,7 @@ var $author$project$Main$init = function (flags) {
 				var model = _v0.a;
 				return model;
 			} else {
-				return {email: '', poem: ''};
+				return {lastAction: '', poem: '', processedPoem: ''};
 			}
 		}(),
 		$elm$core$Platform$Cmd$none);
@@ -5210,8 +5212,11 @@ var $author$project$Main$encode = function (model) {
 				'poem',
 				$elm$json$Json$Encode$string(model.poem)),
 				_Utils_Tuple2(
-				'email',
-				$elm$json$Json$Encode$string(model.email))
+				'processedPoem',
+				$elm$json$Json$Encode$string(model.processedPoem)),
+				_Utils_Tuple2(
+				'lastAction',
+				$elm$json$Json$Encode$string(model.lastAction))
 			]));
 };
 var $author$project$Main$setStorage = _Platform_outgoingPort('setStorage', $elm$core$Basics$identity);
@@ -5222,14 +5227,13 @@ var $author$project$Main$update = F2(
 			return _Utils_Tuple2(
 				_Utils_update(
 					model,
-					{poem: poem}),
+					{lastAction: 'Poem Changed', poem: poem}),
 				$elm$core$Platform$Cmd$none);
 		} else {
-			var email = msg.a;
 			return _Utils_Tuple2(
 				_Utils_update(
 					model,
-					{email: email}),
+					{lastAction: 'Poem Processed', processedPoem: model.poem + 'Processed!'}),
 				$elm$core$Platform$Cmd$none);
 		}
 	});
@@ -5252,15 +5256,33 @@ var $elm$json$Json$Decode$value = _Json_decodeValue;
 var $author$project$Main$PoemChanged = function (a) {
 	return {$: 'PoemChanged', a: a};
 };
+var $author$project$Main$ProcessPoem = {$: 'ProcessPoem'};
+var $elm$html$Html$button = _VirtualDom_node('button');
 var $elm$html$Html$div = _VirtualDom_node('div');
 var $elm$html$Html$input = _VirtualDom_node('input');
+var $elm$virtual_dom$VirtualDom$Normal = function (a) {
+	return {$: 'Normal', a: a};
+};
+var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
+var $elm$html$Html$Events$on = F2(
+	function (event, decoder) {
+		return A2(
+			$elm$virtual_dom$VirtualDom$on,
+			event,
+			$elm$virtual_dom$VirtualDom$Normal(decoder));
+	});
+var $elm$html$Html$Events$onClick = function (msg) {
+	return A2(
+		$elm$html$Html$Events$on,
+		'click',
+		$elm$json$Json$Decode$succeed(msg));
+};
 var $elm$html$Html$Events$alwaysStop = function (x) {
 	return _Utils_Tuple2(x, true);
 };
 var $elm$virtual_dom$VirtualDom$MayStopPropagation = function (a) {
 	return {$: 'MayStopPropagation', a: a};
 };
-var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
 var $elm$html$Html$Events$stopPropagationOn = F2(
 	function (event, decoder) {
 		return A2(
@@ -5294,6 +5316,8 @@ var $elm$html$Html$Attributes$stringProperty = F2(
 			$elm$json$Json$Encode$string(string));
 	});
 var $elm$html$Html$Attributes$placeholder = $elm$html$Html$Attributes$stringProperty('placeholder');
+var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
+var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
 var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
 var $author$project$Main$view = function (model) {
@@ -5313,12 +5337,22 @@ var $author$project$Main$view = function (model) {
 					]),
 				_List_Nil),
 				A2(
+				$elm$html$Html$button,
+				_List_fromArray(
+					[
+						$elm$html$Html$Events$onClick($author$project$Main$ProcessPoem)
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('प्रतिरूप देखें')
+					])),
+				A2(
 				$elm$html$Html$input,
 				_List_fromArray(
 					[
 						$elm$html$Html$Attributes$type_('text'),
-						$elm$html$Html$Attributes$placeholder('Poem Processed'),
-						$elm$html$Html$Attributes$value(model.poem)
+						$elm$html$Html$Attributes$placeholder('Processed Poem'),
+						$elm$html$Html$Attributes$value(model.processedPoem)
 					]),
 				_List_Nil)
 			]));

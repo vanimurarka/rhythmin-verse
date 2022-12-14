@@ -28,7 +28,8 @@ main =
 
 type alias Model =
   { poem : String
-  , email : String
+  , processedPoem : String
+  , lastAction : String
   }
 
 
@@ -43,7 +44,7 @@ init flags =
   (
     case D.decodeValue decoder flags of
       Ok model -> model
-      Err _ -> { poem = "", email = "" }
+      Err _ -> { poem = "", processedPoem = "", lastAction = "" }
   ,
     Cmd.none
   )
@@ -55,19 +56,18 @@ init flags =
 
 type Msg
   = PoemChanged String
-  | EmailChanged String
+  | ProcessPoem
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
   case msg of
     PoemChanged poem ->
-      ( { model | poem = poem }
+      ( { model | poem = poem, lastAction = "Poem Changed" }
       , Cmd.none
       )
-
-    EmailChanged email ->
-      ( { model | email = email }
+    ProcessPoem ->
+      ( { model | processedPoem = model.poem ++ "Processed!", lastAction = "Poem Processed" }
       , Cmd.none
       )
 
@@ -76,7 +76,6 @@ update msg model =
 -- VIEW
 
 
-view : Model -> Html Msg
 view model =
   div []
     [ input
@@ -86,15 +85,14 @@ view model =
         , value model.poem
         ]
         []
+      , button [ onClick ProcessPoem ] [ text "प्रतिरूप देखें" ]
     , input
         [ type_ "text"
-        , placeholder "Poem Processed"
-        , value model.poem
+        , placeholder "Processed Poem"
+        , value model.processedPoem
         ]
         []
     ]
-
-
 
 -- PORTS
 
@@ -125,12 +123,14 @@ encode : Model -> E.Value
 encode model =
   E.object
     [ ("poem", E.string model.poem)
-    , ("email", E.string model.email)
+    , ("processedPoem", E.string model.processedPoem)
+    , ("lastAction", E.string model.lastAction)
     ]
 
 
 decoder : D.Decoder Model
 decoder =
-  D.map2 Model
+  D.map3 Model
     (D.field "poem" D.string)
-    (D.field "email" D.string)
+    (D.field "processedPoem" D.string)
+    (D.field "lastAction" D.string)
