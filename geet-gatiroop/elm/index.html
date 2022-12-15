@@ -8,15 +8,16 @@
 </head>
 
 <body style="background-color: black;">
+  <textarea id="poem">ल</textarea>
   <div id="myapp"></div>
 </body>
 
 <script type="text/javascript">
-// Extract the stored data from previous sessions.
 var storedData = localStorage.getItem('gg-elm-js-interop');
-// console.log(storedData);
+console.log(storedData);
 var flags = storedData ? JSON.parse(storedData) : null;
-// console.log(flags);
+flags = JSON.parse('{"poem":"'+document.getElementById('poem').value+'"}')
+console.log(flags);
 
 // Load the Elm app, passing in the stored data.
 var app = Elm.Main.init({
@@ -27,7 +28,7 @@ var app = Elm.Main.init({
 // Listen for commands from the `setStorage` port.
 // Turn the data to a string and put it in localStorage.
 app.ports.setStorage.subscribe(function(state) {
-    console.log(state);
+    console.log(JSON.stringify(state));
     localStorage.setItem('gg-elm-js-interop', JSON.stringify(state));
 });
 </script>

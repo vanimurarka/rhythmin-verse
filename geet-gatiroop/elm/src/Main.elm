@@ -4,10 +4,23 @@ import Browser
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
+import Array
 import Json.Decode as D
 import Json.Encode as E
 
 -- Hindi Poem Vis
+
+type AksharType  = PureVowel | Maatraa | Consonant | Other | Empty
+
+type alias Akshar =
+  { str : String,
+    code : Int,
+    aksharType : AksharType,
+    vowel : Char,
+    rhythm : Int
+  }
+  
+emptyAkshar = Akshar " " 0 Empty ' ' 0
 
 processPoem poem =
   (String.fromInt (String.length poem)) ++ " Processed!"
@@ -46,7 +59,7 @@ init : E.Value -> ( Model, Cmd Msg )
 init flags =
   (
     case D.decodeValue decoder flags of
-      Ok model -> model
+      Ok poem -> Model poem "" ""
       Err _ -> { poem = "", processedPoem = "", lastAction = "" }
   ,
     Cmd.none
@@ -115,19 +128,21 @@ updateWithStorage msg oldModel =
 
 -- JSON ENCODE/DECODE
 
+encodeAkshar a =
+  E.object
+    [ ("txt", E.string a.str)
+    , ("rhythm", E.int a.rhythm)
+    ]
 
 encodeModel : Model -> E.Value
 encodeModel model =
   E.object
     [ ("poem", E.string model.poem)
-    , ("processedPoem", E.list E.int [1,3,4])
+    , ("processedPoem", encodeAkshar emptyAkshar)
     , ("lastAction", E.string model.lastAction)
     ]
 
 
-decoder : D.Decoder Model
+decoder : D.Decoder String
 decoder =
-  D.map3 Model
-    (D.field "poem" D.string)
-    (D.field "processedPoem" D.string)
-    (D.field "lastAction" D.string)
+  D.field "poem" D.string

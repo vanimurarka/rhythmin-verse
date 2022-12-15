@@ -5159,20 +5159,14 @@ var $elm$core$Task$perform = F2(
 				A2($elm$core$Task$map, toMessage, task)));
 	});
 var $elm$browser$Browser$element = _Browser_element;
-var $elm$json$Json$Decode$decodeValue = _Json_run;
 var $author$project$Main$Model = F3(
 	function (poem, processedPoem, lastAction) {
 		return {lastAction: lastAction, poem: poem, processedPoem: processedPoem};
 	});
+var $elm$json$Json$Decode$decodeValue = _Json_run;
 var $elm$json$Json$Decode$field = _Json_decodeField;
-var $elm$json$Json$Decode$map3 = _Json_map3;
 var $elm$json$Json$Decode$string = _Json_decodeString;
-var $author$project$Main$decoder = A4(
-	$elm$json$Json$Decode$map3,
-	$author$project$Main$Model,
-	A2($elm$json$Json$Decode$field, 'poem', $elm$json$Json$Decode$string),
-	A2($elm$json$Json$Decode$field, 'processedPoem', $elm$json$Json$Decode$string),
-	A2($elm$json$Json$Decode$field, 'lastAction', $elm$json$Json$Decode$string));
+var $author$project$Main$decoder = A2($elm$json$Json$Decode$field, 'poem', $elm$json$Json$Decode$string);
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $author$project$Main$init = function (flags) {
@@ -5180,8 +5174,8 @@ var $author$project$Main$init = function (flags) {
 		function () {
 			var _v0 = A2($elm$json$Json$Decode$decodeValue, $author$project$Main$decoder, flags);
 			if (_v0.$ === 'Ok') {
-				var model = _v0.a;
-				return model;
+				var poem = _v0.a;
+				return A3($author$project$Main$Model, poem, '', '');
 			} else {
 				return {lastAction: '', poem: '', processedPoem: ''};
 			}
@@ -5190,16 +5184,19 @@ var $author$project$Main$init = function (flags) {
 };
 var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
-var $elm$json$Json$Encode$int = _Json_wrap;
-var $elm$json$Json$Encode$list = F2(
-	function (func, entries) {
-		return _Json_wrap(
-			A3(
-				$elm$core$List$foldl,
-				_Json_addEntry(func),
-				_Json_emptyArray(_Utils_Tuple0),
-				entries));
+var $author$project$Main$Akshar = F5(
+	function (str, code, aksharType, vowel, rhythm) {
+		return {aksharType: aksharType, code: code, rhythm: rhythm, str: str, vowel: vowel};
 	});
+var $author$project$Main$Empty = {$: 'Empty'};
+var $author$project$Main$emptyAkshar = A5(
+	$author$project$Main$Akshar,
+	' ',
+	0,
+	$author$project$Main$Empty,
+	_Utils_chr(' '),
+	0);
+var $elm$json$Json$Encode$int = _Json_wrap;
 var $elm$json$Json$Encode$object = function (pairs) {
 	return _Json_wrap(
 		A3(
@@ -5214,6 +5211,18 @@ var $elm$json$Json$Encode$object = function (pairs) {
 			pairs));
 };
 var $elm$json$Json$Encode$string = _Json_wrap;
+var $author$project$Main$encodeAkshar = function (a) {
+	return $elm$json$Json$Encode$object(
+		_List_fromArray(
+			[
+				_Utils_Tuple2(
+				'txt',
+				$elm$json$Json$Encode$string(a.str)),
+				_Utils_Tuple2(
+				'rhythm',
+				$elm$json$Json$Encode$int(a.rhythm))
+			]));
+};
 var $author$project$Main$encodeModel = function (model) {
 	return $elm$json$Json$Encode$object(
 		_List_fromArray(
@@ -5223,11 +5232,7 @@ var $author$project$Main$encodeModel = function (model) {
 				$elm$json$Json$Encode$string(model.poem)),
 				_Utils_Tuple2(
 				'processedPoem',
-				A2(
-					$elm$json$Json$Encode$list,
-					$elm$json$Json$Encode$int,
-					_List_fromArray(
-						[1, 3, 4]))),
+				$author$project$Main$encodeAkshar($author$project$Main$emptyAkshar)),
 				_Utils_Tuple2(
 				'lastAction',
 				$elm$json$Json$Encode$string(model.lastAction))
