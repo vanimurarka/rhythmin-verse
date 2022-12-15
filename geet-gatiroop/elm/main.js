@@ -5190,6 +5190,16 @@ var $author$project$Main$init = function (flags) {
 };
 var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
+var $elm$json$Json$Encode$int = _Json_wrap;
+var $elm$json$Json$Encode$list = F2(
+	function (func, entries) {
+		return _Json_wrap(
+			A3(
+				$elm$core$List$foldl,
+				_Json_addEntry(func),
+				_Json_emptyArray(_Utils_Tuple0),
+				entries));
+	});
 var $elm$json$Json$Encode$object = function (pairs) {
 	return _Json_wrap(
 		A3(
@@ -5204,7 +5214,7 @@ var $elm$json$Json$Encode$object = function (pairs) {
 			pairs));
 };
 var $elm$json$Json$Encode$string = _Json_wrap;
-var $author$project$Main$encode = function (model) {
+var $author$project$Main$encodeModel = function (model) {
 	return $elm$json$Json$Encode$object(
 		_List_fromArray(
 			[
@@ -5213,13 +5223,21 @@ var $author$project$Main$encode = function (model) {
 				$elm$json$Json$Encode$string(model.poem)),
 				_Utils_Tuple2(
 				'processedPoem',
-				$elm$json$Json$Encode$string(model.processedPoem)),
+				A2(
+					$elm$json$Json$Encode$list,
+					$elm$json$Json$Encode$int,
+					_List_fromArray(
+						[1, 3, 4]))),
 				_Utils_Tuple2(
 				'lastAction',
 				$elm$json$Json$Encode$string(model.lastAction))
 			]));
 };
 var $author$project$Main$setStorage = _Platform_outgoingPort('setStorage', $elm$core$Basics$identity);
+var $author$project$Main$processPoem = function (poem) {
+	return $elm$core$String$fromInt(
+		$elm$core$String$length(poem)) + ' Processed!';
+};
 var $author$project$Main$update = F2(
 	function (msg, model) {
 		if (msg.$ === 'PoemChanged') {
@@ -5233,7 +5251,10 @@ var $author$project$Main$update = F2(
 			return _Utils_Tuple2(
 				_Utils_update(
 					model,
-					{lastAction: 'Poem Processed', processedPoem: model.poem + 'Processed!'}),
+					{
+						lastAction: 'Poem Processed',
+						processedPoem: $author$project$Main$processPoem(model.poem)
+					}),
 				$elm$core$Platform$Cmd$none);
 		}
 	});
@@ -5248,7 +5269,7 @@ var $author$project$Main$updateWithStorage = F2(
 				_List_fromArray(
 					[
 						$author$project$Main$setStorage(
-						$author$project$Main$encode(newModel)),
+						$author$project$Main$encodeModel(newModel)),
 						cmds
 					])));
 	});
@@ -5316,6 +5337,8 @@ var $elm$html$Html$Attributes$stringProperty = F2(
 			$elm$json$Json$Encode$string(string));
 	});
 var $elm$html$Html$Attributes$placeholder = $elm$html$Html$Attributes$stringProperty('placeholder');
+var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
+var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
@@ -5323,38 +5346,64 @@ var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('
 var $author$project$Main$view = function (model) {
 	return A2(
 		$elm$html$Html$div,
-		_List_Nil,
+		_List_fromArray(
+			[
+				A2($elm$html$Html$Attributes$style, 'background-color', 'black'),
+				A2($elm$html$Html$Attributes$style, 'color', 'white'),
+				A2($elm$html$Html$Attributes$style, 'padding', '5px')
+			]),
 		_List_fromArray(
 			[
 				A2(
-				$elm$html$Html$input,
+				$elm$html$Html$div,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$type_('text'),
-						$elm$html$Html$Attributes$placeholder('Poem'),
-						$elm$html$Html$Events$onInput($author$project$Main$PoemChanged),
-						$elm$html$Html$Attributes$value(model.poem)
-					]),
-				_List_Nil),
-				A2(
-				$elm$html$Html$button,
-				_List_fromArray(
-					[
-						$elm$html$Html$Events$onClick($author$project$Main$ProcessPoem)
+						A2($elm$html$Html$Attributes$style, 'padding', 'inherit')
 					]),
 				_List_fromArray(
 					[
-						$elm$html$Html$text('प्रतिरूप देखें')
+						A2(
+						$elm$html$Html$input,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$type_('text'),
+								$elm$html$Html$Attributes$placeholder('Poem'),
+								$elm$html$Html$Events$onInput($author$project$Main$PoemChanged),
+								$elm$html$Html$Attributes$value(model.poem),
+								A2($elm$html$Html$Attributes$style, 'background-color', 'grey'),
+								A2($elm$html$Html$Attributes$style, 'color', 'inherit')
+							]),
+						_List_Nil)
 					])),
 				A2(
-				$elm$html$Html$input,
+				$elm$html$Html$div,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$type_('text'),
-						$elm$html$Html$Attributes$placeholder('Processed Poem'),
-						$elm$html$Html$Attributes$value(model.processedPoem)
+						A2($elm$html$Html$Attributes$style, 'padding', 'inherit')
 					]),
-				_List_Nil)
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$button,
+						_List_fromArray(
+							[
+								$elm$html$Html$Events$onClick($author$project$Main$ProcessPoem)
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('प्रतिरूप देखें')
+							]))
+					])),
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						A2($elm$html$Html$Attributes$style, 'padding', 'inherit')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text(model.processedPoem)
+					]))
 			]));
 };
 var $author$project$Main$main = $elm$browser$Browser$element(

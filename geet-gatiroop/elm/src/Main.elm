@@ -7,7 +7,10 @@ import Html.Events exposing (..)
 import Json.Decode as D
 import Json.Encode as E
 
+-- Hindi Poem Vis
 
+processPoem poem =
+  (String.fromInt (String.length poem)) ++ " Processed!"
 
 -- MAIN
 
@@ -67,31 +70,25 @@ update msg model =
       , Cmd.none
       )
     ProcessPoem ->
-      ( { model | processedPoem = model.poem ++ "Processed!", lastAction = "Poem Processed" }
+      ( { model | processedPoem = processPoem model.poem, lastAction = "Poem Processed" }
       , Cmd.none
       )
 
-
-
--- VIEW
-
-
 view model =
-  div []
-    [ input
+  div [style "background-color" "black"
+    , style "color" "white"
+    , style "padding" "5px"]
+    [ div [style "padding" "inherit"] [input
         [ type_ "text"
         , placeholder "Poem"
         , onInput PoemChanged
         , value model.poem
+        , style "background-color" "grey"
+        , style "color" "inherit"
         ]
-        []
-      , button [ onClick ProcessPoem ] [ text "प्रतिरूप देखें" ]
-    , input
-        [ type_ "text"
-        , placeholder "Processed Poem"
-        , value model.processedPoem
-        ]
-        []
+        []]
+      , div [style "padding" "inherit"] [button [ onClick ProcessPoem] [ text "प्रतिरूप देखें" ]]
+      , div [style "padding" "inherit"] [text model.processedPoem]
     ]
 
 -- PORTS
@@ -111,7 +108,7 @@ updateWithStorage msg oldModel =
     ( newModel, cmds ) = update msg oldModel
   in
   ( newModel
-  , Cmd.batch [ setStorage (encode newModel), cmds ]
+  , Cmd.batch [ setStorage (encodeModel newModel), cmds ]
   )
 
 
@@ -119,11 +116,11 @@ updateWithStorage msg oldModel =
 -- JSON ENCODE/DECODE
 
 
-encode : Model -> E.Value
-encode model =
+encodeModel : Model -> E.Value
+encodeModel model =
   E.object
     [ ("poem", E.string model.poem)
-    , ("processedPoem", E.string model.processedPoem)
+    , ("processedPoem", E.list E.int [1,3,4])
     , ("lastAction", E.string model.lastAction)
     ]
 
