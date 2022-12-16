@@ -9,20 +9,15 @@
 
 <body style="background-color: black;">
   <textarea id="poem">ल</textarea>
+  <button onclick="tryElm()">Pass to Elm</button>
   <div id="myapp"></div>
 </body>
 
 <script type="text/javascript">
-var storedData = localStorage.getItem('gg-elm-js-interop');
-console.log(storedData);
-var flags = storedData ? JSON.parse(storedData) : null;
-flags = JSON.parse('{"poem":"'+document.getElementById('poem').value+'"}')
-console.log(flags);
 
 // Load the Elm app, passing in the stored data.
 var app = Elm.Main.init({
 	node: document.getElementById('myapp'),
-	flags: flags
 });
 
 // Listen for commands from the `setStorage` port.
@@ -31,6 +26,13 @@ app.ports.setStorage.subscribe(function(state) {
     console.log(JSON.stringify(state));
     localStorage.setItem('gg-elm-js-interop', JSON.stringify(state));
 });
+
+function tryElm()
+{
+  poem = document.getElementById('poem').value;
+  app.ports.messageReceiver.send(poem);
+}
+
 </script>
 
 </html>

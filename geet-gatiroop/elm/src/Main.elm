@@ -28,13 +28,12 @@ processPoem poem =
 -- MAIN
 
 
-main : Program E.Value Model Msg
 main =
   Browser.element
     { init = init
     , view = view
     , update = updateWithStorage
-    , subscriptions = \_ -> Sub.none
+    , subscriptions = subscriptions
     }
 
 
@@ -55,60 +54,33 @@ type alias Model =
 --
 -- Check out index.html to see the corresponding code on the JS side.
 --
-init : E.Value -> ( Model, Cmd Msg )
+init : () -> ( Model, Cmd Msg )
 init flags =
-  (
-    case D.decodeValue decoder flags of
-      Ok poem -> Model poem "" ""
-      Err _ -> { poem = "", processedPoem = "", lastAction = "" }
-  ,
-    Cmd.none
+  ( { poem = "", processedPoem = "", lastAction = "" }
+  , Cmd.none
   )
 
-
+type Msg
+  = ProcessPoem String
 
 -- UPDATE
-
-
-type Msg
-  = PoemChanged String
-  | ProcessPoem
-
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
   case msg of
-    PoemChanged poem ->
-      ( { model | poem = poem, lastAction = "Poem Changed" }
-      , Cmd.none
-      )
-    ProcessPoem ->
-      ( { model | processedPoem = processPoem model.poem, lastAction = "Poem Processed" }
-      , Cmd.none
-      )
+    ProcessPoem str -> ({ model | poem = str, processedPoem = processPoem str, lastAction = "Poem Processed" }, Cmd.none)
 
 view model =
-  div [style "background-color" "black"
-    , style "color" "white"
-    , style "padding" "5px"]
-    [ div [style "padding" "inherit"] [input
-        [ type_ "text"
-        , placeholder "Poem"
-        , onInput PoemChanged
-        , value model.poem
-        , style "background-color" "grey"
-        , style "color" "inherit"
-        ]
-        []]
-      , div [style "padding" "inherit"] [button [ onClick ProcessPoem] [ text "प्रतिरूप देखें" ]]
-      , div [style "padding" "inherit"] [text model.processedPoem]
+  div [style "background-color" "black", style "color" "white", style "padding" "5px"]
+    [ div [style "padding" "inherit"] [text model.poem]
+    , div [style "padding" "inherit"] [text model.processedPoem]
     ]
 
 -- PORTS
 
 
 port setStorage : E.Value -> Cmd msg
-
+port messageReceiver : (String -> msg) -> Sub msg
 
 -- We want to `setStorage` on every update, so this function adds
 -- the setStorage command on each step of the update function.
@@ -124,7 +96,14 @@ updateWithStorage msg oldModel =
   , Cmd.batch [ setStorage (encodeModel newModel), cmds ]
   )
 
+-- SUBSCRIPTIONS
 
+-- Subscribe to the `messageReceiver` port to hear about messages coming in
+-- from JS. 
+
+subscriptions : Model -> Sub Msg
+subscriptions _ =
+  messageReceiver ProcessPoem
 
 -- JSON ENCODE/DECODE
 
