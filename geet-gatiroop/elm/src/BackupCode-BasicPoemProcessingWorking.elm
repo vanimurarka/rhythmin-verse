@@ -1,4 +1,4 @@
-port module Main exposing (..)
+module Main exposing (..)
 
 import Browser
 import Html exposing (..)
@@ -140,7 +140,7 @@ processLine pomLine =
   
 processPoem pom =
   let
-    pPoemLines = List.map String.toList (String.split "\r\n" pom)
+    pPoemLines = String.lines pom
   in 
     Array.fromList (List.map processLine pPoemLines)
 
@@ -152,5 +152,5 @@ pPoemAMerged = processPoem internalpoem
 
 newstr = Debug.toString pPoemAMerged
 
---main =
-  --Html.text newstr
+main =
+  Html.text newstr

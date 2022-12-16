@@ -4370,6 +4370,43 @@ function _Browser_load(url)
 		}
 	}));
 }
+
+
+
+var _Bitwise_and = F2(function(a, b)
+{
+	return a & b;
+});
+
+var _Bitwise_or = F2(function(a, b)
+{
+	return a | b;
+});
+
+var _Bitwise_xor = F2(function(a, b)
+{
+	return a ^ b;
+});
+
+function _Bitwise_complement(a)
+{
+	return ~a;
+};
+
+var _Bitwise_shiftLeftBy = F2(function(offset, a)
+{
+	return a << offset;
+});
+
+var _Bitwise_shiftRightBy = F2(function(offset, a)
+{
+	return a >> offset;
+});
+
+var _Bitwise_shiftRightZfBy = F2(function(offset, a)
+{
+	return a >>> offset;
+});
 var $elm$core$Basics$EQ = {$: 'EQ'};
 var $elm$core$Basics$GT = {$: 'GT'};
 var $elm$core$Basics$LT = {$: 'LT'};
@@ -5163,7 +5200,7 @@ var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $author$project$Main$init = function (flags) {
 	return _Utils_Tuple2(
-		{lastAction: '', poem: '', processedPoem: ''},
+		{lastAction: '', poem: '', processedPoem: $elm$core$Array$empty},
 		$elm$core$Platform$Cmd$none);
 };
 var $author$project$Main$ProcessPoem = function (a) {
@@ -5229,20 +5266,422 @@ var $author$project$Main$encodeModel = function (model) {
 			]));
 };
 var $author$project$Main$setStorage = _Platform_outgoingPort('setStorage', $elm$core$Basics$identity);
-var $author$project$Main$processPoem = function (poem) {
-	return $elm$core$String$fromInt(
-		$elm$core$String$length(poem)) + ' Processed!';
+var $elm$core$Array$fromListHelp = F3(
+	function (list, nodeList, nodeListSize) {
+		fromListHelp:
+		while (true) {
+			var _v0 = A2($elm$core$Elm$JsArray$initializeFromList, $elm$core$Array$branchFactor, list);
+			var jsArray = _v0.a;
+			var remainingItems = _v0.b;
+			if (_Utils_cmp(
+				$elm$core$Elm$JsArray$length(jsArray),
+				$elm$core$Array$branchFactor) < 0) {
+				return A2(
+					$elm$core$Array$builderToArray,
+					true,
+					{nodeList: nodeList, nodeListSize: nodeListSize, tail: jsArray});
+			} else {
+				var $temp$list = remainingItems,
+					$temp$nodeList = A2(
+					$elm$core$List$cons,
+					$elm$core$Array$Leaf(jsArray),
+					nodeList),
+					$temp$nodeListSize = nodeListSize + 1;
+				list = $temp$list;
+				nodeList = $temp$nodeList;
+				nodeListSize = $temp$nodeListSize;
+				continue fromListHelp;
+			}
+		}
+	});
+var $elm$core$Array$fromList = function (list) {
+	if (!list.b) {
+		return $elm$core$Array$empty;
+	} else {
+		return A3($elm$core$Array$fromListHelp, list, _List_Nil, 0);
+	}
+};
+var $elm$core$String$lines = _String_lines;
+var $elm$core$Bitwise$and = _Bitwise_and;
+var $elm$core$Bitwise$shiftRightZfBy = _Bitwise_shiftRightZfBy;
+var $elm$core$Array$bitMask = 4294967295 >>> (32 - $elm$core$Array$shiftStep);
+var $elm$core$Basics$ge = _Utils_ge;
+var $elm$core$Elm$JsArray$unsafeGet = _JsArray_unsafeGet;
+var $elm$core$Array$getHelp = F3(
+	function (shift, index, tree) {
+		getHelp:
+		while (true) {
+			var pos = $elm$core$Array$bitMask & (index >>> shift);
+			var _v0 = A2($elm$core$Elm$JsArray$unsafeGet, pos, tree);
+			if (_v0.$ === 'SubTree') {
+				var subTree = _v0.a;
+				var $temp$shift = shift - $elm$core$Array$shiftStep,
+					$temp$index = index,
+					$temp$tree = subTree;
+				shift = $temp$shift;
+				index = $temp$index;
+				tree = $temp$tree;
+				continue getHelp;
+			} else {
+				var values = _v0.a;
+				return A2($elm$core$Elm$JsArray$unsafeGet, $elm$core$Array$bitMask & index, values);
+			}
+		}
+	});
+var $elm$core$Bitwise$shiftLeftBy = _Bitwise_shiftLeftBy;
+var $elm$core$Array$tailIndex = function (len) {
+	return (len >>> 5) << 5;
+};
+var $elm$core$Array$get = F2(
+	function (index, _v0) {
+		var len = _v0.a;
+		var startShift = _v0.b;
+		var tree = _v0.c;
+		var tail = _v0.d;
+		return ((index < 0) || (_Utils_cmp(index, len) > -1)) ? $elm$core$Maybe$Nothing : ((_Utils_cmp(
+			index,
+			$elm$core$Array$tailIndex(len)) > -1) ? $elm$core$Maybe$Just(
+			A2($elm$core$Elm$JsArray$unsafeGet, $elm$core$Array$bitMask & index, tail)) : $elm$core$Maybe$Just(
+			A3($elm$core$Array$getHelp, startShift, index, tree)));
+	});
+var $elm$core$Array$length = function (_v0) {
+	var len = _v0.a;
+	return len;
+};
+var $author$project$Main$Consonant = {$: 'Consonant'};
+var $author$project$Main$Maatraa = {$: 'Maatraa'};
+var $author$project$Main$mrgMCakshar = F2(
+	function (aL, aM) {
+		var aC = _Utils_update(
+			aM,
+			{
+				rhythm: aL.rhythm,
+				str: _Utils_ap(aM.str, aL.str),
+				vowel: aL.vowel
+			});
+		return (_Utils_eq(aM.aksharType, $author$project$Main$Consonant) && _Utils_eq(aL.aksharType, $author$project$Main$Maatraa)) ? _Utils_Tuple2(true, aC) : _Utils_Tuple2(false, aL);
+	});
+var $elm$core$Elm$JsArray$push = _JsArray_push;
+var $elm$core$Elm$JsArray$singleton = _JsArray_singleton;
+var $elm$core$Elm$JsArray$unsafeSet = _JsArray_unsafeSet;
+var $elm$core$Array$insertTailInTree = F4(
+	function (shift, index, tail, tree) {
+		var pos = $elm$core$Array$bitMask & (index >>> shift);
+		if (_Utils_cmp(
+			pos,
+			$elm$core$Elm$JsArray$length(tree)) > -1) {
+			if (shift === 5) {
+				return A2(
+					$elm$core$Elm$JsArray$push,
+					$elm$core$Array$Leaf(tail),
+					tree);
+			} else {
+				var newSub = $elm$core$Array$SubTree(
+					A4($elm$core$Array$insertTailInTree, shift - $elm$core$Array$shiftStep, index, tail, $elm$core$Elm$JsArray$empty));
+				return A2($elm$core$Elm$JsArray$push, newSub, tree);
+			}
+		} else {
+			var value = A2($elm$core$Elm$JsArray$unsafeGet, pos, tree);
+			if (value.$ === 'SubTree') {
+				var subTree = value.a;
+				var newSub = $elm$core$Array$SubTree(
+					A4($elm$core$Array$insertTailInTree, shift - $elm$core$Array$shiftStep, index, tail, subTree));
+				return A3($elm$core$Elm$JsArray$unsafeSet, pos, newSub, tree);
+			} else {
+				var newSub = $elm$core$Array$SubTree(
+					A4(
+						$elm$core$Array$insertTailInTree,
+						shift - $elm$core$Array$shiftStep,
+						index,
+						tail,
+						$elm$core$Elm$JsArray$singleton(value)));
+				return A3($elm$core$Elm$JsArray$unsafeSet, pos, newSub, tree);
+			}
+		}
+	});
+var $elm$core$Array$unsafeReplaceTail = F2(
+	function (newTail, _v0) {
+		var len = _v0.a;
+		var startShift = _v0.b;
+		var tree = _v0.c;
+		var tail = _v0.d;
+		var originalTailLen = $elm$core$Elm$JsArray$length(tail);
+		var newTailLen = $elm$core$Elm$JsArray$length(newTail);
+		var newArrayLen = len + (newTailLen - originalTailLen);
+		if (_Utils_eq(newTailLen, $elm$core$Array$branchFactor)) {
+			var overflow = _Utils_cmp(newArrayLen >>> $elm$core$Array$shiftStep, 1 << startShift) > 0;
+			if (overflow) {
+				var newShift = startShift + $elm$core$Array$shiftStep;
+				var newTree = A4(
+					$elm$core$Array$insertTailInTree,
+					newShift,
+					len,
+					newTail,
+					$elm$core$Elm$JsArray$singleton(
+						$elm$core$Array$SubTree(tree)));
+				return A4($elm$core$Array$Array_elm_builtin, newArrayLen, newShift, newTree, $elm$core$Elm$JsArray$empty);
+			} else {
+				return A4(
+					$elm$core$Array$Array_elm_builtin,
+					newArrayLen,
+					startShift,
+					A4($elm$core$Array$insertTailInTree, startShift, len, newTail, tree),
+					$elm$core$Elm$JsArray$empty);
+			}
+		} else {
+			return A4($elm$core$Array$Array_elm_builtin, newArrayLen, startShift, tree, newTail);
+		}
+	});
+var $elm$core$Array$push = F2(
+	function (a, array) {
+		var tail = array.d;
+		return A2(
+			$elm$core$Array$unsafeReplaceTail,
+			A2($elm$core$Elm$JsArray$push, a, tail),
+			array);
+	});
+var $elm$core$Tuple$second = function (_v0) {
+	var y = _v0.b;
+	return y;
+};
+var $elm$core$Array$setHelp = F4(
+	function (shift, index, value, tree) {
+		var pos = $elm$core$Array$bitMask & (index >>> shift);
+		var _v0 = A2($elm$core$Elm$JsArray$unsafeGet, pos, tree);
+		if (_v0.$ === 'SubTree') {
+			var subTree = _v0.a;
+			var newSub = A4($elm$core$Array$setHelp, shift - $elm$core$Array$shiftStep, index, value, subTree);
+			return A3(
+				$elm$core$Elm$JsArray$unsafeSet,
+				pos,
+				$elm$core$Array$SubTree(newSub),
+				tree);
+		} else {
+			var values = _v0.a;
+			var newLeaf = A3($elm$core$Elm$JsArray$unsafeSet, $elm$core$Array$bitMask & index, value, values);
+			return A3(
+				$elm$core$Elm$JsArray$unsafeSet,
+				pos,
+				$elm$core$Array$Leaf(newLeaf),
+				tree);
+		}
+	});
+var $elm$core$Array$set = F3(
+	function (index, value, array) {
+		var len = array.a;
+		var startShift = array.b;
+		var tree = array.c;
+		var tail = array.d;
+		return ((index < 0) || (_Utils_cmp(index, len) > -1)) ? array : ((_Utils_cmp(
+			index,
+			$elm$core$Array$tailIndex(len)) > -1) ? A4(
+			$elm$core$Array$Array_elm_builtin,
+			len,
+			startShift,
+			tree,
+			A3($elm$core$Elm$JsArray$unsafeSet, $elm$core$Array$bitMask & index, value, tail)) : A4(
+			$elm$core$Array$Array_elm_builtin,
+			len,
+			startShift,
+			A4($elm$core$Array$setHelp, startShift, index, value, tree),
+			tail));
+	});
+var $elm$core$Maybe$withDefault = F2(
+	function (_default, maybe) {
+		if (maybe.$ === 'Just') {
+			var value = maybe.a;
+			return value;
+		} else {
+			return _default;
+		}
+	});
+var $author$project$Main$mrgMChelper = F3(
+	function (list, iStart, mList) {
+		mrgMChelper:
+		while (true) {
+			var mListLen = $elm$core$Array$length(mList);
+			var iNext = iStart + 1;
+			var aM = A2(
+				$elm$core$Maybe$withDefault,
+				$author$project$Main$emptyAkshar,
+				A2($elm$core$Array$get, mListLen - 1, mList));
+			var aL = A2(
+				$elm$core$Maybe$withDefault,
+				$author$project$Main$emptyAkshar,
+				A2($elm$core$Array$get, iStart, list));
+			var mrgResult = A2($author$project$Main$mrgMCakshar, aL, aM);
+			var aC = mrgResult.b;
+			if (_Utils_eq(
+				iStart,
+				$elm$core$Array$length(list))) {
+				return mList;
+			} else {
+				if ($elm$core$Array$length(list) === 1) {
+					var $temp$list = list,
+						$temp$iStart = iNext,
+						$temp$mList = A2($elm$core$Array$push, aL, mList);
+					list = $temp$list;
+					iStart = $temp$iStart;
+					mList = $temp$mList;
+					continue mrgMChelper;
+				} else {
+					if (mrgResult.a) {
+						var $temp$list = list,
+							$temp$iStart = iNext,
+							$temp$mList = A3($elm$core$Array$set, mListLen - 1, aC, mList);
+						list = $temp$list;
+						iStart = $temp$iStart;
+						mList = $temp$mList;
+						continue mrgMChelper;
+					} else {
+						var $temp$list = list,
+							$temp$iStart = iNext,
+							$temp$mList = A2($elm$core$Array$push, aC, mList);
+						list = $temp$list;
+						iStart = $temp$iStart;
+						mList = $temp$mList;
+						continue mrgMChelper;
+					}
+				}
+			}
+		}
+	});
+var $author$project$Main$mrgMCline = function (list) {
+	return A3($author$project$Main$mrgMChelper, list, 0, $elm$core$Array$empty);
+};
+var $author$project$Main$Other = {$: 'Other'};
+var $author$project$Main$PureVowel = {$: 'PureVowel'};
+var $elm$core$String$cons = _String_cons;
+var $elm$core$String$fromChar = function (_char) {
+	return A2($elm$core$String$cons, _char, '');
+};
+var $author$project$Main$isHindi = function (c) {
+	var cd = $elm$core$Char$toCode(c);
+	return ((cd >= 2304) && (cd <= 2431)) ? true : false;
+};
+var $author$project$Main$isMaatraaVowel = function (c) {
+	var cd = $elm$core$Char$toCode(c);
+	return ((cd >= 2366) && (cd <= 2381)) ? true : false;
+};
+var $author$project$Main$isPureVowel = function (c) {
+	var cd = $elm$core$Char$toCode(c);
+	return ((cd >= 2309) && (cd <= 2324)) ? true : false;
+};
+var $author$project$Main$maatraaToVowel = function (c) {
+	switch (c.valueOf()) {
+		case 'ा':
+			return _Utils_chr('आ');
+		case 'ि':
+			return _Utils_chr('इ');
+		case 'ी':
+			return _Utils_chr('ई');
+		case 'ु':
+			return _Utils_chr('उ');
+		case 'ू':
+			return _Utils_chr('ऊ');
+		case 'े':
+			return _Utils_chr('ए');
+		case 'ै':
+			return _Utils_chr('ऐ');
+		case 'ो':
+			return _Utils_chr('ओ');
+		case 'ौ':
+			return _Utils_chr('औ');
+		case 'ॉ':
+			return _Utils_chr('ऑ');
+		case 'ृ':
+			return _Utils_chr('ऋ');
+		default:
+			return c;
+	}
+};
+var $author$project$Main$vowelRhythm = function (c) {
+	switch (c.valueOf()) {
+		case 'अ':
+			return 1;
+		case 'आ':
+			return 2;
+		case 'इ':
+			return 1;
+		case 'ई':
+			return 2;
+		case 'उ':
+			return 1;
+		case 'ऊ':
+			return 2;
+		case 'ए':
+			return 2;
+		case 'ऐ':
+			return 2;
+		case 'ओ':
+			return 2;
+		case 'औ':
+			return 2;
+		case 'ऑ':
+			return 2;
+		case 'ऋ':
+			return 1;
+		default:
+			return 0;
+	}
+};
+var $author$project$Main$processChar = function (c) {
+	var m = 0;
+	var cd = $elm$core$Char$toCode(c);
+	var a = {
+		aksharType: $author$project$Main$Other,
+		code: cd,
+		rhythm: 0,
+		str: $elm$core$String$fromChar(c),
+		vowel: c
+	};
+	return $author$project$Main$isHindi(c) ? ($author$project$Main$isPureVowel(c) ? _Utils_update(
+		a,
+		{
+			aksharType: $author$project$Main$PureVowel,
+			rhythm: $author$project$Main$vowelRhythm(a.vowel)
+		}) : ($author$project$Main$isMaatraaVowel(c) ? _Utils_update(
+		a,
+		{
+			aksharType: $author$project$Main$Maatraa,
+			rhythm: $author$project$Main$vowelRhythm(
+				$author$project$Main$maatraaToVowel(a.vowel))
+		}) : _Utils_update(
+		a,
+		{
+			aksharType: $author$project$Main$Consonant,
+			rhythm: $author$project$Main$vowelRhythm(
+				_Utils_chr('अ')),
+			vowel: _Utils_chr('अ')
+		}))) : a;
+};
+var $author$project$Main$processLine = function (pomLine) {
+	var pPoem = A2($elm$core$List$map, $author$project$Main$processChar, pomLine);
+	var pPoemA = $elm$core$Array$fromList(pPoem);
+	return $author$project$Main$mrgMCline(pPoemA);
+};
+var $elm$core$String$foldr = _String_foldr;
+var $elm$core$String$toList = function (string) {
+	return A3($elm$core$String$foldr, $elm$core$List$cons, _List_Nil, string);
+};
+var $author$project$Main$processPoem = function (pom) {
+	var pPoemLines = A2(
+		$elm$core$List$map,
+		$elm$core$String$toList,
+		$elm$core$String$lines(pom));
+	return $elm$core$Array$fromList(
+		A2($elm$core$List$map, $author$project$Main$processLine, pPoemLines));
 };
 var $author$project$Main$update = F2(
 	function (msg, model) {
-		var str = msg.a;
+		var incomingPoem = msg.a;
 		return _Utils_Tuple2(
 			_Utils_update(
 				model,
 				{
 					lastAction: 'Poem Processed',
-					poem: str,
-					processedPoem: $author$project$Main$processPoem(str)
+					poem: incomingPoem,
+					processedPoem: $author$project$Main$processPoem(incomingPoem)
 				}),
 			$elm$core$Platform$Cmd$none);
 	});
@@ -5266,6 +5705,7 @@ var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
 var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
+var $elm$core$Debug$toString = _Debug_toString;
 var $author$project$Main$view = function (model) {
 	return A2(
 		$elm$html$Html$div,
@@ -5281,7 +5721,8 @@ var $author$project$Main$view = function (model) {
 				$elm$html$Html$div,
 				_List_fromArray(
 					[
-						A2($elm$html$Html$Attributes$style, 'padding', 'inherit')
+						A2($elm$html$Html$Attributes$style, 'padding', 'inherit'),
+						A2($elm$html$Html$Attributes$style, 'white-space', 'pre-wrap')
 					]),
 				_List_fromArray(
 					[
@@ -5295,7 +5736,8 @@ var $author$project$Main$view = function (model) {
 					]),
 				_List_fromArray(
 					[
-						$elm$html$Html$text(model.processedPoem)
+						$elm$html$Html$text(
+						$elm$core$Debug$toString(model.processedPoem))
 					]))
 			]));
 };
