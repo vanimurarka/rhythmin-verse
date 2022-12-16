@@ -16,11 +16,12 @@ type alias Akshar =
   { str : String,
     code : Int,
     aksharType : AksharType,
+    mainChar : Char,
     vowel : Char,
     rhythm : Int
   }
   
-emptyAkshar = Akshar " " 0 Empty ' ' 0
+emptyAkshar = Akshar " " 0 Empty ' ' ' ' 0
 
 isHindi c =
   let 
@@ -106,6 +107,7 @@ processChar c =
     a = { str = String.fromChar c,
         code = cd,
         aksharType = Other,
+        mainChar = c,
         vowel = c,
         rhythm = 0}
   in
@@ -155,6 +157,19 @@ mrgMChelper list iStart mList =
 
 mrgMCline list =
  mrgMChelper list 0 Array.empty
+
+calcHalfAksharRhythm ac ap an =
+  if (ac.aksharType /= Half) then
+    ac
+  else if ((ac.mainChar == 'म') && (an.mainChar == 'ह')) || ((ac.mainChar == 'न') && (an.mainChar == 'ह')) then
+      ac
+    else if (ap.rhythm == 1) then
+        {ac | rhythm = 1}
+      else if (ap.rhythm == 2) && (an.rhythm == 2) then
+          {ac | rhythm = 1}
+        else
+          ac
+
  
 processLine pomLine =
   let

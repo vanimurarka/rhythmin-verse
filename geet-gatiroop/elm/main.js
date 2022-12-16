@@ -5326,16 +5326,17 @@ var $elm$core$Array$fromList = function (list) {
 	}
 };
 var $elm$core$String$lines = _String_lines;
-var $author$project$Main$Akshar = F5(
-	function (str, code, aksharType, vowel, rhythm) {
-		return {aksharType: aksharType, code: code, rhythm: rhythm, str: str, vowel: vowel};
+var $author$project$Main$Akshar = F6(
+	function (str, code, aksharType, mainChar, vowel, rhythm) {
+		return {aksharType: aksharType, code: code, mainChar: mainChar, rhythm: rhythm, str: str, vowel: vowel};
 	});
 var $author$project$Main$Empty = {$: 'Empty'};
-var $author$project$Main$emptyAkshar = A5(
+var $author$project$Main$emptyAkshar = A6(
 	$author$project$Main$Akshar,
 	' ',
 	0,
 	$author$project$Main$Empty,
+	_Utils_chr(' '),
 	_Utils_chr(' '),
 	0);
 var $elm$core$Bitwise$and = _Bitwise_and;
@@ -5689,6 +5690,7 @@ var $author$project$Main$processChar = function (c) {
 	var a = {
 		aksharType: $author$project$Main$Other,
 		code: cd,
+		mainChar: c,
 		rhythm: 0,
 		str: $elm$core$String$fromChar(c),
 		vowel: c
