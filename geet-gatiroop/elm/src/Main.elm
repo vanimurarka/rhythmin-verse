@@ -10,7 +10,7 @@ import Json.Encode as E
 
 -- Hindi Poem Vis
 
-type AksharType  = PureVowel | Maatraa | Consonant | Other | Empty
+type AksharType  = PureVowel | Maatraa | Halant | Half | Consonant | Other | Empty
 
 type alias Akshar =
   { str : String,
@@ -26,7 +26,7 @@ isHindi c =
   let 
     cd = Char.toCode c
   in
-    if (cd >= 2304) && (cd <= 2431) then
+    if (cd >= 2306) && (cd <= 2399) then
       True
     else
       False
@@ -44,10 +44,26 @@ isMaatraaVowel c =
   let 
     cd = Char.toCode c
   in
-    if (cd >= 2366) && (cd <= 2381) then
+    if (cd >= 2366) && (cd <= 2380) then
       True
     else
       False
+
+isBindu c =
+  let 
+    cd = Char.toCode c
+  in 
+    case cd of
+      2306 -> True
+      _ -> False
+
+isHalant c =
+  let 
+    cd = Char.toCode c
+  in 
+    case cd of
+      2381 -> True
+      _ -> False
 
 vowelRhythm c =
   case c of
@@ -98,8 +114,12 @@ processChar c =
       {a | aksharType = PureVowel, rhythm = vowelRhythm a.vowel}
     else if isMaatraaVowel c then
         {a | aksharType = Maatraa, rhythm = vowelRhythm (maatraaToVowel a.vowel)}
-      else
-        {a | aksharType = Consonant, vowel = 'अ', rhythm = vowelRhythm 'अ'}
+      else if isBindu c then
+          {a | aksharType = Half, rhythm = 0}
+        else if isHalant c then
+            {a | aksharType = Halant, rhythm = 0}
+          else
+            {a | aksharType = Consonant, vowel = 'अ', rhythm = vowelRhythm 'अ'}
   else
     a
 
@@ -109,6 +129,8 @@ mrgMCakshar aL aM =
   in
     if (aM.aksharType == Consonant) && (aL.aksharType == Maatraa) then
       (True, aC)
+    else if (aM.aksharType == Consonant) && (aL.aksharType == Halant) then
+      (True, {aC | aksharType = Half})
     else
       (False, aL)
 
@@ -213,11 +235,19 @@ encodeAkshar a =
     , ("rhythm", E.int a.rhythm)
     ]
 
+encodeLine al =
+  E.array encodeAkshar al
+
+encodePoem ap =
+  E.array encodeLine ap
+
+
 encodeModel : Model -> E.Value
 encodeModel model =
   E.object
     [ ("poem", E.string model.poem)
-    , ("processedPoem", encodeAkshar emptyAkshar)
+    --, ("processedPoem", encodeAkshar emptyAkshar)
+    , ("processedPoem", encodePoem model.processedPoem)
     , ("lastAction", E.string model.lastAction)
     ]
 

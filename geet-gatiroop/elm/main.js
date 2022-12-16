@@ -5211,18 +5211,36 @@ var $author$project$Main$messageReceiver = _Platform_incomingPort('messageReceiv
 var $author$project$Main$subscriptions = function (_v0) {
 	return $author$project$Main$messageReceiver($author$project$Main$ProcessPoem);
 };
-var $author$project$Main$Akshar = F5(
-	function (str, code, aksharType, vowel, rhythm) {
-		return {aksharType: aksharType, code: code, rhythm: rhythm, str: str, vowel: vowel};
+var $elm$core$Elm$JsArray$foldl = _JsArray_foldl;
+var $elm$core$Array$foldl = F3(
+	function (func, baseCase, _v0) {
+		var tree = _v0.c;
+		var tail = _v0.d;
+		var helper = F2(
+			function (node, acc) {
+				if (node.$ === 'SubTree') {
+					var subTree = node.a;
+					return A3($elm$core$Elm$JsArray$foldl, helper, acc, subTree);
+				} else {
+					var values = node.a;
+					return A3($elm$core$Elm$JsArray$foldl, func, acc, values);
+				}
+			});
+		return A3(
+			$elm$core$Elm$JsArray$foldl,
+			func,
+			A3($elm$core$Elm$JsArray$foldl, helper, baseCase, tree),
+			tail);
 	});
-var $author$project$Main$Empty = {$: 'Empty'};
-var $author$project$Main$emptyAkshar = A5(
-	$author$project$Main$Akshar,
-	' ',
-	0,
-	$author$project$Main$Empty,
-	_Utils_chr(' '),
-	0);
+var $elm$json$Json$Encode$array = F2(
+	function (func, entries) {
+		return _Json_wrap(
+			A3(
+				$elm$core$Array$foldl,
+				_Json_addEntry(func),
+				_Json_emptyArray(_Utils_Tuple0),
+				entries));
+	});
 var $elm$json$Json$Encode$int = _Json_wrap;
 var $elm$json$Json$Encode$object = function (pairs) {
 	return _Json_wrap(
@@ -5250,6 +5268,12 @@ var $author$project$Main$encodeAkshar = function (a) {
 				$elm$json$Json$Encode$int(a.rhythm))
 			]));
 };
+var $author$project$Main$encodeLine = function (al) {
+	return A2($elm$json$Json$Encode$array, $author$project$Main$encodeAkshar, al);
+};
+var $author$project$Main$encodePoem = function (ap) {
+	return A2($elm$json$Json$Encode$array, $author$project$Main$encodeLine, ap);
+};
 var $author$project$Main$encodeModel = function (model) {
 	return $elm$json$Json$Encode$object(
 		_List_fromArray(
@@ -5259,7 +5283,7 @@ var $author$project$Main$encodeModel = function (model) {
 				$elm$json$Json$Encode$string(model.poem)),
 				_Utils_Tuple2(
 				'processedPoem',
-				$author$project$Main$encodeAkshar($author$project$Main$emptyAkshar)),
+				$author$project$Main$encodePoem(model.processedPoem)),
 				_Utils_Tuple2(
 				'lastAction',
 				$elm$json$Json$Encode$string(model.lastAction))
@@ -5302,6 +5326,18 @@ var $elm$core$Array$fromList = function (list) {
 	}
 };
 var $elm$core$String$lines = _String_lines;
+var $author$project$Main$Akshar = F5(
+	function (str, code, aksharType, vowel, rhythm) {
+		return {aksharType: aksharType, code: code, rhythm: rhythm, str: str, vowel: vowel};
+	});
+var $author$project$Main$Empty = {$: 'Empty'};
+var $author$project$Main$emptyAkshar = A5(
+	$author$project$Main$Akshar,
+	' ',
+	0,
+	$author$project$Main$Empty,
+	_Utils_chr(' '),
+	0);
 var $elm$core$Bitwise$and = _Bitwise_and;
 var $elm$core$Bitwise$shiftRightZfBy = _Bitwise_shiftRightZfBy;
 var $elm$core$Array$bitMask = 4294967295 >>> (32 - $elm$core$Array$shiftStep);
@@ -5349,6 +5385,8 @@ var $elm$core$Array$length = function (_v0) {
 	return len;
 };
 var $author$project$Main$Consonant = {$: 'Consonant'};
+var $author$project$Main$Halant = {$: 'Halant'};
+var $author$project$Main$Half = {$: 'Half'};
 var $author$project$Main$Maatraa = {$: 'Maatraa'};
 var $author$project$Main$mrgMCakshar = F2(
 	function (aL, aM) {
@@ -5359,7 +5397,11 @@ var $author$project$Main$mrgMCakshar = F2(
 				str: _Utils_ap(aM.str, aL.str),
 				vowel: aL.vowel
 			});
-		return (_Utils_eq(aM.aksharType, $author$project$Main$Consonant) && _Utils_eq(aL.aksharType, $author$project$Main$Maatraa)) ? _Utils_Tuple2(true, aC) : _Utils_Tuple2(false, aL);
+		return (_Utils_eq(aM.aksharType, $author$project$Main$Consonant) && _Utils_eq(aL.aksharType, $author$project$Main$Maatraa)) ? _Utils_Tuple2(true, aC) : ((_Utils_eq(aM.aksharType, $author$project$Main$Consonant) && _Utils_eq(aL.aksharType, $author$project$Main$Halant)) ? _Utils_Tuple2(
+			true,
+			_Utils_update(
+				aC,
+				{aksharType: $author$project$Main$Half})) : _Utils_Tuple2(false, aL));
 	});
 var $elm$core$Elm$JsArray$push = _JsArray_push;
 var $elm$core$Elm$JsArray$singleton = _JsArray_singleton;
@@ -5555,13 +5597,29 @@ var $elm$core$String$cons = _String_cons;
 var $elm$core$String$fromChar = function (_char) {
 	return A2($elm$core$String$cons, _char, '');
 };
+var $author$project$Main$isBindu = function (c) {
+	var cd = $elm$core$Char$toCode(c);
+	if (cd === 2306) {
+		return true;
+	} else {
+		return false;
+	}
+};
+var $author$project$Main$isHalant = function (c) {
+	var cd = $elm$core$Char$toCode(c);
+	if (cd === 2381) {
+		return true;
+	} else {
+		return false;
+	}
+};
 var $author$project$Main$isHindi = function (c) {
 	var cd = $elm$core$Char$toCode(c);
-	return ((cd >= 2304) && (cd <= 2431)) ? true : false;
+	return ((cd >= 2306) && (cd <= 2399)) ? true : false;
 };
 var $author$project$Main$isMaatraaVowel = function (c) {
 	var cd = $elm$core$Char$toCode(c);
-	return ((cd >= 2366) && (cd <= 2381)) ? true : false;
+	return ((cd >= 2366) && (cd <= 2380)) ? true : false;
 };
 var $author$project$Main$isPureVowel = function (c) {
 	var cd = $elm$core$Char$toCode(c);
@@ -5646,14 +5704,18 @@ var $author$project$Main$processChar = function (c) {
 			aksharType: $author$project$Main$Maatraa,
 			rhythm: $author$project$Main$vowelRhythm(
 				$author$project$Main$maatraaToVowel(a.vowel))
-		}) : _Utils_update(
+		}) : ($author$project$Main$isBindu(c) ? _Utils_update(
+		a,
+		{aksharType: $author$project$Main$Half, rhythm: 0}) : ($author$project$Main$isHalant(c) ? _Utils_update(
+		a,
+		{aksharType: $author$project$Main$Halant, rhythm: 0}) : _Utils_update(
 		a,
 		{
 			aksharType: $author$project$Main$Consonant,
 			rhythm: $author$project$Main$vowelRhythm(
 				_Utils_chr('अ')),
 			vowel: _Utils_chr('अ')
-		}))) : a;
+		}))))) : a;
 };
 var $author$project$Main$processLine = function (pomLine) {
 	var pPoem = A2($elm$core$List$map, $author$project$Main$processChar, pomLine);

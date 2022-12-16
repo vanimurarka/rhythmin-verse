@@ -24,7 +24,7 @@ var app = Elm.Main.init({
 // Listen for commands from the `setStorage` port.
 // Turn the data to a string and put it in localStorage.
 app.ports.setStorage.subscribe(function(state) {
-    console.log(JSON.stringify(state));
+    console.log(state);
     localStorage.setItem('gg-elm-js-interop', JSON.stringify(state));
 });
 
