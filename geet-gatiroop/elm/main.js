@@ -5207,9 +5207,9 @@ var $author$project$Main$ProcessPoem = function (a) {
 	return {$: 'ProcessPoem', a: a};
 };
 var $elm$json$Json$Decode$string = _Json_decodeString;
-var $author$project$Main$messageReceiver = _Platform_incomingPort('messageReceiver', $elm$json$Json$Decode$string);
+var $author$project$Main$getPoem = _Platform_incomingPort('getPoem', $elm$json$Json$Decode$string);
 var $author$project$Main$subscriptions = function (_v0) {
-	return $author$project$Main$messageReceiver($author$project$Main$ProcessPoem);
+	return $author$project$Main$getPoem($author$project$Main$ProcessPoem);
 };
 var $elm$core$Elm$JsArray$foldl = _JsArray_foldl;
 var $elm$core$Array$foldl = F3(
@@ -5289,7 +5289,7 @@ var $author$project$Main$encodeModel = function (model) {
 				$elm$json$Json$Encode$string(model.lastAction))
 			]));
 };
-var $author$project$Main$setStorage = _Platform_outgoingPort('setStorage', $elm$core$Basics$identity);
+var $author$project$Main$givePoemRhythm = _Platform_outgoingPort('givePoemRhythm', $elm$core$Basics$identity);
 var $elm$core$Array$fromListHelp = F3(
 	function (list, nodeList, nodeListSize) {
 		fromListHelp:
@@ -5808,7 +5808,7 @@ var $author$project$Main$updateWithStorage = F2(
 			$elm$core$Platform$Cmd$batch(
 				_List_fromArray(
 					[
-						$author$project$Main$setStorage(
+						$author$project$Main$givePoemRhythm(
 						$author$project$Main$encodeModel(newModel)),
 						cmds
 					])));

@@ -5,6 +5,8 @@
   <meta charset="UTF-8">
   <title>GG Elm</title>
   <script type="text/javascript" src="main.js"></script>
+  <script type="text/javascript" src="d3.v2.min.js"></script>
+  <script type="text/javascript" src="hpv-draw.v8.0.js"></script>
 </head>
 
 <body style="background-color: black;">
@@ -12,28 +14,28 @@
 हिन्दी
 आत्म
 तुम्ही</textarea>
-  <button onclick="tryElm()">Pass to Elm</button>
+  <button onclick="processPoem()">Process Poem</button>
   <div id="myapp"></div>
 </body>
 
 <script type="text/javascript">
 
-// Load the Elm app, passing in the stored data.
-var app = Elm.Main.init({
+// Load the Elm Hindi Poem Rhythm Analyis code
+var hpra = Elm.Main.init({
 	node: document.getElementById('myapp'),
 });
 
 // Listen for commands from the `setStorage` port.
 // Turn the data to a string and put it in localStorage.
-app.ports.setStorage.subscribe(function(state) {
+hpra.ports.givePoemRhythm.subscribe(function(state) {
     console.log(state);
-    localStorage.setItem('gg-elm-js-interop', JSON.stringify(state));
+    // localStorage.setItem('gg-elm-js-interop', JSON.stringify(state));
 });
 
-function tryElm()
+function processPoem()
 {
   poem = document.getElementById('poem').value;
-  app.ports.messageReceiver.send(poem);
+  hpra.ports.getPoem.send(poem);
 }
 
 </script>

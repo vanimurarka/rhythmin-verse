@@ -240,23 +240,23 @@ view model =
     ]
 
 -- PORTS
-port setStorage : E.Value -> Cmd msg
-port messageReceiver : (String -> msg) -> Sub msg
+port givePoemRhythm : E.Value -> Cmd msg
+port getPoem : (String -> msg) -> Sub msg
 
 updateWithStorage msg oldModel =
   let
     ( newModel, cmds ) = update msg oldModel
   in
   ( newModel
-  , Cmd.batch [ setStorage (encodeModel newModel), cmds ]
+  , Cmd.batch [ givePoemRhythm (encodeModel newModel), cmds ]
   )
 
 -- SUBSCRIPTIONS
--- Subscribe to the `messageReceiver` port to hear about messages coming in
+-- Subscribe to the `getPoem` port to hear about messages coming in
 -- from JS. 
 subscriptions : Model -> Sub Msg
 subscriptions _ =
-  messageReceiver ProcessPoem
+  getPoem ProcessPoem
 
 -- JSON ENCODE/DECODE
 encodeAkshar a =
