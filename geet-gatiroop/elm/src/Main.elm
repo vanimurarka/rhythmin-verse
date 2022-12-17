@@ -170,13 +170,28 @@ calcHalfAksharRhythm ac ap an =
         else
           ac
 
+calcHalfAksharRhythmLine line i =
+  let 
+    len = Array.length line
+    maxI = len - 1
+    ac = Maybe.withDefault emptyAkshar (Array.get i line)
+    ap = Maybe.withDefault emptyAkshar (Array.get (i-1) line)
+    an = Maybe.withDefault emptyAkshar (Array.get (i+1) line)
+    aNew = calcHalfAksharRhythm ac ap an
+    newline = Array.set i aNew line
+  in 
+    if (i > maxI) then
+      line
+    else
+      calcHalfAksharRhythmLine newline (i+1)
  
 processLine pomLine =
   let
     pPoem = List.map processChar pomLine -- list of akshars
     pPoemA = Array.fromList pPoem -- as array
+    mergedLine = mrgMCline pPoemA -- merge Maatraa and Consonant akshars
   in
-    mrgMCline pPoemA -- merge Maatraa and Consonant akshars
+    calcHalfAksharRhythmLine mergedLine 0
   
 processPoem pom =
   let
@@ -184,7 +199,7 @@ processPoem pom =
   in 
     Array.fromList (List.map processLine pPoemLines)
 
--- ELM ARCH
+-- ELM ARCHITECTURE
 main =
   Browser.element
     { init = init
@@ -219,9 +234,9 @@ update msg model =
       Cmd.none)
 
 view model =
-  div [style "background-color" "black", style "color" "white", style "padding" "5px"]
-    [ div [style "padding" "inherit", style "white-space" "pre-wrap"] [text model.poem]
-    , div [style "padding" "inherit"] [text (Debug.toString model.processedPoem)]
+  div [style "background-color" "black", style "color" "white", style "padding" "5px"][
+    -- div [style "padding" "inherit", style "white-space" "pre-wrap"] [text model.poem]
+    --, div [style "padding" "inherit"] [text (Debug.toString model.processedPoem)]
     ]
 
 -- PORTS
