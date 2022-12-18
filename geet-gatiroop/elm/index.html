@@ -14,8 +14,11 @@
 हिन्दी
 आत्म
 तुम्ही</textarea>
-  <button onclick="processPoem()">Process Poem</button>
+  <button onclick="callProcessPoem()">Process Poem</button>
   <div id="myapp"></div>
+  <div id="right">
+    <div id="chart"></div>
+  </div>
 </body>
 
 <script type="text/javascript">
@@ -27,12 +30,15 @@ var hpra = Elm.Main.init({
 
 // Listen for commands from the `setStorage` port.
 // Turn the data to a string and put it in localStorage.
-hpra.ports.givePoemRhythm.subscribe(function(state) {
-    console.log(state);
+hpra.ports.givePoemRhythm.subscribe(function(hpraResult) {
+    console.log(hpraResult);
     // localStorage.setItem('gg-elm-js-interop', JSON.stringify(state));
+    let visDiv = document.getElementById("right");
+    let axvailableW = visDiv.clientWidth;
+    visualize(hpraResult.processedPoem, axvailableW);
 });
 
-function processPoem()
+function callProcessPoem()
 {
   poem = document.getElementById('poem').value;
   hpra.ports.getPoem.send(poem);

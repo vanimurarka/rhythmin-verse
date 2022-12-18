@@ -23,6 +23,12 @@ type alias Akshar =
   
 emptyAkshar = Akshar " " 0 Empty ' ' ' ' 0
 
+type alias ProcessedPoem =
+  { maxLineLen : Int,
+    lines : Array.Array (Array.Array Akshar) }
+
+emptyPoem = ProcessedPoem 0 Array.empty
+
 isHindi c =
   let 
     cd = Char.toCode c
@@ -195,9 +201,10 @@ processLine pomLine =
   
 processPoem pom =
   let
-    pPoemLines = List.map String.toList (String.lines pom)
+    pLines = List.map String.toList (String.lines pom)
+    processedLines = Array.fromList (List.map processLine pLines)
   in 
-    Array.fromList (List.map processLine pPoemLines)
+    ProcessedPoem 50 processedLines    
 
 -- ELM ARCHITECTURE
 main =
@@ -210,13 +217,13 @@ main =
 
 type alias Model =
   { poem : String
-  , processedPoem : Array.Array (Array.Array Akshar)
+  , processedPoem : ProcessedPoem
   , lastAction : String
   }
 
 init : () -> ( Model, Cmd Msg )
 init flags =
-  ( { poem = "", processedPoem = Array.empty, lastAction = "" }
+  ( { poem = "", processedPoem = emptyPoem, lastAction = "" }
   , Cmd.none
   )
 
@@ -262,15 +269,21 @@ subscriptions _ =
 encodeAkshar a =
   E.object
     [ ("txt", E.string a.str)
-    , ("rhythm", E.int a.rhythm)
+    , ("systemRhythmAmt", E.int a.rhythm)
+    , ("rhythmAmt", E.int a.rhythm)
     ]
 
 encodeLine al =
   E.array encodeAkshar al
 
-encodePoem ap =
-  E.array encodeLine ap
+--encodePoem ap =
+  --E.array encodeLine ap
 
+encodePoem ap =
+  E.object
+    [ ("maxLineLen", E.int ap.maxLineLen)
+    , ("lines", E.array encodeLine ap.lines)]
+  
 
 encodeModel : Model -> E.Value
 encodeModel model =

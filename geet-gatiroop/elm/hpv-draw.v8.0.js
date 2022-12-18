@@ -65,11 +65,8 @@ function initSvgFlex(svgViewBox)
 function visualize(givenPoem, dAvailableW, dPoemType)
 {
 	fGhazal = fFreeVerse = false;
+
 	dPoem = givenPoem;
-	if (dPoem.type == poemType.ghazal)
-		fGhazal = true;
-	else if (dPoem.type == poemType.freeverse)
-		fFreeVerse= true;
 
 	oVisual = new cVisual(dAvailableW);
 	draw();	
@@ -116,7 +113,7 @@ function draw()
 	    else
 	    	svg = initSvgFlex(svgViewBox);
 	}
-
+	// debugger;
 	// create the "g"s (svg groups) for each line
 	if (fLineSpacing)
 	{
@@ -142,18 +139,18 @@ function draw()
 	if (fShowText)
     {
         g.selectAll("text")               // char text
-          .data(function(d) {return d.subUnits;} )  // d = line, subsequent d = characters
+          .data(function(d) {console.log(d); return d;} )  // d = line, subsequent d = characters
           .enter().append("svg:text")
             .attr("y", charH-2)
             .attr("x", function(d,i) {return drawCharTxtPos(d,i);})
             .attr("class", "graphText3")
             //.attr("dominant-baseline", "central")
             .attr("text-anchor", "middle")
-            .text(function(d) {return d.text;});
+            .text(function(d) {return d.txt;});
     }
 
     g.selectAll("path")
-      .data(function(d) {return d.subUnits;} ) // d = line, subsequent d = characters
+      .data(function(d) {return d;} ) // d = line, subsequent d = characters
       .enter().append("path")
         .attr("id", function(d,i) {return "char"+i})
         .attr("style", function(d,i) {

@@ -5196,11 +5196,16 @@ var $elm$core$Task$perform = F2(
 				A2($elm$core$Task$map, toMessage, task)));
 	});
 var $elm$browser$Browser$element = _Browser_element;
+var $author$project$Main$ProcessedPoem = F2(
+	function (maxLineLen, lines) {
+		return {lines: lines, maxLineLen: maxLineLen};
+	});
+var $author$project$Main$emptyPoem = A2($author$project$Main$ProcessedPoem, 0, $elm$core$Array$empty);
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $author$project$Main$init = function (flags) {
 	return _Utils_Tuple2(
-		{lastAction: '', poem: '', processedPoem: $elm$core$Array$empty},
+		{lastAction: '', poem: '', processedPoem: $author$project$Main$emptyPoem},
 		$elm$core$Platform$Cmd$none);
 };
 var $author$project$Main$ProcessPoem = function (a) {
@@ -5264,7 +5269,10 @@ var $author$project$Main$encodeAkshar = function (a) {
 				'txt',
 				$elm$json$Json$Encode$string(a.str)),
 				_Utils_Tuple2(
-				'rhythm',
+				'systemRhythmAmt',
+				$elm$json$Json$Encode$int(a.rhythm)),
+				_Utils_Tuple2(
+				'rhythmAmt',
 				$elm$json$Json$Encode$int(a.rhythm))
 			]));
 };
@@ -5272,7 +5280,16 @@ var $author$project$Main$encodeLine = function (al) {
 	return A2($elm$json$Json$Encode$array, $author$project$Main$encodeAkshar, al);
 };
 var $author$project$Main$encodePoem = function (ap) {
-	return A2($elm$json$Json$Encode$array, $author$project$Main$encodeLine, ap);
+	return $elm$json$Json$Encode$object(
+		_List_fromArray(
+			[
+				_Utils_Tuple2(
+				'maxLineLen',
+				$elm$json$Json$Encode$int(ap.maxLineLen)),
+				_Utils_Tuple2(
+				'lines',
+				A2($elm$json$Json$Encode$array, $author$project$Main$encodeLine, ap.lines))
+			]));
 };
 var $author$project$Main$encodeModel = function (model) {
 	return $elm$json$Json$Encode$object(
@@ -5778,12 +5795,13 @@ var $elm$core$String$toList = function (string) {
 	return A3($elm$core$String$foldr, $elm$core$List$cons, _List_Nil, string);
 };
 var $author$project$Main$processPoem = function (pom) {
-	var pPoemLines = A2(
+	var pLines = A2(
 		$elm$core$List$map,
 		$elm$core$String$toList,
 		$elm$core$String$lines(pom));
-	return $elm$core$Array$fromList(
-		A2($elm$core$List$map, $author$project$Main$processLine, pPoemLines));
+	var processedLines = $elm$core$Array$fromList(
+		A2($elm$core$List$map, $author$project$Main$processLine, pLines));
+	return A2($author$project$Main$ProcessedPoem, 50, processedLines);
 };
 var $author$project$Main$update = F2(
 	function (msg, model) {
