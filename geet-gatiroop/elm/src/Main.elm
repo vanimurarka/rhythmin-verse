@@ -23,9 +23,18 @@ type alias Akshar =
   
 emptyAkshar = Akshar " " 0 Empty ' ' ' ' 0
 
+type alias PoemLine =
+  {
+    rhythmTotal : Int
+  , units : Array.Array Akshar
+  }
+
+emptyLine = PoemLine 0 Array.empty
+
 type alias ProcessedPoem =
   { maxLineLen : Int,
-    lines : Array.Array (Array.Array Akshar) }
+    lines : Array.Array PoemLine 
+  }
 
 emptyPoem = ProcessedPoem 0 Array.empty
 
@@ -176,7 +185,7 @@ calcHalfAksharRhythm ac ap an =
         else
           ac
 
-calcHalfAksharRhythmLine line i =
+calcHalfAksharRhythmLine line i r =
   let 
     len = Array.length line
     maxI = len - 1
@@ -187,24 +196,41 @@ calcHalfAksharRhythmLine line i =
     newline = Array.set i aNew line
   in 
     if (i > maxI) then
-      line
+      (line, r)
     else
-      calcHalfAksharRhythmLine newline (i+1)
+      calcHalfAksharRhythmLine newline (i+1) (r+aNew.rhythm)
  
 processLine pomLine =
   let
     pPoem = List.map processChar pomLine -- list of akshars
     pPoemA = Array.fromList pPoem -- as array
     mergedLine = mrgMCline pPoemA -- merge Maatraa and Consonant akshars
+    final = calcHalfAksharRhythmLine mergedLine 0 0
   in
-    calcHalfAksharRhythmLine mergedLine 0
-  
+    PoemLine (Tuple.second final) (Tuple.first final)
+
+getMaxLineLen lines i ml =
+  let
+    len = Array.length lines
+    maxI = len - 1
+    line = Maybe.withDefault emptyLine (Array.get i lines)
+    l = line.rhythmTotal
+  in 
+    if (i > maxI) then
+      ml
+    else if (ml > l) then
+        getMaxLineLen lines (i+1) ml 
+      else
+        getMaxLineLen lines (i+1) l
+
+
 processPoem pom =
   let
     pLines = List.map String.toList (String.lines pom)
     processedLines = Array.fromList (List.map processLine pLines)
+    maxLineLen = getMaxLineLen processedLines 0 0
   in 
-    ProcessedPoem 50 processedLines    
+    ProcessedPoem maxLineLen processedLines
 
 -- ELM ARCHITECTURE
 main =
@@ -229,6 +255,7 @@ init flags =
 
 type Msg
   = ProcessPoem String
+  | AdjustMaatraa String
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
@@ -238,6 +265,10 @@ update msg model =
         poem = incomingPoem, 
         processedPoem = processPoem incomingPoem, 
         lastAction = "Poem Processed" }, 
+      Cmd.none)
+    AdjustMaatraa whichChar ->
+      ({ model | 
+         lastAction = "Maatraa Adjusted " ++ whichChar }, 
       Cmd.none)
 
 view model =
@@ -249,6 +280,7 @@ view model =
 -- PORTS
 port givePoemRhythm : E.Value -> Cmd msg
 port getPoem : (String -> msg) -> Sub msg
+port getMaatraaChange : (String -> msg) -> Sub msg
 
 updateWithStorage msg oldModel =
   let
@@ -263,7 +295,10 @@ updateWithStorage msg oldModel =
 -- from JS. 
 subscriptions : Model -> Sub Msg
 subscriptions _ =
-  getPoem ProcessPoem
+  Sub.batch
+    [ getPoem ProcessPoem
+    , getMaatraaChange AdjustMaatraa
+    ]
 
 -- JSON ENCODE/DECODE
 encodeAkshar a =
@@ -274,7 +309,11 @@ encodeAkshar a =
     ]
 
 encodeLine al =
-  E.array encodeAkshar al
+  E.object
+    [("rhythmAmtCumulative",E.int al.rhythmTotal)
+    , ("subUnits", E.array encodeAkshar al.units)
+    ]
+  --E.array encodeAkshar al
 
 --encodePoem ap =
   --E.array encodeLine ap

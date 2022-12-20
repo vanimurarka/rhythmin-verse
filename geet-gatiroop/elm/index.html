@@ -15,6 +15,7 @@
 आत्म
 तुम्ही</textarea>
   <button onclick="callProcessPoem()">Process Poem</button>
+  <button onclick="callAdjustMaatraa()">Adjust Maatraa</button>
   <div id="myapp"></div>
   <div id="right">
     <div id="chart"></div>
@@ -42,6 +43,12 @@ function callProcessPoem()
 {
   poem = document.getElementById('poem').value;
   hpra.ports.getPoem.send(poem);
+}
+
+function callAdjustMaatraa()
+{
+  whichChar = "xyz";
+  hpra.ports.getMaatraaChange.send(whichChar);
 }
 
 </script>

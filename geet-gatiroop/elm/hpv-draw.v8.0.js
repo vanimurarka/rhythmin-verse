@@ -65,8 +65,11 @@ function initSvgFlex(svgViewBox)
 function visualize(givenPoem, dAvailableW, dPoemType)
 {
 	fGhazal = fFreeVerse = false;
-
 	dPoem = givenPoem;
+	// if (dPoem.type == poemType.ghazal)
+	// 	fGhazal = true;
+	// else if (dPoem.type == poemType.freeverse)
+	// 	fFreeVerse= true;
 
 	oVisual = new cVisual(dAvailableW);
 	draw();	
@@ -113,7 +116,7 @@ function draw()
 	    else
 	    	svg = initSvgFlex(svgViewBox);
 	}
-	// debugger;
+
 	// create the "g"s (svg groups) for each line
 	if (fLineSpacing)
 	{
@@ -139,7 +142,7 @@ function draw()
 	if (fShowText)
     {
         g.selectAll("text")               // char text
-          .data(function(d) {console.log(d); return d;} )  // d = line, subsequent d = characters
+          .data(function(d) {return d.subUnits;} )  // d = line, subsequent d = characters
           .enter().append("svg:text")
             .attr("y", charH-2)
             .attr("x", function(d,i) {return drawCharTxtPos(d,i);})
@@ -150,7 +153,7 @@ function draw()
     }
 
     g.selectAll("path")
-      .data(function(d) {return d;} ) // d = line, subsequent d = characters
+      .data(function(d) {return d.subUnits;} ) // d = line, subsequent d = characters
       .enter().append("path")
         .attr("id", function(d,i) {return "char"+i})
         .attr("style", function(d,i) {
@@ -160,7 +163,7 @@ function draw()
             return drawStyleCharBlock(d,'consonant');
         })
         .attr("d", function(d,i) {return drawCharBlock(d,i);})
-        .attr("title", function(d,i) {return d.mainChar()+d.vowelChar;})
+        .attr("title", function(d,i) {return d.txt;})
         .on("click",adjustCharLen);
 
     // line total maatraa
