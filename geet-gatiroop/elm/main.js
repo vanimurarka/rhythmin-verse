@@ -5331,9 +5331,9 @@ var $author$project$Main$encodeModel = function (model) {
 			]));
 };
 var $author$project$Main$givePoemRhythm = _Platform_outgoingPort('givePoemRhythm', $elm$core$Basics$identity);
-var $author$project$Main$PoemLine = F2(
-	function (rhythmTotal, units) {
-		return {rhythmTotal: rhythmTotal, units: units};
+var $author$project$Main$PoemLine = F3(
+	function (str, rhythmTotal, units) {
+		return {rhythmTotal: rhythmTotal, str: str, units: units};
 	});
 var $author$project$Main$Consonant = {$: 'Consonant'};
 var $author$project$Main$PureVowel = {$: 'PureVowel'};
@@ -5466,9 +5466,9 @@ var $author$project$Main$adjustMaatraaLine = F2(
 		var newAkshars = A3($elm$core$Array$set, aI, aNew, oldLine.units);
 		var diff = aNew.userRhythm - a.userRhythm;
 		var newRhythm = oldLine.rhythmTotal + diff;
-		return A2($author$project$Main$PoemLine, newRhythm, newAkshars);
+		return A3($author$project$Main$PoemLine, oldLine.str, newRhythm, newAkshars);
 	});
-var $author$project$Main$emptyLine = A2($author$project$Main$PoemLine, 0, $elm$core$Array$empty);
+var $author$project$Main$emptyLine = A3($author$project$Main$PoemLine, '', 0, $elm$core$Array$empty);
 var $elm$core$Array$length = function (_v0) {
 	var len = _v0.a;
 	return len;
@@ -5510,156 +5510,60 @@ var $author$project$Main$getMaxLineLen = F3(
 var $elm$core$Basics$negate = function (n) {
 	return -n;
 };
-var $elm$core$Tuple$second = function (_v0) {
-	var y = _v0.b;
-	return y;
-};
 var $author$project$Main$adjustMaatraaPoem = F2(
 	function (processedPoem, whichChar) {
-		var args = function () {
-			var _v0 = A2($elm$core$String$split, ':', whichChar);
-			if (!_v0.b) {
-				return _Utils_Tuple2(-1, -1);
+		var _v0 = function () {
+			var _v1 = A2($elm$core$String$split, ':', whichChar);
+			if ((_v1.b && _v1.b.b) && (!_v1.b.b.b)) {
+				var a = _v1.a;
+				var _v2 = _v1.b;
+				var b = _v2.a;
+				return _Utils_Tuple2(
+					A2(
+						$elm$core$Maybe$withDefault,
+						-1,
+						$elm$core$String$toInt(a)),
+					A2(
+						$elm$core$Maybe$withDefault,
+						-1,
+						$elm$core$String$toInt(b)));
 			} else {
-				if (!_v0.b.b) {
-					return _Utils_Tuple2(-1, -1);
-				} else {
-					if (!_v0.b.b.b) {
-						var a = _v0.a;
-						var _v1 = _v0.b;
-						var b = _v1.a;
-						return _Utils_Tuple2(
-							A2(
-								$elm$core$Maybe$withDefault,
-								-1,
-								$elm$core$String$toInt(a)),
-							A2(
-								$elm$core$Maybe$withDefault,
-								-1,
-								$elm$core$String$toInt(b)));
-					} else {
-						var a = _v0.a;
-						var _v2 = _v0.b;
-						var b = _v2.a;
-						return _Utils_Tuple2(-1, -1);
-					}
-				}
+				return _Utils_Tuple2(-1, -1);
 			}
 		}();
-		var lineI = args.a;
+		var lineI = _v0.a;
+		var aI = _v0.b;
 		var oldLine = A2(
 			$elm$core$Maybe$withDefault,
 			$author$project$Main$emptyLine,
 			A2($elm$core$Array$get, lineI, processedPoem.lines));
-		var aI = args.b;
 		var newLine = A2($author$project$Main$adjustMaatraaLine, oldLine, aI);
 		var newLines = A3($elm$core$Array$set, lineI, newLine, processedPoem.lines);
 		var newMaxLineLen = A3($author$project$Main$getMaxLineLen, newLines, 0, 0);
 		return (_Utils_eq(lineI, -1) || _Utils_eq(aI, -1)) ? processedPoem : A2($author$project$Main$ProcessedPoem, newMaxLineLen, newLines);
 	});
-var $elm$core$Array$fromListHelp = F3(
-	function (list, nodeList, nodeListSize) {
-		fromListHelp:
-		while (true) {
-			var _v0 = A2($elm$core$Elm$JsArray$initializeFromList, $elm$core$Array$branchFactor, list);
-			var jsArray = _v0.a;
-			var remainingItems = _v0.b;
-			if (_Utils_cmp(
-				$elm$core$Elm$JsArray$length(jsArray),
-				$elm$core$Array$branchFactor) < 0) {
-				return A2(
-					$elm$core$Array$builderToArray,
-					true,
-					{nodeList: nodeList, nodeListSize: nodeListSize, tail: jsArray});
-			} else {
-				var $temp$list = remainingItems,
-					$temp$nodeList = A2(
-					$elm$core$List$cons,
-					$elm$core$Array$Leaf(jsArray),
-					nodeList),
-					$temp$nodeListSize = nodeListSize + 1;
-				list = $temp$list;
-				nodeList = $temp$nodeList;
-				nodeListSize = $temp$nodeListSize;
-				continue fromListHelp;
-			}
-		}
-	});
-var $elm$core$Array$fromList = function (list) {
-	if (!list.b) {
-		return $elm$core$Array$empty;
-	} else {
-		return A3($elm$core$Array$fromListHelp, list, _List_Nil, 0);
-	}
-};
-var $elm$core$String$lines = _String_lines;
-var $elm$core$Basics$neq = _Utils_notEqual;
-var $author$project$Main$calcHalfAksharRhythm = F3(
-	function (ac, ap, an) {
-		return (!_Utils_eq(ac.aksharType, $author$project$Main$Half)) ? ac : (((_Utils_eq(
-			ac.mainChar,
-			_Utils_chr('म')) && _Utils_eq(
-			an.mainChar,
-			_Utils_chr('ह'))) || (_Utils_eq(
-			ac.mainChar,
-			_Utils_chr('न')) && _Utils_eq(
-			an.mainChar,
-			_Utils_chr('ह')))) ? ac : ((ap.rhythm === 1) ? _Utils_update(
-			ac,
-			{rhythm: 1, userRhythm: 1}) : (((ap.rhythm === 2) && (an.rhythm === 2)) ? _Utils_update(
-			ac,
-			{rhythm: 1, userRhythm: 1}) : ac)));
-	});
-var $author$project$Main$calcHalfAksharRhythmLine = F3(
-	function (line, i, r) {
-		calcHalfAksharRhythmLine:
-		while (true) {
-			var len = $elm$core$Array$length(line);
-			var maxI = len - 1;
-			var ap = A2(
-				$elm$core$Maybe$withDefault,
-				$author$project$Main$emptyAkshar,
-				A2($elm$core$Array$get, i - 1, line));
-			var an = A2(
-				$elm$core$Maybe$withDefault,
-				$author$project$Main$emptyAkshar,
-				A2($elm$core$Array$get, i + 1, line));
-			var ac = A2(
-				$elm$core$Maybe$withDefault,
-				$author$project$Main$emptyAkshar,
-				A2($elm$core$Array$get, i, line));
-			var aNew = A3($author$project$Main$calcHalfAksharRhythm, ac, ap, an);
-			var newline = A3($elm$core$Array$set, i, aNew, line);
-			if (_Utils_cmp(i, maxI) > 0) {
-				return _Utils_Tuple2(line, r);
-			} else {
-				var $temp$line = newline,
-					$temp$i = i + 1,
-					$temp$r = r + aNew.rhythm;
-				line = $temp$line;
-				i = $temp$i;
-				r = $temp$r;
-				continue calcHalfAksharRhythmLine;
-			}
-		}
-	});
-var $author$project$Main$Halant = {$: 'Halant'};
-var $author$project$Main$Maatraa = {$: 'Maatraa'};
-var $author$project$Main$mrgMCakshar = F2(
-	function (aL, aM) {
-		var aC = _Utils_update(
-			aM,
-			{
-				rhythm: aL.rhythm,
-				str: _Utils_ap(aM.str, aL.str),
-				userRhythm: aL.rhythm,
-				vowel: aL.vowel
-			});
-		return (_Utils_eq(aM.aksharType, $author$project$Main$Consonant) && _Utils_eq(aL.aksharType, $author$project$Main$Maatraa)) ? _Utils_Tuple2(true, aC) : ((_Utils_eq(aM.aksharType, $author$project$Main$Consonant) && _Utils_eq(aL.aksharType, $author$project$Main$Halant)) ? _Utils_Tuple2(
-			true,
-			_Utils_update(
-				aC,
-				{aksharType: $author$project$Main$Half})) : _Utils_Tuple2(false, aL));
+var $elm$core$Elm$JsArray$appendN = _JsArray_appendN;
+var $elm$core$Elm$JsArray$slice = _JsArray_slice;
+var $elm$core$Array$appendHelpBuilder = F2(
+	function (tail, builder) {
+		var tailLen = $elm$core$Elm$JsArray$length(tail);
+		var notAppended = ($elm$core$Array$branchFactor - $elm$core$Elm$JsArray$length(builder.tail)) - tailLen;
+		var appended = A3($elm$core$Elm$JsArray$appendN, $elm$core$Array$branchFactor, builder.tail, tail);
+		return (notAppended < 0) ? {
+			nodeList: A2(
+				$elm$core$List$cons,
+				$elm$core$Array$Leaf(appended),
+				builder.nodeList),
+			nodeListSize: builder.nodeListSize + 1,
+			tail: A3($elm$core$Elm$JsArray$slice, notAppended, tailLen, tail)
+		} : ((!notAppended) ? {
+			nodeList: A2(
+				$elm$core$List$cons,
+				$elm$core$Array$Leaf(appended),
+				builder.nodeList),
+			nodeListSize: builder.nodeListSize + 1,
+			tail: $elm$core$Elm$JsArray$empty
+		} : {nodeList: builder.nodeList, nodeListSize: builder.nodeListSize, tail: appended});
 	});
 var $elm$core$Elm$JsArray$push = _JsArray_push;
 var $elm$core$Elm$JsArray$singleton = _JsArray_singleton;
@@ -5731,6 +5635,199 @@ var $elm$core$Array$unsafeReplaceTail = F2(
 			return A4($elm$core$Array$Array_elm_builtin, newArrayLen, startShift, tree, newTail);
 		}
 	});
+var $elm$core$Array$appendHelpTree = F2(
+	function (toAppend, array) {
+		var len = array.a;
+		var tree = array.c;
+		var tail = array.d;
+		var itemsToAppend = $elm$core$Elm$JsArray$length(toAppend);
+		var notAppended = ($elm$core$Array$branchFactor - $elm$core$Elm$JsArray$length(tail)) - itemsToAppend;
+		var appended = A3($elm$core$Elm$JsArray$appendN, $elm$core$Array$branchFactor, tail, toAppend);
+		var newArray = A2($elm$core$Array$unsafeReplaceTail, appended, array);
+		if (notAppended < 0) {
+			var nextTail = A3($elm$core$Elm$JsArray$slice, notAppended, itemsToAppend, toAppend);
+			return A2($elm$core$Array$unsafeReplaceTail, nextTail, newArray);
+		} else {
+			return newArray;
+		}
+	});
+var $elm$core$Array$builderFromArray = function (_v0) {
+	var len = _v0.a;
+	var tree = _v0.c;
+	var tail = _v0.d;
+	var helper = F2(
+		function (node, acc) {
+			if (node.$ === 'SubTree') {
+				var subTree = node.a;
+				return A3($elm$core$Elm$JsArray$foldl, helper, acc, subTree);
+			} else {
+				return A2($elm$core$List$cons, node, acc);
+			}
+		});
+	return {
+		nodeList: A3($elm$core$Elm$JsArray$foldl, helper, _List_Nil, tree),
+		nodeListSize: (len / $elm$core$Array$branchFactor) | 0,
+		tail: tail
+	};
+};
+var $elm$core$Array$append = F2(
+	function (a, _v0) {
+		var aTail = a.d;
+		var bLen = _v0.a;
+		var bTree = _v0.c;
+		var bTail = _v0.d;
+		if (_Utils_cmp(bLen, $elm$core$Array$branchFactor * 4) < 1) {
+			var foldHelper = F2(
+				function (node, array) {
+					if (node.$ === 'SubTree') {
+						var tree = node.a;
+						return A3($elm$core$Elm$JsArray$foldl, foldHelper, array, tree);
+					} else {
+						var leaf = node.a;
+						return A2($elm$core$Array$appendHelpTree, leaf, array);
+					}
+				});
+			return A2(
+				$elm$core$Array$appendHelpTree,
+				bTail,
+				A3($elm$core$Elm$JsArray$foldl, foldHelper, a, bTree));
+		} else {
+			var foldHelper = F2(
+				function (node, builder) {
+					if (node.$ === 'SubTree') {
+						var tree = node.a;
+						return A3($elm$core$Elm$JsArray$foldl, foldHelper, builder, tree);
+					} else {
+						var leaf = node.a;
+						return A2($elm$core$Array$appendHelpBuilder, leaf, builder);
+					}
+				});
+			return A2(
+				$elm$core$Array$builderToArray,
+				true,
+				A2(
+					$elm$core$Array$appendHelpBuilder,
+					bTail,
+					A3(
+						$elm$core$Elm$JsArray$foldl,
+						foldHelper,
+						$elm$core$Array$builderFromArray(a),
+						bTree)));
+		}
+	});
+var $elm$core$Array$fromListHelp = F3(
+	function (list, nodeList, nodeListSize) {
+		fromListHelp:
+		while (true) {
+			var _v0 = A2($elm$core$Elm$JsArray$initializeFromList, $elm$core$Array$branchFactor, list);
+			var jsArray = _v0.a;
+			var remainingItems = _v0.b;
+			if (_Utils_cmp(
+				$elm$core$Elm$JsArray$length(jsArray),
+				$elm$core$Array$branchFactor) < 0) {
+				return A2(
+					$elm$core$Array$builderToArray,
+					true,
+					{nodeList: nodeList, nodeListSize: nodeListSize, tail: jsArray});
+			} else {
+				var $temp$list = remainingItems,
+					$temp$nodeList = A2(
+					$elm$core$List$cons,
+					$elm$core$Array$Leaf(jsArray),
+					nodeList),
+					$temp$nodeListSize = nodeListSize + 1;
+				list = $temp$list;
+				nodeList = $temp$nodeList;
+				nodeListSize = $temp$nodeListSize;
+				continue fromListHelp;
+			}
+		}
+	});
+var $elm$core$Array$fromList = function (list) {
+	if (!list.b) {
+		return $elm$core$Array$empty;
+	} else {
+		return A3($elm$core$Array$fromListHelp, list, _List_Nil, 0);
+	}
+};
+var $elm$core$String$lines = _String_lines;
+var $elm_community$array_extra$Array$Extra$map2 = F3(
+	function (combineAb, aArray, bArray) {
+		return $elm$core$Array$fromList(
+			A3(
+				$elm$core$List$map2,
+				combineAb,
+				$elm$core$Array$toList(aArray),
+				$elm$core$Array$toList(bArray)));
+	});
+var $elm$core$Basics$neq = _Utils_notEqual;
+var $author$project$Main$calcHalfAksharRhythm = F3(
+	function (ac, ap, an) {
+		return (!_Utils_eq(ac.aksharType, $author$project$Main$Half)) ? ac : (((_Utils_eq(
+			ac.mainChar,
+			_Utils_chr('म')) && _Utils_eq(
+			an.mainChar,
+			_Utils_chr('ह'))) || (_Utils_eq(
+			ac.mainChar,
+			_Utils_chr('न')) && _Utils_eq(
+			an.mainChar,
+			_Utils_chr('ह')))) ? ac : ((ap.rhythm === 1) ? _Utils_update(
+			ac,
+			{rhythm: 1, userRhythm: 1}) : (((ap.rhythm === 2) && (an.rhythm === 2)) ? _Utils_update(
+			ac,
+			{rhythm: 1, userRhythm: 1}) : ac)));
+	});
+var $author$project$Main$calcHalfAksharRhythmLine = F3(
+	function (line, i, r) {
+		calcHalfAksharRhythmLine:
+		while (true) {
+			var len = $elm$core$Array$length(line);
+			var maxI = len - 1;
+			var ap = A2(
+				$elm$core$Maybe$withDefault,
+				$author$project$Main$emptyAkshar,
+				A2($elm$core$Array$get, i - 1, line));
+			var an = A2(
+				$elm$core$Maybe$withDefault,
+				$author$project$Main$emptyAkshar,
+				A2($elm$core$Array$get, i + 1, line));
+			var ac = A2(
+				$elm$core$Maybe$withDefault,
+				$author$project$Main$emptyAkshar,
+				A2($elm$core$Array$get, i, line));
+			var aNew = A3($author$project$Main$calcHalfAksharRhythm, ac, ap, an);
+			var newline = A3($elm$core$Array$set, i, aNew, line);
+			if (_Utils_cmp(i, maxI) > 0) {
+				return _Utils_Tuple2(line, r);
+			} else {
+				var $temp$line = newline,
+					$temp$i = i + 1,
+					$temp$r = r + aNew.rhythm;
+				line = $temp$line;
+				i = $temp$i;
+				r = $temp$r;
+				continue calcHalfAksharRhythmLine;
+			}
+		}
+	});
+var $author$project$Main$Halant = {$: 'Halant'};
+var $author$project$Main$Maatraa = {$: 'Maatraa'};
+var $author$project$Main$mrgMCakshar = F2(
+	function (aL, aM) {
+		var aC = _Utils_update(
+			aM,
+			{
+				rhythm: aL.rhythm,
+				str: _Utils_ap(aM.str, aL.str),
+				userRhythm: aL.rhythm,
+				vowel: aL.vowel
+			});
+		return (_Utils_eq(aM.aksharType, $author$project$Main$Consonant) && _Utils_eq(aL.aksharType, $author$project$Main$Maatraa)) ? _Utils_Tuple2(true, aC) : ((_Utils_eq(aM.aksharType, $author$project$Main$Consonant) && _Utils_eq(aL.aksharType, $author$project$Main$Halant)) ? _Utils_Tuple2(
+			true,
+			_Utils_update(
+				aC,
+				{aksharType: $author$project$Main$Half})) : _Utils_Tuple2(false, aL));
+	});
 var $elm$core$Array$push = F2(
 	function (a, array) {
 		var tail = array.d;
@@ -5739,6 +5836,10 @@ var $elm$core$Array$push = F2(
 			A2($elm$core$Elm$JsArray$push, a, tail),
 			array);
 	});
+var $elm$core$Tuple$second = function (_v0) {
+	var y = _v0.b;
+	return y;
+};
 var $author$project$Main$mrgMChelper = F3(
 	function (list, iStart, mList) {
 		mrgMChelper:
@@ -5917,27 +6018,44 @@ var $author$project$Main$processChar = function (c) {
 			vowel: _Utils_chr('अ')
 		}))))) : a;
 };
-var $author$project$Main$processLine = function (pomLine) {
-	var pPoem = A2($elm$core$List$map, $author$project$Main$processChar, pomLine);
-	var pPoemA = $elm$core$Array$fromList(pPoem);
-	var mergedLine = $author$project$Main$mrgMCline(pPoemA);
-	var _final = A3($author$project$Main$calcHalfAksharRhythmLine, mergedLine, 0, 0);
-	return A2($author$project$Main$PoemLine, _final.b, _final.a);
-};
 var $elm$core$String$foldr = _String_foldr;
 var $elm$core$String$toList = function (string) {
 	return A3($elm$core$String$foldr, $elm$core$List$cons, _List_Nil, string);
 };
-var $author$project$Main$processPoem = function (pom) {
-	var pLines = A2(
-		$elm$core$List$map,
-		$elm$core$String$toList,
-		$elm$core$String$lines(pom));
-	var processedLines = $elm$core$Array$fromList(
-		A2($elm$core$List$map, $author$project$Main$processLine, pLines));
-	var maxLineLen = A3($author$project$Main$getMaxLineLen, processedLines, 0, 0);
-	return A2($author$project$Main$ProcessedPoem, maxLineLen, processedLines);
+var $author$project$Main$processLine = function (pomLine) {
+	var pChars = $elm$core$String$toList(pomLine);
+	var pPoem = A2($elm$core$List$map, $author$project$Main$processChar, pChars);
+	var pPoemA = $elm$core$Array$fromList(pPoem);
+	var mergedLine = $author$project$Main$mrgMCline(pPoemA);
+	var _final = A3($author$project$Main$calcHalfAksharRhythmLine, mergedLine, 0, 0);
+	return A3($author$project$Main$PoemLine, pomLine, _final.b, _final.a);
 };
+var $author$project$Main$preProcessLine = F2(
+	function (pomLine, oldLine) {
+		return _Utils_eq(pomLine, oldLine.str) ? oldLine : $author$project$Main$processLine(pomLine);
+	});
+var $elm$core$Array$repeat = F2(
+	function (n, e) {
+		return A2(
+			$elm$core$Array$initialize,
+			n,
+			function (_v0) {
+				return e;
+			});
+	});
+var $author$project$Main$processPoem = F2(
+	function (pom, oldLines) {
+		var pLines = $elm$core$Array$fromList(
+			$elm$core$String$lines(pom));
+		var diff = $elm$core$Array$length(pLines) - $elm$core$Array$length(oldLines);
+		var paddedOldPoem = (diff > 0) ? A2(
+			$elm$core$Array$append,
+			oldLines,
+			A2($elm$core$Array$repeat, diff, $author$project$Main$emptyLine)) : oldLines;
+		var processedLines = A3($elm_community$array_extra$Array$Extra$map2, $author$project$Main$preProcessLine, pLines, paddedOldPoem);
+		var maxLineLen = A3($author$project$Main$getMaxLineLen, processedLines, 0, 0);
+		return A2($author$project$Main$ProcessedPoem, maxLineLen, processedLines);
+	});
 var $author$project$Main$update = F2(
 	function (msg, model) {
 		if (msg.$ === 'ProcessPoem') {
@@ -5948,7 +6066,7 @@ var $author$project$Main$update = F2(
 					{
 						lastAction: 'Poem Processed',
 						poem: incomingPoem,
-						processedPoem: $author$project$Main$processPoem(incomingPoem)
+						processedPoem: A2($author$project$Main$processPoem, incomingPoem, model.processedPoem.lines)
 					}),
 				$elm$core$Platform$Cmd$none);
 		} else {
@@ -5981,6 +6099,9 @@ var $author$project$Main$updateWithStorage = F2(
 var $elm$html$Html$div = _VirtualDom_node('div');
 var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
 var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
+var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
+var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
+var $elm$core$Debug$toString = _Debug_toString;
 var $author$project$Main$view = function (model) {
 	return A2(
 		$elm$html$Html$div,
@@ -5990,7 +6111,31 @@ var $author$project$Main$view = function (model) {
 				A2($elm$html$Html$Attributes$style, 'color', 'white'),
 				A2($elm$html$Html$Attributes$style, 'padding', '5px')
 			]),
-		_List_Nil);
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						A2($elm$html$Html$Attributes$style, 'padding', 'inherit'),
+						A2($elm$html$Html$Attributes$style, 'white-space', 'pre-wrap')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text(model.poem)
+					])),
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						A2($elm$html$Html$Attributes$style, 'padding', 'inherit')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text(
+						$elm$core$Debug$toString(model.processedPoem))
+					]))
+			]));
 };
 var $author$project$Main$main = $elm$browser$Browser$element(
 	{init: $author$project$Main$init, subscriptions: $author$project$Main$subscriptions, update: $author$project$Main$updateWithStorage, view: $author$project$Main$view});

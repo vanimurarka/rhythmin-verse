@@ -4,7 +4,8 @@ import Browser
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import Array
+import Array exposing (Array)
+import Array.Extra as Array
 import Json.Decode as D
 import Json.Encode as E
 
@@ -26,11 +27,12 @@ emptyAkshar = Akshar " " 0 Empty ' ' ' ' 0 0
 
 type alias PoemLine =
   {
-    rhythmTotal : Int
+    str : String
+  , rhythmTotal : Int
   , units : Array.Array Akshar
   }
 
-emptyLine = PoemLine 0 Array.empty
+emptyLine = PoemLine "" 0 Array.empty
 
 type alias ProcessedPoem =
   { maxLineLen : Int,
@@ -208,15 +210,6 @@ calcHalfAksharRhythmLine line i r =
       (line, r)
     else
       calcHalfAksharRhythmLine newline (i+1) (r+aNew.rhythm)
- 
-processLine pomLine =
-  let
-    pPoem = List.map processChar pomLine -- list of akshars
-    pPoemA = Array.fromList pPoem -- as array
-    mergedLine = mrgMCline pPoemA -- merge Maatraa and Consonant akshars
-    final = calcHalfAksharRhythmLine mergedLine 0 0
-  in
-    PoemLine (Tuple.second final) (Tuple.first final)
 
 getMaxLineLen lines i ml =
   let
@@ -231,12 +224,30 @@ getMaxLineLen lines i ml =
         getMaxLineLen lines (i+1) ml 
       else
         getMaxLineLen lines (i+1) l
-
-
-processPoem pom =
+ 
+processLine pomLine =
   let
-    pLines = List.map String.toList (String.lines pom)
-    processedLines = Array.fromList (List.map processLine pLines)
+    pChars = String.toList pomLine
+    pPoem = List.map processChar pChars -- list of akshars
+    pPoemA = Array.fromList pPoem -- as array
+    mergedLine = mrgMCline pPoemA -- merge Maatraa and Consonant akshars
+    final = calcHalfAksharRhythmLine mergedLine 0 0
+  in
+    PoemLine pomLine (Tuple.second final) (Tuple.first final)
+
+preProcessLine pomLine oldLine =
+  if (pomLine == oldLine.str) then
+    oldLine
+  else
+    processLine pomLine
+
+processPoem pom oldLines =
+  let
+    pLines = Array.fromList (String.lines pom)
+    diff = (Array.length pLines) - (Array.length oldLines)
+    paddedOldPoem = if (diff > 0) then Array.append oldLines (Array.repeat diff emptyLine) else oldLines
+    processedLines = Array.map2 preProcessLine pLines paddedOldPoem
+    --processedLines = Array.fromList (List.map processLine pLines)
     maxLineLen = getMaxLineLen processedLines 0 0
   in 
     ProcessedPoem maxLineLen processedLines
@@ -263,18 +274,14 @@ adjustMaatraaLine oldLine aI =
     newRhythm = oldLine.rhythmTotal + diff
     newAkshars = Array.set aI aNew oldLine.units
   in
-    PoemLine newRhythm newAkshars
+    PoemLine oldLine.str newRhythm newAkshars
 
 adjustMaatraaPoem processedPoem whichChar =
   let 
-    args =
+    (lineI, aI) =
       case (String.split ":" whichChar) of
-        [] -> (-1,-1)
-        [_] -> (-1,-1)
         [a,b] -> (Maybe.withDefault -1 (String.toInt a), Maybe.withDefault -1 (String.toInt b))
-        a::b::_ -> (-1,-1)
-    lineI = Tuple.first args
-    aI = Tuple.second args
+        _ -> (-1,-1)
     oldLine = Maybe.withDefault emptyLine (Array.get lineI processedPoem.lines)
     newLine = adjustMaatraaLine oldLine aI
     newLines = Array.set lineI newLine processedPoem.lines
@@ -317,7 +324,7 @@ update msg model =
     ProcessPoem incomingPoem -> 
       ({ model | 
         poem = incomingPoem, 
-        processedPoem = processPoem incomingPoem, 
+        processedPoem = processPoem incomingPoem model.processedPoem.lines, 
         lastAction = "Poem Processed" }, 
       Cmd.none)
     AdjustMaatraa whichChar ->
