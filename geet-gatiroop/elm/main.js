@@ -5256,6 +5256,8 @@ var $elm$json$Json$Encode$array = F2(
 				_Json_emptyArray(_Utils_Tuple0),
 				entries));
 	});
+var $author$project$Main$Half = {$: 'Half'};
+var $elm$json$Json$Encode$bool = _Json_wrap;
 var $elm$json$Json$Encode$int = _Json_wrap;
 var $elm$json$Json$Encode$object = function (pairs) {
 	return _Json_wrap(
@@ -5283,7 +5285,10 @@ var $author$project$Main$encodeAkshar = function (a) {
 				$elm$json$Json$Encode$int(a.rhythm)),
 				_Utils_Tuple2(
 				'rhythmAmt',
-				$elm$json$Json$Encode$int(a.rhythm))
+				$elm$json$Json$Encode$int(a.userRhythm)),
+				_Utils_Tuple2(
+				'isHalfLetter',
+				_Utils_eq(a.aksharType, $author$project$Main$Half) ? $elm$json$Json$Encode$bool(true) : $elm$json$Json$Encode$bool(false))
 			]));
 };
 var $author$project$Main$encodeLine = function (al) {
@@ -5326,46 +5331,37 @@ var $author$project$Main$encodeModel = function (model) {
 			]));
 };
 var $author$project$Main$givePoemRhythm = _Platform_outgoingPort('givePoemRhythm', $elm$core$Basics$identity);
-var $elm$core$Array$fromListHelp = F3(
-	function (list, nodeList, nodeListSize) {
-		fromListHelp:
-		while (true) {
-			var _v0 = A2($elm$core$Elm$JsArray$initializeFromList, $elm$core$Array$branchFactor, list);
-			var jsArray = _v0.a;
-			var remainingItems = _v0.b;
-			if (_Utils_cmp(
-				$elm$core$Elm$JsArray$length(jsArray),
-				$elm$core$Array$branchFactor) < 0) {
-				return A2(
-					$elm$core$Array$builderToArray,
-					true,
-					{nodeList: nodeList, nodeListSize: nodeListSize, tail: jsArray});
-			} else {
-				var $temp$list = remainingItems,
-					$temp$nodeList = A2(
-					$elm$core$List$cons,
-					$elm$core$Array$Leaf(jsArray),
-					nodeList),
-					$temp$nodeListSize = nodeListSize + 1;
-				list = $temp$list;
-				nodeList = $temp$nodeList;
-				nodeListSize = $temp$nodeListSize;
-				continue fromListHelp;
-			}
-		}
-	});
-var $elm$core$Array$fromList = function (list) {
-	if (!list.b) {
-		return $elm$core$Array$empty;
-	} else {
-		return A3($elm$core$Array$fromListHelp, list, _List_Nil, 0);
-	}
-};
 var $author$project$Main$PoemLine = F2(
 	function (rhythmTotal, units) {
 		return {rhythmTotal: rhythmTotal, units: units};
 	});
-var $author$project$Main$emptyLine = A2($author$project$Main$PoemLine, 0, $elm$core$Array$empty);
+var $author$project$Main$Consonant = {$: 'Consonant'};
+var $author$project$Main$PureVowel = {$: 'PureVowel'};
+var $author$project$Main$adjustMaatraaChar = function (a) {
+	return _Utils_eq(a.aksharType, $author$project$Main$Half) ? ((!a.userRhythm) ? _Utils_update(
+		a,
+		{userRhythm: 1}) : _Utils_update(
+		a,
+		{userRhythm: 0})) : (((_Utils_eq(a.aksharType, $author$project$Main$Consonant) || _Utils_eq(a.aksharType, $author$project$Main$PureVowel)) && (a.rhythm === 2)) ? ((a.userRhythm === 2) ? _Utils_update(
+		a,
+		{userRhythm: 1}) : _Utils_update(
+		a,
+		{userRhythm: 2})) : a);
+};
+var $author$project$Main$Akshar = F7(
+	function (str, code, aksharType, mainChar, vowel, rhythm, userRhythm) {
+		return {aksharType: aksharType, code: code, mainChar: mainChar, rhythm: rhythm, str: str, userRhythm: userRhythm, vowel: vowel};
+	});
+var $author$project$Main$Empty = {$: 'Empty'};
+var $author$project$Main$emptyAkshar = A7(
+	$author$project$Main$Akshar,
+	' ',
+	0,
+	$author$project$Main$Empty,
+	_Utils_chr(' '),
+	_Utils_chr(' '),
+	0,
+	0);
 var $elm$core$Bitwise$and = _Bitwise_and;
 var $elm$core$Bitwise$shiftRightZfBy = _Bitwise_shiftRightZfBy;
 var $elm$core$Array$bitMask = 4294967295 >>> (32 - $elm$core$Array$shiftStep);
@@ -5408,85 +5404,6 @@ var $elm$core$Array$get = F2(
 			A2($elm$core$Elm$JsArray$unsafeGet, $elm$core$Array$bitMask & index, tail)) : $elm$core$Maybe$Just(
 			A3($elm$core$Array$getHelp, startShift, index, tree)));
 	});
-var $elm$core$Array$length = function (_v0) {
-	var len = _v0.a;
-	return len;
-};
-var $elm$core$Maybe$withDefault = F2(
-	function (_default, maybe) {
-		if (maybe.$ === 'Just') {
-			var value = maybe.a;
-			return value;
-		} else {
-			return _default;
-		}
-	});
-var $author$project$Main$getMaxLineLen = F3(
-	function (lines, i, ml) {
-		getMaxLineLen:
-		while (true) {
-			var line = A2(
-				$elm$core$Maybe$withDefault,
-				$author$project$Main$emptyLine,
-				A2($elm$core$Array$get, i, lines));
-			var len = $elm$core$Array$length(lines);
-			var maxI = len - 1;
-			var l = line.rhythmTotal;
-			if (_Utils_cmp(i, maxI) > 0) {
-				return ml;
-			} else {
-				if (_Utils_cmp(ml, l) > 0) {
-					var $temp$lines = lines,
-						$temp$i = i + 1,
-						$temp$ml = ml;
-					lines = $temp$lines;
-					i = $temp$i;
-					ml = $temp$ml;
-					continue getMaxLineLen;
-				} else {
-					var $temp$lines = lines,
-						$temp$i = i + 1,
-						$temp$ml = l;
-					lines = $temp$lines;
-					i = $temp$i;
-					ml = $temp$ml;
-					continue getMaxLineLen;
-				}
-			}
-		}
-	});
-var $elm$core$String$lines = _String_lines;
-var $author$project$Main$Half = {$: 'Half'};
-var $elm$core$Basics$neq = _Utils_notEqual;
-var $author$project$Main$calcHalfAksharRhythm = F3(
-	function (ac, ap, an) {
-		return (!_Utils_eq(ac.aksharType, $author$project$Main$Half)) ? ac : (((_Utils_eq(
-			ac.mainChar,
-			_Utils_chr('म')) && _Utils_eq(
-			an.mainChar,
-			_Utils_chr('ह'))) || (_Utils_eq(
-			ac.mainChar,
-			_Utils_chr('न')) && _Utils_eq(
-			an.mainChar,
-			_Utils_chr('ह')))) ? ac : ((ap.rhythm === 1) ? _Utils_update(
-			ac,
-			{rhythm: 1}) : (((ap.rhythm === 2) && (an.rhythm === 2)) ? _Utils_update(
-			ac,
-			{rhythm: 1}) : ac)));
-	});
-var $author$project$Main$Akshar = F6(
-	function (str, code, aksharType, mainChar, vowel, rhythm) {
-		return {aksharType: aksharType, code: code, mainChar: mainChar, rhythm: rhythm, str: str, vowel: vowel};
-	});
-var $author$project$Main$Empty = {$: 'Empty'};
-var $author$project$Main$emptyAkshar = A6(
-	$author$project$Main$Akshar,
-	' ',
-	0,
-	$author$project$Main$Empty,
-	_Utils_chr(' '),
-	_Utils_chr(' '),
-	0);
 var $elm$core$Elm$JsArray$unsafeSet = _JsArray_unsafeSet;
 var $elm$core$Array$setHelp = F4(
 	function (shift, index, value, tree) {
@@ -5530,6 +5447,169 @@ var $elm$core$Array$set = F3(
 			A4($elm$core$Array$setHelp, startShift, index, value, tree),
 			tail));
 	});
+var $elm$core$Maybe$withDefault = F2(
+	function (_default, maybe) {
+		if (maybe.$ === 'Just') {
+			var value = maybe.a;
+			return value;
+		} else {
+			return _default;
+		}
+	});
+var $author$project$Main$adjustMaatraaLine = F2(
+	function (oldLine, aI) {
+		var a = A2(
+			$elm$core$Maybe$withDefault,
+			$author$project$Main$emptyAkshar,
+			A2($elm$core$Array$get, aI, oldLine.units));
+		var aNew = $author$project$Main$adjustMaatraaChar(a);
+		var newAkshars = A3($elm$core$Array$set, aI, aNew, oldLine.units);
+		var diff = aNew.userRhythm - a.userRhythm;
+		var newRhythm = oldLine.rhythmTotal + diff;
+		return A2($author$project$Main$PoemLine, newRhythm, newAkshars);
+	});
+var $author$project$Main$emptyLine = A2($author$project$Main$PoemLine, 0, $elm$core$Array$empty);
+var $elm$core$Array$length = function (_v0) {
+	var len = _v0.a;
+	return len;
+};
+var $author$project$Main$getMaxLineLen = F3(
+	function (lines, i, ml) {
+		getMaxLineLen:
+		while (true) {
+			var line = A2(
+				$elm$core$Maybe$withDefault,
+				$author$project$Main$emptyLine,
+				A2($elm$core$Array$get, i, lines));
+			var len = $elm$core$Array$length(lines);
+			var maxI = len - 1;
+			var l = line.rhythmTotal;
+			if (_Utils_cmp(i, maxI) > 0) {
+				return ml;
+			} else {
+				if (_Utils_cmp(ml, l) > 0) {
+					var $temp$lines = lines,
+						$temp$i = i + 1,
+						$temp$ml = ml;
+					lines = $temp$lines;
+					i = $temp$i;
+					ml = $temp$ml;
+					continue getMaxLineLen;
+				} else {
+					var $temp$lines = lines,
+						$temp$i = i + 1,
+						$temp$ml = l;
+					lines = $temp$lines;
+					i = $temp$i;
+					ml = $temp$ml;
+					continue getMaxLineLen;
+				}
+			}
+		}
+	});
+var $elm$core$Basics$negate = function (n) {
+	return -n;
+};
+var $elm$core$Tuple$second = function (_v0) {
+	var y = _v0.b;
+	return y;
+};
+var $author$project$Main$adjustMaatraaPoem = F2(
+	function (processedPoem, whichChar) {
+		var args = function () {
+			var _v0 = A2($elm$core$String$split, ':', whichChar);
+			if (!_v0.b) {
+				return _Utils_Tuple2(-1, -1);
+			} else {
+				if (!_v0.b.b) {
+					return _Utils_Tuple2(-1, -1);
+				} else {
+					if (!_v0.b.b.b) {
+						var a = _v0.a;
+						var _v1 = _v0.b;
+						var b = _v1.a;
+						return _Utils_Tuple2(
+							A2(
+								$elm$core$Maybe$withDefault,
+								-1,
+								$elm$core$String$toInt(a)),
+							A2(
+								$elm$core$Maybe$withDefault,
+								-1,
+								$elm$core$String$toInt(b)));
+					} else {
+						var a = _v0.a;
+						var _v2 = _v0.b;
+						var b = _v2.a;
+						return _Utils_Tuple2(-1, -1);
+					}
+				}
+			}
+		}();
+		var lineI = args.a;
+		var oldLine = A2(
+			$elm$core$Maybe$withDefault,
+			$author$project$Main$emptyLine,
+			A2($elm$core$Array$get, lineI, processedPoem.lines));
+		var aI = args.b;
+		var newLine = A2($author$project$Main$adjustMaatraaLine, oldLine, aI);
+		var newLines = A3($elm$core$Array$set, lineI, newLine, processedPoem.lines);
+		var newMaxLineLen = A3($author$project$Main$getMaxLineLen, newLines, 0, 0);
+		return (_Utils_eq(lineI, -1) || _Utils_eq(aI, -1)) ? processedPoem : A2($author$project$Main$ProcessedPoem, newMaxLineLen, newLines);
+	});
+var $elm$core$Array$fromListHelp = F3(
+	function (list, nodeList, nodeListSize) {
+		fromListHelp:
+		while (true) {
+			var _v0 = A2($elm$core$Elm$JsArray$initializeFromList, $elm$core$Array$branchFactor, list);
+			var jsArray = _v0.a;
+			var remainingItems = _v0.b;
+			if (_Utils_cmp(
+				$elm$core$Elm$JsArray$length(jsArray),
+				$elm$core$Array$branchFactor) < 0) {
+				return A2(
+					$elm$core$Array$builderToArray,
+					true,
+					{nodeList: nodeList, nodeListSize: nodeListSize, tail: jsArray});
+			} else {
+				var $temp$list = remainingItems,
+					$temp$nodeList = A2(
+					$elm$core$List$cons,
+					$elm$core$Array$Leaf(jsArray),
+					nodeList),
+					$temp$nodeListSize = nodeListSize + 1;
+				list = $temp$list;
+				nodeList = $temp$nodeList;
+				nodeListSize = $temp$nodeListSize;
+				continue fromListHelp;
+			}
+		}
+	});
+var $elm$core$Array$fromList = function (list) {
+	if (!list.b) {
+		return $elm$core$Array$empty;
+	} else {
+		return A3($elm$core$Array$fromListHelp, list, _List_Nil, 0);
+	}
+};
+var $elm$core$String$lines = _String_lines;
+var $elm$core$Basics$neq = _Utils_notEqual;
+var $author$project$Main$calcHalfAksharRhythm = F3(
+	function (ac, ap, an) {
+		return (!_Utils_eq(ac.aksharType, $author$project$Main$Half)) ? ac : (((_Utils_eq(
+			ac.mainChar,
+			_Utils_chr('म')) && _Utils_eq(
+			an.mainChar,
+			_Utils_chr('ह'))) || (_Utils_eq(
+			ac.mainChar,
+			_Utils_chr('न')) && _Utils_eq(
+			an.mainChar,
+			_Utils_chr('ह')))) ? ac : ((ap.rhythm === 1) ? _Utils_update(
+			ac,
+			{rhythm: 1, userRhythm: 1}) : (((ap.rhythm === 2) && (an.rhythm === 2)) ? _Utils_update(
+			ac,
+			{rhythm: 1, userRhythm: 1}) : ac)));
+	});
 var $author$project$Main$calcHalfAksharRhythmLine = F3(
 	function (line, i, r) {
 		calcHalfAksharRhythmLine:
@@ -5563,7 +5643,6 @@ var $author$project$Main$calcHalfAksharRhythmLine = F3(
 			}
 		}
 	});
-var $author$project$Main$Consonant = {$: 'Consonant'};
 var $author$project$Main$Halant = {$: 'Halant'};
 var $author$project$Main$Maatraa = {$: 'Maatraa'};
 var $author$project$Main$mrgMCakshar = F2(
@@ -5573,6 +5652,7 @@ var $author$project$Main$mrgMCakshar = F2(
 			{
 				rhythm: aL.rhythm,
 				str: _Utils_ap(aM.str, aL.str),
+				userRhythm: aL.rhythm,
 				vowel: aL.vowel
 			});
 		return (_Utils_eq(aM.aksharType, $author$project$Main$Consonant) && _Utils_eq(aL.aksharType, $author$project$Main$Maatraa)) ? _Utils_Tuple2(true, aC) : ((_Utils_eq(aM.aksharType, $author$project$Main$Consonant) && _Utils_eq(aL.aksharType, $author$project$Main$Halant)) ? _Utils_Tuple2(
@@ -5659,10 +5739,6 @@ var $elm$core$Array$push = F2(
 			A2($elm$core$Elm$JsArray$push, a, tail),
 			array);
 	});
-var $elm$core$Tuple$second = function (_v0) {
-	var y = _v0.b;
-	return y;
-};
 var $author$project$Main$mrgMChelper = F3(
 	function (list, iStart, mList) {
 		mrgMChelper:
@@ -5718,7 +5794,6 @@ var $author$project$Main$mrgMCline = function (list) {
 	return A3($author$project$Main$mrgMChelper, list, 0, $elm$core$Array$empty);
 };
 var $author$project$Main$Other = {$: 'Other'};
-var $author$project$Main$PureVowel = {$: 'PureVowel'};
 var $elm$core$String$cons = _String_cons;
 var $elm$core$String$fromChar = function (_char) {
 	return A2($elm$core$String$cons, _char, '');
@@ -5812,35 +5887,33 @@ var $author$project$Main$vowelRhythm = function (c) {
 var $author$project$Main$processChar = function (c) {
 	var m = 0;
 	var cd = $elm$core$Char$toCode(c);
+	var aRhythm = $author$project$Main$vowelRhythm(
+		_Utils_chr('अ'));
 	var a = {
 		aksharType: $author$project$Main$Other,
 		code: cd,
 		mainChar: c,
 		rhythm: 0,
 		str: $elm$core$String$fromChar(c),
+		userRhythm: 0,
 		vowel: c
 	};
+	var newRhythm = $author$project$Main$isPureVowel(c) ? $author$project$Main$vowelRhythm(a.vowel) : ($author$project$Main$isMaatraaVowel(c) ? $author$project$Main$vowelRhythm(
+		$author$project$Main$maatraaToVowel(a.vowel)) : 0);
 	return $author$project$Main$isHindi(c) ? ($author$project$Main$isPureVowel(c) ? _Utils_update(
 		a,
-		{
-			aksharType: $author$project$Main$PureVowel,
-			rhythm: $author$project$Main$vowelRhythm(a.vowel)
-		}) : ($author$project$Main$isMaatraaVowel(c) ? _Utils_update(
+		{aksharType: $author$project$Main$PureVowel, rhythm: newRhythm, userRhythm: newRhythm}) : ($author$project$Main$isMaatraaVowel(c) ? _Utils_update(
 		a,
-		{
-			aksharType: $author$project$Main$Maatraa,
-			rhythm: $author$project$Main$vowelRhythm(
-				$author$project$Main$maatraaToVowel(a.vowel))
-		}) : ($author$project$Main$isBindu(c) ? _Utils_update(
+		{aksharType: $author$project$Main$Maatraa, rhythm: newRhythm, userRhythm: newRhythm}) : ($author$project$Main$isBindu(c) ? _Utils_update(
 		a,
-		{aksharType: $author$project$Main$Half, rhythm: 0}) : ($author$project$Main$isHalant(c) ? _Utils_update(
+		{aksharType: $author$project$Main$Half, rhythm: 0, userRhythm: 0}) : ($author$project$Main$isHalant(c) ? _Utils_update(
 		a,
-		{aksharType: $author$project$Main$Halant, rhythm: 0}) : _Utils_update(
+		{aksharType: $author$project$Main$Halant, rhythm: 0, userRhythm: 0}) : _Utils_update(
 		a,
 		{
 			aksharType: $author$project$Main$Consonant,
-			rhythm: $author$project$Main$vowelRhythm(
-				_Utils_chr('अ')),
+			rhythm: aRhythm,
+			userRhythm: aRhythm,
 			vowel: _Utils_chr('अ')
 		}))))) : a;
 };
@@ -5883,7 +5956,10 @@ var $author$project$Main$update = F2(
 			return _Utils_Tuple2(
 				_Utils_update(
 					model,
-					{lastAction: 'Maatraa Adjusted ' + whichChar}),
+					{
+						lastAction: 'Maatraa Adjusted ' + whichChar,
+						processedPoem: A2($author$project$Main$adjustMaatraaPoem, model.processedPoem, whichChar)
+					}),
 				$elm$core$Platform$Cmd$none);
 		}
 	});

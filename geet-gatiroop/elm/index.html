@@ -10,12 +10,10 @@
 </head>
 
 <body style="background-color: black;">
-  <textarea id="poem" rows="5" cols="30">प्यार
-हिन्दी
-आत्म
-तुम्ही</textarea>
+  <textarea id="poem" rows="5" cols="30">शब्द क्रम
+आत्म आत्मा
+तुम्हे</textarea>
   <button onclick="callProcessPoem()">Process Poem</button>
-  <button onclick="callAdjustMaatraa()">Adjust Maatraa</button>
   <div id="myapp"></div>
   <div id="right">
     <div id="chart"></div>
@@ -45,11 +43,7 @@ function callProcessPoem()
   hpra.ports.getPoem.send(poem);
 }
 
-function callAdjustMaatraa()
-{
-  whichChar = "xyz";
-  hpra.ports.getMaatraaChange.send(whichChar);
-}
+function callAdjustMaatraa(li, ci) { hpra.ports.getMaatraaChange.send(li + ":" + ci); }
 
 </script>
 

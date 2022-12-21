@@ -18,10 +18,11 @@ type alias Akshar =
     aksharType : AksharType,
     mainChar : Char,
     vowel : Char,
-    rhythm : Int
+    rhythm : Int,
+    userRhythm : Int
   }
   
-emptyAkshar = Akshar " " 0 Empty ' ' ' ' 0
+emptyAkshar = Akshar " " 0 Empty ' ' ' ' 0 0
 
 type alias PoemLine =
   {
@@ -124,25 +125,33 @@ processChar c =
         aksharType = Other,
         mainChar = c,
         vowel = c,
-        rhythm = 0}
+        rhythm = 0,
+        userRhythm = 0}
+    newRhythm = if isPureVowel c then
+        vowelRhythm a.vowel
+      else if isMaatraaVowel c then
+        vowelRhythm (maatraaToVowel a.vowel)
+      else
+        0
+    aRhythm = vowelRhythm 'अ'
   in
   if isHindi c then
     if isPureVowel c then
-      {a | aksharType = PureVowel, rhythm = vowelRhythm a.vowel}
+      {a | aksharType = PureVowel, rhythm = newRhythm, userRhythm = newRhythm}
     else if isMaatraaVowel c then
-        {a | aksharType = Maatraa, rhythm = vowelRhythm (maatraaToVowel a.vowel)}
+        {a | aksharType = Maatraa, rhythm = newRhythm, userRhythm = newRhythm}
       else if isBindu c then
-          {a | aksharType = Half, rhythm = 0}
+          {a | aksharType = Half, rhythm = 0, userRhythm = 0}
         else if isHalant c then
-            {a | aksharType = Halant, rhythm = 0}
+            {a | aksharType = Halant, rhythm = 0, userRhythm = 0}
           else
-            {a | aksharType = Consonant, vowel = 'अ', rhythm = vowelRhythm 'अ'}
+            {a | aksharType = Consonant, vowel = 'अ', rhythm = aRhythm, userRhythm = aRhythm}
   else
     a
 
 mrgMCakshar aL aM =
   let 
-    aC = {aM | rhythm = aL.rhythm, str = aM.str ++ aL.str, vowel = aL.vowel}
+    aC = {aM | rhythm = aL.rhythm, userRhythm = aL.rhythm, str = aM.str ++ aL.str, vowel = aL.vowel}
   in
     if (aM.aksharType == Consonant) && (aL.aksharType == Maatraa) then
       (True, aC)
@@ -179,9 +188,9 @@ calcHalfAksharRhythm ac ap an =
   else if ((ac.mainChar == 'म') && (an.mainChar == 'ह')) || ((ac.mainChar == 'न') && (an.mainChar == 'ह')) then
       ac
     else if (ap.rhythm == 1) then
-        {ac | rhythm = 1}
+        {ac | rhythm = 1, userRhythm = 1}
       else if (ap.rhythm == 2) && (an.rhythm == 2) then
-          {ac | rhythm = 1}
+          {ac | rhythm = 1, userRhythm = 1}
         else
           ac
 
@@ -232,6 +241,51 @@ processPoem pom =
   in 
     ProcessedPoem maxLineLen processedLines
 
+adjustMaatraaChar a =
+  if (a.aksharType == Half) then
+    if (a.userRhythm == 0) then
+      {a | userRhythm = 1}
+    else
+      {a | userRhythm = 0}
+  else if ((a.aksharType == Consonant) || (a.aksharType == PureVowel)) && (a.rhythm == 2) then
+    if (a.userRhythm == 2) then
+      {a | userRhythm = 1}
+    else
+      {a | userRhythm = 2}
+  else
+    a
+
+adjustMaatraaLine oldLine aI =
+  let 
+    a = Maybe.withDefault emptyAkshar (Array.get aI oldLine.units)
+    aNew = adjustMaatraaChar a
+    diff = aNew.userRhythm - a.userRhythm
+    newRhythm = oldLine.rhythmTotal + diff
+    newAkshars = Array.set aI aNew oldLine.units
+  in
+    PoemLine newRhythm newAkshars
+
+adjustMaatraaPoem processedPoem whichChar =
+  let 
+    args =
+      case (String.split ":" whichChar) of
+        [] -> (-1,-1)
+        [_] -> (-1,-1)
+        [a,b] -> (Maybe.withDefault -1 (String.toInt a), Maybe.withDefault -1 (String.toInt b))
+        a::b::_ -> (-1,-1)
+    lineI = Tuple.first args
+    aI = Tuple.second args
+    oldLine = Maybe.withDefault emptyLine (Array.get lineI processedPoem.lines)
+    newLine = adjustMaatraaLine oldLine aI
+    newLines = Array.set lineI newLine processedPoem.lines
+    newMaxLineLen = getMaxLineLen newLines 0 0
+  in
+    if (lineI == -1) || (aI == -1) then
+      processedPoem
+    else
+      ProcessedPoem newMaxLineLen newLines
+
+
 -- ELM ARCHITECTURE
 main =
   Browser.element
@@ -268,12 +322,13 @@ update msg model =
       Cmd.none)
     AdjustMaatraa whichChar ->
       ({ model | 
+         processedPoem = adjustMaatraaPoem model.processedPoem whichChar,
          lastAction = "Maatraa Adjusted " ++ whichChar }, 
       Cmd.none)
 
 view model =
   div [style "background-color" "black", style "color" "white", style "padding" "5px"][
-    -- div [style "padding" "inherit", style "white-space" "pre-wrap"] [text model.poem]
+     --div [style "padding" "inherit", style "white-space" "pre-wrap"] [text model.poem]
     --, div [style "padding" "inherit"] [text (Debug.toString model.processedPoem)]
     ]
 
@@ -305,7 +360,8 @@ encodeAkshar a =
   E.object
     [ ("txt", E.string a.str)
     , ("systemRhythmAmt", E.int a.rhythm)
-    , ("rhythmAmt", E.int a.rhythm)
+    , ("rhythmAmt", E.int a.userRhythm)
+    , ("isHalfLetter", if (a.aksharType == Half) then (E.bool True) else (E.bool False))
     ]
 
 encodeLine al =
@@ -313,10 +369,6 @@ encodeLine al =
     [("rhythmAmtCumulative",E.int al.rhythmTotal)
     , ("subUnits", E.array encodeAkshar al.units)
     ]
-  --E.array encodeAkshar al
-
---encodePoem ap =
-  --E.array encodeLine ap
 
 encodePoem ap =
   E.object

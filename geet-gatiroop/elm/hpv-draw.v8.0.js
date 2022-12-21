@@ -1,6 +1,6 @@
 let charW = 20; 
 let charH = 20; 
-let paddingLeft = 2;
+let paddingLeft = 7;
 let lineSpacing = 5;
 let fShowText = true;
 let fLineSpacing = true;
@@ -219,7 +219,7 @@ function drawCharBlock(d,i)
 	lineRhythmTotal += d.rhythmAmt;
 	let w = charW*d.rhythmAmt;
 	let h = charH;
-	if ((d.vowelNumber == -1) && (d.rhythmAmt == 0)) // half letter of 0 width
+	if ((d.isHalfLetter) && (d.rhythmAmt == 0)) // half letter of 0 width
 	{
 	  w = 4;  // small black box on top
 	  h = 4;  // small black box on top
@@ -273,6 +273,7 @@ function drawStyleCharBlock(c,colorBy)
 	// call conColor to determine color and opacity as per consonant
 	if (colorBy == 'consonant')
 	{
+		// debugger;
 		if (c.rhythmAmt == c.systemRhythmAmt)
 		{
 				if (c.systemRhythmAmt == 2)
@@ -351,7 +352,7 @@ function drawStyleCharBlock(c,colorBy)
 	  		if (c.isHalfLetter && (c.rhythmAmt == 0))
 	  		{
 	  			color = "black";
-	  			fillOp = "0.5";
+	  			fillOp = "0.7";
 	  		}
 
 		}
@@ -416,8 +417,8 @@ function adjustCharLen()
 	// debugger;
 	let iChr = parseInt(this.getAttribute("id").substring(4));
 	let iLine = parseInt(this.parentNode.getAttribute("id").substring(5));
-	dPoem.adjustUnitRhythm(iLine,iChr);
-	draw();
+	callAdjustMaatraa(iLine,iChr);
+	// draw();
 }
 
 /*
