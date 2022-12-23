@@ -64,12 +64,12 @@ emptyLine = PoemLine "" 0 Array.empty
 
 type alias Misraa =
   { line : PoemLine
-  , ghazalAnnotations : Array.Array UnitAnnotationForGhazal
+  , rfUnits : Array.Array UnitAnnotationForGhazal
   }
 
 type ProcessedPoem 
   = GenericPoem { maxLineLen : Int, lines : Array.Array PoemLine }
-  | Ghazal { maxLineLen: Int, lines: Array.Array Misraa}
+  | Ghazal { maxLineLen: Int, lines: Array.Array Misraa, radeef : String}
 
 emptyPoem = GenericPoem {maxLineLen = 0, lines = Array.empty}
 
@@ -283,8 +283,36 @@ getGenericData p =
     GenericPoem data -> data
     _ -> { maxLineLen = 0, lines = Array.empty}
 
-calculateRadeef pom =
-  pom
+getGhazalData p =
+  case p of
+    Ghazal data -> data
+    _ -> { maxLineLen = 0, lines = Array.empty, radeef = ""}
+
+compareAkshars a b =
+  if (a.str == b.str) then
+    True
+  else
+    False
+
+last akshar =
+  Maybe.withDefault emptyAkshar (Array.get (Array.length akshar - 1) akshar)
+
+--calculateRadeef : String -> PoemLine -> PoemLine -> String
+calculateRadeef radeef line0 line1 =
+  let 
+    a = last line0
+    b = last line1
+    poppedLine0 = Array.slice 0 -1 line0
+    poppedLine1 = Array.slice 0 -1 line1
+  in
+    if ((Array.length line0) == 0) || ((Array.length line1) == 0) then
+      radeef
+    else
+      if (compareAkshars a b) then
+        calculateRadeef (a.str ++ radeef) poppedLine0 poppedLine1
+      else
+        radeef
+
 
 convertPoemLineToMisraa l =
   let 
@@ -294,9 +322,13 @@ convertPoemLineToMisraa l =
 
 processGhazal pom oldPom =
   let 
-    basic = getGenericData (processPoem pom oldPom)
+    basic = getGenericData (processPoem pom oldPom)    
+    line0 = Maybe.withDefault emptyLine (Array.get 0 basic.lines)
+    line1 = Maybe.withDefault emptyLine (Array.get 1 basic.lines)
+    radeef = calculateRadeef "" line0.units line1.units
+    ghazal = Ghazal {maxLineLen = basic.maxLineLen, lines = (Array.map convertPoemLineToMisraa basic.lines), radeef = radeef }
   in 
-    Ghazal {maxLineLen = basic.maxLineLen, lines = (Array.map convertPoemLineToMisraa basic.lines)}
+    ghazal
 
 preProcessPoem pom oldpom pomType =
   case pomType of

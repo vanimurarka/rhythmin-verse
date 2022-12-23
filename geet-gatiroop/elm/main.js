@@ -5684,34 +5684,22 @@ var $elm$core$Basics$negate = function (n) {
 var $author$project$Main$Ghazal = function (a) {
 	return {$: 'Ghazal', a: a};
 };
-var $author$project$Main$Misraa = F2(
-	function (line, ghazalAnnotations) {
-		return {ghazalAnnotations: ghazalAnnotations, line: line};
+var $author$project$Main$compareAkshars = F2(
+	function (a, b) {
+		return _Utils_eq(a.str, b.str) ? true : false;
 	});
-var $author$project$Main$UnitAnnotationForGhazal = F2(
-	function (isRadeef, isKaafiyaa) {
-		return {isKaafiyaa: isKaafiyaa, isRadeef: isRadeef};
-	});
-var $author$project$Main$emptyGhazalAnnotation = A2($author$project$Main$UnitAnnotationForGhazal, false, false);
 var $elm$core$Array$length = function (_v0) {
 	var len = _v0.a;
 	return len;
 };
-var $elm$core$Array$repeat = F2(
-	function (n, e) {
-		return A2(
-			$elm$core$Array$initialize,
-			n,
-			function (_v0) {
-				return e;
-			});
-	});
-var $author$project$Main$convertPoemLineToMisraa = function (l) {
-	var ghazalAnnotations = A2(
-		$elm$core$Array$repeat,
-		$elm$core$Array$length(l.units),
-		$author$project$Main$emptyGhazalAnnotation);
-	return A2($author$project$Main$Misraa, l, ghazalAnnotations);
+var $author$project$Main$last = function (akshar) {
+	return A2(
+		$elm$core$Maybe$withDefault,
+		$author$project$Main$emptyAkshar,
+		A2(
+			$elm$core$Array$get,
+			$elm$core$Array$length(akshar) - 1,
+			akshar));
 };
 var $elm$core$Elm$JsArray$appendN = _JsArray_appendN;
 var $elm$core$Elm$JsArray$slice = _JsArray_slice;
@@ -5736,6 +5724,256 @@ var $elm$core$Array$appendHelpBuilder = F2(
 			tail: $elm$core$Elm$JsArray$empty
 		} : {nodeList: builder.nodeList, nodeListSize: builder.nodeListSize, tail: appended});
 	});
+var $elm$core$List$drop = F2(
+	function (n, list) {
+		drop:
+		while (true) {
+			if (n <= 0) {
+				return list;
+			} else {
+				if (!list.b) {
+					return list;
+				} else {
+					var x = list.a;
+					var xs = list.b;
+					var $temp$n = n - 1,
+						$temp$list = xs;
+					n = $temp$n;
+					list = $temp$list;
+					continue drop;
+				}
+			}
+		}
+	});
+var $elm$core$Array$sliceLeft = F2(
+	function (from, array) {
+		var len = array.a;
+		var tree = array.c;
+		var tail = array.d;
+		if (!from) {
+			return array;
+		} else {
+			if (_Utils_cmp(
+				from,
+				$elm$core$Array$tailIndex(len)) > -1) {
+				return A4(
+					$elm$core$Array$Array_elm_builtin,
+					len - from,
+					$elm$core$Array$shiftStep,
+					$elm$core$Elm$JsArray$empty,
+					A3(
+						$elm$core$Elm$JsArray$slice,
+						from - $elm$core$Array$tailIndex(len),
+						$elm$core$Elm$JsArray$length(tail),
+						tail));
+			} else {
+				var skipNodes = (from / $elm$core$Array$branchFactor) | 0;
+				var helper = F2(
+					function (node, acc) {
+						if (node.$ === 'SubTree') {
+							var subTree = node.a;
+							return A3($elm$core$Elm$JsArray$foldr, helper, acc, subTree);
+						} else {
+							var leaf = node.a;
+							return A2($elm$core$List$cons, leaf, acc);
+						}
+					});
+				var leafNodes = A3(
+					$elm$core$Elm$JsArray$foldr,
+					helper,
+					_List_fromArray(
+						[tail]),
+					tree);
+				var nodesToInsert = A2($elm$core$List$drop, skipNodes, leafNodes);
+				if (!nodesToInsert.b) {
+					return $elm$core$Array$empty;
+				} else {
+					var head = nodesToInsert.a;
+					var rest = nodesToInsert.b;
+					var firstSlice = from - (skipNodes * $elm$core$Array$branchFactor);
+					var initialBuilder = {
+						nodeList: _List_Nil,
+						nodeListSize: 0,
+						tail: A3(
+							$elm$core$Elm$JsArray$slice,
+							firstSlice,
+							$elm$core$Elm$JsArray$length(head),
+							head)
+					};
+					return A2(
+						$elm$core$Array$builderToArray,
+						true,
+						A3($elm$core$List$foldl, $elm$core$Array$appendHelpBuilder, initialBuilder, rest));
+				}
+			}
+		}
+	});
+var $elm$core$Array$fetchNewTail = F4(
+	function (shift, end, treeEnd, tree) {
+		fetchNewTail:
+		while (true) {
+			var pos = $elm$core$Array$bitMask & (treeEnd >>> shift);
+			var _v0 = A2($elm$core$Elm$JsArray$unsafeGet, pos, tree);
+			if (_v0.$ === 'SubTree') {
+				var sub = _v0.a;
+				var $temp$shift = shift - $elm$core$Array$shiftStep,
+					$temp$end = end,
+					$temp$treeEnd = treeEnd,
+					$temp$tree = sub;
+				shift = $temp$shift;
+				end = $temp$end;
+				treeEnd = $temp$treeEnd;
+				tree = $temp$tree;
+				continue fetchNewTail;
+			} else {
+				var values = _v0.a;
+				return A3($elm$core$Elm$JsArray$slice, 0, $elm$core$Array$bitMask & end, values);
+			}
+		}
+	});
+var $elm$core$Array$hoistTree = F3(
+	function (oldShift, newShift, tree) {
+		hoistTree:
+		while (true) {
+			if ((_Utils_cmp(oldShift, newShift) < 1) || (!$elm$core$Elm$JsArray$length(tree))) {
+				return tree;
+			} else {
+				var _v0 = A2($elm$core$Elm$JsArray$unsafeGet, 0, tree);
+				if (_v0.$ === 'SubTree') {
+					var sub = _v0.a;
+					var $temp$oldShift = oldShift - $elm$core$Array$shiftStep,
+						$temp$newShift = newShift,
+						$temp$tree = sub;
+					oldShift = $temp$oldShift;
+					newShift = $temp$newShift;
+					tree = $temp$tree;
+					continue hoistTree;
+				} else {
+					return tree;
+				}
+			}
+		}
+	});
+var $elm$core$Array$sliceTree = F3(
+	function (shift, endIdx, tree) {
+		var lastPos = $elm$core$Array$bitMask & (endIdx >>> shift);
+		var _v0 = A2($elm$core$Elm$JsArray$unsafeGet, lastPos, tree);
+		if (_v0.$ === 'SubTree') {
+			var sub = _v0.a;
+			var newSub = A3($elm$core$Array$sliceTree, shift - $elm$core$Array$shiftStep, endIdx, sub);
+			return (!$elm$core$Elm$JsArray$length(newSub)) ? A3($elm$core$Elm$JsArray$slice, 0, lastPos, tree) : A3(
+				$elm$core$Elm$JsArray$unsafeSet,
+				lastPos,
+				$elm$core$Array$SubTree(newSub),
+				A3($elm$core$Elm$JsArray$slice, 0, lastPos + 1, tree));
+		} else {
+			return A3($elm$core$Elm$JsArray$slice, 0, lastPos, tree);
+		}
+	});
+var $elm$core$Array$sliceRight = F2(
+	function (end, array) {
+		var len = array.a;
+		var startShift = array.b;
+		var tree = array.c;
+		var tail = array.d;
+		if (_Utils_eq(end, len)) {
+			return array;
+		} else {
+			if (_Utils_cmp(
+				end,
+				$elm$core$Array$tailIndex(len)) > -1) {
+				return A4(
+					$elm$core$Array$Array_elm_builtin,
+					end,
+					startShift,
+					tree,
+					A3($elm$core$Elm$JsArray$slice, 0, $elm$core$Array$bitMask & end, tail));
+			} else {
+				var endIdx = $elm$core$Array$tailIndex(end);
+				var depth = $elm$core$Basics$floor(
+					A2(
+						$elm$core$Basics$logBase,
+						$elm$core$Array$branchFactor,
+						A2($elm$core$Basics$max, 1, endIdx - 1)));
+				var newShift = A2($elm$core$Basics$max, 5, depth * $elm$core$Array$shiftStep);
+				return A4(
+					$elm$core$Array$Array_elm_builtin,
+					end,
+					newShift,
+					A3(
+						$elm$core$Array$hoistTree,
+						startShift,
+						newShift,
+						A3($elm$core$Array$sliceTree, startShift, endIdx, tree)),
+					A4($elm$core$Array$fetchNewTail, startShift, end, endIdx, tree));
+			}
+		}
+	});
+var $elm$core$Array$translateIndex = F2(
+	function (index, _v0) {
+		var len = _v0.a;
+		var posIndex = (index < 0) ? (len + index) : index;
+		return (posIndex < 0) ? 0 : ((_Utils_cmp(posIndex, len) > 0) ? len : posIndex);
+	});
+var $elm$core$Array$slice = F3(
+	function (from, to, array) {
+		var correctTo = A2($elm$core$Array$translateIndex, to, array);
+		var correctFrom = A2($elm$core$Array$translateIndex, from, array);
+		return (_Utils_cmp(correctFrom, correctTo) > 0) ? $elm$core$Array$empty : A2(
+			$elm$core$Array$sliceLeft,
+			correctFrom,
+			A2($elm$core$Array$sliceRight, correctTo, array));
+	});
+var $author$project$Main$calculateRadeef = F3(
+	function (radeef, line0, line1) {
+		calculateRadeef:
+		while (true) {
+			var poppedLine1 = A3($elm$core$Array$slice, 0, -1, line1);
+			var poppedLine0 = A3($elm$core$Array$slice, 0, -1, line0);
+			var b = $author$project$Main$last(line1);
+			var a = $author$project$Main$last(line0);
+			if ((!$elm$core$Array$length(line0)) || (!$elm$core$Array$length(line1))) {
+				return radeef;
+			} else {
+				if (A2($author$project$Main$compareAkshars, a, b)) {
+					var $temp$radeef = _Utils_ap(a.str, radeef),
+						$temp$line0 = poppedLine0,
+						$temp$line1 = poppedLine1;
+					radeef = $temp$radeef;
+					line0 = $temp$line0;
+					line1 = $temp$line1;
+					continue calculateRadeef;
+				} else {
+					return radeef;
+				}
+			}
+		}
+	});
+var $author$project$Main$Misraa = F2(
+	function (line, rfUnits) {
+		return {line: line, rfUnits: rfUnits};
+	});
+var $author$project$Main$UnitAnnotationForGhazal = F2(
+	function (isRadeef, isKaafiyaa) {
+		return {isKaafiyaa: isKaafiyaa, isRadeef: isRadeef};
+	});
+var $author$project$Main$emptyGhazalAnnotation = A2($author$project$Main$UnitAnnotationForGhazal, false, false);
+var $elm$core$Array$repeat = F2(
+	function (n, e) {
+		return A2(
+			$elm$core$Array$initialize,
+			n,
+			function (_v0) {
+				return e;
+			});
+	});
+var $author$project$Main$convertPoemLineToMisraa = function (l) {
+	var ghazalAnnotations = A2(
+		$elm$core$Array$repeat,
+		$elm$core$Array$length(l.units),
+		$author$project$Main$emptyGhazalAnnotation);
+	return A2($author$project$Main$Misraa, l, ghazalAnnotations);
+};
 var $elm$core$Elm$JsArray$push = _JsArray_push;
 var $elm$core$Elm$JsArray$singleton = _JsArray_singleton;
 var $elm$core$Array$insertTailInTree = F4(
@@ -6277,11 +6515,22 @@ var $author$project$Main$processGhazal = F2(
 	function (pom, oldPom) {
 		var basic = $author$project$Main$getGenericData(
 			A2($author$project$Main$processPoem, pom, oldPom));
-		return $author$project$Main$Ghazal(
+		var line0 = A2(
+			$elm$core$Maybe$withDefault,
+			$author$project$Main$emptyLine,
+			A2($elm$core$Array$get, 0, basic.lines));
+		var line1 = A2(
+			$elm$core$Maybe$withDefault,
+			$author$project$Main$emptyLine,
+			A2($elm$core$Array$get, 1, basic.lines));
+		var radeef = A3($author$project$Main$calculateRadeef, '', line0.units, line1.units);
+		var ghazal = $author$project$Main$Ghazal(
 			{
 				lines: A2($elm$core$Array$map, $author$project$Main$convertPoemLineToMisraa, basic.lines),
-				maxLineLen: basic.maxLineLen
+				maxLineLen: basic.maxLineLen,
+				radeef: radeef
 			});
+		return ghazal;
 	});
 var $author$project$Main$preProcessPoem = F3(
 	function (pom, oldpom, pomType) {
