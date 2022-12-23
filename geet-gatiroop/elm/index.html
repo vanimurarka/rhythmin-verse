@@ -40,10 +40,12 @@ hpra.ports.givePoemRhythm.subscribe(function(hpraResult) {
 function callProcessPoem()
 {
   poem = document.getElementById('poem').value;
-  hpra.ports.getPoem.send(poem);
+  hpra.ports.getPoem.send(JSON.stringify({ poem: poem, poemType: "ghazal" }));
 }
 
-function callAdjustMaatraa(li, ci) { hpra.ports.getMaatraaChange.send(li + ":" + ci); }
+function callAdjustMaatraa(li, ci) { 
+  hpra.ports.getMaatraaChange.send(JSON.stringify({ lineI: li, charI: ci })); 
+}
 
 </script>
 

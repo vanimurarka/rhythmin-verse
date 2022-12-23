@@ -8,10 +8,32 @@ import Array exposing (Array)
 import Array.Extra as Array
 import Json.Decode as D
 import Json.Encode as E
+import Regex
 
 -- Hindi Poem Vis
 
+userReplace : String -> (Regex.Match -> String) -> String -> String
+userReplace userRegex replacer string =
+  case Regex.fromString userRegex of
+    Nothing ->
+      string
+
+    Just regex ->
+      Regex.replace regex replacer string
+
+removeNonDevanagari : String -> String
+removeNonDevanagari string =
+  userReplace "[^\u{0900}-\u{097F}]" (\_ -> " ") string
+
+removePoornviraam string =
+  userReplace "।" (\_ -> " ") string
+
+removeExtraSpaces string =
+  userReplace "\\s+" (\_ -> " ") string
+
+
 type AksharType  = PureVowel | Maatraa | Halant | Half | Consonant | Other | Empty
+--type PoemType = Generic | Ghazal | FreeVerse | Varnik | EmptyPoem
 
 type alias Akshar =
   { str : String,
@@ -25,21 +47,31 @@ type alias Akshar =
   
 emptyAkshar = Akshar " " 0 Empty ' ' ' ' 0 0
 
+type alias UnitAnnotationForGhazal =
+  { isRadeef : Bool
+  , isKaafiyaa : Bool
+  }
+
+emptyGhazalAnnotation = UnitAnnotationForGhazal False False
+
 type alias PoemLine =
-  {
-    str : String
+  { str : String
   , rhythmTotal : Int
   , units : Array.Array Akshar
   }
 
 emptyLine = PoemLine "" 0 Array.empty
 
-type alias ProcessedPoem =
-  { maxLineLen : Int,
-    lines : Array.Array PoemLine 
+type alias Misraa =
+  { line : PoemLine
+  , ghazalAnnotations : Array.Array UnitAnnotationForGhazal
   }
 
-emptyPoem = ProcessedPoem 0 Array.empty
+type ProcessedPoem 
+  = GenericPoem { maxLineLen : Int, lines : Array.Array PoemLine }
+  | Ghazal { maxLineLen: Int, lines: Array.Array Misraa}
+
+emptyPoem = GenericPoem {maxLineLen = 0, lines = Array.empty}
 
 isHindi c =
   let 
@@ -211,19 +243,11 @@ calcHalfAksharRhythmLine line i r =
     else
       calcHalfAksharRhythmLine newline (i+1) (r+aNew.rhythm)
 
-getMaxLineLen lines i ml =
-  let
-    len = Array.length lines
-    maxI = len - 1
-    line = Maybe.withDefault emptyLine (Array.get i lines)
-    l = line.rhythmTotal
-  in 
-    if (i > maxI) then
-      ml
-    else if (ml > l) then
-        getMaxLineLen lines (i+1) ml 
-      else
-        getMaxLineLen lines (i+1) l
+getBigLine line1 line2 = 
+  if (line1.rhythmTotal) > (line2.rhythmTotal) then line1
+    else line2
+
+getMaxLineLen lines = (Array.foldl getBigLine emptyLine lines).rhythmTotal
  
 processLine pomLine =
   let
@@ -236,10 +260,13 @@ processLine pomLine =
     PoemLine pomLine (Tuple.second final) (Tuple.first final)
 
 preProcessLine pomLine oldLine =
-  if (pomLine == oldLine.str) then
-    oldLine
-  else
-    processLine pomLine
+  let 
+    pCleaned = String.trim (removeExtraSpaces (removePoornviraam (removeNonDevanagari pomLine)))
+  in
+    if (pCleaned == oldLine.str) then
+      oldLine
+    else
+      processLine pCleaned
 
 processPoem pom oldLines =
   let
@@ -247,10 +274,35 @@ processPoem pom oldLines =
     diff = (Array.length pLines) - (Array.length oldLines)
     paddedOldPoem = if (diff > 0) then Array.append oldLines (Array.repeat diff emptyLine) else oldLines
     processedLines = Array.map2 preProcessLine pLines paddedOldPoem
-    --processedLines = Array.fromList (List.map processLine pLines)
-    maxLineLen = getMaxLineLen processedLines 0 0
+    maxLineLen = getMaxLineLen processedLines
   in 
-    ProcessedPoem maxLineLen processedLines
+    GenericPoem {maxLineLen = maxLineLen, lines = processedLines}
+
+getGenericData p =
+  case p of
+    GenericPoem data -> data
+    _ -> { maxLineLen = 0, lines = Array.empty}
+
+calculateRadeef pom =
+  pom
+
+convertPoemLineToMisraa l =
+  let 
+    ghazalAnnotations = Array.repeat (Array.length l.units) emptyGhazalAnnotation
+  in
+    Misraa l ghazalAnnotations
+
+processGhazal pom oldPom =
+  let 
+    basic = getGenericData (processPoem pom oldPom)
+  in 
+    Ghazal {maxLineLen = basic.maxLineLen, lines = (Array.map convertPoemLineToMisraa basic.lines)}
+
+preProcessPoem pom oldpom pomType =
+  case pomType of
+    "GHAZAL" -> processGhazal pom Array.empty
+    _ -> processPoem pom oldpom.lines
+
 
 adjustMaatraaChar a =
   if (a.aksharType == Half) then
@@ -276,21 +328,17 @@ adjustMaatraaLine oldLine aI =
   in
     PoemLine oldLine.str newRhythm newAkshars
 
-adjustMaatraaPoem processedPoem whichChar =
+adjustMaatraaPoem poem li ci =
   let 
-    (lineI, aI) =
-      case (String.split ":" whichChar) of
-        [a,b] -> (Maybe.withDefault -1 (String.toInt a), Maybe.withDefault -1 (String.toInt b))
-        _ -> (-1,-1)
-    oldLine = Maybe.withDefault emptyLine (Array.get lineI processedPoem.lines)
-    newLine = adjustMaatraaLine oldLine aI
-    newLines = Array.set lineI newLine processedPoem.lines
-    newMaxLineLen = getMaxLineLen newLines 0 0
+    lines = case poem of
+      GenericPoem data -> data.lines
+      Ghazal data -> Array.map .line data.lines
+    oldLine = Maybe.withDefault emptyLine (Array.get li lines)
+    newLine = adjustMaatraaLine oldLine ci
+    newLines = Array.set li newLine lines
+    newMaxLineLen = getMaxLineLen newLines
   in
-    if (lineI == -1) || (aI == -1) then
-      processedPoem
-    else
-      ProcessedPoem newMaxLineLen newLines
+    GenericPoem {maxLineLen = newMaxLineLen, lines = newLines}
 
 
 -- ELM ARCHITECTURE
@@ -321,22 +369,34 @@ type Msg
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
   case msg of
-    ProcessPoem incomingPoem -> 
+    ProcessPoem str -> 
+      let 
+        incomingPoem = case D.decodeString decodeIncomingPoem str of
+          Ok result -> result
+          Err _ -> {poem = "", poemType = ""}
+        poemType = String.toUpper incomingPoem.poemType
+        oldPoem = getGenericData model.processedPoem
+      in
       ({ model | 
-        poem = incomingPoem, 
-        processedPoem = processPoem incomingPoem model.processedPoem.lines, 
+        poem = incomingPoem.poem, 
+        processedPoem = preProcessPoem incomingPoem.poem oldPoem poemType, 
         lastAction = "Poem Processed" }, 
       Cmd.none)
-    AdjustMaatraa whichChar ->
+    AdjustMaatraa str ->
+      let 
+        whichChar = case D.decodeString decodeWhichChar str of
+          Ok result -> result
+          Err _ -> {lineI = -1, charI = -1}
+      in
       ({ model | 
-         processedPoem = adjustMaatraaPoem model.processedPoem whichChar,
-         lastAction = "Maatraa Adjusted " ++ whichChar }, 
+         processedPoem = adjustMaatraaPoem model.processedPoem whichChar.lineI whichChar.charI,
+         lastAction = "Maatraa Adjusted " ++ str }, 
       Cmd.none)
 
 view model =
   div [style "background-color" "black", style "color" "white", style "padding" "5px"][
-     --div [style "padding" "inherit", style "white-space" "pre-wrap"] [text model.poem]
-    --, div [style "padding" "inherit"] [text (Debug.toString model.processedPoem)]
+     div [style "padding" "inherit", style "white-space" "pre-wrap"] [text model.poem]
+    , div [style "padding" "inherit"] [text (Debug.toString model.processedPoem)]
     ]
 
 -- PORTS
@@ -353,8 +413,6 @@ updateWithStorage msg oldModel =
   )
 
 -- SUBSCRIPTIONS
--- Subscribe to the `getPoem` port to hear about messages coming in
--- from JS. 
 subscriptions : Model -> Sub Msg
 subscriptions _ =
   Sub.batch
@@ -377,22 +435,49 @@ encodeLine al =
     , ("subUnits", E.array encodeAkshar al.units)
     ]
 
+--encodePoemType pt =
+--  case pt of
+--    Generic -> E.string "GENERIC"
+--    Ghazal -> E.string "GHAZAL"
+--    _ -> E.string "GENERIC"
+
+encodeGeneric m l =
+  E.object 
+    [("maxLineLen", E.int m)
+    , ("lines", E.array encodeLine l)
+    , ("poemType", E.string "GENERIC")
+    ]
+
 encodePoem ap =
-  E.object
-    [ ("maxLineLen", E.int ap.maxLineLen)
-    , ("lines", E.array encodeLine ap.lines)]
-  
+  case ap of
+    GenericPoem data -> encodeGeneric data.maxLineLen data.lines  
+    Ghazal data -> encodeGeneric data.maxLineLen (Array.map .line data.lines)
 
 encodeModel : Model -> E.Value
 encodeModel model =
   E.object
     [ ("poem", E.string model.poem)
-    --, ("processedPoem", encodeAkshar emptyAkshar)
     , ("processedPoem", encodePoem model.processedPoem)
     , ("lastAction", E.string model.lastAction)
     ]
 
+--decodePoemType sType =
+--  case String.toUpper sType of
+--    "GENERIC" -> Generic
+--    "GHAZAL" -> Ghazal
+--    _ -> Generic   
 
-decoder : D.Decoder String
-decoder =
-  D.field "poem" D.string
+type alias IncomingPoem = { poem : String, poemType : String }
+
+decodeIncomingPoem =
+  D.map2 IncomingPoem
+    (D.field "poem" D.string)
+    (D.field "poemType" D.string)
+
+
+type alias WhichChar = { lineI : Int, charI : Int}
+
+decodeWhichChar =
+  D.map2 WhichChar
+    (D.field "lineI" D.int)
+    (D.field "charI" D.int)

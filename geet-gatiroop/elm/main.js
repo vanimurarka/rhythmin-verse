@@ -4407,6 +4407,107 @@ var _Bitwise_shiftRightZfBy = F2(function(offset, a)
 {
 	return a >>> offset;
 });
+
+
+// CREATE
+
+var _Regex_never = /.^/;
+
+var _Regex_fromStringWith = F2(function(options, string)
+{
+	var flags = 'g';
+	if (options.multiline) { flags += 'm'; }
+	if (options.caseInsensitive) { flags += 'i'; }
+
+	try
+	{
+		return $elm$core$Maybe$Just(new RegExp(string, flags));
+	}
+	catch(error)
+	{
+		return $elm$core$Maybe$Nothing;
+	}
+});
+
+
+// USE
+
+var _Regex_contains = F2(function(re, string)
+{
+	return string.match(re) !== null;
+});
+
+
+var _Regex_findAtMost = F3(function(n, re, str)
+{
+	var out = [];
+	var number = 0;
+	var string = str;
+	var lastIndex = re.lastIndex;
+	var prevLastIndex = -1;
+	var result;
+	while (number++ < n && (result = re.exec(string)))
+	{
+		if (prevLastIndex == re.lastIndex) break;
+		var i = result.length - 1;
+		var subs = new Array(i);
+		while (i > 0)
+		{
+			var submatch = result[i];
+			subs[--i] = submatch
+				? $elm$core$Maybe$Just(submatch)
+				: $elm$core$Maybe$Nothing;
+		}
+		out.push(A4($elm$regex$Regex$Match, result[0], result.index, number, _List_fromArray(subs)));
+		prevLastIndex = re.lastIndex;
+	}
+	re.lastIndex = lastIndex;
+	return _List_fromArray(out);
+});
+
+
+var _Regex_replaceAtMost = F4(function(n, re, replacer, string)
+{
+	var count = 0;
+	function jsReplacer(match)
+	{
+		if (count++ >= n)
+		{
+			return match;
+		}
+		var i = arguments.length - 3;
+		var submatches = new Array(i);
+		while (i > 0)
+		{
+			var submatch = arguments[i];
+			submatches[--i] = submatch
+				? $elm$core$Maybe$Just(submatch)
+				: $elm$core$Maybe$Nothing;
+		}
+		return replacer(A4($elm$regex$Regex$Match, match, arguments[arguments.length - 2], count, _List_fromArray(submatches)));
+	}
+	return string.replace(re, jsReplacer);
+});
+
+var _Regex_splitAtMost = F3(function(n, re, str)
+{
+	var string = str;
+	var out = [];
+	var start = re.lastIndex;
+	var restoreLastIndex = re.lastIndex;
+	while (n--)
+	{
+		var result = re.exec(string);
+		if (!result) break;
+		out.push(string.slice(start, result.index));
+		start = re.lastIndex;
+	}
+	out.push(string.slice(start));
+	re.lastIndex = restoreLastIndex;
+	return _List_fromArray(out);
+});
+
+var _Regex_infinity = Infinity;
 var $elm$core$Basics$EQ = {$: 'EQ'};
 var $elm$core$Basics$GT = {$: 'GT'};
 var $elm$core$Basics$LT = {$: 'LT'};
@@ -5196,11 +5297,11 @@ var $elm$core$Task$perform = F2(
 				A2($elm$core$Task$map, toMessage, task)));
 	});
 var $elm$browser$Browser$element = _Browser_element;
-var $author$project$Main$ProcessedPoem = F2(
-	function (maxLineLen, lines) {
-		return {lines: lines, maxLineLen: maxLineLen};
-	});
-var $author$project$Main$emptyPoem = A2($author$project$Main$ProcessedPoem, 0, $elm$core$Array$empty);
+var $author$project$Main$GenericPoem = function (a) {
+	return {$: 'GenericPoem', a: a};
+};
+var $author$project$Main$emptyPoem = $author$project$Main$GenericPoem(
+	{lines: $elm$core$Array$empty, maxLineLen: 0});
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $author$project$Main$init = function (flags) {
@@ -5303,17 +5404,63 @@ var $author$project$Main$encodeLine = function (al) {
 				A2($elm$json$Json$Encode$array, $author$project$Main$encodeAkshar, al.units))
 			]));
 };
+var $author$project$Main$encodeGeneric = F2(
+	function (m, l) {
+		return $elm$json$Json$Encode$object(
+			_List_fromArray(
+				[
+					_Utils_Tuple2(
+					'maxLineLen',
+					$elm$json$Json$Encode$int(m)),
+					_Utils_Tuple2(
+					'lines',
+					A2($elm$json$Json$Encode$array, $author$project$Main$encodeLine, l)),
+					_Utils_Tuple2(
+					'poemType',
+					$elm$json$Json$Encode$string('GENERIC'))
+				]));
+	});
+var $elm$core$Elm$JsArray$map = _JsArray_map;
+var $elm$core$Array$map = F2(
+	function (func, _v0) {
+		var len = _v0.a;
+		var startShift = _v0.b;
+		var tree = _v0.c;
+		var tail = _v0.d;
+		var helper = function (node) {
+			if (node.$ === 'SubTree') {
+				var subTree = node.a;
+				return $elm$core$Array$SubTree(
+					A2($elm$core$Elm$JsArray$map, helper, subTree));
+			} else {
+				var values = node.a;
+				return $elm$core$Array$Leaf(
+					A2($elm$core$Elm$JsArray$map, func, values));
+			}
+		};
+		return A4(
+			$elm$core$Array$Array_elm_builtin,
+			len,
+			startShift,
+			A2($elm$core$Elm$JsArray$map, helper, tree),
+			A2($elm$core$Elm$JsArray$map, func, tail));
+	});
 var $author$project$Main$encodePoem = function (ap) {
-	return $elm$json$Json$Encode$object(
-		_List_fromArray(
-			[
-				_Utils_Tuple2(
-				'maxLineLen',
-				$elm$json$Json$Encode$int(ap.maxLineLen)),
-				_Utils_Tuple2(
-				'lines',
-				A2($elm$json$Json$Encode$array, $author$project$Main$encodeLine, ap.lines))
-			]));
+	if (ap.$ === 'GenericPoem') {
+		var data = ap.a;
+		return A2($author$project$Main$encodeGeneric, data.maxLineLen, data.lines);
+	} else {
+		var data = ap.a;
+		return A2(
+			$author$project$Main$encodeGeneric,
+			data.maxLineLen,
+			A2(
+				$elm$core$Array$map,
+				function ($) {
+					return $.line;
+				},
+				data.lines));
+	}
 };
 var $author$project$Main$encodeModel = function (model) {
 	return $elm$json$Json$Encode$object(
@@ -5469,79 +5616,103 @@ var $author$project$Main$adjustMaatraaLine = F2(
 		return A3($author$project$Main$PoemLine, oldLine.str, newRhythm, newAkshars);
 	});
 var $author$project$Main$emptyLine = A3($author$project$Main$PoemLine, '', 0, $elm$core$Array$empty);
+var $author$project$Main$getBigLine = F2(
+	function (line1, line2) {
+		return (_Utils_cmp(line1.rhythmTotal, line2.rhythmTotal) > 0) ? line1 : line2;
+	});
+var $author$project$Main$getMaxLineLen = function (lines) {
+	return A3($elm$core$Array$foldl, $author$project$Main$getBigLine, $author$project$Main$emptyLine, lines).rhythmTotal;
+};
+var $author$project$Main$adjustMaatraaPoem = F3(
+	function (poem, li, ci) {
+		var lines = function () {
+			if (poem.$ === 'GenericPoem') {
+				var data = poem.a;
+				return data.lines;
+			} else {
+				var data = poem.a;
+				return A2(
+					$elm$core$Array$map,
+					function ($) {
+						return $.line;
+					},
+					data.lines);
+			}
+		}();
+		var oldLine = A2(
+			$elm$core$Maybe$withDefault,
+			$author$project$Main$emptyLine,
+			A2($elm$core$Array$get, li, lines));
+		var newLine = A2($author$project$Main$adjustMaatraaLine, oldLine, ci);
+		var newLines = A3($elm$core$Array$set, li, newLine, lines);
+		var newMaxLineLen = $author$project$Main$getMaxLineLen(newLines);
+		return $author$project$Main$GenericPoem(
+			{lines: newLines, maxLineLen: newMaxLineLen});
+	});
+var $author$project$Main$IncomingPoem = F2(
+	function (poem, poemType) {
+		return {poem: poem, poemType: poemType};
+	});
+var $elm$json$Json$Decode$field = _Json_decodeField;
+var $author$project$Main$decodeIncomingPoem = A3(
+	$elm$json$Json$Decode$map2,
+	$author$project$Main$IncomingPoem,
+	A2($elm$json$Json$Decode$field, 'poem', $elm$json$Json$Decode$string),
+	A2($elm$json$Json$Decode$field, 'poemType', $elm$json$Json$Decode$string));
+var $elm$json$Json$Decode$decodeString = _Json_runOnString;
+var $author$project$Main$WhichChar = F2(
+	function (lineI, charI) {
+		return {charI: charI, lineI: lineI};
+	});
+var $elm$json$Json$Decode$int = _Json_decodeInt;
+var $author$project$Main$decodeWhichChar = A3(
+	$elm$json$Json$Decode$map2,
+	$author$project$Main$WhichChar,
+	A2($elm$json$Json$Decode$field, 'lineI', $elm$json$Json$Decode$int),
+	A2($elm$json$Json$Decode$field, 'charI', $elm$json$Json$Decode$int));
+var $author$project$Main$getGenericData = function (p) {
+	if (p.$ === 'GenericPoem') {
+		var data = p.a;
+		return data;
+	} else {
+		return {lines: $elm$core$Array$empty, maxLineLen: 0};
+	}
+};
+var $elm$core$Basics$negate = function (n) {
+	return -n;
+};
+var $author$project$Main$Ghazal = function (a) {
+	return {$: 'Ghazal', a: a};
+};
+var $author$project$Main$Misraa = F2(
+	function (line, ghazalAnnotations) {
+		return {ghazalAnnotations: ghazalAnnotations, line: line};
+	});
+var $author$project$Main$UnitAnnotationForGhazal = F2(
+	function (isRadeef, isKaafiyaa) {
+		return {isKaafiyaa: isKaafiyaa, isRadeef: isRadeef};
+	});
+var $author$project$Main$emptyGhazalAnnotation = A2($author$project$Main$UnitAnnotationForGhazal, false, false);
 var $elm$core$Array$length = function (_v0) {
 	var len = _v0.a;
 	return len;
 };
-var $author$project$Main$getMaxLineLen = F3(
-	function (lines, i, ml) {
-		getMaxLineLen:
-		while (true) {
-			var line = A2(
-				$elm$core$Maybe$withDefault,
-				$author$project$Main$emptyLine,
-				A2($elm$core$Array$get, i, lines));
-			var len = $elm$core$Array$length(lines);
-			var maxI = len - 1;
-			var l = line.rhythmTotal;
-			if (_Utils_cmp(i, maxI) > 0) {
-				return ml;
-			} else {
-				if (_Utils_cmp(ml, l) > 0) {
-					var $temp$lines = lines,
-						$temp$i = i + 1,
-						$temp$ml = ml;
-					lines = $temp$lines;
-					i = $temp$i;
-					ml = $temp$ml;
-					continue getMaxLineLen;
-				} else {
-					var $temp$lines = lines,
-						$temp$i = i + 1,
-						$temp$ml = l;
-					lines = $temp$lines;
-					i = $temp$i;
-					ml = $temp$ml;
-					continue getMaxLineLen;
-				}
-			}
-		}
+var $elm$core$Array$repeat = F2(
+	function (n, e) {
+		return A2(
+			$elm$core$Array$initialize,
+			n,
+			function (_v0) {
+				return e;
+			});
 	});
-var $elm$core$Basics$negate = function (n) {
-	return -n;
+var $author$project$Main$convertPoemLineToMisraa = function (l) {
+	var ghazalAnnotations = A2(
+		$elm$core$Array$repeat,
+		$elm$core$Array$length(l.units),
+		$author$project$Main$emptyGhazalAnnotation);
+	return A2($author$project$Main$Misraa, l, ghazalAnnotations);
 };
-var $author$project$Main$adjustMaatraaPoem = F2(
-	function (processedPoem, whichChar) {
-		var _v0 = function () {
-			var _v1 = A2($elm$core$String$split, ':', whichChar);
-			if ((_v1.b && _v1.b.b) && (!_v1.b.b.b)) {
-				var a = _v1.a;
-				var _v2 = _v1.b;
-				var b = _v2.a;
-				return _Utils_Tuple2(
-					A2(
-						$elm$core$Maybe$withDefault,
-						-1,
-						$elm$core$String$toInt(a)),
-					A2(
-						$elm$core$Maybe$withDefault,
-						-1,
-						$elm$core$String$toInt(b)));
-			} else {
-				return _Utils_Tuple2(-1, -1);
-			}
-		}();
-		var lineI = _v0.a;
-		var aI = _v0.b;
-		var oldLine = A2(
-			$elm$core$Maybe$withDefault,
-			$author$project$Main$emptyLine,
-			A2($elm$core$Array$get, lineI, processedPoem.lines));
-		var newLine = A2($author$project$Main$adjustMaatraaLine, oldLine, aI);
-		var newLines = A3($elm$core$Array$set, lineI, newLine, processedPoem.lines);
-		var newMaxLineLen = A3($author$project$Main$getMaxLineLen, newLines, 0, 0);
-		return (_Utils_eq(lineI, -1) || _Utils_eq(aI, -1)) ? processedPoem : A2($author$project$Main$ProcessedPoem, newMaxLineLen, newLines);
-	});
 var $elm$core$Elm$JsArray$appendN = _JsArray_appendN;
 var $elm$core$Elm$JsArray$slice = _JsArray_slice;
 var $elm$core$Array$appendHelpBuilder = F2(
@@ -6030,18 +6201,63 @@ var $author$project$Main$processLine = function (pomLine) {
 	var _final = A3($author$project$Main$calcHalfAksharRhythmLine, mergedLine, 0, 0);
 	return A3($author$project$Main$PoemLine, pomLine, _final.b, _final.a);
 };
+var $elm$regex$Regex$Match = F4(
+	function (match, index, number, submatches) {
+		return {index: index, match: match, number: number, submatches: submatches};
+	});
+var $elm$regex$Regex$fromStringWith = _Regex_fromStringWith;
+var $elm$regex$Regex$fromString = function (string) {
+	return A2(
+		$elm$regex$Regex$fromStringWith,
+		{caseInsensitive: false, multiline: false},
+		string);
+};
+var $elm$regex$Regex$replace = _Regex_replaceAtMost(_Regex_infinity);
+var $author$project$Main$userReplace = F3(
+	function (userRegex, replacer, string) {
+		var _v0 = $elm$regex$Regex$fromString(userRegex);
+		if (_v0.$ === 'Nothing') {
+			return string;
+		} else {
+			var regex = _v0.a;
+			return A3($elm$regex$Regex$replace, regex, replacer, string);
+		}
+	});
+var $author$project$Main$removeExtraSpaces = function (string) {
+	return A3(
+		$author$project$Main$userReplace,
+		'\\s+',
+		function (_v0) {
+			return ' ';
+		},
+		string);
+};
+var $author$project$Main$removeNonDevanagari = function (string) {
+	return A3(
+		$author$project$Main$userReplace,
+		'[^\u0900-\u097F]',
+		function (_v0) {
+			return ' ';
+		},
+		string);
+};
+var $author$project$Main$removePoornviraam = function (string) {
+	return A3(
+		$author$project$Main$userReplace,
+		'।',
+		function (_v0) {
+			return ' ';
+		},
+		string);
+};
+var $elm$core$String$trim = _String_trim;
 var $author$project$Main$preProcessLine = F2(
 	function (pomLine, oldLine) {
-		return _Utils_eq(pomLine, oldLine.str) ? oldLine : $author$project$Main$processLine(pomLine);
-	});
-var $elm$core$Array$repeat = F2(
-	function (n, e) {
-		return A2(
-			$elm$core$Array$initialize,
-			n,
-			function (_v0) {
-				return e;
-			});
+		var pCleaned = $elm$core$String$trim(
+			$author$project$Main$removeExtraSpaces(
+				$author$project$Main$removePoornviraam(
+					$author$project$Main$removeNonDevanagari(pomLine))));
+		return _Utils_eq(pCleaned, oldLine.str) ? oldLine : $author$project$Main$processLine(pCleaned);
 	});
 var $author$project$Main$processPoem = F2(
 	function (pom, oldLines) {
@@ -6053,30 +6269,70 @@ var $author$project$Main$processPoem = F2(
 			oldLines,
 			A2($elm$core$Array$repeat, diff, $author$project$Main$emptyLine)) : oldLines;
 		var processedLines = A3($elm_community$array_extra$Array$Extra$map2, $author$project$Main$preProcessLine, pLines, paddedOldPoem);
-		var maxLineLen = A3($author$project$Main$getMaxLineLen, processedLines, 0, 0);
-		return A2($author$project$Main$ProcessedPoem, maxLineLen, processedLines);
+		var maxLineLen = $author$project$Main$getMaxLineLen(processedLines);
+		return $author$project$Main$GenericPoem(
+			{lines: processedLines, maxLineLen: maxLineLen});
 	});
+var $author$project$Main$processGhazal = F2(
+	function (pom, oldPom) {
+		var basic = $author$project$Main$getGenericData(
+			A2($author$project$Main$processPoem, pom, oldPom));
+		return $author$project$Main$Ghazal(
+			{
+				lines: A2($elm$core$Array$map, $author$project$Main$convertPoemLineToMisraa, basic.lines),
+				maxLineLen: basic.maxLineLen
+			});
+	});
+var $author$project$Main$preProcessPoem = F3(
+	function (pom, oldpom, pomType) {
+		if (pomType === 'GHAZAL') {
+			return A2($author$project$Main$processGhazal, pom, $elm$core$Array$empty);
+		} else {
+			return A2($author$project$Main$processPoem, pom, oldpom.lines);
+		}
+	});
+var $elm$core$String$toUpper = _String_toUpper;
 var $author$project$Main$update = F2(
 	function (msg, model) {
 		if (msg.$ === 'ProcessPoem') {
-			var incomingPoem = msg.a;
+			var str = msg.a;
+			var oldPoem = $author$project$Main$getGenericData(model.processedPoem);
+			var incomingPoem = function () {
+				var _v1 = A2($elm$json$Json$Decode$decodeString, $author$project$Main$decodeIncomingPoem, str);
+				if (_v1.$ === 'Ok') {
+					var result = _v1.a;
+					return result;
+				} else {
+					return {poem: '', poemType: ''};
+				}
+			}();
+			var poemType = $elm$core$String$toUpper(incomingPoem.poemType);
 			return _Utils_Tuple2(
 				_Utils_update(
 					model,
 					{
 						lastAction: 'Poem Processed',
-						poem: incomingPoem,
-						processedPoem: A2($author$project$Main$processPoem, incomingPoem, model.processedPoem.lines)
+						poem: incomingPoem.poem,
+						processedPoem: A3($author$project$Main$preProcessPoem, incomingPoem.poem, oldPoem, poemType)
 					}),
 				$elm$core$Platform$Cmd$none);
 		} else {
-			var whichChar = msg.a;
+			var str = msg.a;
+			var whichChar = function () {
+				var _v2 = A2($elm$json$Json$Decode$decodeString, $author$project$Main$decodeWhichChar, str);
+				if (_v2.$ === 'Ok') {
+					var result = _v2.a;
+					return result;
+				} else {
+					return {charI: -1, lineI: -1};
+				}
+			}();
 			return _Utils_Tuple2(
 				_Utils_update(
 					model,
 					{
-						lastAction: 'Maatraa Adjusted ' + whichChar,
-						processedPoem: A2($author$project$Main$adjustMaatraaPoem, model.processedPoem, whichChar)
+						lastAction: 'Maatraa Adjusted ' + str,
+						processedPoem: A3($author$project$Main$adjustMaatraaPoem, model.processedPoem, whichChar.lineI, whichChar.charI)
 					}),
 				$elm$core$Platform$Cmd$none);
 		}
