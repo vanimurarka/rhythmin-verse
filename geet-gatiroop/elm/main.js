@@ -6511,6 +6511,33 @@ var $author$project$Main$processPoem = F2(
 		return $author$project$Main$GenericPoem(
 			{lines: processedLines, maxLineLen: maxLineLen});
 	});
+var $author$project$Main$truncateRadeef = F2(
+	function (radeef, line) {
+		truncateRadeef:
+		while (true) {
+			var len = $elm$core$String$length(radeef);
+			var ci = $elm$core$String$length(line.str) - len;
+			var a = A3($elm$core$String$slice, ci, ci + 1, line.str);
+			if (a === ' ') {
+				return $elm$core$String$trim(
+					A3(
+						$elm$core$String$slice,
+						1,
+						$elm$core$String$length(radeef),
+						radeef));
+			} else {
+				var $temp$radeef = A3(
+					$elm$core$String$slice,
+					1,
+					$elm$core$String$length(radeef),
+					radeef),
+					$temp$line = line;
+				radeef = $temp$radeef;
+				line = $temp$line;
+				continue truncateRadeef;
+			}
+		}
+	});
 var $author$project$Main$processGhazal = F2(
 	function (pom, oldPom) {
 		var basic = $author$project$Main$getGenericData(
@@ -6524,11 +6551,12 @@ var $author$project$Main$processGhazal = F2(
 			$author$project$Main$emptyLine,
 			A2($elm$core$Array$get, 1, basic.lines));
 		var radeef = A3($author$project$Main$calculateRadeef, '', line0.units, line1.units);
+		var finalRadeef = A2($author$project$Main$truncateRadeef, radeef, line0);
 		var ghazal = $author$project$Main$Ghazal(
 			{
 				lines: A2($elm$core$Array$map, $author$project$Main$convertPoemLineToMisraa, basic.lines),
 				maxLineLen: basic.maxLineLen,
-				radeef: radeef
+				radeef: finalRadeef
 			});
 		return ghazal;
 	});

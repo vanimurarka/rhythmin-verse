@@ -297,7 +297,6 @@ compareAkshars a b =
 last akshar =
   Maybe.withDefault emptyAkshar (Array.get (Array.length akshar - 1) akshar)
 
---calculateRadeef : String -> PoemLine -> PoemLine -> String
 calculateRadeef radeef line0 line1 =
   let 
     a = last line0
@@ -313,6 +312,16 @@ calculateRadeef radeef line0 line1 =
       else
         radeef
 
+truncateRadeef radeef line =
+  let 
+    len = String.length radeef
+    ci = (String.length line.str) - len
+    a = String.slice ci (ci+1) line.str
+  in 
+    if (a == " ") then
+      String.trim (String.slice 1 (String.length radeef) radeef)
+    else
+      truncateRadeef (String.slice 1 (String.length radeef) radeef) line
 
 convertPoemLineToMisraa l =
   let 
@@ -326,7 +335,8 @@ processGhazal pom oldPom =
     line0 = Maybe.withDefault emptyLine (Array.get 0 basic.lines)
     line1 = Maybe.withDefault emptyLine (Array.get 1 basic.lines)
     radeef = calculateRadeef "" line0.units line1.units
-    ghazal = Ghazal {maxLineLen = basic.maxLineLen, lines = (Array.map convertPoemLineToMisraa basic.lines), radeef = radeef }
+    finalRadeef = truncateRadeef radeef line0
+    ghazal = Ghazal {maxLineLen = basic.maxLineLen, lines = (Array.map convertPoemLineToMisraa basic.lines), radeef = finalRadeef }
   in 
     ghazal
 
