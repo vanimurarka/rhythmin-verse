@@ -5684,23 +5684,23 @@ var $elm$core$Basics$negate = function (n) {
 var $author$project$Main$Ghazal = function (a) {
 	return {$: 'Ghazal', a: a};
 };
-var $author$project$Main$compareAkshars = F2(
+var $author$project$Main$aksharVowelCompare = F2(
 	function (a, b) {
-		return _Utils_eq(a.str, b.str) ? true : false;
+		return _Utils_eq(a.vowel, b.vowel) ? true : false;
 	});
 var $elm$core$Array$length = function (_v0) {
 	var len = _v0.a;
 	return len;
 };
-var $author$project$Main$last = function (akshar) {
-	return A2(
-		$elm$core$Maybe$withDefault,
-		$author$project$Main$emptyAkshar,
-		A2(
-			$elm$core$Array$get,
-			$elm$core$Array$length(akshar) - 1,
-			akshar));
-};
+var $elm$core$Array$repeat = F2(
+	function (n, e) {
+		return A2(
+			$elm$core$Array$initialize,
+			n,
+			function (_v0) {
+				return e;
+			});
+	});
 var $elm$core$Elm$JsArray$appendN = _JsArray_appendN;
 var $elm$core$Elm$JsArray$slice = _JsArray_slice;
 var $elm$core$Array$appendHelpBuilder = F2(
@@ -5924,56 +5924,45 @@ var $elm$core$Array$slice = F3(
 			correctFrom,
 			A2($elm$core$Array$sliceRight, correctTo, array));
 	});
-var $author$project$Main$calculateRadeef = F3(
-	function (radeef, line0, line1) {
-		calculateRadeef:
+var $author$project$Main$unitsLast = function (akshar) {
+	return A2(
+		$elm$core$Maybe$withDefault,
+		$author$project$Main$emptyAkshar,
+		A2(
+			$elm$core$Array$get,
+			$elm$core$Array$length(akshar) - 1,
+			akshar));
+};
+var $author$project$Main$ghazalCalcKaafiyaa = F3(
+	function (kaafiyaa, line0, line1) {
+		ghazalCalcKaafiyaa:
 		while (true) {
 			var poppedLine1 = A3($elm$core$Array$slice, 0, -1, line1);
 			var poppedLine0 = A3($elm$core$Array$slice, 0, -1, line0);
-			var b = $author$project$Main$last(line1);
-			var a = $author$project$Main$last(line0);
+			var b = $author$project$Main$unitsLast(line1);
+			var a = $author$project$Main$unitsLast(line0);
+			var appendArray = A2($elm$core$Array$repeat, 1, a);
 			if ((!$elm$core$Array$length(line0)) || (!$elm$core$Array$length(line1))) {
-				return radeef;
+				return kaafiyaa;
 			} else {
-				if (A2($author$project$Main$compareAkshars, a, b)) {
-					var $temp$radeef = _Utils_ap(a.str, radeef),
+				if (A2($author$project$Main$aksharVowelCompare, a, b)) {
+					var $temp$kaafiyaa = _Utils_ap(a.str, kaafiyaa),
 						$temp$line0 = poppedLine0,
 						$temp$line1 = poppedLine1;
-					radeef = $temp$radeef;
+					kaafiyaa = $temp$kaafiyaa;
 					line0 = $temp$line0;
 					line1 = $temp$line1;
-					continue calculateRadeef;
+					continue ghazalCalcKaafiyaa;
 				} else {
-					return radeef;
+					return kaafiyaa;
 				}
 			}
 		}
 	});
-var $author$project$Main$Misraa = F2(
-	function (line, rfUnits) {
-		return {line: line, rfUnits: rfUnits};
+var $author$project$Main$aksharCompare = F2(
+	function (a, b) {
+		return _Utils_eq(a.str, b.str) ? true : false;
 	});
-var $author$project$Main$UnitAnnotationForGhazal = F2(
-	function (isRadeef, isKaafiyaa) {
-		return {isKaafiyaa: isKaafiyaa, isRadeef: isRadeef};
-	});
-var $author$project$Main$emptyGhazalAnnotation = A2($author$project$Main$UnitAnnotationForGhazal, false, false);
-var $elm$core$Array$repeat = F2(
-	function (n, e) {
-		return A2(
-			$elm$core$Array$initialize,
-			n,
-			function (_v0) {
-				return e;
-			});
-	});
-var $author$project$Main$convertPoemLineToMisraa = function (l) {
-	var ghazalAnnotations = A2(
-		$elm$core$Array$repeat,
-		$elm$core$Array$length(l.units),
-		$author$project$Main$emptyGhazalAnnotation);
-	return A2($author$project$Main$Misraa, l, ghazalAnnotations);
-};
 var $elm$core$Elm$JsArray$push = _JsArray_push;
 var $elm$core$Elm$JsArray$singleton = _JsArray_singleton;
 var $elm$core$Array$insertTailInTree = F4(
@@ -6124,6 +6113,79 @@ var $elm$core$Array$append = F2(
 						bTree)));
 		}
 	});
+var $author$project$Main$ghazalCalcRadeef = F3(
+	function (radeef, line0, line1) {
+		debugger;
+		ghazalCalcRadeef:
+		while (true) {
+			var poppedLine1 = A3($elm$core$Array$slice, 0, -1, line1);
+			var poppedLine0 = A3($elm$core$Array$slice, 0, -1, line0);
+			var b = $author$project$Main$unitsLast(line1);
+			var a = $author$project$Main$unitsLast(line0);
+			var appendArray = A2($elm$core$Array$repeat, 1, a);
+			if ((!$elm$core$Array$length(line0)) || (!$elm$core$Array$length(line1))) {
+				return radeef;
+			} else {
+				if (A2($author$project$Main$aksharCompare, a, b)) {
+					var $temp$radeef = A2($elm$core$Array$append, appendArray, radeef),
+						$temp$line0 = poppedLine0,
+						$temp$line1 = poppedLine1;
+					radeef = $temp$radeef;
+					line0 = $temp$line0;
+					line1 = $temp$line1;
+					continue ghazalCalcRadeef;
+				} else {
+					return radeef;
+				}
+			}
+		}
+	});
+var $author$project$Main$Other = {$: 'Other'};
+var $author$project$Main$ghazalTruncRadeef = F2(
+	function (radeef, line) {
+		ghazalTruncRadeef:
+		while (true) {
+			var len = $elm$core$Array$length(radeef);
+			var ci = $elm$core$Array$length(line) - len;
+			var a = A2(
+				$elm$core$Maybe$withDefault,
+				$author$project$Main$emptyAkshar,
+				A2($elm$core$Array$get, ci, line));
+			if (_Utils_eq(a.aksharType, $author$project$Main$Other) || _Utils_eq(a.aksharType, $author$project$Main$Empty)) {
+				return A3(
+					$elm$core$Array$slice,
+					1,
+					$elm$core$Array$length(radeef),
+					radeef);
+			} else {
+				var $temp$radeef = A3(
+					$elm$core$Array$slice,
+					1,
+					$elm$core$Array$length(radeef),
+					radeef),
+					$temp$line = line;
+				radeef = $temp$radeef;
+				line = $temp$line;
+				continue ghazalTruncRadeef;
+			}
+		}
+	});
+var $author$project$Main$Misraa = F2(
+	function (line, rfUnits) {
+		return {line: line, rfUnits: rfUnits};
+	});
+var $author$project$Main$UnitAnnotationForGhazal = F2(
+	function (isRadeef, isKaafiyaa) {
+		return {isKaafiyaa: isKaafiyaa, isRadeef: isRadeef};
+	});
+var $author$project$Main$emptyGhazalAnnotation = A2($author$project$Main$UnitAnnotationForGhazal, false, false);
+var $author$project$Main$misraaFromPoemLine = function (line) {
+	var ghazalAnnotations = A2(
+		$elm$core$Array$repeat,
+		$elm$core$Array$length(line.units),
+		$author$project$Main$emptyGhazalAnnotation);
+	return A2($author$project$Main$Misraa, line, ghazalAnnotations);
+};
 var $elm$core$Array$fromListHelp = F3(
 	function (list, nodeList, nodeListSize) {
 		fromListHelp:
@@ -6303,7 +6365,6 @@ var $author$project$Main$mrgMChelper = F3(
 var $author$project$Main$mrgMCline = function (list) {
 	return A3($author$project$Main$mrgMChelper, list, 0, $elm$core$Array$empty);
 };
-var $author$project$Main$Other = {$: 'Other'};
 var $elm$core$String$cons = _String_cons;
 var $elm$core$String$fromChar = function (_char) {
 	return A2($elm$core$String$cons, _char, '');
@@ -6511,34 +6572,7 @@ var $author$project$Main$processPoem = F2(
 		return $author$project$Main$GenericPoem(
 			{lines: processedLines, maxLineLen: maxLineLen});
 	});
-var $author$project$Main$truncateRadeef = F2(
-	function (radeef, line) {
-		truncateRadeef:
-		while (true) {
-			var len = $elm$core$String$length(radeef);
-			var ci = $elm$core$String$length(line.str) - len;
-			var a = A3($elm$core$String$slice, ci, ci + 1, line.str);
-			if (a === ' ') {
-				return $elm$core$String$trim(
-					A3(
-						$elm$core$String$slice,
-						1,
-						$elm$core$String$length(radeef),
-						radeef));
-			} else {
-				var $temp$radeef = A3(
-					$elm$core$String$slice,
-					1,
-					$elm$core$String$length(radeef),
-					radeef),
-					$temp$line = line;
-				radeef = $temp$radeef;
-				line = $temp$line;
-				continue truncateRadeef;
-			}
-		}
-	});
-var $author$project$Main$processGhazal = F2(
+var $author$project$Main$ghazalProcess = F2(
 	function (pom, oldPom) {
 		var basic = $author$project$Main$getGenericData(
 			A2($author$project$Main$processPoem, pom, oldPom));
@@ -6550,11 +6584,17 @@ var $author$project$Main$processGhazal = F2(
 			$elm$core$Maybe$withDefault,
 			$author$project$Main$emptyLine,
 			A2($elm$core$Array$get, 1, basic.lines));
-		var radeef = A3($author$project$Main$calculateRadeef, '', line0.units, line1.units);
-		var finalRadeef = A2($author$project$Main$truncateRadeef, radeef, line0);
+		var radeef = A3($author$project$Main$ghazalCalcRadeef, $elm$core$Array$empty, line0.units, line1.units);
+		var finalRadeef = A2($author$project$Main$ghazalTruncRadeef, radeef, line0.units);
+		var l0i = $elm$core$Array$length(line0.units) - $elm$core$Array$length(finalRadeef);
+		var cutLine0 = A3($elm$core$Array$slice, 0, l0i, line0.units);
+		var l1i = $elm$core$Array$length(line1.units) - $elm$core$Array$length(finalRadeef);
+		var cutLine1 = A3($elm$core$Array$slice, 0, l1i, line1.units);
+		var kaafiyaa = A3($author$project$Main$ghazalCalcKaafiyaa, '', cutLine0, cutLine1);
 		var ghazal = $author$project$Main$Ghazal(
 			{
-				lines: A2($elm$core$Array$map, $author$project$Main$convertPoemLineToMisraa, basic.lines),
+				kaafiyaa: kaafiyaa,
+				lines: A2($elm$core$Array$map, $author$project$Main$misraaFromPoemLine, basic.lines),
 				maxLineLen: basic.maxLineLen,
 				radeef: finalRadeef
 			});
@@ -6563,7 +6603,7 @@ var $author$project$Main$processGhazal = F2(
 var $author$project$Main$preProcessPoem = F3(
 	function (pom, oldpom, pomType) {
 		if (pomType === 'GHAZAL') {
-			return A2($author$project$Main$processGhazal, pom, $elm$core$Array$empty);
+			return A2($author$project$Main$ghazalProcess, pom, $elm$core$Array$empty);
 		} else {
 			return A2($author$project$Main$processPoem, pom, oldpom.lines);
 		}

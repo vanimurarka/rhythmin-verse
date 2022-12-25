@@ -69,7 +69,7 @@ type alias Misraa =
 
 type ProcessedPoem 
   = GenericPoem { maxLineLen : Int, lines : Array.Array PoemLine }
-  | Ghazal { maxLineLen: Int, lines: Array.Array Misraa, radeef : String}
+  | Ghazal { maxLineLen: Int, lines: Array.Array Misraa, radeef : Array.Array Akshar, kaafiyaa : String}
 
 emptyPoem = GenericPoem {maxLineLen = 0, lines = Array.empty}
 
@@ -283,66 +283,88 @@ getGenericData p =
     GenericPoem data -> data
     _ -> { maxLineLen = 0, lines = Array.empty}
 
-getGhazalData p =
+ghazalGetData p =
   case p of
     Ghazal data -> data
-    _ -> { maxLineLen = 0, lines = Array.empty, radeef = ""}
+    _ -> { maxLineLen = 0, lines = Array.empty, radeef = Array.empty, kaafiyaa = ""}
 
-compareAkshars a b =
-  if (a.str == b.str) then
-    True
-  else
-    False
+aksharCompare a b =
+  if (a.str == b.str) then True else False
 
-last akshar =
+aksharVowelCompare a b =
+  if (a.vowel == b.vowel) then True else False
+
+unitsLast akshar =
   Maybe.withDefault emptyAkshar (Array.get (Array.length akshar - 1) akshar)
 
-calculateRadeef radeef line0 line1 =
+ghazalCalcRadeef radeef line0 line1 =
   let 
-    a = last line0
-    b = last line1
+    a = unitsLast line0
+    b = unitsLast line1
     poppedLine0 = Array.slice 0 -1 line0
     poppedLine1 = Array.slice 0 -1 line1
+    appendArray = Array.repeat 1 a
   in
     if ((Array.length line0) == 0) || ((Array.length line1) == 0) then
       radeef
     else
-      if (compareAkshars a b) then
-        calculateRadeef (a.str ++ radeef) poppedLine0 poppedLine1
+      if (aksharCompare a b) then
+        ghazalCalcRadeef (Array.append appendArray radeef) poppedLine0 poppedLine1
       else
         radeef
 
-truncateRadeef radeef line =
+ghazalTruncRadeef radeef line =
   let 
-    len = String.length radeef
-    ci = (String.length line.str) - len
-    a = String.slice ci (ci+1) line.str
+    len = Array.length radeef
+    ci = (Array.length line) - len
+    a = Maybe.withDefault emptyAkshar (Array.get ci line)
   in 
-    if (a == " ") then
-      String.trim (String.slice 1 (String.length radeef) radeef)
+    if (a.aksharType == Other) || (a.aksharType == Empty) then
+      (Array.slice 1 (Array.length radeef) radeef)
     else
-      truncateRadeef (String.slice 1 (String.length radeef) radeef) line
+      ghazalTruncRadeef (Array.slice 1 (Array.length radeef) radeef) line
 
-convertPoemLineToMisraa l =
+misraaFromPoemLine line =
   let 
-    ghazalAnnotations = Array.repeat (Array.length l.units) emptyGhazalAnnotation
+    ghazalAnnotations = Array.repeat (Array.length line.units) emptyGhazalAnnotation
   in
-    Misraa l ghazalAnnotations
+    Misraa line ghazalAnnotations
 
-processGhazal pom oldPom =
+ghazalCalcKaafiyaa kaafiyaa line0 line1 =
+  let
+    a = unitsLast line0
+    b = unitsLast line1
+    poppedLine0 = Array.slice 0 -1 line0
+    poppedLine1 = Array.slice 0 -1 line1
+    appendArray = Array.repeat 1 a
+  in 
+    if ((Array.length line0) == 0) || ((Array.length line1) == 0) then
+      kaafiyaa
+    else
+      if (aksharVowelCompare a b) then
+        ghazalCalcKaafiyaa (a.str ++ kaafiyaa) poppedLine0 poppedLine1
+      else
+        kaafiyaa
+
+ghazalProcess pom oldPom =
   let 
     basic = getGenericData (processPoem pom oldPom)    
     line0 = Maybe.withDefault emptyLine (Array.get 0 basic.lines)
     line1 = Maybe.withDefault emptyLine (Array.get 1 basic.lines)
-    radeef = calculateRadeef "" line0.units line1.units
-    finalRadeef = truncateRadeef radeef line0
-    ghazal = Ghazal {maxLineLen = basic.maxLineLen, lines = (Array.map convertPoemLineToMisraa basic.lines), radeef = finalRadeef }
+    radeef = ghazalCalcRadeef Array.empty line0.units line1.units
+    finalRadeef = ghazalTruncRadeef radeef line0.units
+    l0i = (Array.length line0.units) - (Array.length finalRadeef)
+    l1i = (Array.length line1.units) - (Array.length finalRadeef)
+    cutLine0 = Array.slice 0 l0i line0.units
+    cutLine1 = Array.slice 0 l1i line1.units
+    kaafiyaa = ghazalCalcKaafiyaa "" cutLine0 cutLine1
+    ghazal = Ghazal {maxLineLen = basic.maxLineLen, lines = (Array.map misraaFromPoemLine basic.lines), radeef = finalRadeef, kaafiyaa = kaafiyaa}
   in 
     ghazal
 
 preProcessPoem pom oldpom pomType =
   case pomType of
-    "GHAZAL" -> processGhazal pom Array.empty
+    "GHAZAL" -> ghazalProcess pom Array.empty
     _ -> processPoem pom oldpom.lines
 
 
