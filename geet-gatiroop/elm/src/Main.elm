@@ -48,13 +48,6 @@ type alias Akshar =
 emptyAkshar = Akshar " " 0 Empty ' ' ' ' 0 0
 space = Akshar " " 32 Other ' ' ' ' 0 0
 
-type alias UnitAnnotationForGhazal =
-  { isRadeef : Bool
-  , isKaafiyaa : Bool
-  }
-
-emptyGhazalAnnotation = UnitAnnotationForGhazal False False
-
 type alias PoemLine =
   { str : String
   , rhythmTotal : Int
@@ -65,8 +58,10 @@ emptyLine = PoemLine "" 0 Array.empty
 
 type alias Misraa =
   { line : PoemLine
-  , rfUnits : Array.Array UnitAnnotationForGhazal
+  , rkUnits : Array.Array Char
   }
+
+emptyRKUnit = ' '
 
 type ProcessedPoem 
   = GenericPoem { maxLineLen : Int, lines : Array.Array PoemLine }
@@ -330,9 +325,9 @@ ghazalTruncRadeef radeef line =
 
 misraaFromPoemLine line =
   let 
-    ghazalAnnotations = Array.repeat (Array.length line.units) emptyGhazalAnnotation
+    rkUnits = Array.repeat (Array.length line.units) emptyRKUnit
   in
-    Misraa line ghazalAnnotations
+    Misraa line rkUnits
 
 ghazalCalcKaafiyaa kaafiyaa line0 line1 =
   let
@@ -350,6 +345,21 @@ ghazalCalcKaafiyaa kaafiyaa line0 line1 =
       else
         kaafiyaa
 
+ghazalSetRadeef misraa radeef radeefLen =
+  let 
+    ri = (Array.length radeef) - radeefLen - 1
+    ai = (Array.length misraa.line) - ri 
+    r = Maybe.withDefault emptyAkshar (Array.get ri radeef)
+    a = Maybe.withDefault emptyAkshar (Array.get ai misraa.line)
+    --if (aksharCompare a b) then
+      --Array.set ai {}
+    newMisraa = misraa
+  in 
+  if ((Array.length radeef) == radeefLen) then
+    misraa
+  else
+    ghazalSetRadeef newMisraa radeef (radeefLen + 1)
+
 ghazalProcess pom oldPom =
   let 
     basic = getGenericData (processPoem pom oldPom)    
@@ -363,6 +373,7 @@ ghazalProcess pom oldPom =
     cutLine1 = Array.slice 0 l1i line1.units
     kaafiyaa = ghazalCalcKaafiyaa Array.empty cutLine0 cutLine1
     ghazal = Ghazal {maxLineLen = basic.maxLineLen, lines = (Array.map misraaFromPoemLine basic.lines), radeef = finalRadeef, kaafiyaa = kaafiyaa}
+    --ghazalWRadeef = ghazalSetRadeef ghazal 0 0 0
   in 
     ghazal
 

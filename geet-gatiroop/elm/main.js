@@ -6192,20 +6192,16 @@ var $author$project$Main$ghazalTruncRadeef = F2(
 		}
 	});
 var $author$project$Main$Misraa = F2(
-	function (line, rfUnits) {
-		return {line: line, rfUnits: rfUnits};
+	function (line, rkUnits) {
+		return {line: line, rkUnits: rkUnits};
 	});
-var $author$project$Main$UnitAnnotationForGhazal = F2(
-	function (isRadeef, isKaafiyaa) {
-		return {isKaafiyaa: isKaafiyaa, isRadeef: isRadeef};
-	});
-var $author$project$Main$emptyGhazalAnnotation = A2($author$project$Main$UnitAnnotationForGhazal, false, false);
+var $author$project$Main$emptyRKUnit = _Utils_chr(' ');
 var $author$project$Main$misraaFromPoemLine = function (line) {
-	var ghazalAnnotations = A2(
+	var rkUnits = A2(
 		$elm$core$Array$repeat,
 		$elm$core$Array$length(line.units),
-		$author$project$Main$emptyGhazalAnnotation);
-	return A2($author$project$Main$Misraa, line, ghazalAnnotations);
+		$author$project$Main$emptyRKUnit);
+	return A2($author$project$Main$Misraa, line, rkUnits);
 };
 var $elm$core$Array$fromListHelp = F3(
 	function (list, nodeList, nodeListSize) {
