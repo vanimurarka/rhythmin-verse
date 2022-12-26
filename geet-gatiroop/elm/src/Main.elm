@@ -345,37 +345,66 @@ ghazalCalcKaafiyaa kaafiyaa line0 line1 =
       else
         kaafiyaa
 
-ghazalSetRadeef misraa radeef radeefLen =
+ghazalSetMisraaRadeef misraa radeef radeefI =
   let 
-    ri = (Array.length radeef) - radeefLen - 1
-    ai = (Array.length misraa.line) - ri 
+    ri = Array.length radeef - radeefI - 1
+    ai = Array.length misraa.line.units - radeefI - 1
     r = Maybe.withDefault emptyAkshar (Array.get ri radeef)
-    a = Maybe.withDefault emptyAkshar (Array.get ai misraa.line)
-    --if (aksharCompare a b) then
-      --Array.set ai {}
-    newMisraa = misraa
+    a = Maybe.withDefault emptyAkshar (Array.get ai misraa.line.units)
   in 
-  if ((Array.length radeef) == radeefLen) then
-    misraa
-  else
-    ghazalSetRadeef newMisraa radeef (radeefLen + 1)
+    if ((Array.length radeef) == radeefI) then
+      misraa
+    else if (aksharCompare a r) then
+        ghazalSetMisraaRadeef { misraa | rkUnits = Array.set ai 'r' misraa.rkUnits} radeef (radeefI + 1)
+      else
+        misraa
+
+ghazalSetMisraaKaafiyaa misraa radeefLen kaafiyaa kaafiyaaI =
+  let 
+    ki = Array.length kaafiyaa - radeefLen - kaafiyaaI - 1
+    ai = Array.length misraa.line.units - radeefLen - kaafiyaaI - 1
+    k = Maybe.withDefault emptyAkshar (Array.get ki kaafiyaa)
+    a = Maybe.withDefault emptyAkshar (Array.get ai misraa.line.units)
+  in 
+    if ((Array.length kaafiyaa) == kaafiyaaI) then
+      misraa
+    else if (aksharVowelCompare a k) then
+        ghazalSetMisraaKaafiyaa { misraa | rkUnits = Array.set ai 'k' misraa.rkUnits} radeefLen kaafiyaa (kaafiyaaI + 1)
+      else
+        misraa
+
+ghazalSetRadeef misre radeef mi =
+  let
+    misraa = Maybe.withDefault {line = emptyLine, rkUnits = Array.empty} (Array.get mi misre)
+    newMisraa = ghazalSetMisraaRadeef misraa radeef 0
+    misre1 = Array.set mi newMisraa misre
+    iNext = if (mi == 0) then mi + 1
+              else mi + 3
+  in 
+    if (iNext >= (Array.length misre)) then
+      misre1 
+    else
+      ghazalSetRadeef misre1 radeef iNext
 
 ghazalProcess pom oldPom =
   let 
-    basic = getGenericData (processPoem pom oldPom)    
+    basic = getGenericData (processPoem pom oldPom) 
+
     line0 = Maybe.withDefault emptyLine (Array.get 0 basic.lines)
     line1 = Maybe.withDefault emptyLine (Array.get 1 basic.lines)
-    radeef = ghazalCalcRadeef Array.empty line0.units line1.units
-    finalRadeef = ghazalTruncRadeef radeef line0.units
-    l0i = (Array.length line0.units) - (Array.length finalRadeef)
-    l1i = (Array.length line1.units) - (Array.length finalRadeef)
+    preRadeef = ghazalCalcRadeef Array.empty line0.units line1.units
+    radeef = ghazalTruncRadeef preRadeef line0.units
+
+    l0i = (Array.length line0.units) - (Array.length radeef)
+    l1i = (Array.length line1.units) - (Array.length radeef)
     cutLine0 = Array.slice 0 l0i line0.units
     cutLine1 = Array.slice 0 l1i line1.units
     kaafiyaa = ghazalCalcKaafiyaa Array.empty cutLine0 cutLine1
-    ghazal = Ghazal {maxLineLen = basic.maxLineLen, lines = (Array.map misraaFromPoemLine basic.lines), radeef = finalRadeef, kaafiyaa = kaafiyaa}
-    --ghazalWRadeef = ghazalSetRadeef ghazal 0 0 0
+
+    misre = Array.map misraaFromPoemLine basic.lines
+    misre1 = ghazalSetRadeef misre radeef 0
   in 
-    ghazal
+    Ghazal {maxLineLen = basic.maxLineLen, lines = misre1, radeef = radeef, kaafiyaa = kaafiyaa}
 
 preProcessPoem pom oldpom pomType =
   case pomType of

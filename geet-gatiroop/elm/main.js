@@ -6139,6 +6139,73 @@ var $author$project$Main$ghazalCalcRadeef = F3(
 			}
 		}
 	});
+var $author$project$Main$ghazalSetMisraaRadeef = F3(
+	function (misraa, radeef, radeefI) {
+		ghazalSetMisraaRadeef:
+		while (true) {
+			var ri = ($elm$core$Array$length(radeef) - radeefI) - 1;
+			var r = A2(
+				$elm$core$Maybe$withDefault,
+				$author$project$Main$emptyAkshar,
+				A2($elm$core$Array$get, ri, radeef));
+			var ai = ($elm$core$Array$length(misraa.line.units) - radeefI) - 1;
+			var a = A2(
+				$elm$core$Maybe$withDefault,
+				$author$project$Main$emptyAkshar,
+				A2($elm$core$Array$get, ai, misraa.line.units));
+			if (_Utils_eq(
+				$elm$core$Array$length(radeef),
+				radeefI)) {
+				return misraa;
+			} else {
+				if (A2($author$project$Main$aksharCompare, a, r)) {
+					var $temp$misraa = _Utils_update(
+						misraa,
+						{
+							rkUnits: A3(
+								$elm$core$Array$set,
+								ai,
+								_Utils_chr('r'),
+								misraa.rkUnits)
+						}),
+						$temp$radeef = radeef,
+						$temp$radeefI = radeefI + 1;
+					misraa = $temp$misraa;
+					radeef = $temp$radeef;
+					radeefI = $temp$radeefI;
+					continue ghazalSetMisraaRadeef;
+				} else {
+					return misraa;
+				}
+			}
+		}
+	});
+var $author$project$Main$ghazalSetRadeef = F3(
+	function (misre, radeef, mi) {
+		ghazalSetRadeef:
+		while (true) {
+			var misraa = A2(
+				$elm$core$Maybe$withDefault,
+				{line: $author$project$Main$emptyLine, rkUnits: $elm$core$Array$empty},
+				A2($elm$core$Array$get, mi, misre));
+			var newMisraa = A3($author$project$Main$ghazalSetMisraaRadeef, misraa, radeef, 0);
+			var misre1 = A3($elm$core$Array$set, mi, newMisraa, misre);
+			var iNext = (!mi) ? (mi + 1) : (mi + 3);
+			if (_Utils_cmp(
+				iNext,
+				$elm$core$Array$length(misre)) > -1) {
+				return misre1;
+			} else {
+				var $temp$misre = misre1,
+					$temp$radeef = radeef,
+					$temp$mi = iNext;
+				misre = $temp$misre;
+				radeef = $temp$radeef;
+				mi = $temp$mi;
+				continue ghazalSetRadeef;
+			}
+		}
+	});
 var $author$project$Main$Other = {$: 'Other'};
 var $elm_community$array_extra$Array$Extra$member = function (needle) {
 	return A2(
@@ -6601,21 +6668,17 @@ var $author$project$Main$ghazalProcess = F2(
 			$elm$core$Maybe$withDefault,
 			$author$project$Main$emptyLine,
 			A2($elm$core$Array$get, 1, basic.lines));
-		var radeef = A3($author$project$Main$ghazalCalcRadeef, $elm$core$Array$empty, line0.units, line1.units);
-		var finalRadeef = A2($author$project$Main$ghazalTruncRadeef, radeef, line0.units);
-		var l0i = $elm$core$Array$length(line0.units) - $elm$core$Array$length(finalRadeef);
+		var preRadeef = A3($author$project$Main$ghazalCalcRadeef, $elm$core$Array$empty, line0.units, line1.units);
+		var radeef = A2($author$project$Main$ghazalTruncRadeef, preRadeef, line0.units);
+		var l0i = $elm$core$Array$length(line0.units) - $elm$core$Array$length(radeef);
 		var cutLine0 = A3($elm$core$Array$slice, 0, l0i, line0.units);
-		var l1i = $elm$core$Array$length(line1.units) - $elm$core$Array$length(finalRadeef);
+		var l1i = $elm$core$Array$length(line1.units) - $elm$core$Array$length(radeef);
 		var cutLine1 = A3($elm$core$Array$slice, 0, l1i, line1.units);
 		var kaafiyaa = A3($author$project$Main$ghazalCalcKaafiyaa, $elm$core$Array$empty, cutLine0, cutLine1);
-		var ghazal = $author$project$Main$Ghazal(
-			{
-				kaafiyaa: kaafiyaa,
-				lines: A2($elm$core$Array$map, $author$project$Main$misraaFromPoemLine, basic.lines),
-				maxLineLen: basic.maxLineLen,
-				radeef: finalRadeef
-			});
-		return ghazal;
+		var misre = A2($elm$core$Array$map, $author$project$Main$misraaFromPoemLine, basic.lines);
+		var misre1 = A3($author$project$Main$ghazalSetRadeef, misre, radeef, 0);
+		return $author$project$Main$Ghazal(
+			{kaafiyaa: kaafiyaa, lines: misre1, maxLineLen: basic.maxLineLen, radeef: radeef});
 	});
 var $author$project$Main$preProcessPoem = F3(
 	function (pom, oldpom, pomType) {
