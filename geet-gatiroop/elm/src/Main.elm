@@ -46,6 +46,7 @@ type alias Akshar =
   }
   
 emptyAkshar = Akshar " " 0 Empty ' ' ' ' 0 0
+space = Akshar " " 32 Other ' ' ' ' 0 0
 
 type alias UnitAnnotationForGhazal =
   { isRadeef : Bool
@@ -69,7 +70,7 @@ type alias Misraa =
 
 type ProcessedPoem 
   = GenericPoem { maxLineLen : Int, lines : Array.Array PoemLine }
-  | Ghazal { maxLineLen: Int, lines: Array.Array Misraa, radeef : Array.Array Akshar, kaafiyaa : String}
+  | Ghazal { maxLineLen: Int, lines: Array.Array Misraa, radeef : Array.Array Akshar, kaafiyaa : Array.Array Akshar}
 
 emptyPoem = GenericPoem {maxLineLen = 0, lines = Array.empty}
 
@@ -286,7 +287,7 @@ getGenericData p =
 ghazalGetData p =
   case p of
     Ghazal data -> data
-    _ -> { maxLineLen = 0, lines = Array.empty, radeef = Array.empty, kaafiyaa = ""}
+    _ -> { maxLineLen = 0, lines = Array.empty, radeef = Array.empty, kaafiyaa = Array.empty}
 
 aksharCompare a b =
   if (a.str == b.str) then True else False
@@ -319,10 +320,13 @@ ghazalTruncRadeef radeef line =
     ci = (Array.length line) - len
     a = Maybe.withDefault emptyAkshar (Array.get ci line)
   in 
-    if (a.aksharType == Other) || (a.aksharType == Empty) then
-      (Array.slice 1 (Array.length radeef) radeef)
+    if (Array.member space radeef) then
+      if (a.aksharType == Other) || (a.aksharType == Empty) then
+        (Array.slice 1 (Array.length radeef) radeef)
+      else
+        ghazalTruncRadeef (Array.slice 1 (Array.length radeef) radeef) line
     else
-      ghazalTruncRadeef (Array.slice 1 (Array.length radeef) radeef) line
+      radeef
 
 misraaFromPoemLine line =
   let 
@@ -342,7 +346,7 @@ ghazalCalcKaafiyaa kaafiyaa line0 line1 =
       kaafiyaa
     else
       if (aksharVowelCompare a b) then
-        ghazalCalcKaafiyaa (a.str ++ kaafiyaa) poppedLine0 poppedLine1
+        ghazalCalcKaafiyaa (Array.append appendArray kaafiyaa) poppedLine0 poppedLine1
       else
         kaafiyaa
 
@@ -357,7 +361,7 @@ ghazalProcess pom oldPom =
     l1i = (Array.length line1.units) - (Array.length finalRadeef)
     cutLine0 = Array.slice 0 l0i line0.units
     cutLine1 = Array.slice 0 l1i line1.units
-    kaafiyaa = ghazalCalcKaafiyaa "" cutLine0 cutLine1
+    kaafiyaa = ghazalCalcKaafiyaa Array.empty cutLine0 cutLine1
     ghazal = Ghazal {maxLineLen = basic.maxLineLen, lines = (Array.map misraaFromPoemLine basic.lines), radeef = finalRadeef, kaafiyaa = kaafiyaa}
   in 
     ghazal

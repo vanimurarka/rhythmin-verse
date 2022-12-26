@@ -5688,19 +5688,6 @@ var $author$project$Main$aksharVowelCompare = F2(
 	function (a, b) {
 		return _Utils_eq(a.vowel, b.vowel) ? true : false;
 	});
-var $elm$core$Array$length = function (_v0) {
-	var len = _v0.a;
-	return len;
-};
-var $elm$core$Array$repeat = F2(
-	function (n, e) {
-		return A2(
-			$elm$core$Array$initialize,
-			n,
-			function (_v0) {
-				return e;
-			});
-	});
 var $elm$core$Elm$JsArray$appendN = _JsArray_appendN;
 var $elm$core$Elm$JsArray$slice = _JsArray_slice;
 var $elm$core$Array$appendHelpBuilder = F2(
@@ -5723,6 +5710,169 @@ var $elm$core$Array$appendHelpBuilder = F2(
 			nodeListSize: builder.nodeListSize + 1,
 			tail: $elm$core$Elm$JsArray$empty
 		} : {nodeList: builder.nodeList, nodeListSize: builder.nodeListSize, tail: appended});
+	});
+var $elm$core$Elm$JsArray$push = _JsArray_push;
+var $elm$core$Elm$JsArray$singleton = _JsArray_singleton;
+var $elm$core$Array$insertTailInTree = F4(
+	function (shift, index, tail, tree) {
+		var pos = $elm$core$Array$bitMask & (index >>> shift);
+		if (_Utils_cmp(
+			pos,
+			$elm$core$Elm$JsArray$length(tree)) > -1) {
+			if (shift === 5) {
+				return A2(
+					$elm$core$Elm$JsArray$push,
+					$elm$core$Array$Leaf(tail),
+					tree);
+			} else {
+				var newSub = $elm$core$Array$SubTree(
+					A4($elm$core$Array$insertTailInTree, shift - $elm$core$Array$shiftStep, index, tail, $elm$core$Elm$JsArray$empty));
+				return A2($elm$core$Elm$JsArray$push, newSub, tree);
+			}
+		} else {
+			var value = A2($elm$core$Elm$JsArray$unsafeGet, pos, tree);
+			if (value.$ === 'SubTree') {
+				var subTree = value.a;
+				var newSub = $elm$core$Array$SubTree(
+					A4($elm$core$Array$insertTailInTree, shift - $elm$core$Array$shiftStep, index, tail, subTree));
+				return A3($elm$core$Elm$JsArray$unsafeSet, pos, newSub, tree);
+			} else {
+				var newSub = $elm$core$Array$SubTree(
+					A4(
+						$elm$core$Array$insertTailInTree,
+						shift - $elm$core$Array$shiftStep,
+						index,
+						tail,
+						$elm$core$Elm$JsArray$singleton(value)));
+				return A3($elm$core$Elm$JsArray$unsafeSet, pos, newSub, tree);
+			}
+		}
+	});
+var $elm$core$Array$unsafeReplaceTail = F2(
+	function (newTail, _v0) {
+		var len = _v0.a;
+		var startShift = _v0.b;
+		var tree = _v0.c;
+		var tail = _v0.d;
+		var originalTailLen = $elm$core$Elm$JsArray$length(tail);
+		var newTailLen = $elm$core$Elm$JsArray$length(newTail);
+		var newArrayLen = len + (newTailLen - originalTailLen);
+		if (_Utils_eq(newTailLen, $elm$core$Array$branchFactor)) {
+			var overflow = _Utils_cmp(newArrayLen >>> $elm$core$Array$shiftStep, 1 << startShift) > 0;
+			if (overflow) {
+				var newShift = startShift + $elm$core$Array$shiftStep;
+				var newTree = A4(
+					$elm$core$Array$insertTailInTree,
+					newShift,
+					len,
+					newTail,
+					$elm$core$Elm$JsArray$singleton(
+						$elm$core$Array$SubTree(tree)));
+				return A4($elm$core$Array$Array_elm_builtin, newArrayLen, newShift, newTree, $elm$core$Elm$JsArray$empty);
+			} else {
+				return A4(
+					$elm$core$Array$Array_elm_builtin,
+					newArrayLen,
+					startShift,
+					A4($elm$core$Array$insertTailInTree, startShift, len, newTail, tree),
+					$elm$core$Elm$JsArray$empty);
+			}
+		} else {
+			return A4($elm$core$Array$Array_elm_builtin, newArrayLen, startShift, tree, newTail);
+		}
+	});
+var $elm$core$Array$appendHelpTree = F2(
+	function (toAppend, array) {
+		var len = array.a;
+		var tree = array.c;
+		var tail = array.d;
+		var itemsToAppend = $elm$core$Elm$JsArray$length(toAppend);
+		var notAppended = ($elm$core$Array$branchFactor - $elm$core$Elm$JsArray$length(tail)) - itemsToAppend;
+		var appended = A3($elm$core$Elm$JsArray$appendN, $elm$core$Array$branchFactor, tail, toAppend);
+		var newArray = A2($elm$core$Array$unsafeReplaceTail, appended, array);
+		if (notAppended < 0) {
+			var nextTail = A3($elm$core$Elm$JsArray$slice, notAppended, itemsToAppend, toAppend);
+			return A2($elm$core$Array$unsafeReplaceTail, nextTail, newArray);
+		} else {
+			return newArray;
+		}
+	});
+var $elm$core$Array$builderFromArray = function (_v0) {
+	var len = _v0.a;
+	var tree = _v0.c;
+	var tail = _v0.d;
+	var helper = F2(
+		function (node, acc) {
+			if (node.$ === 'SubTree') {
+				var subTree = node.a;
+				return A3($elm$core$Elm$JsArray$foldl, helper, acc, subTree);
+			} else {
+				return A2($elm$core$List$cons, node, acc);
+			}
+		});
+	return {
+		nodeList: A3($elm$core$Elm$JsArray$foldl, helper, _List_Nil, tree),
+		nodeListSize: (len / $elm$core$Array$branchFactor) | 0,
+		tail: tail
+	};
+};
+var $elm$core$Array$append = F2(
+	function (a, _v0) {
+		var aTail = a.d;
+		var bLen = _v0.a;
+		var bTree = _v0.c;
+		var bTail = _v0.d;
+		if (_Utils_cmp(bLen, $elm$core$Array$branchFactor * 4) < 1) {
+			var foldHelper = F2(
+				function (node, array) {
+					if (node.$ === 'SubTree') {
+						var tree = node.a;
+						return A3($elm$core$Elm$JsArray$foldl, foldHelper, array, tree);
+					} else {
+						var leaf = node.a;
+						return A2($elm$core$Array$appendHelpTree, leaf, array);
+					}
+				});
+			return A2(
+				$elm$core$Array$appendHelpTree,
+				bTail,
+				A3($elm$core$Elm$JsArray$foldl, foldHelper, a, bTree));
+		} else {
+			var foldHelper = F2(
+				function (node, builder) {
+					if (node.$ === 'SubTree') {
+						var tree = node.a;
+						return A3($elm$core$Elm$JsArray$foldl, foldHelper, builder, tree);
+					} else {
+						var leaf = node.a;
+						return A2($elm$core$Array$appendHelpBuilder, leaf, builder);
+					}
+				});
+			return A2(
+				$elm$core$Array$builderToArray,
+				true,
+				A2(
+					$elm$core$Array$appendHelpBuilder,
+					bTail,
+					A3(
+						$elm$core$Elm$JsArray$foldl,
+						foldHelper,
+						$elm$core$Array$builderFromArray(a),
+						bTree)));
+		}
+	});
+var $elm$core$Array$length = function (_v0) {
+	var len = _v0.a;
+	return len;
+};
+var $elm$core$Array$repeat = F2(
+	function (n, e) {
+		return A2(
+			$elm$core$Array$initialize,
+			n,
+			function (_v0) {
+				return e;
+			});
 	});
 var $elm$core$List$drop = F2(
 	function (n, list) {
@@ -5946,7 +6096,7 @@ var $author$project$Main$ghazalCalcKaafiyaa = F3(
 				return kaafiyaa;
 			} else {
 				if (A2($author$project$Main$aksharVowelCompare, a, b)) {
-					var $temp$kaafiyaa = _Utils_ap(a.str, kaafiyaa),
+					var $temp$kaafiyaa = A2($elm$core$Array$append, appendArray, kaafiyaa),
 						$temp$line0 = poppedLine0,
 						$temp$line1 = poppedLine1;
 					kaafiyaa = $temp$kaafiyaa;
@@ -5963,159 +6113,8 @@ var $author$project$Main$aksharCompare = F2(
 	function (a, b) {
 		return _Utils_eq(a.str, b.str) ? true : false;
 	});
-var $elm$core$Elm$JsArray$push = _JsArray_push;
-var $elm$core$Elm$JsArray$singleton = _JsArray_singleton;
-var $elm$core$Array$insertTailInTree = F4(
-	function (shift, index, tail, tree) {
-		var pos = $elm$core$Array$bitMask & (index >>> shift);
-		if (_Utils_cmp(
-			pos,
-			$elm$core$Elm$JsArray$length(tree)) > -1) {
-			if (shift === 5) {
-				return A2(
-					$elm$core$Elm$JsArray$push,
-					$elm$core$Array$Leaf(tail),
-					tree);
-			} else {
-				var newSub = $elm$core$Array$SubTree(
-					A4($elm$core$Array$insertTailInTree, shift - $elm$core$Array$shiftStep, index, tail, $elm$core$Elm$JsArray$empty));
-				return A2($elm$core$Elm$JsArray$push, newSub, tree);
-			}
-		} else {
-			var value = A2($elm$core$Elm$JsArray$unsafeGet, pos, tree);
-			if (value.$ === 'SubTree') {
-				var subTree = value.a;
-				var newSub = $elm$core$Array$SubTree(
-					A4($elm$core$Array$insertTailInTree, shift - $elm$core$Array$shiftStep, index, tail, subTree));
-				return A3($elm$core$Elm$JsArray$unsafeSet, pos, newSub, tree);
-			} else {
-				var newSub = $elm$core$Array$SubTree(
-					A4(
-						$elm$core$Array$insertTailInTree,
-						shift - $elm$core$Array$shiftStep,
-						index,
-						tail,
-						$elm$core$Elm$JsArray$singleton(value)));
-				return A3($elm$core$Elm$JsArray$unsafeSet, pos, newSub, tree);
-			}
-		}
-	});
-var $elm$core$Array$unsafeReplaceTail = F2(
-	function (newTail, _v0) {
-		var len = _v0.a;
-		var startShift = _v0.b;
-		var tree = _v0.c;
-		var tail = _v0.d;
-		var originalTailLen = $elm$core$Elm$JsArray$length(tail);
-		var newTailLen = $elm$core$Elm$JsArray$length(newTail);
-		var newArrayLen = len + (newTailLen - originalTailLen);
-		if (_Utils_eq(newTailLen, $elm$core$Array$branchFactor)) {
-			var overflow = _Utils_cmp(newArrayLen >>> $elm$core$Array$shiftStep, 1 << startShift) > 0;
-			if (overflow) {
-				var newShift = startShift + $elm$core$Array$shiftStep;
-				var newTree = A4(
-					$elm$core$Array$insertTailInTree,
-					newShift,
-					len,
-					newTail,
-					$elm$core$Elm$JsArray$singleton(
-						$elm$core$Array$SubTree(tree)));
-				return A4($elm$core$Array$Array_elm_builtin, newArrayLen, newShift, newTree, $elm$core$Elm$JsArray$empty);
-			} else {
-				return A4(
-					$elm$core$Array$Array_elm_builtin,
-					newArrayLen,
-					startShift,
-					A4($elm$core$Array$insertTailInTree, startShift, len, newTail, tree),
-					$elm$core$Elm$JsArray$empty);
-			}
-		} else {
-			return A4($elm$core$Array$Array_elm_builtin, newArrayLen, startShift, tree, newTail);
-		}
-	});
-var $elm$core$Array$appendHelpTree = F2(
-	function (toAppend, array) {
-		var len = array.a;
-		var tree = array.c;
-		var tail = array.d;
-		var itemsToAppend = $elm$core$Elm$JsArray$length(toAppend);
-		var notAppended = ($elm$core$Array$branchFactor - $elm$core$Elm$JsArray$length(tail)) - itemsToAppend;
-		var appended = A3($elm$core$Elm$JsArray$appendN, $elm$core$Array$branchFactor, tail, toAppend);
-		var newArray = A2($elm$core$Array$unsafeReplaceTail, appended, array);
-		if (notAppended < 0) {
-			var nextTail = A3($elm$core$Elm$JsArray$slice, notAppended, itemsToAppend, toAppend);
-			return A2($elm$core$Array$unsafeReplaceTail, nextTail, newArray);
-		} else {
-			return newArray;
-		}
-	});
-var $elm$core$Array$builderFromArray = function (_v0) {
-	var len = _v0.a;
-	var tree = _v0.c;
-	var tail = _v0.d;
-	var helper = F2(
-		function (node, acc) {
-			if (node.$ === 'SubTree') {
-				var subTree = node.a;
-				return A3($elm$core$Elm$JsArray$foldl, helper, acc, subTree);
-			} else {
-				return A2($elm$core$List$cons, node, acc);
-			}
-		});
-	return {
-		nodeList: A3($elm$core$Elm$JsArray$foldl, helper, _List_Nil, tree),
-		nodeListSize: (len / $elm$core$Array$branchFactor) | 0,
-		tail: tail
-	};
-};
-var $elm$core$Array$append = F2(
-	function (a, _v0) {
-		var aTail = a.d;
-		var bLen = _v0.a;
-		var bTree = _v0.c;
-		var bTail = _v0.d;
-		if (_Utils_cmp(bLen, $elm$core$Array$branchFactor * 4) < 1) {
-			var foldHelper = F2(
-				function (node, array) {
-					if (node.$ === 'SubTree') {
-						var tree = node.a;
-						return A3($elm$core$Elm$JsArray$foldl, foldHelper, array, tree);
-					} else {
-						var leaf = node.a;
-						return A2($elm$core$Array$appendHelpTree, leaf, array);
-					}
-				});
-			return A2(
-				$elm$core$Array$appendHelpTree,
-				bTail,
-				A3($elm$core$Elm$JsArray$foldl, foldHelper, a, bTree));
-		} else {
-			var foldHelper = F2(
-				function (node, builder) {
-					if (node.$ === 'SubTree') {
-						var tree = node.a;
-						return A3($elm$core$Elm$JsArray$foldl, foldHelper, builder, tree);
-					} else {
-						var leaf = node.a;
-						return A2($elm$core$Array$appendHelpBuilder, leaf, builder);
-					}
-				});
-			return A2(
-				$elm$core$Array$builderToArray,
-				true,
-				A2(
-					$elm$core$Array$appendHelpBuilder,
-					bTail,
-					A3(
-						$elm$core$Elm$JsArray$foldl,
-						foldHelper,
-						$elm$core$Array$builderFromArray(a),
-						bTree)));
-		}
-	});
 var $author$project$Main$ghazalCalcRadeef = F3(
 	function (radeef, line0, line1) {
-		debugger;
 		ghazalCalcRadeef:
 		while (true) {
 			var poppedLine1 = A3($elm$core$Array$slice, 0, -1, line1);
@@ -6141,6 +6140,24 @@ var $author$project$Main$ghazalCalcRadeef = F3(
 		}
 	});
 var $author$project$Main$Other = {$: 'Other'};
+var $elm_community$array_extra$Array$Extra$member = function (needle) {
+	return A2(
+		$elm$core$Array$foldr,
+		F2(
+			function (i, res) {
+				return _Utils_eq(needle, i) || res;
+			}),
+		false);
+};
+var $author$project$Main$space = A7(
+	$author$project$Main$Akshar,
+	' ',
+	32,
+	$author$project$Main$Other,
+	_Utils_chr(' '),
+	_Utils_chr(' '),
+	0,
+	0);
 var $author$project$Main$ghazalTruncRadeef = F2(
 	function (radeef, line) {
 		ghazalTruncRadeef:
@@ -6151,22 +6168,26 @@ var $author$project$Main$ghazalTruncRadeef = F2(
 				$elm$core$Maybe$withDefault,
 				$author$project$Main$emptyAkshar,
 				A2($elm$core$Array$get, ci, line));
-			if (_Utils_eq(a.aksharType, $author$project$Main$Other) || _Utils_eq(a.aksharType, $author$project$Main$Empty)) {
-				return A3(
-					$elm$core$Array$slice,
-					1,
-					$elm$core$Array$length(radeef),
-					radeef);
+			if (A2($elm_community$array_extra$Array$Extra$member, $author$project$Main$space, radeef)) {
+				if (_Utils_eq(a.aksharType, $author$project$Main$Other) || _Utils_eq(a.aksharType, $author$project$Main$Empty)) {
+					return A3(
+						$elm$core$Array$slice,
+						1,
+						$elm$core$Array$length(radeef),
+						radeef);
+				} else {
+					var $temp$radeef = A3(
+						$elm$core$Array$slice,
+						1,
+						$elm$core$Array$length(radeef),
+						radeef),
+						$temp$line = line;
+					radeef = $temp$radeef;
+					line = $temp$line;
+					continue ghazalTruncRadeef;
+				}
 			} else {
-				var $temp$radeef = A3(
-					$elm$core$Array$slice,
-					1,
-					$elm$core$Array$length(radeef),
-					radeef),
-					$temp$line = line;
-				radeef = $temp$radeef;
-				line = $temp$line;
-				continue ghazalTruncRadeef;
+				return radeef;
 			}
 		}
 	});
@@ -6590,7 +6611,7 @@ var $author$project$Main$ghazalProcess = F2(
 		var cutLine0 = A3($elm$core$Array$slice, 0, l0i, line0.units);
 		var l1i = $elm$core$Array$length(line1.units) - $elm$core$Array$length(finalRadeef);
 		var cutLine1 = A3($elm$core$Array$slice, 0, l1i, line1.units);
-		var kaafiyaa = A3($author$project$Main$ghazalCalcKaafiyaa, '', cutLine0, cutLine1);
+		var kaafiyaa = A3($author$project$Main$ghazalCalcKaafiyaa, $elm$core$Array$empty, cutLine0, cutLine1);
 		var ghazal = $author$project$Main$Ghazal(
 			{
 				kaafiyaa: kaafiyaa,
