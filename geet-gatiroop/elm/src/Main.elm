@@ -361,7 +361,7 @@ ghazalSetMisraaRadeef misraa radeef radeefI =
 
 ghazalSetMisraaKaafiyaa misraa radeefLen kaafiyaa kaafiyaaI =
   let 
-    ki = Array.length kaafiyaa - radeefLen - kaafiyaaI - 1
+    ki = Array.length kaafiyaa - kaafiyaaI - 1
     ai = Array.length misraa.line.units - radeefLen - kaafiyaaI - 1
     k = Maybe.withDefault emptyAkshar (Array.get ki kaafiyaa)
     a = Maybe.withDefault emptyAkshar (Array.get ai misraa.line.units)
@@ -386,6 +386,19 @@ ghazalSetRadeef misre radeef mi =
     else
       ghazalSetRadeef misre1 radeef iNext
 
+ghazalSetKaafiyaa misre radeefLen kaafiyaa mi =
+  let
+    misraa = Maybe.withDefault {line = emptyLine, rkUnits = Array.empty} (Array.get mi misre)
+    newMisraa = ghazalSetMisraaKaafiyaa misraa radeefLen kaafiyaa 0
+    misre1 = Array.set mi newMisraa misre
+    iNext = if (mi == 0) then mi + 1
+              else mi + 3
+  in 
+    if (iNext >= (Array.length misre)) then
+      misre1 
+    else
+      ghazalSetKaafiyaa misre1 radeefLen kaafiyaa iNext
+
 ghazalProcess pom oldPom =
   let 
     basic = getGenericData (processPoem pom oldPom) 
@@ -403,8 +416,9 @@ ghazalProcess pom oldPom =
 
     misre = Array.map misraaFromPoemLine basic.lines
     misre1 = ghazalSetRadeef misre radeef 0
+    misre2 = ghazalSetKaafiyaa misre1 (Array.length radeef) kaafiyaa 0
   in 
-    Ghazal {maxLineLen = basic.maxLineLen, lines = misre1, radeef = radeef, kaafiyaa = kaafiyaa}
+    Ghazal {maxLineLen = basic.maxLineLen, lines = misre2, radeef = radeef, kaafiyaa = kaafiyaa}
 
 preProcessPoem pom oldpom pomType =
   case pomType of
@@ -503,8 +517,8 @@ update msg model =
 
 view model =
   div [style "background-color" "black", style "color" "white", style "padding" "5px"][
-     div [style "padding" "inherit", style "white-space" "pre-wrap"] [text model.poem]
-    , div [style "padding" "inherit"] [text (Debug.toString model.processedPoem)]
+     --div [style "padding" "inherit", style "white-space" "pre-wrap"] [text model.poem]
+    --, div [style "padding" "inherit"] [text (Debug.toString model.processedPoem)]
     ]
 
 -- PORTS
@@ -537,17 +551,35 @@ encodeAkshar a =
     , ("isHalfLetter", if (a.aksharType == Half) then (E.bool True) else (E.bool False))
     ]
 
+combineAksharRK a rk =
+  { str = a.str, rhythm = a.rhythm, userRhythm = a.userRhythm, aksharType = a.aksharType, rk = rk }
+
+encodeAksharRK a =
+  E.object
+    [ ("txt", E.string a.str)
+    , ("systemRhythmAmt", E.int a.rhythm)
+    , ("rhythmAmt", E.int a.userRhythm)
+    , ("isHalfLetter", if (a.aksharType == Half) then (E.bool True) else (E.bool False))
+    , ("rk", E.string (String.fromChar a.rk))
+    ]
+
 encodeLine al =
   E.object
     [("rhythmAmtCumulative",E.int al.rhythmTotal)
     , ("subUnits", E.array encodeAkshar al.units)
     ]
 
---encodePoemType pt =
---  case pt of
---    Generic -> E.string "GENERIC"
---    Ghazal -> E.string "GHAZAL"
---    _ -> E.string "GENERIC"
+--encodeMisraa m =
+--  E.object
+--    [("rhythmAmtCumulative",E.int m.line.rhythmTotal)
+--    , ("subUnits", E.array encodeAkshar m.line.units)
+--    , ("rkUnits", E.array E.string (Array.map String.fromChar m.rkUnits))
+--    ]
+encodeMisraa m =
+  E.object
+    [("rhythmAmtCumulative",E.int m.line.rhythmTotal)
+    , ("subUnits", E.array encodeAksharRK (Array.map2 combineAksharRK m.line.units m.rkUnits))
+    ]
 
 encodeGeneric m l =
   E.object 
@@ -556,10 +588,18 @@ encodeGeneric m l =
     , ("poemType", E.string "GENERIC")
     ]
 
-encodePoem ap =
-  case ap of
+encodeGhazal m l =
+  E.object 
+    [("maxLineLen", E.int m)
+    , ("lines", E.array encodeMisraa l)
+    , ("poemType", E.string "GHAZAL")
+    ]
+
+encodePoem p =
+  case p of
     GenericPoem data -> encodeGeneric data.maxLineLen data.lines  
-    Ghazal data -> encodeGeneric data.maxLineLen (Array.map .line data.lines)
+    Ghazal data -> encodeGhazal data.maxLineLen data.lines
+    --Ghazal data -> encodeGhazal data.maxLineLen (Array.map .line data.lines)
 
 encodeModel : Model -> E.Value
 encodeModel model =
