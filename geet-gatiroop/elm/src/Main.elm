@@ -10,16 +10,16 @@ import Json.Decode as D
 import Json.Encode as E
 import Regex
 
--- Hindi Poem Vis
-
 userReplace : String -> (Regex.Match -> String) -> String -> String
 userReplace userRegex replacer string =
   case Regex.fromString userRegex of
-    Nothing ->
-      string
+    Nothing -> string
+    Just regex -> Regex.replace regex replacer string
 
-    Just regex ->
-      Regex.replace regex replacer string
+removeExtraSpaces string =
+  userReplace "\\s+" (\_ -> " ") string
+
+-- Hindi Poem Vis
 
 removeNonDevanagari : String -> String
 removeNonDevanagari string =
@@ -28,12 +28,7 @@ removeNonDevanagari string =
 removePoornviraam string =
   userReplace "।" (\_ -> " ") string
 
-removeExtraSpaces string =
-  userReplace "\\s+" (\_ -> " ") string
-
-
 type AksharType  = PureVowel | Maatraa | Halant | Half | Consonant | Other | Empty
---type PoemType = Generic | Ghazal | FreeVerse | Varnik | EmptyPoem
 
 type alias Akshar =
   { str : String,
@@ -69,48 +64,42 @@ type ProcessedPoem
 
 emptyPoem = GenericPoem {maxLineLen = 0, lines = Array.empty}
 
+-- BASIC --
+
 isHindi c =
   let 
     cd = Char.toCode c
   in
-    if (cd >= 2306) && (cd <= 2399) then
-      True
-    else
-      False
+    if (cd >= 2306) && (cd <= 2399) then True
+    else False
       
 isPureVowel c =
   let 
     cd = Char.toCode c
   in
-    if (cd >= 2309) && (cd <= 2324) then
-      True
-    else
-      False
+    if (cd >= 2309) && (cd <= 2324) then True
+    else False
       
 isMaatraaVowel c =
   let 
     cd = Char.toCode c
   in
-    if (cd >= 2366) && (cd <= 2380) then
-      True
-    else
-      False
+    if (cd >= 2366) && (cd <= 2380) then True
+    else False
 
 isBindu c =
   let 
     cd = Char.toCode c
   in 
-    case cd of
-      2306 -> True
-      _ -> False
+    if (cd == 2306) then True
+    else False
 
 isHalant c =
   let 
     cd = Char.toCode c
   in 
-    case cd of
-      2381 -> True
-      _ -> False
+    if (cd == 2381) then True
+    else False
 
 vowelRhythm c =
   case c of
@@ -142,6 +131,15 @@ maatraaToVowel c =
     'ॉ' ->'ऑ'
     'ृ' -> 'ऋ'
     _ -> c
+
+aksharCompare a b =
+  if (a.str == b.str) then True else False
+
+aksharVowelCompare a b =
+  if (a.vowel == b.vowel) then True else False
+
+unitsLast akshar =
+  Maybe.withDefault emptyAkshar (Array.get (Array.length akshar - 1) akshar)
 
 setRhythm a =
   {a | rhythm = vowelRhythm a.vowel}
@@ -239,11 +237,11 @@ calcHalfAksharRhythmLine line i r =
     else
       calcHalfAksharRhythmLine newline (i+1) (r+aNew.rhythm)
 
-getBigLine line1 line2 = 
+getBiggerLine line1 line2 = 
   if (line1.rhythmTotal) > (line2.rhythmTotal) then line1
     else line2
 
-getMaxLineLen lines = (Array.foldl getBigLine emptyLine lines).rhythmTotal
+getMaxLineLen lines = (Array.foldl getBiggerLine emptyLine lines).rhythmTotal
  
 processLine pomLine =
   let
@@ -274,7 +272,9 @@ processPoem pom oldLines =
   in 
     GenericPoem {maxLineLen = maxLineLen, lines = processedLines}
 
-getGenericData p =
+-- == GHAZAL == --
+
+genericGetData p =
   case p of
     GenericPoem data -> data
     _ -> { maxLineLen = 0, lines = Array.empty}
@@ -283,15 +283,6 @@ ghazalGetData p =
   case p of
     Ghazal data -> data
     _ -> { maxLineLen = 0, lines = Array.empty, radeef = Array.empty, kaafiyaa = Array.empty}
-
-aksharCompare a b =
-  if (a.str == b.str) then True else False
-
-aksharVowelCompare a b =
-  if (a.vowel == b.vowel) then True else False
-
-unitsLast akshar =
-  Maybe.withDefault emptyAkshar (Array.get (Array.length akshar - 1) akshar)
 
 ghazalCalcRadeef radeef line0 line1 =
   let 
@@ -328,6 +319,9 @@ misraaFromPoemLine line =
     rkUnits = Array.repeat (Array.length line.units) emptyRKUnit
   in
     Misraa line rkUnits
+
+misraaFromPoemLineWRK line rk =
+  Misraa line rk
 
 ghazalCalcKaafiyaa kaafiyaa line0 line1 =
   let
@@ -401,7 +395,7 @@ ghazalSetKaafiyaa misre radeefLen kaafiyaa mi =
 
 ghazalProcess pom oldPom =
   let 
-    basic = getGenericData (processPoem pom oldPom) 
+    basic = genericGetData (processPoem pom oldPom) 
 
     line0 = Maybe.withDefault emptyLine (Array.get 0 basic.lines)
     line1 = Maybe.withDefault emptyLine (Array.get 1 basic.lines)
@@ -419,6 +413,8 @@ ghazalProcess pom oldPom =
     misre2 = ghazalSetKaafiyaa misre1 (Array.length radeef) kaafiyaa 0
   in 
     Ghazal {maxLineLen = basic.maxLineLen, lines = misre2, radeef = radeef, kaafiyaa = kaafiyaa}
+
+-- == MASTER == --
 
 preProcessPoem pom oldpom pomType =
   case pomType of
@@ -460,7 +456,9 @@ adjustMaatraaPoem poem li ci =
     newLines = Array.set li newLine lines
     newMaxLineLen = getMaxLineLen newLines
   in
-    GenericPoem {maxLineLen = newMaxLineLen, lines = newLines}
+    case poem of
+      GenericPoem _ -> GenericPoem {maxLineLen = newMaxLineLen, lines = newLines}
+      Ghazal data -> Ghazal {data | maxLineLen = newMaxLineLen, lines = (Array.map2 misraaFromPoemLineWRK newLines (Array.map .rkUnits data.lines))}
 
 
 -- ELM ARCHITECTURE
@@ -497,7 +495,7 @@ update msg model =
           Ok result -> result
           Err _ -> {poem = "", poemType = ""}
         poemType = String.toUpper incomingPoem.poemType
-        oldPoem = getGenericData model.processedPoem
+        oldPoem = genericGetData model.processedPoem
       in
       ({ model | 
         poem = incomingPoem.poem, 
@@ -569,12 +567,6 @@ encodeLine al =
     , ("subUnits", E.array encodeAkshar al.units)
     ]
 
---encodeMisraa m =
---  E.object
---    [("rhythmAmtCumulative",E.int m.line.rhythmTotal)
---    , ("subUnits", E.array encodeAkshar m.line.units)
---    , ("rkUnits", E.array E.string (Array.map String.fromChar m.rkUnits))
---    ]
 encodeMisraa m =
   E.object
     [("rhythmAmtCumulative",E.int m.line.rhythmTotal)

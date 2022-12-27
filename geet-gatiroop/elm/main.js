@@ -5550,6 +5550,9 @@ var $author$project$Main$encodeModel = function (model) {
 			]));
 };
 var $author$project$Main$givePoemRhythm = _Platform_outgoingPort('givePoemRhythm', $elm$core$Basics$identity);
+var $author$project$Main$Ghazal = function (a) {
+	return {$: 'Ghazal', a: a};
+};
 var $author$project$Main$PoemLine = F3(
 	function (str, rhythmTotal, units) {
 		return {rhythmTotal: rhythmTotal, str: str, units: units};
@@ -5688,12 +5691,12 @@ var $author$project$Main$adjustMaatraaLine = F2(
 		return A3($author$project$Main$PoemLine, oldLine.str, newRhythm, newAkshars);
 	});
 var $author$project$Main$emptyLine = A3($author$project$Main$PoemLine, '', 0, $elm$core$Array$empty);
-var $author$project$Main$getBigLine = F2(
+var $author$project$Main$getBiggerLine = F2(
 	function (line1, line2) {
 		return (_Utils_cmp(line1.rhythmTotal, line2.rhythmTotal) > 0) ? line1 : line2;
 	});
 var $author$project$Main$getMaxLineLen = function (lines) {
-	return A3($elm$core$Array$foldl, $author$project$Main$getBigLine, $author$project$Main$emptyLine, lines).rhythmTotal;
+	return A3($elm$core$Array$foldl, $author$project$Main$getBiggerLine, $author$project$Main$emptyLine, lines).rhythmTotal;
 };
 var $elm$core$Elm$JsArray$map = _JsArray_map;
 var $elm$core$Array$map = F2(
@@ -5720,6 +5723,14 @@ var $elm$core$Array$map = F2(
 			A2($elm$core$Elm$JsArray$map, helper, tree),
 			A2($elm$core$Elm$JsArray$map, func, tail));
 	});
+var $author$project$Main$Misraa = F2(
+	function (line, rkUnits) {
+		return {line: line, rkUnits: rkUnits};
+	});
+var $author$project$Main$misraaFromPoemLineWRK = F2(
+	function (line, rk) {
+		return A2($author$project$Main$Misraa, line, rk);
+	});
 var $author$project$Main$adjustMaatraaPoem = F3(
 	function (poem, li, ci) {
 		var lines = function () {
@@ -5743,8 +5754,28 @@ var $author$project$Main$adjustMaatraaPoem = F3(
 		var newLine = A2($author$project$Main$adjustMaatraaLine, oldLine, ci);
 		var newLines = A3($elm$core$Array$set, li, newLine, lines);
 		var newMaxLineLen = $author$project$Main$getMaxLineLen(newLines);
-		return $author$project$Main$GenericPoem(
-			{lines: newLines, maxLineLen: newMaxLineLen});
+		if (poem.$ === 'GenericPoem') {
+			return $author$project$Main$GenericPoem(
+				{lines: newLines, maxLineLen: newMaxLineLen});
+		} else {
+			var data = poem.a;
+			return $author$project$Main$Ghazal(
+				_Utils_update(
+					data,
+					{
+						lines: A3(
+							$elm_community$array_extra$Array$Extra$map2,
+							$author$project$Main$misraaFromPoemLineWRK,
+							newLines,
+							A2(
+								$elm$core$Array$map,
+								function ($) {
+									return $.rkUnits;
+								},
+								data.lines)),
+						maxLineLen: newMaxLineLen
+					}));
+		}
 	});
 var $author$project$Main$IncomingPoem = F2(
 	function (poem, poemType) {
@@ -5767,7 +5798,7 @@ var $author$project$Main$decodeWhichChar = A3(
 	$author$project$Main$WhichChar,
 	A2($elm$json$Json$Decode$field, 'lineI', $elm$json$Json$Decode$int),
 	A2($elm$json$Json$Decode$field, 'charI', $elm$json$Json$Decode$int));
-var $author$project$Main$getGenericData = function (p) {
+var $author$project$Main$genericGetData = function (p) {
 	if (p.$ === 'GenericPoem') {
 		var data = p.a;
 		return data;
@@ -5777,9 +5808,6 @@ var $author$project$Main$getGenericData = function (p) {
 };
 var $elm$core$Basics$negate = function (n) {
 	return -n;
-};
-var $author$project$Main$Ghazal = function (a) {
-	return {$: 'Ghazal', a: a};
 };
 var $author$project$Main$aksharVowelCompare = F2(
 	function (a, b) {
@@ -6426,10 +6454,6 @@ var $author$project$Main$ghazalTruncRadeef = F2(
 			}
 		}
 	});
-var $author$project$Main$Misraa = F2(
-	function (line, rkUnits) {
-		return {line: line, rkUnits: rkUnits};
-	});
 var $author$project$Main$emptyRKUnit = _Utils_chr(' ');
 var $author$project$Main$misraaFromPoemLine = function (line) {
 	var rkUnits = A2(
@@ -6575,19 +6599,11 @@ var $author$project$Main$mrgMCline = function (list) {
 };
 var $author$project$Main$isBindu = function (c) {
 	var cd = $elm$core$Char$toCode(c);
-	if (cd === 2306) {
-		return true;
-	} else {
-		return false;
-	}
+	return (cd === 2306) ? true : false;
 };
 var $author$project$Main$isHalant = function (c) {
 	var cd = $elm$core$Char$toCode(c);
-	if (cd === 2381) {
-		return true;
-	} else {
-		return false;
-	}
+	return (cd === 2381) ? true : false;
 };
 var $author$project$Main$isHindi = function (c) {
 	var cd = $elm$core$Char$toCode(c);
@@ -6778,7 +6794,7 @@ var $author$project$Main$processPoem = F2(
 	});
 var $author$project$Main$ghazalProcess = F2(
 	function (pom, oldPom) {
-		var basic = $author$project$Main$getGenericData(
+		var basic = $author$project$Main$genericGetData(
 			A2($author$project$Main$processPoem, pom, oldPom));
 		var line0 = A2(
 			$elm$core$Maybe$withDefault,
@@ -6819,7 +6835,7 @@ var $author$project$Main$update = F2(
 	function (msg, model) {
 		if (msg.$ === 'ProcessPoem') {
 			var str = msg.a;
-			var oldPoem = $author$project$Main$getGenericData(model.processedPoem);
+			var oldPoem = $author$project$Main$genericGetData(model.processedPoem);
 			var incomingPoem = function () {
 				var _v1 = A2($elm$json$Json$Decode$decodeString, $author$project$Main$decodeIncomingPoem, str);
 				if (_v1.$ === 'Ok') {

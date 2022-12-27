@@ -66,8 +66,8 @@ function visualize(givenPoem, dAvailableW, dPoemType)
 {
 	fGhazal = fFreeVerse = false;
 	dPoem = givenPoem;
-	// if (dPoem.type == poemType.ghazal)
-	// 	fGhazal = true;
+	if (dPoem.poemType == "GHAZAL")
+		fGhazal = true;
 	// else if (dPoem.type == poemType.freeverse)
 	// 	fFreeVerse= true;
 
@@ -368,24 +368,23 @@ function drawStyleCharBlock(c,colorBy)
     {
   		if (c.rhythmAmt == c.systemRhythmAmt)
   		{
-		    if (c.isRadeef) // is a radeef char
+		    if (c.rk == "r") // is a radeef char
 		    {
-		      color = "rgb(0,220,255)"; // blue
+		      color = "rgb(0,100,255)"; // blue
 		      fillOp = "0.5";
 		    }
-		    if (c.isKaafiyaa) // is a kaafiyaa char
+		    if (c.rk == "k") // is a kaafiyaa char
 		    {
 		      color = "rgb(0,255,0)"; // green
 		      fillOp = "0.5";
 		    }
-		}
-		else
-		{
-			// color = "rgb(220,45,45)"; //
-			color = "yellow";
-			fillOp = "0.5";
-		}
-
+			}
+			else
+			{
+				// color = "rgb(220,45,45)"; //
+				color = "yellow";
+				fillOp = "0.5";
+			}
   }
 
 	// unknown vowel, individual length unknown/0
