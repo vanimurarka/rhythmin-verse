@@ -39,11 +39,15 @@ hpra.ports.givePoemRhythm.subscribe(function(hpraResult) {
 function callProcessPoem()
 {
   poem = document.getElementById('poem').value;
-  hpra.ports.getPoem.send(JSON.stringify({ poem: poem, poemType: "ghazal" }));
+  hpra.ports.getPoem.send(JSON.stringify({ poem: poem, poemType: "FREEVERSE" }));
 }
 
 function callAdjustMaatraa(li, ci) { 
   hpra.ports.getMaatraaChange.send(JSON.stringify({ lineI: li, charI: ci })); 
+}
+
+function callSetComposite(li) {
+  hpra.ports.setComposite.send(JSON.stringify(li)); 
 }
 
 </script>

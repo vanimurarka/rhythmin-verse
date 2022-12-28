@@ -68,8 +68,8 @@ function visualize(givenPoem, dAvailableW, dPoemType)
 	dPoem = givenPoem;
 	if (dPoem.poemType == "GHAZAL")
 		fGhazal = true;
-	// else if (dPoem.type == poemType.freeverse)
-	// 	fFreeVerse= true;
+	if (dPoem.poemType == "FREEVERSE")
+		fFreeVerse= true;
 
 	oVisual = new cVisual(dAvailableW);
 	draw();	
@@ -433,8 +433,9 @@ function markCompositeLine()
 	// if not marked as composite
 	if ((i < dPoem.lines.length-1) && (!dPoem.lines[i+1].isComposite))
 	{
-	  dPoem.setComposite(i+1); // why is the next line marked composite? but it works
-	  draw();
+	  // dPoem.setComposite(i+1); // why is the next line marked composite? but it works
+	  callSetComposite(i+1);
+	  // draw();
 	} 
 }
 

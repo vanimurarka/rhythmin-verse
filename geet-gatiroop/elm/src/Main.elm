@@ -60,13 +60,13 @@ emptyRKUnit = ' '
 
 type alias FreeVerseLine =
   { line : PoemLine
-  , inComposite : Bool
+  , isComposite : Bool
   }
 
 type ProcessedPoem 
   = GenericPoem { maxLineLen : Int, lines : Array.Array PoemLine }
   | Ghazal { maxLineLen: Int, lines: Array.Array Misraa, radeef : Array.Array Akshar, kaafiyaa : Array.Array Akshar}
-  --| FreeVerse {maxLineLen: Int, lines: Array.Array FreeVerseLine }
+  | FreeVerse {maxLineLen: Int, lines: Array.Array FreeVerseLine }
 
 emptyPoem = GenericPoem {maxLineLen = 0, lines = Array.empty}
 
@@ -284,6 +284,7 @@ genericGetData p =
   case p of
     GenericPoem data -> data
     Ghazal data -> { maxLineLen = data.maxLineLen, lines = Array.map .line data.lines }
+    FreeVerse data -> { maxLineLen = data.maxLineLen, lines = Array.map .line data.lines }
 
 ghazalGetData p =
   case p of
@@ -422,18 +423,35 @@ ghazalProcess pom oldPom =
 
 -- == FREE VERSE == --
 
---fvGetData p =
---  case p of
---    FreeVerse data -> data 
---    _ -> { maxLineLen = 0, lines = Array.empty}
+fvGetData p =
+  case p of
+    FreeVerse data -> data 
+    _ -> { maxLineLen = 0, lines = Array.empty}
 
+fvLineFromLine l =
+  FreeVerseLine l False
 
+fvProcess pom oldPom =
+  let
+    basic = genericGetData (processPoem pom oldPom)
+  in 
+    FreeVerse {maxLineLen = basic.maxLineLen, lines = Array.map fvLineFromLine basic.lines}
+
+fvSetComposite pom li =
+  let 
+    data = fvGetData pom
+    line = Maybe.withDefault (FreeVerseLine emptyLine False) (Array.get li data.lines)
+    newLine = FreeVerseLine line.line (not line.isComposite)
+    newLines = Array.set li newLine data.lines
+  in
+    FreeVerse {maxLineLen = data.maxLineLen, lines = newLines}
 
 -- == MASTER == --
 
 preProcessPoem pom oldpom pomType =
   case pomType of
     "GHAZAL" -> ghazalProcess pom oldpom.lines
+    "FREEVERSE" -> fvProcess pom oldpom.lines
     _ -> processPoem pom oldpom.lines
 
 
@@ -466,6 +484,7 @@ adjustMaatraaPoem poem li ci =
     lines = case poem of
       GenericPoem data -> data.lines
       Ghazal data -> Array.map .line data.lines
+      _ -> Array.empty
     oldLine = Maybe.withDefault emptyLine (Array.get li lines)
     newLine = adjustMaatraaLine oldLine ci
     newLines = Array.set li newLine lines
@@ -474,6 +493,7 @@ adjustMaatraaPoem poem li ci =
     case poem of
       GenericPoem _ -> GenericPoem {maxLineLen = newMaxLineLen, lines = newLines}
       Ghazal data -> Ghazal {data | maxLineLen = newMaxLineLen, lines = (Array.map2 misraaFromPoemLineWRK newLines (Array.map .rkUnits data.lines))}
+      _ -> GenericPoem {maxLineLen = newMaxLineLen, lines = newLines}
 
 
 -- ELM ARCHITECTURE
@@ -500,6 +520,7 @@ init flags =
 type Msg
   = ProcessPoem String
   | AdjustMaatraa String
+  | SetComposite String
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
@@ -527,6 +548,16 @@ update msg model =
          processedPoem = adjustMaatraaPoem model.processedPoem whichChar.lineI whichChar.charI,
          lastAction = "Maatraa Adjusted " ++ str }, 
       Cmd.none)
+    SetComposite str ->
+      let 
+        lineI = case D.decodeString D.int str of
+          Ok result -> result
+          Err _ -> -1
+      in
+      ({ model | 
+         processedPoem = fvSetComposite model.processedPoem lineI,
+         lastAction = "Composite Set " ++ str }, 
+      Cmd.none)
 
 view model =
   div [style "background-color" "black", style "color" "white", style "padding" "5px"][
@@ -538,6 +569,7 @@ view model =
 port givePoemRhythm : E.Value -> Cmd msg
 port getPoem : (String -> msg) -> Sub msg
 port getMaatraaChange : (String -> msg) -> Sub msg
+port setComposite : (String -> msg) -> Sub msg
 
 updateWithStorage msg oldModel =
   let
@@ -553,6 +585,7 @@ subscriptions _ =
   Sub.batch
     [ getPoem ProcessPoem
     , getMaatraaChange AdjustMaatraa
+    , setComposite SetComposite
     ]
 
 -- JSON ENCODE/DECODE
@@ -588,6 +621,13 @@ encodeMisraa m =
     , ("subUnits", E.array encodeAksharRK (Array.map2 combineAksharRK m.line.units m.rkUnits))
     ]
 
+encodeFVLine fvl =
+  E.object
+    [("rhythmAmtCumulative",E.int fvl.line.rhythmTotal)
+    , ("subUnits", E.array encodeAkshar fvl.line.units)
+    , ("isComposite", E.bool fvl.isComposite)
+    ]
+
 encodeGeneric m l =
   E.object 
     [("maxLineLen", E.int m)
@@ -597,16 +637,24 @@ encodeGeneric m l =
 
 encodeGhazal m l =
   E.object 
-    [("maxLineLen", E.int m)
+    [ ("maxLineLen", E.int m)
     , ("lines", E.array encodeMisraa l)
     , ("poemType", E.string "GHAZAL")
+    ]
+
+encodeFreeVerse m l =
+  E.object
+    [ ("maxLineLen", E.int m)
+    , ("lines", E.array encodeFVLine l)
+    , ("compositeLines", E.array E.string Array.empty)
+    , ("poemType", E.string "FREEVERSE")
     ]
 
 encodePoem p =
   case p of
     GenericPoem data -> encodeGeneric data.maxLineLen data.lines  
     Ghazal data -> encodeGhazal data.maxLineLen data.lines
-    --Ghazal data -> encodeGhazal data.maxLineLen (Array.map .line data.lines)
+    FreeVerse data -> encodeFreeVerse data.maxLineLen data.lines
 
 encodeModel : Model -> E.Value
 encodeModel model =
@@ -615,12 +663,6 @@ encodeModel model =
     , ("processedPoem", encodePoem model.processedPoem)
     , ("lastAction", E.string model.lastAction)
     ]
-
---decodePoemType sType =
---  case String.toUpper sType of
---    "GENERIC" -> Generic
---    "GHAZAL" -> Ghazal
---    _ -> Generic   
 
 type alias IncomingPoem = { poem : String, poemType : String }
 

@@ -5315,16 +5315,21 @@ var $author$project$Main$AdjustMaatraa = function (a) {
 var $author$project$Main$ProcessPoem = function (a) {
 	return {$: 'ProcessPoem', a: a};
 };
+var $author$project$Main$SetComposite = function (a) {
+	return {$: 'SetComposite', a: a};
+};
 var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$json$Json$Decode$string = _Json_decodeString;
 var $author$project$Main$getMaatraaChange = _Platform_incomingPort('getMaatraaChange', $elm$json$Json$Decode$string);
 var $author$project$Main$getPoem = _Platform_incomingPort('getPoem', $elm$json$Json$Decode$string);
+var $author$project$Main$setComposite = _Platform_incomingPort('setComposite', $elm$json$Json$Decode$string);
 var $author$project$Main$subscriptions = function (_v0) {
 	return $elm$core$Platform$Sub$batch(
 		_List_fromArray(
 			[
 				$author$project$Main$getPoem($author$project$Main$ProcessPoem),
-				$author$project$Main$getMaatraaChange($author$project$Main$AdjustMaatraa)
+				$author$project$Main$getMaatraaChange($author$project$Main$AdjustMaatraa),
+				$author$project$Main$setComposite($author$project$Main$SetComposite)
 			]));
 };
 var $elm$core$Elm$JsArray$foldl = _JsArray_foldl;
@@ -5357,8 +5362,8 @@ var $elm$json$Json$Encode$array = F2(
 				_Json_emptyArray(_Utils_Tuple0),
 				entries));
 	});
-var $author$project$Main$Half = {$: 'Half'};
 var $elm$json$Json$Encode$bool = _Json_wrap;
+var $author$project$Main$Half = {$: 'Half'};
 var $elm$json$Json$Encode$int = _Json_wrap;
 var $elm$json$Json$Encode$object = function (pairs) {
 	return _Json_wrap(
@@ -5392,6 +5397,40 @@ var $author$project$Main$encodeAkshar = function (a) {
 				_Utils_eq(a.aksharType, $author$project$Main$Half) ? $elm$json$Json$Encode$bool(true) : $elm$json$Json$Encode$bool(false))
 			]));
 };
+var $author$project$Main$encodeFVLine = function (fvl) {
+	return $elm$json$Json$Encode$object(
+		_List_fromArray(
+			[
+				_Utils_Tuple2(
+				'rhythmAmtCumulative',
+				$elm$json$Json$Encode$int(fvl.line.rhythmTotal)),
+				_Utils_Tuple2(
+				'subUnits',
+				A2($elm$json$Json$Encode$array, $author$project$Main$encodeAkshar, fvl.line.units)),
+				_Utils_Tuple2(
+				'isComposite',
+				$elm$json$Json$Encode$bool(fvl.isComposite))
+			]));
+};
+var $author$project$Main$encodeFreeVerse = F2(
+	function (m, l) {
+		return $elm$json$Json$Encode$object(
+			_List_fromArray(
+				[
+					_Utils_Tuple2(
+					'maxLineLen',
+					$elm$json$Json$Encode$int(m)),
+					_Utils_Tuple2(
+					'lines',
+					A2($elm$json$Json$Encode$array, $author$project$Main$encodeFVLine, l)),
+					_Utils_Tuple2(
+					'compositeLines',
+					A2($elm$json$Json$Encode$array, $elm$json$Json$Encode$string, $elm$core$Array$empty)),
+					_Utils_Tuple2(
+					'poemType',
+					$elm$json$Json$Encode$string('FREEVERSE'))
+				]));
+	});
 var $author$project$Main$encodeLine = function (al) {
 	return $elm$json$Json$Encode$object(
 		_List_fromArray(
@@ -5526,12 +5565,16 @@ var $author$project$Main$encodeGhazal = F2(
 				]));
 	});
 var $author$project$Main$encodePoem = function (p) {
-	if (p.$ === 'GenericPoem') {
-		var data = p.a;
-		return A2($author$project$Main$encodeGeneric, data.maxLineLen, data.lines);
-	} else {
-		var data = p.a;
-		return A2($author$project$Main$encodeGhazal, data.maxLineLen, data.lines);
+	switch (p.$) {
+		case 'GenericPoem':
+			var data = p.a;
+			return A2($author$project$Main$encodeGeneric, data.maxLineLen, data.lines);
+		case 'Ghazal':
+			var data = p.a;
+			return A2($author$project$Main$encodeGhazal, data.maxLineLen, data.lines);
+		default:
+			var data = p.a;
+			return A2($author$project$Main$encodeFreeVerse, data.maxLineLen, data.lines);
 	}
 };
 var $author$project$Main$encodeModel = function (model) {
@@ -5734,17 +5777,20 @@ var $author$project$Main$misraaFromPoemLineWRK = F2(
 var $author$project$Main$adjustMaatraaPoem = F3(
 	function (poem, li, ci) {
 		var lines = function () {
-			if (poem.$ === 'GenericPoem') {
-				var data = poem.a;
-				return data.lines;
-			} else {
-				var data = poem.a;
-				return A2(
-					$elm$core$Array$map,
-					function ($) {
-						return $.line;
-					},
-					data.lines);
+			switch (poem.$) {
+				case 'GenericPoem':
+					var data = poem.a;
+					return data.lines;
+				case 'Ghazal':
+					var data = poem.a;
+					return A2(
+						$elm$core$Array$map,
+						function ($) {
+							return $.line;
+						},
+						data.lines);
+				default:
+					return $elm$core$Array$empty;
 			}
 		}();
 		var oldLine = A2(
@@ -5754,27 +5800,31 @@ var $author$project$Main$adjustMaatraaPoem = F3(
 		var newLine = A2($author$project$Main$adjustMaatraaLine, oldLine, ci);
 		var newLines = A3($elm$core$Array$set, li, newLine, lines);
 		var newMaxLineLen = $author$project$Main$getMaxLineLen(newLines);
-		if (poem.$ === 'GenericPoem') {
-			return $author$project$Main$GenericPoem(
-				{lines: newLines, maxLineLen: newMaxLineLen});
-		} else {
-			var data = poem.a;
-			return $author$project$Main$Ghazal(
-				_Utils_update(
-					data,
-					{
-						lines: A3(
-							$elm_community$array_extra$Array$Extra$map2,
-							$author$project$Main$misraaFromPoemLineWRK,
-							newLines,
-							A2(
-								$elm$core$Array$map,
-								function ($) {
-									return $.rkUnits;
-								},
-								data.lines)),
-						maxLineLen: newMaxLineLen
-					}));
+		switch (poem.$) {
+			case 'GenericPoem':
+				return $author$project$Main$GenericPoem(
+					{lines: newLines, maxLineLen: newMaxLineLen});
+			case 'Ghazal':
+				var data = poem.a;
+				return $author$project$Main$Ghazal(
+					_Utils_update(
+						data,
+						{
+							lines: A3(
+								$elm_community$array_extra$Array$Extra$map2,
+								$author$project$Main$misraaFromPoemLineWRK,
+								newLines,
+								A2(
+									$elm$core$Array$map,
+									function ($) {
+										return $.rkUnits;
+									},
+									data.lines)),
+							maxLineLen: newMaxLineLen
+						}));
+			default:
+				return $author$project$Main$GenericPoem(
+					{lines: newLines, maxLineLen: newMaxLineLen});
 		}
 	});
 var $author$project$Main$IncomingPoem = F2(
@@ -5798,30 +5848,69 @@ var $author$project$Main$decodeWhichChar = A3(
 	$author$project$Main$WhichChar,
 	A2($elm$json$Json$Decode$field, 'lineI', $elm$json$Json$Decode$int),
 	A2($elm$json$Json$Decode$field, 'charI', $elm$json$Json$Decode$int));
-var $author$project$Main$genericGetData = function (p) {
-	if (p.$ === 'GenericPoem') {
+var $author$project$Main$FreeVerse = function (a) {
+	return {$: 'FreeVerse', a: a};
+};
+var $author$project$Main$FreeVerseLine = F2(
+	function (line, isComposite) {
+		return {isComposite: isComposite, line: line};
+	});
+var $author$project$Main$fvGetData = function (p) {
+	if (p.$ === 'FreeVerse') {
 		var data = p.a;
 		return data;
 	} else {
-		var data = p.a;
-		return {
-			lines: A2(
-				$elm$core$Array$map,
-				function ($) {
-					return $.line;
-				},
-				data.lines),
-			maxLineLen: data.maxLineLen
-		};
+		return {lines: $elm$core$Array$empty, maxLineLen: 0};
+	}
+};
+var $elm$core$Basics$not = _Basics_not;
+var $author$project$Main$fvSetComposite = F2(
+	function (pom, li) {
+		var data = $author$project$Main$fvGetData(pom);
+		var line = A2(
+			$elm$core$Maybe$withDefault,
+			A2($author$project$Main$FreeVerseLine, $author$project$Main$emptyLine, false),
+			A2($elm$core$Array$get, li, data.lines));
+		var newLine = A2($author$project$Main$FreeVerseLine, line.line, !line.isComposite);
+		var newLines = A3($elm$core$Array$set, li, newLine, data.lines);
+		return $author$project$Main$FreeVerse(
+			{lines: newLines, maxLineLen: data.maxLineLen});
+	});
+var $author$project$Main$genericGetData = function (p) {
+	switch (p.$) {
+		case 'GenericPoem':
+			var data = p.a;
+			return data;
+		case 'Ghazal':
+			var data = p.a;
+			return {
+				lines: A2(
+					$elm$core$Array$map,
+					function ($) {
+						return $.line;
+					},
+					data.lines),
+				maxLineLen: data.maxLineLen
+			};
+		default:
+			var data = p.a;
+			return {
+				lines: A2(
+					$elm$core$Array$map,
+					function ($) {
+						return $.line;
+					},
+					data.lines),
+				maxLineLen: data.maxLineLen
+			};
 	}
 };
 var $elm$core$Basics$negate = function (n) {
 	return -n;
 };
-var $author$project$Main$aksharVowelCompare = F2(
-	function (a, b) {
-		return _Utils_eq(a.vowel, b.vowel) ? true : false;
-	});
+var $author$project$Main$fvLineFromLine = function (l) {
+	return A2($author$project$Main$FreeVerseLine, l, false);
+};
 var $elm$core$Elm$JsArray$appendN = _JsArray_appendN;
 var $elm$core$Elm$JsArray$slice = _JsArray_slice;
 var $elm$core$Array$appendHelpBuilder = F2(
@@ -5999,6 +6088,323 @@ var $elm$core$Array$length = function (_v0) {
 	var len = _v0.a;
 	return len;
 };
+var $elm$core$String$lines = _String_lines;
+var $elm$core$Basics$neq = _Utils_notEqual;
+var $author$project$Main$calcHalfAksharRhythm = F3(
+	function (ac, ap, an) {
+		return (!_Utils_eq(ac.aksharType, $author$project$Main$Half)) ? ac : (((_Utils_eq(
+			ac.mainChar,
+			_Utils_chr('म')) && _Utils_eq(
+			an.mainChar,
+			_Utils_chr('ह'))) || (_Utils_eq(
+			ac.mainChar,
+			_Utils_chr('न')) && _Utils_eq(
+			an.mainChar,
+			_Utils_chr('ह')))) ? ac : ((ap.rhythm === 1) ? _Utils_update(
+			ac,
+			{rhythm: 1, userRhythm: 1}) : (((ap.rhythm === 2) && (an.rhythm === 2)) ? _Utils_update(
+			ac,
+			{rhythm: 1, userRhythm: 1}) : ac)));
+	});
+var $author$project$Main$calcHalfAksharRhythmLine = F3(
+	function (line, i, r) {
+		calcHalfAksharRhythmLine:
+		while (true) {
+			var len = $elm$core$Array$length(line);
+			var maxI = len - 1;
+			var ap = A2(
+				$elm$core$Maybe$withDefault,
+				$author$project$Main$emptyAkshar,
+				A2($elm$core$Array$get, i - 1, line));
+			var an = A2(
+				$elm$core$Maybe$withDefault,
+				$author$project$Main$emptyAkshar,
+				A2($elm$core$Array$get, i + 1, line));
+			var ac = A2(
+				$elm$core$Maybe$withDefault,
+				$author$project$Main$emptyAkshar,
+				A2($elm$core$Array$get, i, line));
+			var aNew = A3($author$project$Main$calcHalfAksharRhythm, ac, ap, an);
+			var newline = A3($elm$core$Array$set, i, aNew, line);
+			if (_Utils_cmp(i, maxI) > 0) {
+				return _Utils_Tuple2(line, r);
+			} else {
+				var $temp$line = newline,
+					$temp$i = i + 1,
+					$temp$r = r + aNew.rhythm;
+				line = $temp$line;
+				i = $temp$i;
+				r = $temp$r;
+				continue calcHalfAksharRhythmLine;
+			}
+		}
+	});
+var $author$project$Main$Halant = {$: 'Halant'};
+var $author$project$Main$Maatraa = {$: 'Maatraa'};
+var $author$project$Main$mrgMCakshar = F2(
+	function (aL, aM) {
+		var aC = _Utils_update(
+			aM,
+			{
+				rhythm: aL.rhythm,
+				str: _Utils_ap(aM.str, aL.str),
+				userRhythm: aL.rhythm,
+				vowel: aL.vowel
+			});
+		return (_Utils_eq(aM.aksharType, $author$project$Main$Consonant) && _Utils_eq(aL.aksharType, $author$project$Main$Maatraa)) ? _Utils_Tuple2(true, aC) : ((_Utils_eq(aM.aksharType, $author$project$Main$Consonant) && _Utils_eq(aL.aksharType, $author$project$Main$Halant)) ? _Utils_Tuple2(
+			true,
+			_Utils_update(
+				aC,
+				{aksharType: $author$project$Main$Half})) : _Utils_Tuple2(false, aL));
+	});
+var $elm$core$Array$push = F2(
+	function (a, array) {
+		var tail = array.d;
+		return A2(
+			$elm$core$Array$unsafeReplaceTail,
+			A2($elm$core$Elm$JsArray$push, a, tail),
+			array);
+	});
+var $elm$core$Tuple$second = function (_v0) {
+	var y = _v0.b;
+	return y;
+};
+var $author$project$Main$mrgMChelper = F3(
+	function (list, iStart, mList) {
+		mrgMChelper:
+		while (true) {
+			var mListLen = $elm$core$Array$length(mList);
+			var iNext = iStart + 1;
+			var aM = A2(
+				$elm$core$Maybe$withDefault,
+				$author$project$Main$emptyAkshar,
+				A2($elm$core$Array$get, mListLen - 1, mList));
+			var aL = A2(
+				$elm$core$Maybe$withDefault,
+				$author$project$Main$emptyAkshar,
+				A2($elm$core$Array$get, iStart, list));
+			var mrgResult = A2($author$project$Main$mrgMCakshar, aL, aM);
+			var aC = mrgResult.b;
+			if (_Utils_eq(
+				iStart,
+				$elm$core$Array$length(list))) {
+				return mList;
+			} else {
+				if ($elm$core$Array$length(list) === 1) {
+					var $temp$list = list,
+						$temp$iStart = iNext,
+						$temp$mList = A2($elm$core$Array$push, aL, mList);
+					list = $temp$list;
+					iStart = $temp$iStart;
+					mList = $temp$mList;
+					continue mrgMChelper;
+				} else {
+					if (mrgResult.a) {
+						var $temp$list = list,
+							$temp$iStart = iNext,
+							$temp$mList = A3($elm$core$Array$set, mListLen - 1, aC, mList);
+						list = $temp$list;
+						iStart = $temp$iStart;
+						mList = $temp$mList;
+						continue mrgMChelper;
+					} else {
+						var $temp$list = list,
+							$temp$iStart = iNext,
+							$temp$mList = A2($elm$core$Array$push, aC, mList);
+						list = $temp$list;
+						iStart = $temp$iStart;
+						mList = $temp$mList;
+						continue mrgMChelper;
+					}
+				}
+			}
+		}
+	});
+var $author$project$Main$mrgMCline = function (list) {
+	return A3($author$project$Main$mrgMChelper, list, 0, $elm$core$Array$empty);
+};
+var $author$project$Main$Other = {$: 'Other'};
+var $author$project$Main$isBindu = function (c) {
+	var cd = $elm$core$Char$toCode(c);
+	return (cd === 2306) ? true : false;
+};
+var $author$project$Main$isHalant = function (c) {
+	var cd = $elm$core$Char$toCode(c);
+	return (cd === 2381) ? true : false;
+};
+var $author$project$Main$isHindi = function (c) {
+	var cd = $elm$core$Char$toCode(c);
+	return ((cd >= 2306) && (cd <= 2399)) ? true : false;
+};
+var $author$project$Main$isMaatraaVowel = function (c) {
+	var cd = $elm$core$Char$toCode(c);
+	return ((cd >= 2366) && (cd <= 2380)) ? true : false;
+};
+var $author$project$Main$isPureVowel = function (c) {
+	var cd = $elm$core$Char$toCode(c);
+	return ((cd >= 2309) && (cd <= 2324)) ? true : false;
+};
+var $author$project$Main$maatraaToVowel = function (c) {
+	switch (c.valueOf()) {
+		case 'ा':
+			return _Utils_chr('आ');
+		case 'ि':
+			return _Utils_chr('इ');
+		case 'ी':
+			return _Utils_chr('ई');
+		case 'ु':
+			return _Utils_chr('उ');
+		case 'ू':
+			return _Utils_chr('ऊ');
+		case 'े':
+			return _Utils_chr('ए');
+		case 'ै':
+			return _Utils_chr('ऐ');
+		case 'ो':
+			return _Utils_chr('ओ');
+		case 'ौ':
+			return _Utils_chr('औ');
+		case 'ॉ':
+			return _Utils_chr('ऑ');
+		case 'ृ':
+			return _Utils_chr('ऋ');
+		default:
+			return c;
+	}
+};
+var $author$project$Main$vowelRhythm = function (c) {
+	switch (c.valueOf()) {
+		case 'अ':
+			return 1;
+		case 'आ':
+			return 2;
+		case 'इ':
+			return 1;
+		case 'ई':
+			return 2;
+		case 'उ':
+			return 1;
+		case 'ऊ':
+			return 2;
+		case 'ए':
+			return 2;
+		case 'ऐ':
+			return 2;
+		case 'ओ':
+			return 2;
+		case 'औ':
+			return 2;
+		case 'ऑ':
+			return 2;
+		case 'ऋ':
+			return 1;
+		default:
+			return 0;
+	}
+};
+var $author$project$Main$processChar = function (c) {
+	var m = 0;
+	var cd = $elm$core$Char$toCode(c);
+	var aRhythm = $author$project$Main$vowelRhythm(
+		_Utils_chr('अ'));
+	var a = {
+		aksharType: $author$project$Main$Other,
+		code: cd,
+		mainChar: c,
+		rhythm: 0,
+		str: $elm$core$String$fromChar(c),
+		userRhythm: 0,
+		vowel: c
+	};
+	var newRhythm = $author$project$Main$isPureVowel(c) ? $author$project$Main$vowelRhythm(a.vowel) : ($author$project$Main$isMaatraaVowel(c) ? $author$project$Main$vowelRhythm(
+		$author$project$Main$maatraaToVowel(a.vowel)) : 0);
+	return $author$project$Main$isHindi(c) ? ($author$project$Main$isPureVowel(c) ? _Utils_update(
+		a,
+		{aksharType: $author$project$Main$PureVowel, rhythm: newRhythm, userRhythm: newRhythm}) : ($author$project$Main$isMaatraaVowel(c) ? _Utils_update(
+		a,
+		{aksharType: $author$project$Main$Maatraa, rhythm: newRhythm, userRhythm: newRhythm}) : ($author$project$Main$isBindu(c) ? _Utils_update(
+		a,
+		{aksharType: $author$project$Main$Half, rhythm: 0, userRhythm: 0}) : ($author$project$Main$isHalant(c) ? _Utils_update(
+		a,
+		{aksharType: $author$project$Main$Halant, rhythm: 0, userRhythm: 0}) : _Utils_update(
+		a,
+		{
+			aksharType: $author$project$Main$Consonant,
+			rhythm: aRhythm,
+			userRhythm: aRhythm,
+			vowel: _Utils_chr('अ')
+		}))))) : a;
+};
+var $elm$core$String$foldr = _String_foldr;
+var $elm$core$String$toList = function (string) {
+	return A3($elm$core$String$foldr, $elm$core$List$cons, _List_Nil, string);
+};
+var $author$project$Main$processLine = function (pomLine) {
+	var pChars = $elm$core$String$toList(pomLine);
+	var pPoem = A2($elm$core$List$map, $author$project$Main$processChar, pChars);
+	var pPoemA = $elm$core$Array$fromList(pPoem);
+	var mergedLine = $author$project$Main$mrgMCline(pPoemA);
+	var _final = A3($author$project$Main$calcHalfAksharRhythmLine, mergedLine, 0, 0);
+	return A3($author$project$Main$PoemLine, pomLine, _final.b, _final.a);
+};
+var $elm$regex$Regex$Match = F4(
+	function (match, index, number, submatches) {
+		return {index: index, match: match, number: number, submatches: submatches};
+	});
+var $elm$regex$Regex$fromStringWith = _Regex_fromStringWith;
+var $elm$regex$Regex$fromString = function (string) {
+	return A2(
+		$elm$regex$Regex$fromStringWith,
+		{caseInsensitive: false, multiline: false},
+		string);
+};
+var $elm$regex$Regex$replace = _Regex_replaceAtMost(_Regex_infinity);
+var $author$project$Main$userReplace = F3(
+	function (userRegex, replacer, string) {
+		var _v0 = $elm$regex$Regex$fromString(userRegex);
+		if (_v0.$ === 'Nothing') {
+			return string;
+		} else {
+			var regex = _v0.a;
+			return A3($elm$regex$Regex$replace, regex, replacer, string);
+		}
+	});
+var $author$project$Main$removeExtraSpaces = function (string) {
+	return A3(
+		$author$project$Main$userReplace,
+		'\\s+',
+		function (_v0) {
+			return ' ';
+		},
+		string);
+};
+var $author$project$Main$removeNonDevanagari = function (string) {
+	return A3(
+		$author$project$Main$userReplace,
+		'[^\u0900-\u097F]',
+		function (_v0) {
+			return ' ';
+		},
+		string);
+};
+var $author$project$Main$removePoornviraam = function (string) {
+	return A3(
+		$author$project$Main$userReplace,
+		'।',
+		function (_v0) {
+			return ' ';
+		},
+		string);
+};
+var $elm$core$String$trim = _String_trim;
+var $author$project$Main$preProcessLine = F2(
+	function (pomLine, oldLine) {
+		var pCleaned = $elm$core$String$trim(
+			$author$project$Main$removeExtraSpaces(
+				$author$project$Main$removePoornviraam(
+					$author$project$Main$removeNonDevanagari(pomLine))));
+		return _Utils_eq(pCleaned, oldLine.str) ? oldLine : $author$project$Main$processLine(pCleaned);
+	});
 var $elm$core$Array$repeat = F2(
 	function (n, e) {
 		return A2(
@@ -6007,6 +6413,34 @@ var $elm$core$Array$repeat = F2(
 			function (_v0) {
 				return e;
 			});
+	});
+var $author$project$Main$processPoem = F2(
+	function (pom, oldLines) {
+		var pLines = $elm$core$Array$fromList(
+			$elm$core$String$lines(pom));
+		var diff = $elm$core$Array$length(pLines) - $elm$core$Array$length(oldLines);
+		var paddedOldPoem = (diff > 0) ? A2(
+			$elm$core$Array$append,
+			oldLines,
+			A2($elm$core$Array$repeat, diff, $author$project$Main$emptyLine)) : oldLines;
+		var processedLines = A3($elm_community$array_extra$Array$Extra$map2, $author$project$Main$preProcessLine, pLines, paddedOldPoem);
+		var maxLineLen = $author$project$Main$getMaxLineLen(processedLines);
+		return $author$project$Main$GenericPoem(
+			{lines: processedLines, maxLineLen: maxLineLen});
+	});
+var $author$project$Main$fvProcess = F2(
+	function (pom, oldPom) {
+		var basic = $author$project$Main$genericGetData(
+			A2($author$project$Main$processPoem, pom, oldPom));
+		return $author$project$Main$FreeVerse(
+			{
+				lines: A2($elm$core$Array$map, $author$project$Main$fvLineFromLine, basic.lines),
+				maxLineLen: basic.maxLineLen
+			});
+	});
+var $author$project$Main$aksharVowelCompare = F2(
+	function (a, b) {
+		return _Utils_eq(a.vowel, b.vowel) ? true : false;
 	});
 var $elm$core$List$drop = F2(
 	function (n, list) {
@@ -6411,7 +6845,6 @@ var $author$project$Main$ghazalSetRadeef = F3(
 			}
 		}
 	});
-var $author$project$Main$Other = {$: 'Other'};
 var $elm_community$array_extra$Array$Extra$member = function (needle) {
 	return A2(
 		$elm$core$Array$foldr,
@@ -6471,336 +6904,6 @@ var $author$project$Main$misraaFromPoemLine = function (line) {
 		$author$project$Main$emptyRKUnit);
 	return A2($author$project$Main$Misraa, line, rkUnits);
 };
-var $elm$core$String$lines = _String_lines;
-var $elm$core$Basics$neq = _Utils_notEqual;
-var $author$project$Main$calcHalfAksharRhythm = F3(
-	function (ac, ap, an) {
-		return (!_Utils_eq(ac.aksharType, $author$project$Main$Half)) ? ac : (((_Utils_eq(
-			ac.mainChar,
-			_Utils_chr('म')) && _Utils_eq(
-			an.mainChar,
-			_Utils_chr('ह'))) || (_Utils_eq(
-			ac.mainChar,
-			_Utils_chr('न')) && _Utils_eq(
-			an.mainChar,
-			_Utils_chr('ह')))) ? ac : ((ap.rhythm === 1) ? _Utils_update(
-			ac,
-			{rhythm: 1, userRhythm: 1}) : (((ap.rhythm === 2) && (an.rhythm === 2)) ? _Utils_update(
-			ac,
-			{rhythm: 1, userRhythm: 1}) : ac)));
-	});
-var $author$project$Main$calcHalfAksharRhythmLine = F3(
-	function (line, i, r) {
-		calcHalfAksharRhythmLine:
-		while (true) {
-			var len = $elm$core$Array$length(line);
-			var maxI = len - 1;
-			var ap = A2(
-				$elm$core$Maybe$withDefault,
-				$author$project$Main$emptyAkshar,
-				A2($elm$core$Array$get, i - 1, line));
-			var an = A2(
-				$elm$core$Maybe$withDefault,
-				$author$project$Main$emptyAkshar,
-				A2($elm$core$Array$get, i + 1, line));
-			var ac = A2(
-				$elm$core$Maybe$withDefault,
-				$author$project$Main$emptyAkshar,
-				A2($elm$core$Array$get, i, line));
-			var aNew = A3($author$project$Main$calcHalfAksharRhythm, ac, ap, an);
-			var newline = A3($elm$core$Array$set, i, aNew, line);
-			if (_Utils_cmp(i, maxI) > 0) {
-				return _Utils_Tuple2(line, r);
-			} else {
-				var $temp$line = newline,
-					$temp$i = i + 1,
-					$temp$r = r + aNew.rhythm;
-				line = $temp$line;
-				i = $temp$i;
-				r = $temp$r;
-				continue calcHalfAksharRhythmLine;
-			}
-		}
-	});
-var $author$project$Main$Halant = {$: 'Halant'};
-var $author$project$Main$Maatraa = {$: 'Maatraa'};
-var $author$project$Main$mrgMCakshar = F2(
-	function (aL, aM) {
-		var aC = _Utils_update(
-			aM,
-			{
-				rhythm: aL.rhythm,
-				str: _Utils_ap(aM.str, aL.str),
-				userRhythm: aL.rhythm,
-				vowel: aL.vowel
-			});
-		return (_Utils_eq(aM.aksharType, $author$project$Main$Consonant) && _Utils_eq(aL.aksharType, $author$project$Main$Maatraa)) ? _Utils_Tuple2(true, aC) : ((_Utils_eq(aM.aksharType, $author$project$Main$Consonant) && _Utils_eq(aL.aksharType, $author$project$Main$Halant)) ? _Utils_Tuple2(
-			true,
-			_Utils_update(
-				aC,
-				{aksharType: $author$project$Main$Half})) : _Utils_Tuple2(false, aL));
-	});
-var $elm$core$Array$push = F2(
-	function (a, array) {
-		var tail = array.d;
-		return A2(
-			$elm$core$Array$unsafeReplaceTail,
-			A2($elm$core$Elm$JsArray$push, a, tail),
-			array);
-	});
-var $elm$core$Tuple$second = function (_v0) {
-	var y = _v0.b;
-	return y;
-};
-var $author$project$Main$mrgMChelper = F3(
-	function (list, iStart, mList) {
-		mrgMChelper:
-		while (true) {
-			var mListLen = $elm$core$Array$length(mList);
-			var iNext = iStart + 1;
-			var aM = A2(
-				$elm$core$Maybe$withDefault,
-				$author$project$Main$emptyAkshar,
-				A2($elm$core$Array$get, mListLen - 1, mList));
-			var aL = A2(
-				$elm$core$Maybe$withDefault,
-				$author$project$Main$emptyAkshar,
-				A2($elm$core$Array$get, iStart, list));
-			var mrgResult = A2($author$project$Main$mrgMCakshar, aL, aM);
-			var aC = mrgResult.b;
-			if (_Utils_eq(
-				iStart,
-				$elm$core$Array$length(list))) {
-				return mList;
-			} else {
-				if ($elm$core$Array$length(list) === 1) {
-					var $temp$list = list,
-						$temp$iStart = iNext,
-						$temp$mList = A2($elm$core$Array$push, aL, mList);
-					list = $temp$list;
-					iStart = $temp$iStart;
-					mList = $temp$mList;
-					continue mrgMChelper;
-				} else {
-					if (mrgResult.a) {
-						var $temp$list = list,
-							$temp$iStart = iNext,
-							$temp$mList = A3($elm$core$Array$set, mListLen - 1, aC, mList);
-						list = $temp$list;
-						iStart = $temp$iStart;
-						mList = $temp$mList;
-						continue mrgMChelper;
-					} else {
-						var $temp$list = list,
-							$temp$iStart = iNext,
-							$temp$mList = A2($elm$core$Array$push, aC, mList);
-						list = $temp$list;
-						iStart = $temp$iStart;
-						mList = $temp$mList;
-						continue mrgMChelper;
-					}
-				}
-			}
-		}
-	});
-var $author$project$Main$mrgMCline = function (list) {
-	return A3($author$project$Main$mrgMChelper, list, 0, $elm$core$Array$empty);
-};
-var $author$project$Main$isBindu = function (c) {
-	var cd = $elm$core$Char$toCode(c);
-	return (cd === 2306) ? true : false;
-};
-var $author$project$Main$isHalant = function (c) {
-	var cd = $elm$core$Char$toCode(c);
-	return (cd === 2381) ? true : false;
-};
-var $author$project$Main$isHindi = function (c) {
-	var cd = $elm$core$Char$toCode(c);
-	return ((cd >= 2306) && (cd <= 2399)) ? true : false;
-};
-var $author$project$Main$isMaatraaVowel = function (c) {
-	var cd = $elm$core$Char$toCode(c);
-	return ((cd >= 2366) && (cd <= 2380)) ? true : false;
-};
-var $author$project$Main$isPureVowel = function (c) {
-	var cd = $elm$core$Char$toCode(c);
-	return ((cd >= 2309) && (cd <= 2324)) ? true : false;
-};
-var $author$project$Main$maatraaToVowel = function (c) {
-	switch (c.valueOf()) {
-		case 'ा':
-			return _Utils_chr('आ');
-		case 'ि':
-			return _Utils_chr('इ');
-		case 'ी':
-			return _Utils_chr('ई');
-		case 'ु':
-			return _Utils_chr('उ');
-		case 'ू':
-			return _Utils_chr('ऊ');
-		case 'े':
-			return _Utils_chr('ए');
-		case 'ै':
-			return _Utils_chr('ऐ');
-		case 'ो':
-			return _Utils_chr('ओ');
-		case 'ौ':
-			return _Utils_chr('औ');
-		case 'ॉ':
-			return _Utils_chr('ऑ');
-		case 'ृ':
-			return _Utils_chr('ऋ');
-		default:
-			return c;
-	}
-};
-var $author$project$Main$vowelRhythm = function (c) {
-	switch (c.valueOf()) {
-		case 'अ':
-			return 1;
-		case 'आ':
-			return 2;
-		case 'इ':
-			return 1;
-		case 'ई':
-			return 2;
-		case 'उ':
-			return 1;
-		case 'ऊ':
-			return 2;
-		case 'ए':
-			return 2;
-		case 'ऐ':
-			return 2;
-		case 'ओ':
-			return 2;
-		case 'औ':
-			return 2;
-		case 'ऑ':
-			return 2;
-		case 'ऋ':
-			return 1;
-		default:
-			return 0;
-	}
-};
-var $author$project$Main$processChar = function (c) {
-	var m = 0;
-	var cd = $elm$core$Char$toCode(c);
-	var aRhythm = $author$project$Main$vowelRhythm(
-		_Utils_chr('अ'));
-	var a = {
-		aksharType: $author$project$Main$Other,
-		code: cd,
-		mainChar: c,
-		rhythm: 0,
-		str: $elm$core$String$fromChar(c),
-		userRhythm: 0,
-		vowel: c
-	};
-	var newRhythm = $author$project$Main$isPureVowel(c) ? $author$project$Main$vowelRhythm(a.vowel) : ($author$project$Main$isMaatraaVowel(c) ? $author$project$Main$vowelRhythm(
-		$author$project$Main$maatraaToVowel(a.vowel)) : 0);
-	return $author$project$Main$isHindi(c) ? ($author$project$Main$isPureVowel(c) ? _Utils_update(
-		a,
-		{aksharType: $author$project$Main$PureVowel, rhythm: newRhythm, userRhythm: newRhythm}) : ($author$project$Main$isMaatraaVowel(c) ? _Utils_update(
-		a,
-		{aksharType: $author$project$Main$Maatraa, rhythm: newRhythm, userRhythm: newRhythm}) : ($author$project$Main$isBindu(c) ? _Utils_update(
-		a,
-		{aksharType: $author$project$Main$Half, rhythm: 0, userRhythm: 0}) : ($author$project$Main$isHalant(c) ? _Utils_update(
-		a,
-		{aksharType: $author$project$Main$Halant, rhythm: 0, userRhythm: 0}) : _Utils_update(
-		a,
-		{
-			aksharType: $author$project$Main$Consonant,
-			rhythm: aRhythm,
-			userRhythm: aRhythm,
-			vowel: _Utils_chr('अ')
-		}))))) : a;
-};
-var $elm$core$String$foldr = _String_foldr;
-var $elm$core$String$toList = function (string) {
-	return A3($elm$core$String$foldr, $elm$core$List$cons, _List_Nil, string);
-};
-var $author$project$Main$processLine = function (pomLine) {
-	var pChars = $elm$core$String$toList(pomLine);
-	var pPoem = A2($elm$core$List$map, $author$project$Main$processChar, pChars);
-	var pPoemA = $elm$core$Array$fromList(pPoem);
-	var mergedLine = $author$project$Main$mrgMCline(pPoemA);
-	var _final = A3($author$project$Main$calcHalfAksharRhythmLine, mergedLine, 0, 0);
-	return A3($author$project$Main$PoemLine, pomLine, _final.b, _final.a);
-};
-var $elm$regex$Regex$Match = F4(
-	function (match, index, number, submatches) {
-		return {index: index, match: match, number: number, submatches: submatches};
-	});
-var $elm$regex$Regex$fromStringWith = _Regex_fromStringWith;
-var $elm$regex$Regex$fromString = function (string) {
-	return A2(
-		$elm$regex$Regex$fromStringWith,
-		{caseInsensitive: false, multiline: false},
-		string);
-};
-var $elm$regex$Regex$replace = _Regex_replaceAtMost(_Regex_infinity);
-var $author$project$Main$userReplace = F3(
-	function (userRegex, replacer, string) {
-		var _v0 = $elm$regex$Regex$fromString(userRegex);
-		if (_v0.$ === 'Nothing') {
-			return string;
-		} else {
-			var regex = _v0.a;
-			return A3($elm$regex$Regex$replace, regex, replacer, string);
-		}
-	});
-var $author$project$Main$removeExtraSpaces = function (string) {
-	return A3(
-		$author$project$Main$userReplace,
-		'\\s+',
-		function (_v0) {
-			return ' ';
-		},
-		string);
-};
-var $author$project$Main$removeNonDevanagari = function (string) {
-	return A3(
-		$author$project$Main$userReplace,
-		'[^\u0900-\u097F]',
-		function (_v0) {
-			return ' ';
-		},
-		string);
-};
-var $author$project$Main$removePoornviraam = function (string) {
-	return A3(
-		$author$project$Main$userReplace,
-		'।',
-		function (_v0) {
-			return ' ';
-		},
-		string);
-};
-var $elm$core$String$trim = _String_trim;
-var $author$project$Main$preProcessLine = F2(
-	function (pomLine, oldLine) {
-		var pCleaned = $elm$core$String$trim(
-			$author$project$Main$removeExtraSpaces(
-				$author$project$Main$removePoornviraam(
-					$author$project$Main$removeNonDevanagari(pomLine))));
-		return _Utils_eq(pCleaned, oldLine.str) ? oldLine : $author$project$Main$processLine(pCleaned);
-	});
-var $author$project$Main$processPoem = F2(
-	function (pom, oldLines) {
-		var pLines = $elm$core$Array$fromList(
-			$elm$core$String$lines(pom));
-		var diff = $elm$core$Array$length(pLines) - $elm$core$Array$length(oldLines);
-		var paddedOldPoem = (diff > 0) ? A2(
-			$elm$core$Array$append,
-			oldLines,
-			A2($elm$core$Array$repeat, diff, $author$project$Main$emptyLine)) : oldLines;
-		var processedLines = A3($elm_community$array_extra$Array$Extra$map2, $author$project$Main$preProcessLine, pLines, paddedOldPoem);
-		var maxLineLen = $author$project$Main$getMaxLineLen(processedLines);
-		return $author$project$Main$GenericPoem(
-			{lines: processedLines, maxLineLen: maxLineLen});
-	});
 var $author$project$Main$ghazalProcess = F2(
 	function (pom, oldPom) {
 		var basic = $author$project$Main$genericGetData(
@@ -6833,56 +6936,79 @@ var $author$project$Main$ghazalProcess = F2(
 	});
 var $author$project$Main$preProcessPoem = F3(
 	function (pom, oldpom, pomType) {
-		if (pomType === 'GHAZAL') {
-			return A2($author$project$Main$ghazalProcess, pom, oldpom.lines);
-		} else {
-			return A2($author$project$Main$processPoem, pom, oldpom.lines);
+		switch (pomType) {
+			case 'GHAZAL':
+				return A2($author$project$Main$ghazalProcess, pom, oldpom.lines);
+			case 'FREEVERSE':
+				return A2($author$project$Main$fvProcess, pom, oldpom.lines);
+			default:
+				return A2($author$project$Main$processPoem, pom, oldpom.lines);
 		}
 	});
 var $elm$core$String$toUpper = _String_toUpper;
 var $author$project$Main$update = F2(
 	function (msg, model) {
-		if (msg.$ === 'ProcessPoem') {
-			var str = msg.a;
-			var oldPoem = $author$project$Main$genericGetData(model.processedPoem);
-			var incomingPoem = function () {
-				var _v1 = A2($elm$json$Json$Decode$decodeString, $author$project$Main$decodeIncomingPoem, str);
-				if (_v1.$ === 'Ok') {
-					var result = _v1.a;
-					return result;
-				} else {
-					return {poem: '', poemType: ''};
-				}
-			}();
-			var poemType = $elm$core$String$toUpper(incomingPoem.poemType);
-			return _Utils_Tuple2(
-				_Utils_update(
-					model,
-					{
-						lastAction: 'Poem Processed',
-						poem: incomingPoem.poem,
-						processedPoem: A3($author$project$Main$preProcessPoem, incomingPoem.poem, oldPoem, poemType)
-					}),
-				$elm$core$Platform$Cmd$none);
-		} else {
-			var str = msg.a;
-			var whichChar = function () {
-				var _v2 = A2($elm$json$Json$Decode$decodeString, $author$project$Main$decodeWhichChar, str);
-				if (_v2.$ === 'Ok') {
-					var result = _v2.a;
-					return result;
-				} else {
-					return {charI: -1, lineI: -1};
-				}
-			}();
-			return _Utils_Tuple2(
-				_Utils_update(
-					model,
-					{
-						lastAction: 'Maatraa Adjusted ' + str,
-						processedPoem: A3($author$project$Main$adjustMaatraaPoem, model.processedPoem, whichChar.lineI, whichChar.charI)
-					}),
-				$elm$core$Platform$Cmd$none);
+		switch (msg.$) {
+			case 'ProcessPoem':
+				var str = msg.a;
+				var oldPoem = $author$project$Main$genericGetData(model.processedPoem);
+				var incomingPoem = function () {
+					var _v1 = A2($elm$json$Json$Decode$decodeString, $author$project$Main$decodeIncomingPoem, str);
+					if (_v1.$ === 'Ok') {
+						var result = _v1.a;
+						return result;
+					} else {
+						return {poem: '', poemType: ''};
+					}
+				}();
+				var poemType = $elm$core$String$toUpper(incomingPoem.poemType);
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							lastAction: 'Poem Processed',
+							poem: incomingPoem.poem,
+							processedPoem: A3($author$project$Main$preProcessPoem, incomingPoem.poem, oldPoem, poemType)
+						}),
+					$elm$core$Platform$Cmd$none);
+			case 'AdjustMaatraa':
+				var str = msg.a;
+				var whichChar = function () {
+					var _v2 = A2($elm$json$Json$Decode$decodeString, $author$project$Main$decodeWhichChar, str);
+					if (_v2.$ === 'Ok') {
+						var result = _v2.a;
+						return result;
+					} else {
+						return {charI: -1, lineI: -1};
+					}
+				}();
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							lastAction: 'Maatraa Adjusted ' + str,
+							processedPoem: A3($author$project$Main$adjustMaatraaPoem, model.processedPoem, whichChar.lineI, whichChar.charI)
+						}),
+					$elm$core$Platform$Cmd$none);
+			default:
+				var str = msg.a;
+				var lineI = function () {
+					var _v3 = A2($elm$json$Json$Decode$decodeString, $elm$json$Json$Decode$int, str);
+					if (_v3.$ === 'Ok') {
+						var result = _v3.a;
+						return result;
+					} else {
+						return -1;
+					}
+				}();
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							lastAction: 'Composite Set ' + str,
+							processedPoem: A2($author$project$Main$fvSetComposite, model.processedPoem, lineI)
+						}),
+					$elm$core$Platform$Cmd$none);
 		}
 	});
 var $author$project$Main$updateWithStorage = F2(
