@@ -5803,7 +5803,16 @@ var $author$project$Main$genericGetData = function (p) {
 		var data = p.a;
 		return data;
 	} else {
-		return {lines: $elm$core$Array$empty, maxLineLen: 0};
+		var data = p.a;
+		return {
+			lines: A2(
+				$elm$core$Array$map,
+				function ($) {
+					return $.line;
+				},
+				data.lines),
+			maxLineLen: data.maxLineLen
+		};
 	}
 };
 var $elm$core$Basics$negate = function (n) {
@@ -6825,7 +6834,7 @@ var $author$project$Main$ghazalProcess = F2(
 var $author$project$Main$preProcessPoem = F3(
 	function (pom, oldpom, pomType) {
 		if (pomType === 'GHAZAL') {
-			return A2($author$project$Main$ghazalProcess, pom, $elm$core$Array$empty);
+			return A2($author$project$Main$ghazalProcess, pom, oldpom.lines);
 		} else {
 			return A2($author$project$Main$processPoem, pom, oldpom.lines);
 		}

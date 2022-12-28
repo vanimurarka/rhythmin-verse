@@ -58,9 +58,15 @@ type alias Misraa =
 
 emptyRKUnit = ' '
 
+type alias FreeVerseLine =
+  { line : PoemLine
+  , inComposite : Bool
+  }
+
 type ProcessedPoem 
   = GenericPoem { maxLineLen : Int, lines : Array.Array PoemLine }
   | Ghazal { maxLineLen: Int, lines: Array.Array Misraa, radeef : Array.Array Akshar, kaafiyaa : Array.Array Akshar}
+  --| FreeVerse {maxLineLen: Int, lines: Array.Array FreeVerseLine }
 
 emptyPoem = GenericPoem {maxLineLen = 0, lines = Array.empty}
 
@@ -277,7 +283,7 @@ processPoem pom oldLines =
 genericGetData p =
   case p of
     GenericPoem data -> data
-    _ -> { maxLineLen = 0, lines = Array.empty}
+    Ghazal data -> { maxLineLen = data.maxLineLen, lines = Array.map .line data.lines }
 
 ghazalGetData p =
   case p of
@@ -414,11 +420,20 @@ ghazalProcess pom oldPom =
   in 
     Ghazal {maxLineLen = basic.maxLineLen, lines = misre2, radeef = radeef, kaafiyaa = kaafiyaa}
 
+-- == FREE VERSE == --
+
+--fvGetData p =
+--  case p of
+--    FreeVerse data -> data 
+--    _ -> { maxLineLen = 0, lines = Array.empty}
+
+
+
 -- == MASTER == --
 
 preProcessPoem pom oldpom pomType =
   case pomType of
-    "GHAZAL" -> ghazalProcess pom Array.empty
+    "GHAZAL" -> ghazalProcess pom oldpom.lines
     _ -> processPoem pom oldpom.lines
 
 
