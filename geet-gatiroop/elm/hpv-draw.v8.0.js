@@ -495,8 +495,8 @@ function unmarkCompositeLine()
     // if true, the line is composite with top
     if (i > 0)
     {
-      dPoem.setComposite(i); 
-      draw();
+      callSetComposite(i); 
+      // draw();
     } 
   }
 

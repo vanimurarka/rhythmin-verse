@@ -63,6 +63,13 @@ type alias FreeVerseLine =
   , isComposite : Bool
   }
 
+type alias CompositeLine =
+  { originalLineI : Int 
+  , rhythm : Int 
+  , remainder : Int
+  , multipleOfBase : Bool
+  }
+
 type ProcessedPoem 
   = GenericPoem { maxLineLen : Int, lines : Array.Array PoemLine }
   | Ghazal { maxLineLen: Int, lines: Array.Array Misraa, radeef : Array.Array Akshar, kaafiyaa : Array.Array Akshar}
@@ -445,6 +452,29 @@ fvSetComposite pom li =
     newLines = Array.set li newLine data.lines
   in
     FreeVerse {maxLineLen = data.maxLineLen, lines = newLines}
+
+fvAddComposite compsiteLines li rhythm =
+  Array.push (CompositeLine li rhythm 0 True) compsiteLines
+
+fvCalcCompositeRhythm lines li compsiteLines inProgress =
+  let 
+    line = Maybe.withDefault (FreeVerseLine emptyLine False) (Array.get li lines)
+    addedComposites = fvAddComposite compsiteLines li line.line.rhythmTotal
+    compositesLastI = (Array.length compsiteLines) - 1
+    composite = Maybe.withDefault (CompositeLine -1 0 0 True) (Array.get compositesLastI compsiteLines)
+    newComposite = CompositeLine composite.originalLineI (composite.rhythm + line.line.rhythmTotal) 0 True
+    updatedComposites = Array.set compositesLastI newComposite compsiteLines
+  in  
+  if (li > (Array.length lines)) then
+    compsiteLines
+  else if (line.isComposite) then
+      if (not inProgress) then -- new composite added
+        fvCalcCompositeRhythm lines (li + 1) addedComposites True
+      else 
+        fvCalcCompositeRhythm lines (li + 1) updatedComposites True
+    else
+      fvCalcCompositeRhythm lines (li+1) compsiteLines False
+
 
 -- == MASTER == --
 
