@@ -73,7 +73,7 @@ type alias CompositeLine =
 type ProcessedPoem 
   = GenericPoem { maxLineLen : Int, lines : Array.Array PoemLine }
   | Ghazal { maxLineLen: Int, lines: Array.Array Misraa, radeef : Array.Array Akshar, kaafiyaa : Array.Array Akshar}
-  | FreeVerse {maxLineLen: Int, lines: Array.Array FreeVerseLine }
+  | FreeVerse {maxLineLen: Int, lines: Array.Array FreeVerseLine, composite : Array.Array CompositeLine }
 
 emptyPoem = GenericPoem {maxLineLen = 0, lines = Array.empty}
 
@@ -433,16 +433,19 @@ ghazalProcess pom oldPom =
 fvGetData p =
   case p of
     FreeVerse data -> data 
-    _ -> { maxLineLen = 0, lines = Array.empty}
+    _ -> { maxLineLen = 0, lines = Array.empty, composite = Array.empty}
 
 fvLineFromLine l =
   FreeVerseLine l False
+
+fvLineFromLineWFlag l f =
+  FreeVerseLine l f
 
 fvProcess pom oldPom =
   let
     basic = genericGetData (processPoem pom oldPom)
   in 
-    FreeVerse {maxLineLen = basic.maxLineLen, lines = Array.map fvLineFromLine basic.lines}
+    FreeVerse {maxLineLen = basic.maxLineLen, lines = Array.map fvLineFromLine basic.lines, composite = Array.empty}
 
 fvSetComposite pom li =
   let 
@@ -450,16 +453,22 @@ fvSetComposite pom li =
     line = Maybe.withDefault (FreeVerseLine emptyLine False) (Array.get li data.lines)
     newLine = FreeVerseLine line.line (not line.isComposite)
     newLines = Array.set li newLine data.lines
+    composite = fvCalcCompositeRhythm newLines 0 Array.empty False
   in
-    FreeVerse {maxLineLen = data.maxLineLen, lines = newLines}
+    FreeVerse {maxLineLen = data.maxLineLen, lines = newLines, composite = composite}
 
-fvAddComposite compsiteLines li rhythm =
-  Array.push (CompositeLine li rhythm 0 True) compsiteLines
+fvAddComposite compsiteLines li r0 r1 =
+  let
+    c = CompositeLine li r0 0 True
+    c1 = CompositeLine li (r0+r1) 0 True 
+  in
+    Array.push c1 compsiteLines
 
 fvCalcCompositeRhythm lines li compsiteLines inProgress =
   let 
     line = Maybe.withDefault (FreeVerseLine emptyLine False) (Array.get li lines)
-    addedComposites = fvAddComposite compsiteLines li line.line.rhythmTotal
+    line0 = Maybe.withDefault (FreeVerseLine emptyLine False) (Array.get (li-1) lines)
+    addedComposites = fvAddComposite compsiteLines (li-1) line0.line.rhythmTotal line.line.rhythmTotal
     compositesLastI = (Array.length compsiteLines) - 1
     composite = Maybe.withDefault (CompositeLine -1 0 0 True) (Array.get compositesLastI compsiteLines)
     newComposite = CompositeLine composite.originalLineI (composite.rhythm + line.line.rhythmTotal) 0 True
@@ -514,7 +523,7 @@ adjustMaatraaPoem poem li ci =
     lines = case poem of
       GenericPoem data -> data.lines
       Ghazal data -> Array.map .line data.lines
-      _ -> Array.empty
+      FreeVerse data -> Array.map .line data.lines
     oldLine = Maybe.withDefault emptyLine (Array.get li lines)
     newLine = adjustMaatraaLine oldLine ci
     newLines = Array.set li newLine lines
@@ -523,7 +532,7 @@ adjustMaatraaPoem poem li ci =
     case poem of
       GenericPoem _ -> GenericPoem {maxLineLen = newMaxLineLen, lines = newLines}
       Ghazal data -> Ghazal {data | maxLineLen = newMaxLineLen, lines = (Array.map2 misraaFromPoemLineWRK newLines (Array.map .rkUnits data.lines))}
-      _ -> GenericPoem {maxLineLen = newMaxLineLen, lines = newLines}
+      FreeVerse data -> FreeVerse {data | maxLineLen = newMaxLineLen, lines = (Array.map2 fvLineFromLineWFlag newLines (Array.map .isComposite data.lines))}
 
 
 -- ELM ARCHITECTURE
@@ -672,11 +681,19 @@ encodeGhazal m l =
     , ("poemType", E.string "GHAZAL")
     ]
 
-encodeFreeVerse m l =
+encodeComposite c =
+  E.object
+    [ ("originalLineIdx", E.int c.originalLineI)
+    , ("rhythmAmtCumulative", E.int c.rhythm)
+    , ("remainder", E.int c.remainder)
+    , ("multipleOfBaseCount", E.bool c.multipleOfBase)
+    ]
+
+encodeFreeVerse m l c =
   E.object
     [ ("maxLineLen", E.int m)
     , ("lines", E.array encodeFVLine l)
-    , ("compositeLines", E.array E.string Array.empty)
+    , ("compositeLines", E.array encodeComposite c)
     , ("poemType", E.string "FREEVERSE")
     ]
 
@@ -684,7 +701,7 @@ encodePoem p =
   case p of
     GenericPoem data -> encodeGeneric data.maxLineLen data.lines  
     Ghazal data -> encodeGhazal data.maxLineLen data.lines
-    FreeVerse data -> encodeFreeVerse data.maxLineLen data.lines
+    FreeVerse data -> encodeFreeVerse data.maxLineLen data.lines data.composite
 
 encodeModel : Model -> E.Value
 encodeModel model =

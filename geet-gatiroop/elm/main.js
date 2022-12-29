@@ -5363,7 +5363,6 @@ var $elm$json$Json$Encode$array = F2(
 				entries));
 	});
 var $elm$json$Json$Encode$bool = _Json_wrap;
-var $author$project$Main$Half = {$: 'Half'};
 var $elm$json$Json$Encode$int = _Json_wrap;
 var $elm$json$Json$Encode$object = function (pairs) {
 	return _Json_wrap(
@@ -5378,6 +5377,25 @@ var $elm$json$Json$Encode$object = function (pairs) {
 			_Json_emptyObject(_Utils_Tuple0),
 			pairs));
 };
+var $author$project$Main$encodeComposite = function (c) {
+	return $elm$json$Json$Encode$object(
+		_List_fromArray(
+			[
+				_Utils_Tuple2(
+				'originalLineIdx',
+				$elm$json$Json$Encode$int(c.originalLineI)),
+				_Utils_Tuple2(
+				'rhythmAmtCumulative',
+				$elm$json$Json$Encode$int(c.rhythm)),
+				_Utils_Tuple2(
+				'remainder',
+				$elm$json$Json$Encode$int(c.remainder)),
+				_Utils_Tuple2(
+				'multipleOfBaseCount',
+				$elm$json$Json$Encode$bool(c.multipleOfBase))
+			]));
+};
+var $author$project$Main$Half = {$: 'Half'};
 var $elm$json$Json$Encode$string = _Json_wrap;
 var $author$project$Main$encodeAkshar = function (a) {
 	return $elm$json$Json$Encode$object(
@@ -5412,8 +5430,8 @@ var $author$project$Main$encodeFVLine = function (fvl) {
 				$elm$json$Json$Encode$bool(fvl.isComposite))
 			]));
 };
-var $author$project$Main$encodeFreeVerse = F2(
-	function (m, l) {
+var $author$project$Main$encodeFreeVerse = F3(
+	function (m, l, c) {
 		return $elm$json$Json$Encode$object(
 			_List_fromArray(
 				[
@@ -5425,7 +5443,7 @@ var $author$project$Main$encodeFreeVerse = F2(
 					A2($elm$json$Json$Encode$array, $author$project$Main$encodeFVLine, l)),
 					_Utils_Tuple2(
 					'compositeLines',
-					A2($elm$json$Json$Encode$array, $elm$json$Json$Encode$string, $elm$core$Array$empty)),
+					A2($elm$json$Json$Encode$array, $author$project$Main$encodeComposite, c)),
 					_Utils_Tuple2(
 					'poemType',
 					$elm$json$Json$Encode$string('FREEVERSE'))
@@ -5574,7 +5592,7 @@ var $author$project$Main$encodePoem = function (p) {
 			return A2($author$project$Main$encodeGhazal, data.maxLineLen, data.lines);
 		default:
 			var data = p.a;
-			return A2($author$project$Main$encodeFreeVerse, data.maxLineLen, data.lines);
+			return A3($author$project$Main$encodeFreeVerse, data.maxLineLen, data.lines, data.composite);
 	}
 };
 var $author$project$Main$encodeModel = function (model) {
@@ -5593,6 +5611,9 @@ var $author$project$Main$encodeModel = function (model) {
 			]));
 };
 var $author$project$Main$givePoemRhythm = _Platform_outgoingPort('givePoemRhythm', $elm$core$Basics$identity);
+var $author$project$Main$FreeVerse = function (a) {
+	return {$: 'FreeVerse', a: a};
+};
 var $author$project$Main$Ghazal = function (a) {
 	return {$: 'Ghazal', a: a};
 };
@@ -5734,6 +5755,14 @@ var $author$project$Main$adjustMaatraaLine = F2(
 		return A3($author$project$Main$PoemLine, oldLine.str, newRhythm, newAkshars);
 	});
 var $author$project$Main$emptyLine = A3($author$project$Main$PoemLine, '', 0, $elm$core$Array$empty);
+var $author$project$Main$FreeVerseLine = F2(
+	function (line, isComposite) {
+		return {isComposite: isComposite, line: line};
+	});
+var $author$project$Main$fvLineFromLineWFlag = F2(
+	function (l, f) {
+		return A2($author$project$Main$FreeVerseLine, l, f);
+	});
 var $author$project$Main$getBiggerLine = F2(
 	function (line1, line2) {
 		return (_Utils_cmp(line1.rhythmTotal, line2.rhythmTotal) > 0) ? line1 : line2;
@@ -5790,7 +5819,13 @@ var $author$project$Main$adjustMaatraaPoem = F3(
 						},
 						data.lines);
 				default:
-					return $elm$core$Array$empty;
+					var data = poem.a;
+					return A2(
+						$elm$core$Array$map,
+						function ($) {
+							return $.line;
+						},
+						data.lines);
 			}
 		}();
 		var oldLine = A2(
@@ -5823,8 +5858,23 @@ var $author$project$Main$adjustMaatraaPoem = F3(
 							maxLineLen: newMaxLineLen
 						}));
 			default:
-				return $author$project$Main$GenericPoem(
-					{lines: newLines, maxLineLen: newMaxLineLen});
+				var data = poem.a;
+				return $author$project$Main$FreeVerse(
+					_Utils_update(
+						data,
+						{
+							lines: A3(
+								$elm_community$array_extra$Array$Extra$map2,
+								$author$project$Main$fvLineFromLineWFlag,
+								newLines,
+								A2(
+									$elm$core$Array$map,
+									function ($) {
+										return $.isComposite;
+									},
+									data.lines)),
+							maxLineLen: newMaxLineLen
+						}));
 		}
 	});
 var $author$project$Main$IncomingPoem = F2(
@@ -5848,91 +5898,9 @@ var $author$project$Main$decodeWhichChar = A3(
 	$author$project$Main$WhichChar,
 	A2($elm$json$Json$Decode$field, 'lineI', $elm$json$Json$Decode$int),
 	A2($elm$json$Json$Decode$field, 'charI', $elm$json$Json$Decode$int));
-var $author$project$Main$FreeVerse = function (a) {
-	return {$: 'FreeVerse', a: a};
-};
-var $author$project$Main$FreeVerseLine = F2(
-	function (line, isComposite) {
-		return {isComposite: isComposite, line: line};
-	});
-var $author$project$Main$fvGetData = function (p) {
-	if (p.$ === 'FreeVerse') {
-		var data = p.a;
-		return data;
-	} else {
-		return {lines: $elm$core$Array$empty, maxLineLen: 0};
-	}
-};
-var $elm$core$Basics$not = _Basics_not;
-var $author$project$Main$fvSetComposite = F2(
-	function (pom, li) {
-		var data = $author$project$Main$fvGetData(pom);
-		var line = A2(
-			$elm$core$Maybe$withDefault,
-			A2($author$project$Main$FreeVerseLine, $author$project$Main$emptyLine, false),
-			A2($elm$core$Array$get, li, data.lines));
-		var newLine = A2($author$project$Main$FreeVerseLine, line.line, !line.isComposite);
-		var newLines = A3($elm$core$Array$set, li, newLine, data.lines);
-		return $author$project$Main$FreeVerse(
-			{lines: newLines, maxLineLen: data.maxLineLen});
-	});
-var $author$project$Main$genericGetData = function (p) {
-	switch (p.$) {
-		case 'GenericPoem':
-			var data = p.a;
-			return data;
-		case 'Ghazal':
-			var data = p.a;
-			return {
-				lines: A2(
-					$elm$core$Array$map,
-					function ($) {
-						return $.line;
-					},
-					data.lines),
-				maxLineLen: data.maxLineLen
-			};
-		default:
-			var data = p.a;
-			return {
-				lines: A2(
-					$elm$core$Array$map,
-					function ($) {
-						return $.line;
-					},
-					data.lines),
-				maxLineLen: data.maxLineLen
-			};
-	}
-};
-var $elm$core$Basics$negate = function (n) {
-	return -n;
-};
-var $author$project$Main$fvLineFromLine = function (l) {
-	return A2($author$project$Main$FreeVerseLine, l, false);
-};
-var $elm$core$Elm$JsArray$appendN = _JsArray_appendN;
-var $elm$core$Elm$JsArray$slice = _JsArray_slice;
-var $elm$core$Array$appendHelpBuilder = F2(
-	function (tail, builder) {
-		var tailLen = $elm$core$Elm$JsArray$length(tail);
-		var notAppended = ($elm$core$Array$branchFactor - $elm$core$Elm$JsArray$length(builder.tail)) - tailLen;
-		var appended = A3($elm$core$Elm$JsArray$appendN, $elm$core$Array$branchFactor, builder.tail, tail);
-		return (notAppended < 0) ? {
-			nodeList: A2(
-				$elm$core$List$cons,
-				$elm$core$Array$Leaf(appended),
-				builder.nodeList),
-			nodeListSize: builder.nodeListSize + 1,
-			tail: A3($elm$core$Elm$JsArray$slice, notAppended, tailLen, tail)
-		} : ((!notAppended) ? {
-			nodeList: A2(
-				$elm$core$List$cons,
-				$elm$core$Array$Leaf(appended),
-				builder.nodeList),
-			nodeListSize: builder.nodeListSize + 1,
-			tail: $elm$core$Elm$JsArray$empty
-		} : {nodeList: builder.nodeList, nodeListSize: builder.nodeListSize, tail: appended});
+var $author$project$Main$CompositeLine = F4(
+	function (originalLineI, rhythm, remainder, multipleOfBase) {
+		return {multipleOfBase: multipleOfBase, originalLineI: originalLineI, remainder: remainder, rhythm: rhythm};
 	});
 var $elm$core$Elm$JsArray$push = _JsArray_push;
 var $elm$core$Elm$JsArray$singleton = _JsArray_singleton;
@@ -6003,6 +5971,165 @@ var $elm$core$Array$unsafeReplaceTail = F2(
 		} else {
 			return A4($elm$core$Array$Array_elm_builtin, newArrayLen, startShift, tree, newTail);
 		}
+	});
+var $elm$core$Array$push = F2(
+	function (a, array) {
+		var tail = array.d;
+		return A2(
+			$elm$core$Array$unsafeReplaceTail,
+			A2($elm$core$Elm$JsArray$push, a, tail),
+			array);
+	});
+var $author$project$Main$fvAddComposite = F4(
+	function (compsiteLines, li, r0, r1) {
+		var c1 = A4($author$project$Main$CompositeLine, li, r0 + r1, 0, true);
+		var c = A4($author$project$Main$CompositeLine, li, r0, 0, true);
+		return A2($elm$core$Array$push, c1, compsiteLines);
+	});
+var $elm$core$Array$length = function (_v0) {
+	var len = _v0.a;
+	return len;
+};
+var $elm$core$Basics$negate = function (n) {
+	return -n;
+};
+var $elm$core$Basics$not = _Basics_not;
+var $author$project$Main$fvCalcCompositeRhythm = F4(
+	function (lines, li, compsiteLines, inProgress) {
+		fvCalcCompositeRhythm:
+		while (true) {
+			var line0 = A2(
+				$elm$core$Maybe$withDefault,
+				A2($author$project$Main$FreeVerseLine, $author$project$Main$emptyLine, false),
+				A2($elm$core$Array$get, li - 1, lines));
+			var line = A2(
+				$elm$core$Maybe$withDefault,
+				A2($author$project$Main$FreeVerseLine, $author$project$Main$emptyLine, false),
+				A2($elm$core$Array$get, li, lines));
+			var compositesLastI = $elm$core$Array$length(compsiteLines) - 1;
+			var composite = A2(
+				$elm$core$Maybe$withDefault,
+				A4($author$project$Main$CompositeLine, -1, 0, 0, true),
+				A2($elm$core$Array$get, compositesLastI, compsiteLines));
+			var newComposite = A4($author$project$Main$CompositeLine, composite.originalLineI, composite.rhythm + line.line.rhythmTotal, 0, true);
+			var updatedComposites = A3($elm$core$Array$set, compositesLastI, newComposite, compsiteLines);
+			var addedComposites = A4($author$project$Main$fvAddComposite, compsiteLines, li - 1, line0.line.rhythmTotal, line.line.rhythmTotal);
+			if (_Utils_cmp(
+				li,
+				$elm$core$Array$length(lines)) > 0) {
+				return compsiteLines;
+			} else {
+				if (line.isComposite) {
+					if (!inProgress) {
+						var $temp$lines = lines,
+							$temp$li = li + 1,
+							$temp$compsiteLines = addedComposites,
+							$temp$inProgress = true;
+						lines = $temp$lines;
+						li = $temp$li;
+						compsiteLines = $temp$compsiteLines;
+						inProgress = $temp$inProgress;
+						continue fvCalcCompositeRhythm;
+					} else {
+						var $temp$lines = lines,
+							$temp$li = li + 1,
+							$temp$compsiteLines = updatedComposites,
+							$temp$inProgress = true;
+						lines = $temp$lines;
+						li = $temp$li;
+						compsiteLines = $temp$compsiteLines;
+						inProgress = $temp$inProgress;
+						continue fvCalcCompositeRhythm;
+					}
+				} else {
+					var $temp$lines = lines,
+						$temp$li = li + 1,
+						$temp$compsiteLines = compsiteLines,
+						$temp$inProgress = false;
+					lines = $temp$lines;
+					li = $temp$li;
+					compsiteLines = $temp$compsiteLines;
+					inProgress = $temp$inProgress;
+					continue fvCalcCompositeRhythm;
+				}
+			}
+		}
+	});
+var $author$project$Main$fvGetData = function (p) {
+	if (p.$ === 'FreeVerse') {
+		var data = p.a;
+		return data;
+	} else {
+		return {composite: $elm$core$Array$empty, lines: $elm$core$Array$empty, maxLineLen: 0};
+	}
+};
+var $author$project$Main$fvSetComposite = F2(
+	function (pom, li) {
+		var data = $author$project$Main$fvGetData(pom);
+		var line = A2(
+			$elm$core$Maybe$withDefault,
+			A2($author$project$Main$FreeVerseLine, $author$project$Main$emptyLine, false),
+			A2($elm$core$Array$get, li, data.lines));
+		var newLine = A2($author$project$Main$FreeVerseLine, line.line, !line.isComposite);
+		var newLines = A3($elm$core$Array$set, li, newLine, data.lines);
+		var composite = A4($author$project$Main$fvCalcCompositeRhythm, newLines, 0, $elm$core$Array$empty, false);
+		return $author$project$Main$FreeVerse(
+			{composite: composite, lines: newLines, maxLineLen: data.maxLineLen});
+	});
+var $author$project$Main$genericGetData = function (p) {
+	switch (p.$) {
+		case 'GenericPoem':
+			var data = p.a;
+			return data;
+		case 'Ghazal':
+			var data = p.a;
+			return {
+				lines: A2(
+					$elm$core$Array$map,
+					function ($) {
+						return $.line;
+					},
+					data.lines),
+				maxLineLen: data.maxLineLen
+			};
+		default:
+			var data = p.a;
+			return {
+				lines: A2(
+					$elm$core$Array$map,
+					function ($) {
+						return $.line;
+					},
+					data.lines),
+				maxLineLen: data.maxLineLen
+			};
+	}
+};
+var $author$project$Main$fvLineFromLine = function (l) {
+	return A2($author$project$Main$FreeVerseLine, l, false);
+};
+var $elm$core$Elm$JsArray$appendN = _JsArray_appendN;
+var $elm$core$Elm$JsArray$slice = _JsArray_slice;
+var $elm$core$Array$appendHelpBuilder = F2(
+	function (tail, builder) {
+		var tailLen = $elm$core$Elm$JsArray$length(tail);
+		var notAppended = ($elm$core$Array$branchFactor - $elm$core$Elm$JsArray$length(builder.tail)) - tailLen;
+		var appended = A3($elm$core$Elm$JsArray$appendN, $elm$core$Array$branchFactor, builder.tail, tail);
+		return (notAppended < 0) ? {
+			nodeList: A2(
+				$elm$core$List$cons,
+				$elm$core$Array$Leaf(appended),
+				builder.nodeList),
+			nodeListSize: builder.nodeListSize + 1,
+			tail: A3($elm$core$Elm$JsArray$slice, notAppended, tailLen, tail)
+		} : ((!notAppended) ? {
+			nodeList: A2(
+				$elm$core$List$cons,
+				$elm$core$Array$Leaf(appended),
+				builder.nodeList),
+			nodeListSize: builder.nodeListSize + 1,
+			tail: $elm$core$Elm$JsArray$empty
+		} : {nodeList: builder.nodeList, nodeListSize: builder.nodeListSize, tail: appended});
 	});
 var $elm$core$Array$appendHelpTree = F2(
 	function (toAppend, array) {
@@ -6084,10 +6211,6 @@ var $elm$core$Array$append = F2(
 						bTree)));
 		}
 	});
-var $elm$core$Array$length = function (_v0) {
-	var len = _v0.a;
-	return len;
-};
 var $elm$core$String$lines = _String_lines;
 var $elm$core$Basics$neq = _Utils_notEqual;
 var $author$project$Main$calcHalfAksharRhythm = F3(
@@ -6156,14 +6279,6 @@ var $author$project$Main$mrgMCakshar = F2(
 			_Utils_update(
 				aC,
 				{aksharType: $author$project$Main$Half})) : _Utils_Tuple2(false, aL));
-	});
-var $elm$core$Array$push = F2(
-	function (a, array) {
-		var tail = array.d;
-		return A2(
-			$elm$core$Array$unsafeReplaceTail,
-			A2($elm$core$Elm$JsArray$push, a, tail),
-			array);
 	});
 var $elm$core$Tuple$second = function (_v0) {
 	var y = _v0.b;
@@ -6434,6 +6549,7 @@ var $author$project$Main$fvProcess = F2(
 			A2($author$project$Main$processPoem, pom, oldPom));
 		return $author$project$Main$FreeVerse(
 			{
+				composite: $elm$core$Array$empty,
 				lines: A2($elm$core$Array$map, $author$project$Main$fvLineFromLine, basic.lines),
 				maxLineLen: basic.maxLineLen
 			});
