@@ -528,11 +528,15 @@ adjustMaatraaPoem poem li ci =
     newLine = adjustMaatraaLine oldLine ci
     newLines = Array.set li newLine lines
     newMaxLineLen = getMaxLineLen newLines
+    finalFVLines = 
+      case poem of
+        FreeVerse data -> Array.map2 fvLineFromLineWFlag newLines (Array.map .isComposite data.lines)
+        _ -> Array.map fvLineFromLine newLines
   in
     case poem of
       GenericPoem _ -> GenericPoem {maxLineLen = newMaxLineLen, lines = newLines}
       Ghazal data -> Ghazal {data | maxLineLen = newMaxLineLen, lines = (Array.map2 misraaFromPoemLineWRK newLines (Array.map .rkUnits data.lines))}
-      FreeVerse data -> FreeVerse {data | maxLineLen = newMaxLineLen, lines = (Array.map2 fvLineFromLineWFlag newLines (Array.map .isComposite data.lines))}
+      FreeVerse data -> FreeVerse {maxLineLen = newMaxLineLen, lines = finalFVLines, composite = fvCalcCompositeRhythm finalFVLines 0 Array.empty False}
 
 
 -- ELM ARCHITECTURE
