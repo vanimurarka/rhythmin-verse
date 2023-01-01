@@ -6086,35 +6086,6 @@ var $author$project$Main$fvSetComposite = F2(
 		return $author$project$Main$FreeVerse(
 			{composite: composite, lines: newLines, maxLineLen: data.maxLineLen});
 	});
-var $author$project$Main$genericGetData = function (p) {
-	switch (p.$) {
-		case 'GenericPoem':
-			var data = p.a;
-			return data;
-		case 'Ghazal':
-			var data = p.a;
-			return {
-				lines: A2(
-					$elm$core$Array$map,
-					function ($) {
-						return $.line;
-					},
-					data.lines),
-				maxLineLen: data.maxLineLen
-			};
-		default:
-			var data = p.a;
-			return {
-				lines: A2(
-					$elm$core$Array$map,
-					function ($) {
-						return $.line;
-					},
-					data.lines),
-				maxLineLen: data.maxLineLen
-			};
-	}
-};
 var $elm$core$Elm$JsArray$appendN = _JsArray_appendN;
 var $elm$core$Elm$JsArray$slice = _JsArray_slice;
 var $elm$core$Array$appendHelpBuilder = F2(
@@ -6218,6 +6189,35 @@ var $elm$core$Array$append = F2(
 						bTree)));
 		}
 	});
+var $author$project$Main$genericGetData = function (p) {
+	switch (p.$) {
+		case 'GenericPoem':
+			var data = p.a;
+			return data;
+		case 'Ghazal':
+			var data = p.a;
+			return {
+				lines: A2(
+					$elm$core$Array$map,
+					function ($) {
+						return $.line;
+					},
+					data.lines),
+				maxLineLen: data.maxLineLen
+			};
+		default:
+			var data = p.a;
+			return {
+				lines: A2(
+					$elm$core$Array$map,
+					function ($) {
+						return $.line;
+					},
+					data.lines),
+				maxLineLen: data.maxLineLen
+			};
+	}
+};
 var $elm$core$String$lines = _String_lines;
 var $elm$core$Basics$neq = _Utils_notEqual;
 var $author$project$Main$calcHalfAksharRhythm = F3(
@@ -6552,14 +6552,25 @@ var $author$project$Main$processPoem = F2(
 	});
 var $author$project$Main$fvProcess = F2(
 	function (pom, oldPom) {
-		var basic = $author$project$Main$genericGetData(
-			A2($author$project$Main$processPoem, pom, oldPom));
+		var oldFVData = $author$project$Main$fvGetData(oldPom);
+		var oldFVFlags = A2(
+			$elm$core$Array$map,
+			function ($) {
+				return $.isComposite;
+			},
+			oldFVData.lines);
+		var basicOldLines = $author$project$Main$genericGetData(oldPom).lines;
+		var basicProcessed = $author$project$Main$genericGetData(
+			A2($author$project$Main$processPoem, pom, basicOldLines));
+		var diff = $elm$core$Array$length(basicProcessed.lines) - $elm$core$Array$length(oldFVData.lines);
+		var paddedOldFlags = (diff > 0) ? A2(
+			$elm$core$Array$append,
+			oldFVFlags,
+			A2($elm$core$Array$repeat, diff, false)) : oldFVFlags;
+		var newFVLines = A3($elm_community$array_extra$Array$Extra$map2, $author$project$Main$fvLineFromLineWFlag, basicProcessed.lines, paddedOldFlags);
+		var composite = A4($author$project$Main$fvCalcCompositeRhythm, newFVLines, 0, $elm$core$Array$empty, false);
 		return $author$project$Main$FreeVerse(
-			{
-				composite: $elm$core$Array$empty,
-				lines: A2($elm$core$Array$map, $author$project$Main$fvLineFromLine, basic.lines),
-				maxLineLen: basic.maxLineLen
-			});
+			{composite: composite, lines: newFVLines, maxLineLen: basicProcessed.maxLineLen});
 	});
 var $author$project$Main$aksharVowelCompare = F2(
 	function (a, b) {
@@ -7061,11 +7072,17 @@ var $author$project$Main$preProcessPoem = F3(
 	function (pom, oldpom, pomType) {
 		switch (pomType) {
 			case 'GHAZAL':
-				return A2($author$project$Main$ghazalProcess, pom, oldpom.lines);
+				return A2(
+					$author$project$Main$ghazalProcess,
+					pom,
+					$author$project$Main$genericGetData(oldpom).lines);
 			case 'FREEVERSE':
-				return A2($author$project$Main$fvProcess, pom, oldpom.lines);
+				return A2($author$project$Main$fvProcess, pom, oldpom);
 			default:
-				return A2($author$project$Main$processPoem, pom, oldpom.lines);
+				return A2(
+					$author$project$Main$processPoem,
+					pom,
+					$author$project$Main$genericGetData(oldpom).lines);
 		}
 	});
 var $elm$core$String$toUpper = _String_toUpper;
@@ -7074,7 +7091,7 @@ var $author$project$Main$update = F2(
 		switch (msg.$) {
 			case 'ProcessPoem':
 				var str = msg.a;
-				var oldPoem = $author$project$Main$genericGetData(model.processedPoem);
+				var oldPoem = model.processedPoem;
 				var incomingPoem = function () {
 					var _v1 = A2($elm$json$Json$Decode$decodeString, $author$project$Main$decodeIncomingPoem, str);
 					if (_v1.$ === 'Ok') {

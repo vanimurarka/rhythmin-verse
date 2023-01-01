@@ -443,9 +443,17 @@ fvLineFromLineWFlag l f =
 
 fvProcess pom oldPom =
   let
-    basic = genericGetData (processPoem pom oldPom)
+    basicOldLines = (genericGetData oldPom).lines
+    basicProcessed = genericGetData (processPoem pom basicOldLines)
+    oldFVData = fvGetData oldPom
+    diff = (Array.length basicProcessed.lines) - (Array.length oldFVData.lines)
+    oldFVFlags = Array.map .isComposite oldFVData.lines
+    paddedOldFlags = if (diff > 0) then Array.append oldFVFlags (Array.repeat diff False) else oldFVFlags
+    newFVLines = Array.map2 fvLineFromLineWFlag basicProcessed.lines paddedOldFlags
+    composite = fvCalcCompositeRhythm newFVLines 0 Array.empty False
+    --fvdatainstr = Debug.log "oldFVData " (Debug.toString fvdata)
   in 
-    FreeVerse {maxLineLen = basic.maxLineLen, lines = Array.map fvLineFromLine basic.lines, composite = Array.empty}
+    FreeVerse {maxLineLen = basicProcessed.maxLineLen, lines = newFVLines, composite = composite}
 
 fvSetComposite pom li =
   let 
@@ -489,9 +497,10 @@ fvCalcCompositeRhythm lines li compsiteLines inProgress =
 
 preProcessPoem pom oldpom pomType =
   case pomType of
-    "GHAZAL" -> ghazalProcess pom oldpom.lines
-    "FREEVERSE" -> fvProcess pom oldpom.lines
-    _ -> processPoem pom oldpom.lines
+    "GHAZAL" -> 
+        ghazalProcess pom (genericGetData oldpom).lines
+    "FREEVERSE" -> fvProcess pom oldpom 
+    _ -> processPoem pom (genericGetData oldpom).lines
 
 
 adjustMaatraaChar a =
@@ -574,7 +583,8 @@ update msg model =
           Ok result -> result
           Err _ -> {poem = "", poemType = ""}
         poemType = String.toUpper incomingPoem.poemType
-        oldPoem = genericGetData model.processedPoem
+        --oldPoem = genericGetData model.processedPoem
+        oldPoem = model.processedPoem
       in
       ({ model | 
         poem = incomingPoem.poem, 
