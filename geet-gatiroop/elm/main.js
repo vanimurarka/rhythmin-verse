@@ -5315,6 +5315,9 @@ var $author$project$Main$AdjustMaatraa = function (a) {
 var $author$project$Main$ProcessPoem = function (a) {
 	return {$: 'ProcessPoem', a: a};
 };
+var $author$project$Main$SetBase = function (a) {
+	return {$: 'SetBase', a: a};
+};
 var $author$project$Main$SetComposite = function (a) {
 	return {$: 'SetComposite', a: a};
 };
@@ -5322,6 +5325,7 @@ var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$json$Json$Decode$string = _Json_decodeString;
 var $author$project$Main$getMaatraaChange = _Platform_incomingPort('getMaatraaChange', $elm$json$Json$Decode$string);
 var $author$project$Main$getPoem = _Platform_incomingPort('getPoem', $elm$json$Json$Decode$string);
+var $author$project$Main$setBase = _Platform_incomingPort('setBase', $elm$json$Json$Decode$string);
 var $author$project$Main$setComposite = _Platform_incomingPort('setComposite', $elm$json$Json$Decode$string);
 var $author$project$Main$subscriptions = function (_v0) {
 	return $elm$core$Platform$Sub$batch(
@@ -5329,7 +5333,8 @@ var $author$project$Main$subscriptions = function (_v0) {
 			[
 				$author$project$Main$getPoem($author$project$Main$ProcessPoem),
 				$author$project$Main$getMaatraaChange($author$project$Main$AdjustMaatraa),
-				$author$project$Main$setComposite($author$project$Main$SetComposite)
+				$author$project$Main$setComposite($author$project$Main$SetComposite),
+				$author$project$Main$setBase($author$project$Main$SetBase)
 			]));
 };
 var $elm$core$Elm$JsArray$foldl = _JsArray_foldl;
@@ -6038,6 +6043,7 @@ var $author$project$Main$adjustMaatraaPoem = F3(
 				var data = poem.a;
 				return $author$project$Main$FreeVerse(
 					{
+						baseCount: data.baseCount,
 						composite: A4($author$project$Main$fvCalcCompositeRhythm, finalFVLines, 0, $elm$core$Array$empty, false),
 						lines: finalFVLines,
 						maxLineLen: newMaxLineLen
@@ -6065,14 +6071,64 @@ var $author$project$Main$decodeWhichChar = A3(
 	$author$project$Main$WhichChar,
 	A2($elm$json$Json$Decode$field, 'lineI', $elm$json$Json$Decode$int),
 	A2($elm$json$Json$Decode$field, 'charI', $elm$json$Json$Decode$int));
+var $elm$core$Basics$neq = _Utils_notEqual;
+var $author$project$Main$fvCalcRemainderSingle = F2(
+	function (compositeLine, baseCount) {
+		var rhy = compositeLine.rhythm;
+		var quo = rhy / baseCount;
+		var intQuo = (rhy / baseCount) | 0;
+		var r = quo - intQuo;
+		var useR = (r < 0.5) ? (rhy - (intQuo * baseCount)) : ((((intQuo + 1) * baseCount) - rhy) * (-1));
+		return (!(!useR)) ? _Utils_update(
+			compositeLine,
+			{multipleOfBase: false, remainder: useR}) : compositeLine;
+	});
+var $author$project$Main$fvCalcRemainderWhole = F3(
+	function (composites, baseCount, i) {
+		fvCalcRemainderWhole:
+		while (true) {
+			var line = A2(
+				$elm$core$Maybe$withDefault,
+				A4($author$project$Main$CompositeLine, 0, 0, 0, false),
+				A2($elm$core$Array$get, i, composites));
+			var newLine = A2($author$project$Main$fvCalcRemainderSingle, line, baseCount);
+			var newComposites = A3($elm$core$Array$set, i, newLine, composites);
+			if (baseCount === 1) {
+				return composites;
+			} else {
+				if (_Utils_eq(
+					i,
+					$elm$core$Array$length(composites))) {
+					return composites;
+				} else {
+					var $temp$composites = newComposites,
+						$temp$baseCount = baseCount,
+						$temp$i = i + 1;
+					composites = $temp$composites;
+					baseCount = $temp$baseCount;
+					i = $temp$i;
+					continue fvCalcRemainderWhole;
+				}
+			}
+		}
+	});
 var $author$project$Main$fvGetData = function (p) {
 	if (p.$ === 'FreeVerse') {
 		var data = p.a;
 		return data;
 	} else {
-		return {composite: $elm$core$Array$empty, lines: $elm$core$Array$empty, maxLineLen: 0};
+		return {baseCount: 1, composite: $elm$core$Array$empty, lines: $elm$core$Array$empty, maxLineLen: 0};
 	}
 };
+var $author$project$Main$fvSetBase = F2(
+	function (pom, base) {
+		var data = $author$project$Main$fvGetData(pom);
+		var compositeWRemainder = A3($author$project$Main$fvCalcRemainderWhole, data.composite, base, 0);
+		return $author$project$Main$FreeVerse(
+			_Utils_update(
+				data,
+				{baseCount: base, composite: compositeWRemainder}));
+	});
 var $author$project$Main$fvSetComposite = F2(
 	function (pom, li) {
 		var data = $author$project$Main$fvGetData(pom);
@@ -6083,8 +6139,9 @@ var $author$project$Main$fvSetComposite = F2(
 		var newLine = A2($author$project$Main$FreeVerseLine, line.line, !line.isComposite);
 		var newLines = A3($elm$core$Array$set, li, newLine, data.lines);
 		var composite = A4($author$project$Main$fvCalcCompositeRhythm, newLines, 0, $elm$core$Array$empty, false);
+		var compositeWRemainder = A3($author$project$Main$fvCalcRemainderWhole, composite, data.baseCount, 0);
 		return $author$project$Main$FreeVerse(
-			{composite: composite, lines: newLines, maxLineLen: data.maxLineLen});
+			{baseCount: data.baseCount, composite: compositeWRemainder, lines: newLines, maxLineLen: data.maxLineLen});
 	});
 var $elm$core$Elm$JsArray$appendN = _JsArray_appendN;
 var $elm$core$Elm$JsArray$slice = _JsArray_slice;
@@ -6219,7 +6276,6 @@ var $author$project$Main$genericGetData = function (p) {
 	}
 };
 var $elm$core$String$lines = _String_lines;
-var $elm$core$Basics$neq = _Utils_notEqual;
 var $author$project$Main$calcHalfAksharRhythm = F3(
 	function (ac, ap, an) {
 		return (!_Utils_eq(ac.aksharType, $author$project$Main$Half)) ? ac : (((_Utils_eq(
@@ -6569,8 +6625,9 @@ var $author$project$Main$fvProcess = F2(
 			A2($elm$core$Array$repeat, diff, false)) : oldFVFlags;
 		var newFVLines = A3($elm_community$array_extra$Array$Extra$map2, $author$project$Main$fvLineFromLineWFlag, basicProcessed.lines, paddedOldFlags);
 		var composite = A4($author$project$Main$fvCalcCompositeRhythm, newFVLines, 0, $elm$core$Array$empty, false);
+		var compositeWRemainder = A3($author$project$Main$fvCalcRemainderWhole, composite, oldFVData.baseCount, 0);
 		return $author$project$Main$FreeVerse(
-			{composite: composite, lines: newFVLines, maxLineLen: basicProcessed.maxLineLen});
+			{baseCount: oldFVData.baseCount, composite: compositeWRemainder, lines: newFVLines, maxLineLen: basicProcessed.maxLineLen});
 	});
 var $author$project$Main$aksharVowelCompare = F2(
 	function (a, b) {
@@ -7130,7 +7187,7 @@ var $author$project$Main$update = F2(
 							processedPoem: A3($author$project$Main$adjustMaatraaPoem, model.processedPoem, whichChar.lineI, whichChar.charI)
 						}),
 					$elm$core$Platform$Cmd$none);
-			default:
+			case 'SetComposite':
 				var str = msg.a;
 				var lineI = function () {
 					var _v3 = A2($elm$json$Json$Decode$decodeString, $elm$json$Json$Decode$int, str);
@@ -7147,6 +7204,25 @@ var $author$project$Main$update = F2(
 						{
 							lastAction: 'Composite Set ' + str,
 							processedPoem: A2($author$project$Main$fvSetComposite, model.processedPoem, lineI)
+						}),
+					$elm$core$Platform$Cmd$none);
+			default:
+				var str = msg.a;
+				var base = function () {
+					var _v4 = A2($elm$json$Json$Decode$decodeString, $elm$json$Json$Decode$int, str);
+					if (_v4.$ === 'Ok') {
+						var result = _v4.a;
+						return result;
+					} else {
+						return 1;
+					}
+				}();
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							lastAction: 'BaseCount Set ' + str,
+							processedPoem: A2($author$project$Main$fvSetBase, model.processedPoem, base)
 						}),
 					$elm$core$Platform$Cmd$none);
 		}
@@ -7169,6 +7245,9 @@ var $author$project$Main$updateWithStorage = F2(
 var $elm$html$Html$div = _VirtualDom_node('div');
 var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
 var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
+var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
+var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
+var $elm$core$Debug$toString = _Debug_toString;
 var $author$project$Main$view = function (model) {
 	return A2(
 		$elm$html$Html$div,
@@ -7178,7 +7257,20 @@ var $author$project$Main$view = function (model) {
 				A2($elm$html$Html$Attributes$style, 'color', 'white'),
 				A2($elm$html$Html$Attributes$style, 'padding', '5px')
 			]),
-		_List_Nil);
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						A2($elm$html$Html$Attributes$style, 'padding', 'inherit')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text(
+						$elm$core$Debug$toString(model.processedPoem))
+					]))
+			]));
 };
 var $author$project$Main$main = $elm$browser$Browser$element(
 	{init: $author$project$Main$init, subscriptions: $author$project$Main$subscriptions, update: $author$project$Main$updateWithStorage, view: $author$project$Main$view});

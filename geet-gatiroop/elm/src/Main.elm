@@ -73,7 +73,7 @@ type alias CompositeLine =
 type ProcessedPoem 
   = GenericPoem { maxLineLen : Int, lines : Array.Array PoemLine }
   | Ghazal { maxLineLen: Int, lines: Array.Array Misraa, radeef : Array.Array Akshar, kaafiyaa : Array.Array Akshar}
-  | FreeVerse {maxLineLen: Int, lines: Array.Array FreeVerseLine, composite : Array.Array CompositeLine }
+  | FreeVerse {maxLineLen: Int, lines: Array.Array FreeVerseLine, composite : Array.Array CompositeLine, baseCount : Int }
 
 emptyPoem = GenericPoem {maxLineLen = 0, lines = Array.empty}
 
@@ -433,7 +433,7 @@ ghazalProcess pom oldPom =
 fvGetData p =
   case p of
     FreeVerse data -> data 
-    _ -> { maxLineLen = 0, lines = Array.empty, composite = Array.empty}
+    _ -> { maxLineLen = 0, lines = Array.empty, composite = Array.empty, baseCount = 1}
 
 fvLineFromLine l =
   FreeVerseLine l False
@@ -451,9 +451,9 @@ fvProcess pom oldPom =
     paddedOldFlags = if (diff > 0) then Array.append oldFVFlags (Array.repeat diff False) else oldFVFlags
     newFVLines = Array.map2 fvLineFromLineWFlag basicProcessed.lines paddedOldFlags
     composite = fvCalcCompositeRhythm newFVLines 0 Array.empty False
-    --fvdatainstr = Debug.log "oldFVData " (Debug.toString fvdata)
+    compositeWRemainder = fvCalcRemainderWhole composite oldFVData.baseCount 0
   in 
-    FreeVerse {maxLineLen = basicProcessed.maxLineLen, lines = newFVLines, composite = composite}
+    FreeVerse {maxLineLen = basicProcessed.maxLineLen, lines = newFVLines, composite = compositeWRemainder, baseCount = oldFVData.baseCount}
 
 fvSetComposite pom li =
   let 
@@ -462,8 +462,9 @@ fvSetComposite pom li =
     newLine = FreeVerseLine line.line (not line.isComposite)
     newLines = Array.set li newLine data.lines
     composite = fvCalcCompositeRhythm newLines 0 Array.empty False
+    compositeWRemainder = fvCalcRemainderWhole composite data.baseCount 0
   in
-    FreeVerse {maxLineLen = data.maxLineLen, lines = newLines, composite = composite}
+    FreeVerse {maxLineLen = data.maxLineLen, lines = newLines, composite = compositeWRemainder, baseCount = data.baseCount}
 
 fvAddComposite compsiteLines li r0 r1 =
   let
@@ -492,6 +493,41 @@ fvCalcCompositeRhythm lines li compsiteLines inProgress =
     else
       fvCalcCompositeRhythm lines (li+1) compsiteLines False
 
+fvSetBase pom base =
+  let 
+    data = fvGetData pom
+    compositeWRemainder = fvCalcRemainderWhole data.composite base 0
+  in 
+    FreeVerse  {data | composite = compositeWRemainder, baseCount = base}
+
+fvCalcRemainderWhole composites baseCount i =
+  let
+    line = Maybe.withDefault (CompositeLine 0 0 0 False) (Array.get i composites)
+    newLine = fvCalcRemainderSingle line baseCount
+    newComposites = Array.set i newLine composites
+  in 
+  if (baseCount == 1) then
+    composites
+  else if (i == (Array.length composites)) then
+      composites
+    else
+      fvCalcRemainderWhole newComposites baseCount (i+1)
+
+fvCalcRemainderSingle compositeLine baseCount =
+    let 
+      rhy = compositeLine.rhythm
+      quo = (toFloat rhy) / (toFloat baseCount)
+      intQuo = rhy // baseCount
+      r = quo - (toFloat intQuo)
+      useR = if (r < 0.5) then 
+          (rhy - (intQuo * baseCount))
+        else
+          (((intQuo + 1) * baseCount) - rhy) * -1
+    in 
+      if (useR /= 0) then
+        {compositeLine | remainder = useR, multipleOfBase = False }
+      else
+        compositeLine
 
 -- == MASTER == --
 
@@ -545,7 +581,7 @@ adjustMaatraaPoem poem li ci =
     case poem of
       GenericPoem _ -> GenericPoem {maxLineLen = newMaxLineLen, lines = newLines}
       Ghazal data -> Ghazal {data | maxLineLen = newMaxLineLen, lines = (Array.map2 misraaFromPoemLineWRK newLines (Array.map .rkUnits data.lines))}
-      FreeVerse data -> FreeVerse {maxLineLen = newMaxLineLen, lines = finalFVLines, composite = fvCalcCompositeRhythm finalFVLines 0 Array.empty False}
+      FreeVerse data -> FreeVerse {maxLineLen = newMaxLineLen, lines = finalFVLines, composite = fvCalcCompositeRhythm finalFVLines 0 Array.empty False, baseCount = data.baseCount}
 
 
 -- ELM ARCHITECTURE
@@ -573,6 +609,7 @@ type Msg
   = ProcessPoem String
   | AdjustMaatraa String
   | SetComposite String
+  | SetBase String
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
@@ -611,11 +648,21 @@ update msg model =
          processedPoem = fvSetComposite model.processedPoem lineI,
          lastAction = "Composite Set " ++ str }, 
       Cmd.none)
+    SetBase str ->
+      let
+        base = case D.decodeString D.int str of
+          Ok result -> result
+          Err _ -> 1
+      in 
+        ({ model | 
+         processedPoem = fvSetBase model.processedPoem base,
+         lastAction = "BaseCount Set " ++ str }, 
+      Cmd.none)
 
 view model =
   div [style "background-color" "black", style "color" "white", style "padding" "5px"][
      --div [style "padding" "inherit", style "white-space" "pre-wrap"] [text model.poem]
-    --, div [style "padding" "inherit"] [text (Debug.toString model.processedPoem)]
+    div [style "padding" "inherit"] [text (Debug.toString model.processedPoem)]
     ]
 
 -- PORTS
@@ -623,6 +670,7 @@ port givePoemRhythm : E.Value -> Cmd msg
 port getPoem : (String -> msg) -> Sub msg
 port getMaatraaChange : (String -> msg) -> Sub msg
 port setComposite : (String -> msg) -> Sub msg
+port setBase : (String -> msg) -> Sub msg
 
 updateWithStorage msg oldModel =
   let
@@ -639,6 +687,7 @@ subscriptions _ =
     [ getPoem ProcessPoem
     , getMaatraaChange AdjustMaatraa
     , setComposite SetComposite
+    , setBase SetBase
     ]
 
 -- JSON ENCODE/DECODE

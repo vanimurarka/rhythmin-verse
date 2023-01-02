@@ -10,8 +10,10 @@
 </head>
 
 <body style="background-color: black;">
-  <textarea id="poem" rows="5" cols="30">कोई उम्मीद बर नहीं आती
-कोई सूरत नज़र नहीं आती</textarea>
+  <textarea id="poem" rows="5" cols="30">कोई 
+कोई को
+को</textarea>
+  <input type="number" min="1" step="1" id='txtBase' value="1" onchange="callBaseChange()">
   <button onclick="callProcessPoem()">Process Poem</button>
   <div id="myapp"></div>
   <div id="right">
@@ -48,6 +50,11 @@ function callAdjustMaatraa(li, ci) {
 
 function callSetComposite(li) {
   hpra.ports.setComposite.send(JSON.stringify(li)); 
+}
+
+function callBaseChange() {
+  base = parseInt(document.getElementById('txtBase').value)
+  hpra.ports.setBase.send(JSON.stringify(base));
 }
 
 </script>

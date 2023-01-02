@@ -83,7 +83,7 @@ function draw()
 	const lineCount = dPoem.lines.length;
 	var chart = d3.select("#chart");
 	chart.select("svg").remove();
-	const svgW = fFreeVerse?(charW*maxLen)+70:(charW*maxLen)+30;
+	const svgW = fFreeVerse?(charW*maxLen)+80:(charW*maxLen)+30;
 	const svgH = fLineSpacing?(lineCount*(charH+lineSpacing))+(charH*2):(lineCount*charH)+(charH*2);
 	const svgViewBox = "0 0 "+svgW+" "+svgH;
 	const ratio = oVisual.availableW / svgW;
