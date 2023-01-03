@@ -6081,7 +6081,9 @@ var $author$project$Main$fvCalcRemainderSingle = F2(
 		var useR = (r < 0.5) ? (rhy - (intQuo * baseCount)) : ((((intQuo + 1) * baseCount) - rhy) * (-1));
 		return (!(!useR)) ? _Utils_update(
 			compositeLine,
-			{multipleOfBase: false, remainder: useR}) : compositeLine;
+			{multipleOfBase: false, remainder: useR}) : _Utils_update(
+			compositeLine,
+			{multipleOfBase: true, remainder: useR});
 	});
 var $author$project$Main$fvCalcRemainderWhole = F3(
 	function (composites, baseCount, i) {

@@ -527,7 +527,7 @@ fvCalcRemainderSingle compositeLine baseCount =
       if (useR /= 0) then
         {compositeLine | remainder = useR, multipleOfBase = False }
       else
-        compositeLine
+        {compositeLine | remainder = useR, multipleOfBase = True}
 
 -- == MASTER == --
 
@@ -662,7 +662,7 @@ update msg model =
 view model =
   div [style "background-color" "black", style "color" "white", style "padding" "5px"][
      --div [style "padding" "inherit", style "white-space" "pre-wrap"] [text model.poem]
-    div [style "padding" "inherit"] [text (Debug.toString model.processedPoem)]
+    --div [style "padding" "inherit"] [text (Debug.toString model.processedPoem)]
     ]
 
 -- PORTS
