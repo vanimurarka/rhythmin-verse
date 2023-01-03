@@ -5587,6 +5587,47 @@ var $author$project$Main$encodeGhazal = F2(
 					$elm$json$Json$Encode$string('GHAZAL'))
 				]));
 	});
+var $author$project$Main$PoemLine = F3(
+	function (str, rhythmTotal, units) {
+		return {rhythmTotal: rhythmTotal, str: str, units: units};
+	});
+var $elm$core$Elm$JsArray$map = _JsArray_map;
+var $elm$core$Array$map = F2(
+	function (func, _v0) {
+		var len = _v0.a;
+		var startShift = _v0.b;
+		var tree = _v0.c;
+		var tail = _v0.d;
+		var helper = function (node) {
+			if (node.$ === 'SubTree') {
+				var subTree = node.a;
+				return $elm$core$Array$SubTree(
+					A2($elm$core$Elm$JsArray$map, helper, subTree));
+			} else {
+				var values = node.a;
+				return $elm$core$Array$Leaf(
+					A2($elm$core$Elm$JsArray$map, func, values));
+			}
+		};
+		return A4(
+			$elm$core$Array$Array_elm_builtin,
+			len,
+			startShift,
+			A2($elm$core$Elm$JsArray$map, helper, tree),
+			A2($elm$core$Elm$JsArray$map, func, tail));
+	});
+var $author$project$Main$maatrikLToPoemL = function (lineM) {
+	return A3(
+		$author$project$Main$PoemLine,
+		lineM.str,
+		lineM.rhythmTotal,
+		A2(
+			$elm$core$Array$map,
+			function ($) {
+				return $.a;
+			},
+			lineM.units));
+};
 var $author$project$Main$encodePoem = function (p) {
 	switch (p.$) {
 		case 'GenericPoem':
@@ -5595,9 +5636,15 @@ var $author$project$Main$encodePoem = function (p) {
 		case 'Ghazal':
 			var data = p.a;
 			return A2($author$project$Main$encodeGhazal, data.maxLineLen, data.lines);
-		default:
+		case 'FreeVerse':
 			var data = p.a;
 			return A3($author$project$Main$encodeFreeVerse, data.maxLineLen, data.lines, data.composite);
+		default:
+			var data = p.a;
+			return A2(
+				$author$project$Main$encodeGeneric,
+				data.maxLineLen,
+				A2($elm$core$Array$map, $author$project$Main$maatrikLToPoemL, data.lines));
 	}
 };
 var $author$project$Main$encodeModel = function (model) {
@@ -5622,10 +5669,9 @@ var $author$project$Main$FreeVerse = function (a) {
 var $author$project$Main$Ghazal = function (a) {
 	return {$: 'Ghazal', a: a};
 };
-var $author$project$Main$PoemLine = F3(
-	function (str, rhythmTotal, units) {
-		return {rhythmTotal: rhythmTotal, str: str, units: units};
-	});
+var $author$project$Main$MaatrikPoem = function (a) {
+	return {$: 'MaatrikPoem', a: a};
+};
 var $author$project$Main$Consonant = {$: 'Consonant'};
 var $author$project$Main$PureVowel = {$: 'PureVowel'};
 var $author$project$Main$adjustMaatraaChar = function (a) {
@@ -5935,31 +5981,24 @@ var $author$project$Main$getBiggerLine = F2(
 var $author$project$Main$getMaxLineLen = function (lines) {
 	return A3($elm$core$Array$foldl, $author$project$Main$getBiggerLine, $author$project$Main$emptyLine, lines).rhythmTotal;
 };
-var $elm$core$Elm$JsArray$map = _JsArray_map;
-var $elm$core$Array$map = F2(
-	function (func, _v0) {
-		var len = _v0.a;
-		var startShift = _v0.b;
-		var tree = _v0.c;
-		var tail = _v0.d;
-		var helper = function (node) {
-			if (node.$ === 'SubTree') {
-				var subTree = node.a;
-				return $elm$core$Array$SubTree(
-					A2($elm$core$Elm$JsArray$map, helper, subTree));
-			} else {
-				var values = node.a;
-				return $elm$core$Array$Leaf(
-					A2($elm$core$Elm$JsArray$map, func, values));
-			}
-		};
-		return A4(
-			$elm$core$Array$Array_elm_builtin,
-			len,
-			startShift,
-			A2($elm$core$Elm$JsArray$map, helper, tree),
-			A2($elm$core$Elm$JsArray$map, func, tail));
+var $author$project$Main$MaatrikLine = F3(
+	function (str, rhythmTotal, units) {
+		return {rhythmTotal: rhythmTotal, str: str, units: units};
 	});
+var $author$project$Main$MaatrikAkshar = F2(
+	function (a, patternValue) {
+		return {a: a, patternValue: patternValue};
+	});
+var $author$project$Main$maatrikAksharFrmGA = function (a) {
+	return A2($author$project$Main$MaatrikAkshar, a, a.rhythm);
+};
+var $author$project$Main$maatrikLFromPoemL = function (lineP) {
+	return A3(
+		$author$project$Main$MaatrikLine,
+		lineP.str,
+		lineP.rhythmTotal,
+		A2($elm$core$Array$map, $author$project$Main$maatrikAksharFrmGA, lineP.units));
+};
 var $author$project$Main$Misraa = F2(
 	function (line, rkUnits) {
 		return {line: line, rkUnits: rkUnits};
@@ -5983,7 +6022,7 @@ var $author$project$Main$adjustMaatraaPoem = F3(
 							return $.line;
 						},
 						data.lines);
-				default:
+				case 'FreeVerse':
 					var data = poem.a;
 					return A2(
 						$elm$core$Array$map,
@@ -5991,6 +6030,9 @@ var $author$project$Main$adjustMaatraaPoem = F3(
 							return $.line;
 						},
 						data.lines);
+				default:
+					var data = poem.a;
+					return A2($elm$core$Array$map, $author$project$Main$maatrikLToPoemL, data.lines);
 			}
 		}();
 		var oldLine = A2(
@@ -6039,13 +6081,20 @@ var $author$project$Main$adjustMaatraaPoem = F3(
 									data.lines)),
 							maxLineLen: newMaxLineLen
 						}));
-			default:
+			case 'FreeVerse':
 				var data = poem.a;
 				return $author$project$Main$FreeVerse(
 					{
 						baseCount: data.baseCount,
 						composite: A4($author$project$Main$fvCalcCompositeRhythm, finalFVLines, 0, $elm$core$Array$empty, false),
 						lines: finalFVLines,
+						maxLineLen: newMaxLineLen
+					});
+			default:
+				var data = poem.a;
+				return $author$project$Main$MaatrikPoem(
+					{
+						lines: A2($elm$core$Array$map, $author$project$Main$maatrikLFromPoemL, newLines),
 						maxLineLen: newMaxLineLen
 					});
 		}
@@ -6264,7 +6313,7 @@ var $author$project$Main$genericGetData = function (p) {
 					data.lines),
 				maxLineLen: data.maxLineLen
 			};
-		default:
+		case 'FreeVerse':
 			var data = p.a;
 			return {
 				lines: A2(
@@ -6273,6 +6322,12 @@ var $author$project$Main$genericGetData = function (p) {
 						return $.line;
 					},
 					data.lines),
+				maxLineLen: data.maxLineLen
+			};
+		default:
+			var data = p.a;
+			return {
+				lines: A2($elm$core$Array$map, $author$project$Main$maatrikLToPoemL, data.lines),
 				maxLineLen: data.maxLineLen
 			};
 	}
@@ -7247,9 +7302,6 @@ var $author$project$Main$updateWithStorage = F2(
 var $elm$html$Html$div = _VirtualDom_node('div');
 var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
 var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
-var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
-var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
-var $elm$core$Debug$toString = _Debug_toString;
 var $author$project$Main$view = function (model) {
 	return A2(
 		$elm$html$Html$div,
@@ -7259,20 +7311,7 @@ var $author$project$Main$view = function (model) {
 				A2($elm$html$Html$Attributes$style, 'color', 'white'),
 				A2($elm$html$Html$Attributes$style, 'padding', '5px')
 			]),
-		_List_fromArray(
-			[
-				A2(
-				$elm$html$Html$div,
-				_List_fromArray(
-					[
-						A2($elm$html$Html$Attributes$style, 'padding', 'inherit')
-					]),
-				_List_fromArray(
-					[
-						$elm$html$Html$text(
-						$elm$core$Debug$toString(model.processedPoem))
-					]))
-			]));
+		_List_Nil);
 };
 var $author$project$Main$main = $elm$browser$Browser$element(
 	{init: $author$project$Main$init, subscriptions: $author$project$Main$subscriptions, update: $author$project$Main$updateWithStorage, view: $author$project$Main$view});

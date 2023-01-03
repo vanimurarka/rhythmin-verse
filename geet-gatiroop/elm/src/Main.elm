@@ -43,6 +43,12 @@ type alias Akshar =
 emptyAkshar = Akshar " " 0 Empty ' ' ' ' 0 0
 space = Akshar " " 32 Other ' ' ' ' 0 0
 
+type alias MaatrikAkshar =
+  {
+    a : Akshar,
+    patternValue : Float
+  }
+
 type alias PoemLine =
   { str : String
   , rhythmTotal : Int
@@ -50,6 +56,12 @@ type alias PoemLine =
   }
 
 emptyLine = PoemLine "" 0 Array.empty
+
+type alias MaatrikLine = 
+  { str : String
+  , rhythmTotal : Int
+  , units : Array.Array MaatrikAkshar
+  }
 
 type alias Misraa =
   { line : PoemLine
@@ -72,6 +84,7 @@ type alias CompositeLine =
 
 type ProcessedPoem 
   = GenericPoem { maxLineLen : Int, lines : Array.Array PoemLine }
+  | MaatrikPoem { maxLineLen : Int, lines : Array.Array MaatrikLine }
   | Ghazal { maxLineLen: Int, lines: Array.Array Misraa, radeef : Array.Array Akshar, kaafiyaa : Array.Array Akshar}
   | FreeVerse {maxLineLen: Int, lines: Array.Array FreeVerseLine, composite : Array.Array CompositeLine, baseCount : Int }
 
@@ -167,7 +180,7 @@ processChar c =
         mainChar = c,
         vowel = c,
         rhythm = 0,
-        userRhythm = 0}
+        userRhythm = 0 }
     newRhythm = if isPureVowel c then
         vowelRhythm a.vowel
       else if isMaatraaVowel c then
@@ -285,13 +298,25 @@ processPoem pom oldLines =
   in 
     GenericPoem {maxLineLen = maxLineLen, lines = processedLines}
 
--- == GHAZAL == --
+-- == MAATRIK == --
 
 genericGetData p =
   case p of
     GenericPoem data -> data
     Ghazal data -> { maxLineLen = data.maxLineLen, lines = Array.map .line data.lines }
     FreeVerse data -> { maxLineLen = data.maxLineLen, lines = Array.map .line data.lines }
+    MaatrikPoem data -> { maxLineLen = data.maxLineLen, lines = Array.map maatrikLToPoemL data.lines }
+
+maatrikAksharFrmGA a =
+  MaatrikAkshar a (toFloat a.rhythm)
+
+maatrikLToPoemL lineM =
+  PoemLine lineM.str lineM.rhythmTotal (Array.map .a lineM.units)
+
+maatrikLFromPoemL lineP =
+  MaatrikLine lineP.str lineP.rhythmTotal (Array.map maatrikAksharFrmGA lineP.units)
+
+-- == GHAZAL == --
 
 ghazalGetData p =
   case p of
@@ -569,6 +594,7 @@ adjustMaatraaPoem poem li ci =
       GenericPoem data -> data.lines
       Ghazal data -> Array.map .line data.lines
       FreeVerse data -> Array.map .line data.lines
+      MaatrikPoem data -> Array.map maatrikLToPoemL data.lines
     oldLine = Maybe.withDefault emptyLine (Array.get li lines)
     newLine = adjustMaatraaLine oldLine ci
     newLines = Array.set li newLine lines
@@ -582,6 +608,8 @@ adjustMaatraaPoem poem li ci =
       GenericPoem _ -> GenericPoem {maxLineLen = newMaxLineLen, lines = newLines}
       Ghazal data -> Ghazal {data | maxLineLen = newMaxLineLen, lines = (Array.map2 misraaFromPoemLineWRK newLines (Array.map .rkUnits data.lines))}
       FreeVerse data -> FreeVerse {maxLineLen = newMaxLineLen, lines = finalFVLines, composite = fvCalcCompositeRhythm finalFVLines 0 Array.empty False, baseCount = data.baseCount}
+      MaatrikPoem data -> MaatrikPoem {maxLineLen = newMaxLineLen, lines = Array.map maatrikLFromPoemL newLines}
+
 
 
 -- ELM ARCHITECTURE
@@ -765,6 +793,7 @@ encodePoem p =
     GenericPoem data -> encodeGeneric data.maxLineLen data.lines  
     Ghazal data -> encodeGhazal data.maxLineLen data.lines
     FreeVerse data -> encodeFreeVerse data.maxLineLen data.lines data.composite
+    MaatrikPoem data -> encodeGeneric data.maxLineLen (Array.map maatrikLToPoemL data.lines)
 
 encodeModel : Model -> E.Value
 encodeModel model =
