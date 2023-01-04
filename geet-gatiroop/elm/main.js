@@ -6241,7 +6241,7 @@ var $author$project$Main$userReplace = F3(
 var $author$project$Main$cleanMaapnee = function (string) {
 	return A3(
 		$author$project$Main$userReplace,
-		'[^21२१ ]',
+		'[^21२१]',
 		function (_v0) {
 			return '';
 		},

@@ -29,7 +29,7 @@ removePoornviraam string =
   userReplace "।" (\_ -> " ") string
 
 cleanMaapnee string =
-  userReplace "[^21२१ ]" (\_ -> "") string
+  userReplace "[^21२१]" (\_ -> "") string
 
 type AksharType  = PureVowel | Maatraa | Halant | Half | Consonant | Other | Empty
 
@@ -346,6 +346,20 @@ maatrikSetLineUnitsPattern lineUnits i =
 
 maatrikSetLinePattern line =
   { line | units = maatrikSetLineUnitsPattern line.units 0}
+
+maatrikSetAksharMaapnee ac an mc mn =
+  if (mc == 1) then
+    if (ac.userRhythm == 1) then
+      {a1 = ac, a2 = an, set = 1}
+    else 
+      {a1 = ac, a2 = an, set = 0}
+  else -- all other mc values = 2
+    if (ac.userRhythm == 2) then
+      {a1 = ac, a2 = an, set = 1}
+    else 
+      {a1 = ac, a2 = an, set = 0}
+
+
 
 maatrikProcessPoem pom oldPom maapnee =
   let 
