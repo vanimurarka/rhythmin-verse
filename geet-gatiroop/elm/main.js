@@ -5675,9 +5675,6 @@ var $author$project$Main$FreeVerse = function (a) {
 var $author$project$Main$Ghazal = function (a) {
 	return {$: 'Ghazal', a: a};
 };
-var $author$project$Main$MaatrikPoem = function (a) {
-	return {$: 'MaatrikPoem', a: a};
-};
 var $author$project$Main$PoemLine = F3(
 	function (str, rhythmTotal, units) {
 		return {rhythmTotal: rhythmTotal, str: str, units: units};
@@ -5991,6 +5988,9 @@ var $author$project$Main$getBiggerLine = F2(
 var $author$project$Main$getMaxLineLen = function (lines) {
 	return A3($elm$core$Array$foldl, $author$project$Main$getBiggerLine, $author$project$Main$emptyLine, lines).rhythmTotal;
 };
+var $author$project$Main$MaatrikPoem = function (a) {
+	return {$: 'MaatrikPoem', a: a};
+};
 var $author$project$Main$MaatrikLine = F3(
 	function (str, rhythmTotal, units) {
 		return {rhythmTotal: rhythmTotal, str: str, units: units};
@@ -6034,6 +6034,7 @@ var $author$project$Main$maatrikLFromPoemL = function (lineP) {
 		lineP.rhythmTotal,
 		A2($elm$core$Array$map, $author$project$Main$maatrikAksharFrmGA, lineP.units));
 };
+var $author$project$Main$emptyMLine = $author$project$Main$maatrikLFromPoemL($author$project$Main$emptyLine);
 var $author$project$Main$maatrikLToPoemL = function (lineM) {
 	return A3(
 		$author$project$Main$PoemLine,
@@ -6046,6 +6047,79 @@ var $author$project$Main$maatrikLToPoemL = function (lineM) {
 			},
 			lineM.units));
 };
+var $author$project$Main$emptyMAkshar = A2($author$project$Main$MaatrikAkshar, $author$project$Main$emptyAkshar, 0);
+var $author$project$Main$maatrikSetAksharPattern = F2(
+	function (ac, an) {
+		return ((ac.a.userRhythm === 1) && (an.a.userRhythm === 1)) ? {
+			a1: _Utils_update(
+				ac,
+				{patternValue: 1.5}),
+			a2: _Utils_update(
+				an,
+				{patternValue: 1.5}),
+			changed: true
+		} : {a1: ac, a2: an, changed: false};
+	});
+var $author$project$Main$maatrikSetLineUnitsPattern = F2(
+	function (lineUnits, i) {
+		maatrikSetLineUnitsPattern:
+		while (true) {
+			var an = A2(
+				$elm$core$Maybe$withDefault,
+				$author$project$Main$emptyMAkshar,
+				A2($elm$core$Array$get, i + 1, lineUnits));
+			var ac = A2(
+				$elm$core$Maybe$withDefault,
+				$author$project$Main$emptyMAkshar,
+				A2($elm$core$Array$get, i, lineUnits));
+			var result = A2($author$project$Main$maatrikSetAksharPattern, ac, an);
+			var lineUnits1 = A3($elm$core$Array$set, i, result.a1, lineUnits);
+			var newLineUnits = A3($elm$core$Array$set, i + 1, result.a2, lineUnits1);
+			if (_Utils_cmp(
+				i,
+				$elm$core$Array$length(lineUnits) - 1) > 0) {
+				return lineUnits;
+			} else {
+				if (result.changed) {
+					var $temp$lineUnits = newLineUnits,
+						$temp$i = i + 2;
+					lineUnits = $temp$lineUnits;
+					i = $temp$i;
+					continue maatrikSetLineUnitsPattern;
+				} else {
+					var $temp$lineUnits = newLineUnits,
+						$temp$i = i + 1;
+					lineUnits = $temp$lineUnits;
+					i = $temp$i;
+					continue maatrikSetLineUnitsPattern;
+				}
+			}
+		}
+	});
+var $author$project$Main$maatrikSetLinePattern = function (line) {
+	return _Utils_update(
+		line,
+		{
+			units: A2($author$project$Main$maatrikSetLineUnitsPattern, line.units, 0)
+		});
+};
+var $author$project$Main$maatrikAdjustMaatraa = F3(
+	function (poemData, li, ci) {
+		var oldLine = A2(
+			$elm$core$Maybe$withDefault,
+			$author$project$Main$emptyMLine,
+			A2($elm$core$Array$get, li, poemData.lines));
+		var newBasicLine = A2(
+			$author$project$Main$adjustMaatraaLine,
+			$author$project$Main$maatrikLToPoemL(oldLine),
+			ci);
+		var newLine = $author$project$Main$maatrikSetLinePattern(
+			$author$project$Main$maatrikLFromPoemL(newBasicLine));
+		var newLines = A3($elm$core$Array$set, li, newLine, poemData.lines);
+		var newMaxLineLen = (_Utils_cmp(newLine.rhythmTotal, poemData.maxLineLen) > 0) ? newLine.rhythmTotal : poemData.maxLineLen;
+		return $author$project$Main$MaatrikPoem(
+			{lines: newLines, maxLineLen: newMaxLineLen});
+	});
 var $author$project$Main$Misraa = F2(
 	function (line, rkUnits) {
 		return {line: line, rkUnits: rkUnits};
@@ -6139,11 +6213,7 @@ var $author$project$Main$adjustMaatraaPoem = F3(
 					});
 			default:
 				var data = poem.a;
-				return $author$project$Main$MaatrikPoem(
-					{
-						lines: A2($elm$core$Array$map, $author$project$Main$maatrikLFromPoemL, newLines),
-						maxLineLen: newMaxLineLen
-					});
+				return A3($author$project$Main$maatrikAdjustMaatraa, data, li, ci);
 		}
 	});
 var $author$project$Main$IncomingPoem = F2(
@@ -6390,7 +6460,7 @@ var $author$project$Main$calcHalfAksharRhythm = F3(
 			ac.mainChar,
 			_Utils_chr('न')) && _Utils_eq(
 			an.mainChar,
-			_Utils_chr('ह')))) ? ac : ((ap.rhythm === 1) ? _Utils_update(
+			_Utils_chr('ह')))) ? ac : (((ap.rhythm === 1) && (!_Utils_eq(ap.aksharType, $author$project$Main$Half))) ? _Utils_update(
 			ac,
 			{rhythm: 1, userRhythm: 1}) : (((ap.rhythm === 2) && (an.rhythm === 2)) ? _Utils_update(
 			ac,
@@ -7229,62 +7299,6 @@ var $author$project$Main$ghazalProcess = F2(
 		return $author$project$Main$Ghazal(
 			{kaafiyaa: kaafiyaa, lines: misre2, maxLineLen: basic.maxLineLen, radeef: radeef});
 	});
-var $author$project$Main$emptyMAkshar = A2($author$project$Main$MaatrikAkshar, $author$project$Main$emptyAkshar, 0);
-var $author$project$Main$maatrikSetAksharPattern = F2(
-	function (ac, an) {
-		return ((ac.a.rhythm === 1) && (an.a.rhythm === 1)) ? {
-			a1: _Utils_update(
-				ac,
-				{patternValue: 1.5}),
-			a2: _Utils_update(
-				an,
-				{patternValue: 1.5}),
-			changed: true
-		} : {a1: ac, a2: an, changed: false};
-	});
-var $author$project$Main$maatrikSetLineUnitsPattern = F2(
-	function (lineUnits, i) {
-		maatrikSetLineUnitsPattern:
-		while (true) {
-			var an = A2(
-				$elm$core$Maybe$withDefault,
-				$author$project$Main$emptyMAkshar,
-				A2($elm$core$Array$get, i + 1, lineUnits));
-			var ac = A2(
-				$elm$core$Maybe$withDefault,
-				$author$project$Main$emptyMAkshar,
-				A2($elm$core$Array$get, i, lineUnits));
-			var result = A2($author$project$Main$maatrikSetAksharPattern, ac, an);
-			var lineUnits1 = A3($elm$core$Array$set, i, result.a1, lineUnits);
-			var newLineUnits = A3($elm$core$Array$set, i + 1, result.a2, lineUnits1);
-			if (_Utils_cmp(
-				i,
-				$elm$core$Array$length(lineUnits) - 1) > 0) {
-				return lineUnits;
-			} else {
-				if (result.changed) {
-					var $temp$lineUnits = newLineUnits,
-						$temp$i = i + 2;
-					lineUnits = $temp$lineUnits;
-					i = $temp$i;
-					continue maatrikSetLineUnitsPattern;
-				} else {
-					var $temp$lineUnits = newLineUnits,
-						$temp$i = i + 1;
-					lineUnits = $temp$lineUnits;
-					i = $temp$i;
-					continue maatrikSetLineUnitsPattern;
-				}
-			}
-		}
-	});
-var $author$project$Main$maatrikSetLinePattern = function (line) {
-	return _Utils_update(
-		line,
-		{
-			units: A2($author$project$Main$maatrikSetLineUnitsPattern, line.units, 0)
-		});
-};
 var $author$project$Main$maatrikProcessPoem = F2(
 	function (pom, oldPom) {
 		var genericOld = $author$project$Main$genericGetData(oldPom);

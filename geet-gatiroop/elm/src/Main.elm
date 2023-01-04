@@ -64,6 +64,8 @@ type alias MaatrikLine =
   , units : Array.Array MaatrikAkshar
   }
 
+emptyMLine = maatrikLFromPoemL emptyLine
+
 type alias Misraa =
   { line : PoemLine
   , rkUnits : Array.Array Char
@@ -242,7 +244,7 @@ calcHalfAksharRhythm ac ap an =
     ac
   else if ((ac.mainChar == 'म') && (an.mainChar == 'ह')) || ((ac.mainChar == 'न') && (an.mainChar == 'ह')) then
       ac
-    else if (ap.rhythm == 1) then
+    else if (ap.rhythm == 1) && (ap.aksharType /= Half) then
         {ac | rhythm = 1, userRhythm = 1}
       else if (ap.rhythm == 2) && (an.rhythm == 2) then
           {ac | rhythm = 1, userRhythm = 1}
@@ -318,7 +320,7 @@ maatrikLFromPoemL lineP =
   MaatrikLine lineP.str lineP.rhythmTotal (Array.map maatrikAksharFrmGA lineP.units)
 
 maatrikSetAksharPattern ac an =
-  if ((ac.a.rhythm == 1) && (an.a.rhythm == 1)) then
+  if ((ac.a.userRhythm == 1) && (an.a.userRhythm == 1)) then
     {a1 = {ac | patternValue = 1.5}, a2 = {an | patternValue = 1.5}, changed = True}
   else
     {a1 = ac, a2 = an, changed = False}
@@ -349,6 +351,19 @@ maatrikProcessPoem pom oldPom =
     maatrikLinesWPattern = Array.map maatrikSetLinePattern (Array.map maatrikLFromPoemL basic.lines)
   in 
     MaatrikPoem { maxLineLen = basic.maxLineLen, lines = maatrikLinesWPattern }    
+
+maatrikAdjustMaatraa poemData li ci =
+  let 
+    oldLine = Maybe.withDefault emptyMLine (Array.get li poemData.lines)
+    newBasicLine = adjustMaatraaLine (maatrikLToPoemL oldLine) ci
+    newLine = maatrikSetLinePattern (maatrikLFromPoemL newBasicLine)
+    newLines = Array.set li newLine poemData.lines
+    newMaxLineLen = if (newLine.rhythmTotal > poemData.maxLineLen) then
+        newLine.rhythmTotal
+      else
+        poemData.maxLineLen 
+  in 
+    MaatrikPoem {maxLineLen = newMaxLineLen, lines = newLines}
 
 -- == GHAZAL == --
 
@@ -643,7 +658,7 @@ adjustMaatraaPoem poem li ci =
       GenericPoem _ -> GenericPoem {maxLineLen = newMaxLineLen, lines = newLines}
       Ghazal data -> Ghazal {data | maxLineLen = newMaxLineLen, lines = (Array.map2 misraaFromPoemLineWRK newLines (Array.map .rkUnits data.lines))}
       FreeVerse data -> FreeVerse {maxLineLen = newMaxLineLen, lines = finalFVLines, composite = fvCalcCompositeRhythm finalFVLines 0 Array.empty False, baseCount = data.baseCount}
-      MaatrikPoem data -> MaatrikPoem {maxLineLen = newMaxLineLen, lines = Array.map maatrikLFromPoemL newLines}
+      MaatrikPoem data -> maatrikAdjustMaatraa data li ci
 
 
 
