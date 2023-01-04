@@ -6216,16 +6216,49 @@ var $author$project$Main$adjustMaatraaPoem = F3(
 				return A3($author$project$Main$maatrikAdjustMaatraa, data, li, ci);
 		}
 	});
-var $author$project$Main$IncomingPoem = F2(
-	function (poem, poemType) {
-		return {poem: poem, poemType: poemType};
+var $elm$regex$Regex$Match = F4(
+	function (match, index, number, submatches) {
+		return {index: index, match: match, number: number, submatches: submatches};
+	});
+var $elm$regex$Regex$fromStringWith = _Regex_fromStringWith;
+var $elm$regex$Regex$fromString = function (string) {
+	return A2(
+		$elm$regex$Regex$fromStringWith,
+		{caseInsensitive: false, multiline: false},
+		string);
+};
+var $elm$regex$Regex$replace = _Regex_replaceAtMost(_Regex_infinity);
+var $author$project$Main$userReplace = F3(
+	function (userRegex, replacer, string) {
+		var _v0 = $elm$regex$Regex$fromString(userRegex);
+		if (_v0.$ === 'Nothing') {
+			return string;
+		} else {
+			var regex = _v0.a;
+			return A3($elm$regex$Regex$replace, regex, replacer, string);
+		}
+	});
+var $author$project$Main$cleanMaapnee = function (string) {
+	return A3(
+		$author$project$Main$userReplace,
+		'[^21२१ ]',
+		function (_v0) {
+			return '';
+		},
+		string);
+};
+var $author$project$Main$IncomingPoem = F3(
+	function (poem, poemType, maapnee) {
+		return {maapnee: maapnee, poem: poem, poemType: poemType};
 	});
 var $elm$json$Json$Decode$field = _Json_decodeField;
-var $author$project$Main$decodeIncomingPoem = A3(
-	$elm$json$Json$Decode$map2,
+var $elm$json$Json$Decode$map3 = _Json_map3;
+var $author$project$Main$decodeIncomingPoem = A4(
+	$elm$json$Json$Decode$map3,
 	$author$project$Main$IncomingPoem,
 	A2($elm$json$Json$Decode$field, 'poem', $elm$json$Json$Decode$string),
-	A2($elm$json$Json$Decode$field, 'poemType', $elm$json$Json$Decode$string));
+	A2($elm$json$Json$Decode$field, 'poemType', $elm$json$Json$Decode$string),
+	A2($elm$json$Json$Decode$field, 'maapnee', $elm$json$Json$Decode$string));
 var $elm$json$Json$Decode$decodeString = _Json_runOnString;
 var $author$project$Main$WhichChar = F2(
 	function (lineI, charI) {
@@ -6699,28 +6732,6 @@ var $author$project$Main$processLine = function (pomLine) {
 	var _final = A3($author$project$Main$calcHalfAksharRhythmLine, mergedLine, 0, 0);
 	return A3($author$project$Main$PoemLine, pomLine, _final.b, _final.a);
 };
-var $elm$regex$Regex$Match = F4(
-	function (match, index, number, submatches) {
-		return {index: index, match: match, number: number, submatches: submatches};
-	});
-var $elm$regex$Regex$fromStringWith = _Regex_fromStringWith;
-var $elm$regex$Regex$fromString = function (string) {
-	return A2(
-		$elm$regex$Regex$fromStringWith,
-		{caseInsensitive: false, multiline: false},
-		string);
-};
-var $elm$regex$Regex$replace = _Regex_replaceAtMost(_Regex_infinity);
-var $author$project$Main$userReplace = F3(
-	function (userRegex, replacer, string) {
-		var _v0 = $elm$regex$Regex$fromString(userRegex);
-		if (_v0.$ === 'Nothing') {
-			return string;
-		} else {
-			var regex = _v0.a;
-			return A3($elm$regex$Regex$replace, regex, replacer, string);
-		}
-	});
 var $author$project$Main$removeExtraSpaces = function (string) {
 	return A3(
 		$author$project$Main$userReplace,
@@ -7299,8 +7310,8 @@ var $author$project$Main$ghazalProcess = F2(
 		return $author$project$Main$Ghazal(
 			{kaafiyaa: kaafiyaa, lines: misre2, maxLineLen: basic.maxLineLen, radeef: radeef});
 	});
-var $author$project$Main$maatrikProcessPoem = F2(
-	function (pom, oldPom) {
+var $author$project$Main$maatrikProcessPoem = F3(
+	function (pom, oldPom, maapnee) {
 		var genericOld = $author$project$Main$genericGetData(oldPom);
 		var basic = $author$project$Main$genericGetData(
 			A2($author$project$Main$processPoem, pom, genericOld.lines));
@@ -7311,8 +7322,8 @@ var $author$project$Main$maatrikProcessPoem = F2(
 		return $author$project$Main$MaatrikPoem(
 			{lines: maatrikLinesWPattern, maxLineLen: basic.maxLineLen});
 	});
-var $author$project$Main$preProcessPoem = F3(
-	function (pom, oldpom, pomType) {
+var $author$project$Main$preProcessPoem = F4(
+	function (pom, oldpom, pomType, maapnee) {
 		switch (pomType) {
 			case 'GHAZAL':
 				return A2(
@@ -7322,7 +7333,7 @@ var $author$project$Main$preProcessPoem = F3(
 			case 'FREEVERSE':
 				return A2($author$project$Main$fvProcess, pom, oldpom);
 			case 'MAATRIK':
-				return A2($author$project$Main$maatrikProcessPoem, pom, oldpom);
+				return A3($author$project$Main$maatrikProcessPoem, pom, oldpom, maapnee);
 			default:
 				return A2(
 					$author$project$Main$processPoem,
@@ -7343,9 +7354,12 @@ var $author$project$Main$update = F2(
 						var result = _v1.a;
 						return result;
 					} else {
-						return {poem: '', poemType: ''};
+						return {maapnee: '', poem: '', poemType: ''};
 					}
 				}();
+				var maapnee = $elm$core$String$trim(
+					$author$project$Main$removeExtraSpaces(
+						$author$project$Main$cleanMaapnee(incomingPoem.maapnee)));
 				var poemType = $elm$core$String$toUpper(incomingPoem.poemType);
 				return _Utils_Tuple2(
 					_Utils_update(
@@ -7353,7 +7367,7 @@ var $author$project$Main$update = F2(
 						{
 							lastAction: 'Poem Processed',
 							poem: incomingPoem.poem,
-							processedPoem: A3($author$project$Main$preProcessPoem, incomingPoem.poem, oldPoem, poemType)
+							processedPoem: A4($author$project$Main$preProcessPoem, incomingPoem.poem, oldPoem, poemType, maapnee)
 						}),
 					$elm$core$Platform$Cmd$none);
 			case 'AdjustMaatraa':

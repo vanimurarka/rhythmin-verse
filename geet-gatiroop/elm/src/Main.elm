@@ -28,6 +28,9 @@ removeNonDevanagari string =
 removePoornviraam string =
   userReplace "।" (\_ -> " ") string
 
+cleanMaapnee string =
+  userReplace "[^21२१ ]" (\_ -> "") string
+
 type AksharType  = PureVowel | Maatraa | Halant | Half | Consonant | Other | Empty
 
 type alias Akshar =
@@ -344,7 +347,7 @@ maatrikSetLineUnitsPattern lineUnits i =
 maatrikSetLinePattern line =
   { line | units = maatrikSetLineUnitsPattern line.units 0}
 
-maatrikProcessPoem pom oldPom =
+maatrikProcessPoem pom oldPom maapnee =
   let 
     genericOld = genericGetData oldPom
     basic = genericGetData (processPoem pom genericOld.lines)
@@ -605,12 +608,12 @@ fvCalcRemainderSingle compositeLine baseCount =
 
 -- == MASTER == --
 
-preProcessPoem pom oldpom pomType =
+preProcessPoem pom oldpom pomType maapnee =
   case pomType of
     "GHAZAL" -> 
         ghazalProcess pom (genericGetData oldpom).lines
     "FREEVERSE" -> fvProcess pom oldpom 
-    "MAATRIK" -> maatrikProcessPoem pom oldpom
+    "MAATRIK" -> maatrikProcessPoem pom oldpom maapnee
     _ -> processPoem pom (genericGetData oldpom).lines
 
 
@@ -696,14 +699,14 @@ update msg model =
       let 
         incomingPoem = case D.decodeString decodeIncomingPoem str of
           Ok result -> result
-          Err _ -> {poem = "", poemType = ""}
+          Err _ -> {poem = "", poemType = "", maapnee = ""}
         poemType = String.toUpper incomingPoem.poemType
-        --oldPoem = genericGetData model.processedPoem
         oldPoem = model.processedPoem
+        maapnee = String.trim (removeExtraSpaces (cleanMaapnee incomingPoem.maapnee))
       in
       ({ model | 
         poem = incomingPoem.poem, 
-        processedPoem = preProcessPoem incomingPoem.poem oldPoem poemType, 
+        processedPoem = preProcessPoem incomingPoem.poem oldPoem poemType maapnee, 
         lastAction = "Poem Processed" }, 
       Cmd.none)
     AdjustMaatraa str ->
@@ -875,12 +878,13 @@ encodeModel model =
     , ("lastAction", E.string model.lastAction)
     ]
 
-type alias IncomingPoem = { poem : String, poemType : String }
+type alias IncomingPoem = { poem : String, poemType : String, maapnee : String }
 
 decodeIncomingPoem =
-  D.map2 IncomingPoem
+  D.map3 IncomingPoem
     (D.field "poem" D.string)
     (D.field "poemType" D.string)
+    (D.field "maapnee" D.string)
 
 
 type alias WhichChar = { lineI : Int, charI : Int}

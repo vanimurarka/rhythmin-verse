@@ -9,8 +9,9 @@
   <script type="text/javascript" src="hpv-draw.v8.0.js"></script>
 </head>
 
-<body style="background-color: black;">
-  <textarea id="poem" rows="5" cols="30">ज़िन्दगी के मोड़ पर यह प्यार का नाता हमारा।
+<body style="background-color: black; color: white;">
+  Maapnee <input type="text" id='idMaapnee' value="2122212221222122"><br>
+  <textarea id="poem" rows="5" cols="40">ज़िन्दगी के मोड़ पर यह प्यार का नाता हमारा।
 राह की वीरानियों को मिल गया आखिर सहारा।
 
 ज्योत्सना सी स्निग्ध सुन्दर, तुम गगन की तारिका सी।
@@ -30,12 +31,14 @@
 
 गुनगुना लो प्यार से, यह गीत मेरा है तुम्हारा।
 प्यार का नाता हमारा, प्यार का नाता हमारा।</textarea>
-  <input type="number" min="1" step="1" id='txtBase' value="1" onchange="callBaseChange()">
+  <br>
   <button onclick="callProcessPoem()">Process Poem</button>
   <div id="myapp"></div>
   <div id="right">
     <div id="chart"></div>
   </div>
+  <br>
+  Base Count <input type="number" min="1" step="1" id='txtBase' value="1" onchange="callBaseChange()">
 </body>
 
 <script type="text/javascript">
@@ -58,7 +61,8 @@ hpra.ports.givePoemRhythm.subscribe(function(hpraResult) {
 function callProcessPoem()
 {
   poem = document.getElementById('poem').value;
-  hpra.ports.getPoem.send(JSON.stringify({ poem: poem, poemType: "maatrik" }));
+  maapnee = document.getElementById('idMaapnee').value;
+  hpra.ports.getPoem.send(JSON.stringify({ poem: poem, poemType: "maatrik", maapnee : maapnee }));
 }
 
 function callAdjustMaatraa(li, ci) { 
