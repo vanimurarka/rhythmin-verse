@@ -5587,47 +5587,56 @@ var $author$project$Main$encodeGhazal = F2(
 					$elm$json$Json$Encode$string('GHAZAL'))
 				]));
 	});
-var $author$project$Main$PoemLine = F3(
-	function (str, rhythmTotal, units) {
-		return {rhythmTotal: rhythmTotal, str: str, units: units};
-	});
-var $elm$core$Elm$JsArray$map = _JsArray_map;
-var $elm$core$Array$map = F2(
-	function (func, _v0) {
-		var len = _v0.a;
-		var startShift = _v0.b;
-		var tree = _v0.c;
-		var tail = _v0.d;
-		var helper = function (node) {
-			if (node.$ === 'SubTree') {
-				var subTree = node.a;
-				return $elm$core$Array$SubTree(
-					A2($elm$core$Elm$JsArray$map, helper, subTree));
-			} else {
-				var values = node.a;
-				return $elm$core$Array$Leaf(
-					A2($elm$core$Elm$JsArray$map, func, values));
-			}
-		};
-		return A4(
-			$elm$core$Array$Array_elm_builtin,
-			len,
-			startShift,
-			A2($elm$core$Elm$JsArray$map, helper, tree),
-			A2($elm$core$Elm$JsArray$map, func, tail));
-	});
-var $author$project$Main$maatrikLToPoemL = function (lineM) {
-	return A3(
-		$author$project$Main$PoemLine,
-		lineM.str,
-		lineM.rhythmTotal,
-		A2(
-			$elm$core$Array$map,
-			function ($) {
-				return $.a;
-			},
-			lineM.units));
+var $elm$json$Json$Encode$float = _Json_wrap;
+var $author$project$Main$encodeMAkshar = function (a) {
+	return $elm$json$Json$Encode$object(
+		_List_fromArray(
+			[
+				_Utils_Tuple2(
+				'txt',
+				$elm$json$Json$Encode$string(a.a.str)),
+				_Utils_Tuple2(
+				'systemRhythmAmt',
+				$elm$json$Json$Encode$int(a.a.rhythm)),
+				_Utils_Tuple2(
+				'rhythmAmt',
+				$elm$json$Json$Encode$int(a.a.userRhythm)),
+				_Utils_Tuple2(
+				'isHalfLetter',
+				_Utils_eq(a.a.aksharType, $author$project$Main$Half) ? $elm$json$Json$Encode$bool(true) : $elm$json$Json$Encode$bool(false)),
+				_Utils_Tuple2(
+				'rhythmPatternValue',
+				$elm$json$Json$Encode$float(a.patternValue))
+			]));
 };
+var $author$project$Main$encodeMLine = function (al) {
+	return $elm$json$Json$Encode$object(
+		_List_fromArray(
+			[
+				_Utils_Tuple2(
+				'rhythmAmtCumulative',
+				$elm$json$Json$Encode$int(al.rhythmTotal)),
+				_Utils_Tuple2(
+				'subUnits',
+				A2($elm$json$Json$Encode$array, $author$project$Main$encodeMAkshar, al.units))
+			]));
+};
+var $author$project$Main$encodeMaatrik = F2(
+	function (m, l) {
+		return $elm$json$Json$Encode$object(
+			_List_fromArray(
+				[
+					_Utils_Tuple2(
+					'maxLineLen',
+					$elm$json$Json$Encode$int(m)),
+					_Utils_Tuple2(
+					'lines',
+					A2($elm$json$Json$Encode$array, $author$project$Main$encodeMLine, l)),
+					_Utils_Tuple2(
+					'poemType',
+					$elm$json$Json$Encode$string('MAATRIK'))
+				]));
+	});
 var $author$project$Main$encodePoem = function (p) {
 	switch (p.$) {
 		case 'GenericPoem':
@@ -5641,10 +5650,7 @@ var $author$project$Main$encodePoem = function (p) {
 			return A3($author$project$Main$encodeFreeVerse, data.maxLineLen, data.lines, data.composite);
 		default:
 			var data = p.a;
-			return A2(
-				$author$project$Main$encodeGeneric,
-				data.maxLineLen,
-				A2($elm$core$Array$map, $author$project$Main$maatrikLToPoemL, data.lines));
+			return A2($author$project$Main$encodeMaatrik, data.maxLineLen, data.lines);
 	}
 };
 var $author$project$Main$encodeModel = function (model) {
@@ -5672,6 +5678,10 @@ var $author$project$Main$Ghazal = function (a) {
 var $author$project$Main$MaatrikPoem = function (a) {
 	return {$: 'MaatrikPoem', a: a};
 };
+var $author$project$Main$PoemLine = F3(
+	function (str, rhythmTotal, units) {
+		return {rhythmTotal: rhythmTotal, str: str, units: units};
+	});
 var $author$project$Main$Consonant = {$: 'Consonant'};
 var $author$project$Main$PureVowel = {$: 'PureVowel'};
 var $author$project$Main$adjustMaatraaChar = function (a) {
@@ -5992,12 +6002,49 @@ var $author$project$Main$MaatrikAkshar = F2(
 var $author$project$Main$maatrikAksharFrmGA = function (a) {
 	return A2($author$project$Main$MaatrikAkshar, a, a.rhythm);
 };
+var $elm$core$Elm$JsArray$map = _JsArray_map;
+var $elm$core$Array$map = F2(
+	function (func, _v0) {
+		var len = _v0.a;
+		var startShift = _v0.b;
+		var tree = _v0.c;
+		var tail = _v0.d;
+		var helper = function (node) {
+			if (node.$ === 'SubTree') {
+				var subTree = node.a;
+				return $elm$core$Array$SubTree(
+					A2($elm$core$Elm$JsArray$map, helper, subTree));
+			} else {
+				var values = node.a;
+				return $elm$core$Array$Leaf(
+					A2($elm$core$Elm$JsArray$map, func, values));
+			}
+		};
+		return A4(
+			$elm$core$Array$Array_elm_builtin,
+			len,
+			startShift,
+			A2($elm$core$Elm$JsArray$map, helper, tree),
+			A2($elm$core$Elm$JsArray$map, func, tail));
+	});
 var $author$project$Main$maatrikLFromPoemL = function (lineP) {
 	return A3(
 		$author$project$Main$MaatrikLine,
 		lineP.str,
 		lineP.rhythmTotal,
 		A2($elm$core$Array$map, $author$project$Main$maatrikAksharFrmGA, lineP.units));
+};
+var $author$project$Main$maatrikLToPoemL = function (lineM) {
+	return A3(
+		$author$project$Main$PoemLine,
+		lineM.str,
+		lineM.rhythmTotal,
+		A2(
+			$elm$core$Array$map,
+			function ($) {
+				return $.a;
+			},
+			lineM.units));
 };
 var $author$project$Main$Misraa = F2(
 	function (line, rkUnits) {
@@ -7182,6 +7229,74 @@ var $author$project$Main$ghazalProcess = F2(
 		return $author$project$Main$Ghazal(
 			{kaafiyaa: kaafiyaa, lines: misre2, maxLineLen: basic.maxLineLen, radeef: radeef});
 	});
+var $author$project$Main$emptyMAkshar = A2($author$project$Main$MaatrikAkshar, $author$project$Main$emptyAkshar, 0);
+var $author$project$Main$maatrikSetAksharPattern = F2(
+	function (ac, an) {
+		return ((ac.a.rhythm === 1) && (an.a.rhythm === 1)) ? {
+			a1: _Utils_update(
+				ac,
+				{patternValue: 1.5}),
+			a2: _Utils_update(
+				an,
+				{patternValue: 1.5}),
+			changed: true
+		} : {a1: ac, a2: an, changed: false};
+	});
+var $author$project$Main$maatrikSetLineUnitsPattern = F2(
+	function (lineUnits, i) {
+		maatrikSetLineUnitsPattern:
+		while (true) {
+			var an = A2(
+				$elm$core$Maybe$withDefault,
+				$author$project$Main$emptyMAkshar,
+				A2($elm$core$Array$get, i + 1, lineUnits));
+			var ac = A2(
+				$elm$core$Maybe$withDefault,
+				$author$project$Main$emptyMAkshar,
+				A2($elm$core$Array$get, i, lineUnits));
+			var result = A2($author$project$Main$maatrikSetAksharPattern, ac, an);
+			var lineUnits1 = A3($elm$core$Array$set, i, result.a1, lineUnits);
+			var newLineUnits = A3($elm$core$Array$set, i + 1, result.a2, lineUnits1);
+			if (_Utils_cmp(
+				i,
+				$elm$core$Array$length(lineUnits) - 1) > 0) {
+				return lineUnits;
+			} else {
+				if (result.changed) {
+					var $temp$lineUnits = newLineUnits,
+						$temp$i = i + 2;
+					lineUnits = $temp$lineUnits;
+					i = $temp$i;
+					continue maatrikSetLineUnitsPattern;
+				} else {
+					var $temp$lineUnits = newLineUnits,
+						$temp$i = i + 1;
+					lineUnits = $temp$lineUnits;
+					i = $temp$i;
+					continue maatrikSetLineUnitsPattern;
+				}
+			}
+		}
+	});
+var $author$project$Main$maatrikSetLinePattern = function (line) {
+	return _Utils_update(
+		line,
+		{
+			units: A2($author$project$Main$maatrikSetLineUnitsPattern, line.units, 0)
+		});
+};
+var $author$project$Main$maatrikProcessPoem = F2(
+	function (pom, oldPom) {
+		var genericOld = $author$project$Main$genericGetData(oldPom);
+		var basic = $author$project$Main$genericGetData(
+			A2($author$project$Main$processPoem, pom, genericOld.lines));
+		var maatrikLinesWPattern = A2(
+			$elm$core$Array$map,
+			$author$project$Main$maatrikSetLinePattern,
+			A2($elm$core$Array$map, $author$project$Main$maatrikLFromPoemL, basic.lines));
+		return $author$project$Main$MaatrikPoem(
+			{lines: maatrikLinesWPattern, maxLineLen: basic.maxLineLen});
+	});
 var $author$project$Main$preProcessPoem = F3(
 	function (pom, oldpom, pomType) {
 		switch (pomType) {
@@ -7192,6 +7307,8 @@ var $author$project$Main$preProcessPoem = F3(
 					$author$project$Main$genericGetData(oldpom).lines);
 			case 'FREEVERSE':
 				return A2($author$project$Main$fvProcess, pom, oldpom);
+			case 'MAATRIK':
+				return A2($author$project$Main$maatrikProcessPoem, pom, oldpom);
 			default:
 				return A2(
 					$author$project$Main$processPoem,

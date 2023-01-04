@@ -10,9 +10,7 @@
 </head>
 
 <body style="background-color: black;">
-  <textarea id="poem" rows="5" cols="30">कोई 
-कोई को
-को</textarea>
+  <textarea id="poem" rows="5" cols="30">ज़िन्दगी के मोड़ पर</textarea>
   <input type="number" min="1" step="1" id='txtBase' value="1" onchange="callBaseChange()">
   <button onclick="callProcessPoem()">Process Poem</button>
   <div id="myapp"></div>
@@ -41,7 +39,7 @@ hpra.ports.givePoemRhythm.subscribe(function(hpraResult) {
 function callProcessPoem()
 {
   poem = document.getElementById('poem').value;
-  hpra.ports.getPoem.send(JSON.stringify({ poem: poem, poemType: "generic" }));
+  hpra.ports.getPoem.send(JSON.stringify({ poem: poem, poemType: "maatrik" }));
 }
 
 function callAdjustMaatraa(li, ci) { 

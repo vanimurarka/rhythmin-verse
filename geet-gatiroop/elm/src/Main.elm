@@ -48,6 +48,7 @@ type alias MaatrikAkshar =
     a : Akshar,
     patternValue : Float
   }
+emptyMAkshar = MaatrikAkshar emptyAkshar 0
 
 type alias PoemLine =
   { str : String
@@ -316,6 +317,39 @@ maatrikLToPoemL lineM =
 maatrikLFromPoemL lineP =
   MaatrikLine lineP.str lineP.rhythmTotal (Array.map maatrikAksharFrmGA lineP.units)
 
+maatrikSetAksharPattern ac an =
+  if ((ac.a.rhythm == 1) && (an.a.rhythm == 1)) then
+    {a1 = {ac | patternValue = 1.5}, a2 = {an | patternValue = 1.5}, changed = True}
+  else
+    {a1 = ac, a2 = an, changed = False}
+
+maatrikSetLineUnitsPattern lineUnits i =
+  let 
+    ac = Maybe.withDefault emptyMAkshar (Array.get i lineUnits)
+    an = Maybe.withDefault emptyMAkshar (Array.get (i+1) lineUnits)
+    result = maatrikSetAksharPattern ac an 
+    lineUnits1 = Array.set i result.a1 lineUnits
+    newLineUnits = Array.set (i+1) result.a2 lineUnits1
+  in 
+    if (i > (Array.length lineUnits - 1)) then
+      lineUnits
+    else
+      if (result.changed) then
+        maatrikSetLineUnitsPattern newLineUnits (i+2)
+      else
+        maatrikSetLineUnitsPattern newLineUnits (i+1)
+
+maatrikSetLinePattern line =
+  { line | units = maatrikSetLineUnitsPattern line.units 0}
+
+maatrikProcessPoem pom oldPom =
+  let 
+    genericOld = genericGetData oldPom
+    basic = genericGetData (processPoem pom genericOld.lines)
+    maatrikLinesWPattern = Array.map maatrikSetLinePattern (Array.map maatrikLFromPoemL basic.lines)
+  in 
+    MaatrikPoem { maxLineLen = basic.maxLineLen, lines = maatrikLinesWPattern }    
+
 -- == GHAZAL == --
 
 ghazalGetData p =
@@ -561,6 +595,7 @@ preProcessPoem pom oldpom pomType =
     "GHAZAL" -> 
         ghazalProcess pom (genericGetData oldpom).lines
     "FREEVERSE" -> fvProcess pom oldpom 
+    "MAATRIK" -> maatrikProcessPoem pom oldpom
     _ -> processPoem pom (genericGetData oldpom).lines
 
 
@@ -727,6 +762,15 @@ encodeAkshar a =
     , ("isHalfLetter", if (a.aksharType == Half) then (E.bool True) else (E.bool False))
     ]
 
+encodeMAkshar a =
+  E.object
+    [ ("txt", E.string a.a.str)
+    , ("systemRhythmAmt", E.int a.a.rhythm)
+    , ("rhythmAmt", E.int a.a.userRhythm)
+    , ("isHalfLetter", if (a.a.aksharType == Half) then (E.bool True) else (E.bool False))
+    , ("rhythmPatternValue", E.float a.patternValue)
+    ]
+
 combineAksharRK a rk =
   { str = a.str, rhythm = a.rhythm, userRhythm = a.userRhythm, aksharType = a.aksharType, rk = rk }
 
@@ -743,6 +787,12 @@ encodeLine al =
   E.object
     [("rhythmAmtCumulative",E.int al.rhythmTotal)
     , ("subUnits", E.array encodeAkshar al.units)
+    ]
+
+encodeMLine al =
+  E.object
+    [("rhythmAmtCumulative",E.int al.rhythmTotal)
+    , ("subUnits", E.array encodeMAkshar al.units)
     ]
 
 encodeMisraa m =
@@ -763,6 +813,13 @@ encodeGeneric m l =
     [("maxLineLen", E.int m)
     , ("lines", E.array encodeLine l)
     , ("poemType", E.string "GENERIC")
+    ]
+
+encodeMaatrik m l =
+  E.object
+    [("maxLineLen", E.int m)
+    , ("lines", E.array encodeMLine l)
+    , ("poemType", E.string "MAATRIK")
     ]
 
 encodeGhazal m l =
@@ -793,7 +850,7 @@ encodePoem p =
     GenericPoem data -> encodeGeneric data.maxLineLen data.lines  
     Ghazal data -> encodeGhazal data.maxLineLen data.lines
     FreeVerse data -> encodeFreeVerse data.maxLineLen data.lines data.composite
-    MaatrikPoem data -> encodeGeneric data.maxLineLen (Array.map maatrikLToPoemL data.lines)
+    MaatrikPoem data -> encodeMaatrik data.maxLineLen data.lines
 
 encodeModel : Model -> E.Value
 encodeModel model =
