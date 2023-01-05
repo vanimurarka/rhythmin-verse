@@ -29,7 +29,7 @@ removePoornviraam string =
   userReplace "।" (\_ -> " ") string
 
 cleanMaapnee string =
-  userReplace "[^21२१]" (\_ -> "") string
+  userReplace "[^21२१ ]" (\_ -> "") string
 
 type AksharType  = PureVowel | Maatraa | Halant | Half | Consonant | Other | Empty
 
@@ -347,27 +347,74 @@ maatrikSetLineUnitsPattern lineUnits i =
 maatrikSetLinePattern line =
   { line | units = maatrikSetLineUnitsPattern line.units 0}
 
-maatrikSetAksharMaapnee ac an mc mn =
+maatrikSetAksharMaapnee : MaatrikAkshar -> Int -> MaatrikAkshar -> MaapneeResult
+maatrikSetAksharMaapnee ac mc an =
+  let
+   mc1 = Debug.log "mc " mc
+   a1s = Debug.log "ac-s " ac.a.str
+   a1r = Debug.log "ac-r " ac.a.userRhythm
+   
+  in 
   if (mc == 1) then
-    if (ac.userRhythm == 1) then
-      {a1 = ac, a2 = an, set = 1}
+    if (ac.a.userRhythm == 1) then
+      {a1 = {ac | patternValue = 1}, a2 = an, set = 1}
     else 
       {a1 = ac, a2 = an, set = 0}
   else -- all other mc values = 2
-    if (ac.userRhythm == 2) then
-      {a1 = ac, a2 = an, set = 1}
-    else 
-      {a1 = ac, a2 = an, set = 0}
+    if (ac.a.userRhythm == 2) then
+      {a1 = {ac | patternValue = 2}, a2 = an, set = 1}
+    else if ((ac.a.userRhythm == 1) && (an.a.userRhythm == 1)) then
+        {a1 = {ac | patternValue = 1.5}, a2 = {an | patternValue = 1.5}, set = 2}
+      else
+        {a1 = ac, a2 = an, set = 0}
 
+type alias MaapneeResult = {a1 : MaatrikAkshar, a2 : MaatrikAkshar, set : Int}
+
+maatrikSetLineUnitsMaapnee : Array MaatrikAkshar -> Int -> Array Int -> Int -> Array MaatrikAkshar
+maatrikSetLineUnitsMaapnee lineUnits i maapnee mi =
+  let 
+    ac = Maybe.withDefault emptyMAkshar (Array.get i lineUnits)
+    an = Maybe.withDefault emptyMAkshar (Array.get (i+1) lineUnits)
+    mc = Maybe.withDefault 2 (Array.get mi maapnee)
+    result = maatrikSetAksharMaapnee ac mc an
+    lineUnits1 = Array.set i result.a1 lineUnits
+    newLineUnits = Array.set (i+1) result.a2 lineUnits1
+  in 
+    if (i > (Array.length lineUnits - 1)) then
+      newLineUnits
+    else
+      if (result.set == 2) then
+        maatrikSetLineUnitsMaapnee newLineUnits (i+2) maapnee (mi+1)
+      else if (result.set == 1) then
+          maatrikSetLineUnitsMaapnee newLineUnits (i+1) maapnee (mi+1)
+        else if (ac.a.userRhythm == 0) then
+            maatrikSetLineUnitsMaapnee newLineUnits (i+1) maapnee mi
+          else 
+            newLineUnits
+
+maatrikSetLineMaapnee : MaatrikLine -> Array Int -> MaatrikLine
+maatrikSetLineMaapnee line maapnee =
+  { line | units = maatrikSetLineUnitsMaapnee line.units 0 maapnee 0}
+
+maapneeToInt m = 
+  case m of 
+    '1' -> 1
+    '2' -> 2
+    '१' -> 1
+    '२' -> 2
+    _ -> 0
 
 
 maatrikProcessPoem pom oldPom maapnee =
   let 
     genericOld = genericGetData oldPom
     basic = genericGetData (processPoem pom genericOld.lines)
-    maatrikLinesWPattern = Array.map maatrikSetLinePattern (Array.map maatrikLFromPoemL basic.lines)
+    maapneeCharA = Array.fromList (String.toList maapnee)
+    maapneeArray = Array.map maapneeToInt maapneeCharA 
+    maatrikLines = Array.map maatrikLFromPoemL basic.lines
+    maatrikLinesWMaapnee = Array.map2 maatrikSetLineMaapnee maatrikLines (Array.repeat (Array.length maatrikLines) maapneeArray) 
   in 
-    MaatrikPoem { maxLineLen = basic.maxLineLen, lines = maatrikLinesWPattern }    
+    MaatrikPoem { maxLineLen = basic.maxLineLen, lines = maatrikLinesWMaapnee }    
 
 maatrikAdjustMaatraa poemData li ci =
   let 

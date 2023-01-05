@@ -6241,7 +6241,7 @@ var $author$project$Main$userReplace = F3(
 var $author$project$Main$cleanMaapnee = function (string) {
 	return A3(
 		$author$project$Main$userReplace,
-		'[^21२१]',
+		'[^21२१ ]',
 		function (_v0) {
 			return '';
 		},
@@ -7310,17 +7310,139 @@ var $author$project$Main$ghazalProcess = F2(
 		return $author$project$Main$Ghazal(
 			{kaafiyaa: kaafiyaa, lines: misre2, maxLineLen: basic.maxLineLen, radeef: radeef});
 	});
+var $author$project$Main$maapneeToInt = function (m) {
+	switch (m.valueOf()) {
+		case '1':
+			return 1;
+		case '2':
+			return 2;
+		case '१':
+			return 1;
+		case '२':
+			return 2;
+		default:
+			return 0;
+	}
+};
+var $elm$core$Debug$log = _Debug_log;
+var $author$project$Main$maatrikSetAksharMaapnee = F3(
+	function (ac, mc, an) {
+		var mc1 = A2($elm$core$Debug$log, 'mc ', mc);
+		var a1s = A2($elm$core$Debug$log, 'ac-s ', ac.a.str);
+		var a1r = A2($elm$core$Debug$log, 'ac-r ', ac.a.userRhythm);
+		return (mc === 1) ? ((ac.a.userRhythm === 1) ? {
+			a1: _Utils_update(
+				ac,
+				{patternValue: 1}),
+			a2: an,
+			set: 1
+		} : {a1: ac, a2: an, set: 0}) : ((ac.a.userRhythm === 2) ? {
+			a1: _Utils_update(
+				ac,
+				{patternValue: 2}),
+			a2: an,
+			set: 1
+		} : (((ac.a.userRhythm === 1) && (an.a.userRhythm === 1)) ? {
+			a1: _Utils_update(
+				ac,
+				{patternValue: 1.5}),
+			a2: _Utils_update(
+				an,
+				{patternValue: 1.5}),
+			set: 2
+		} : {a1: ac, a2: an, set: 0}));
+	});
+var $author$project$Main$maatrikSetLineUnitsMaapnee = F4(
+	function (lineUnits, i, maapnee, mi) {
+		maatrikSetLineUnitsMaapnee:
+		while (true) {
+			var mc = A2(
+				$elm$core$Maybe$withDefault,
+				2,
+				A2($elm$core$Array$get, mi, maapnee));
+			var an = A2(
+				$elm$core$Maybe$withDefault,
+				$author$project$Main$emptyMAkshar,
+				A2($elm$core$Array$get, i + 1, lineUnits));
+			var ac = A2(
+				$elm$core$Maybe$withDefault,
+				$author$project$Main$emptyMAkshar,
+				A2($elm$core$Array$get, i, lineUnits));
+			var result = A3($author$project$Main$maatrikSetAksharMaapnee, ac, mc, an);
+			var lineUnits1 = A3($elm$core$Array$set, i, result.a1, lineUnits);
+			var newLineUnits = A3($elm$core$Array$set, i + 1, result.a2, lineUnits1);
+			if (_Utils_cmp(
+				i,
+				$elm$core$Array$length(lineUnits) - 1) > 0) {
+				return newLineUnits;
+			} else {
+				if (result.set === 2) {
+					var $temp$lineUnits = newLineUnits,
+						$temp$i = i + 2,
+						$temp$maapnee = maapnee,
+						$temp$mi = mi + 1;
+					lineUnits = $temp$lineUnits;
+					i = $temp$i;
+					maapnee = $temp$maapnee;
+					mi = $temp$mi;
+					continue maatrikSetLineUnitsMaapnee;
+				} else {
+					if (result.set === 1) {
+						var $temp$lineUnits = newLineUnits,
+							$temp$i = i + 1,
+							$temp$maapnee = maapnee,
+							$temp$mi = mi + 1;
+						lineUnits = $temp$lineUnits;
+						i = $temp$i;
+						maapnee = $temp$maapnee;
+						mi = $temp$mi;
+						continue maatrikSetLineUnitsMaapnee;
+					} else {
+						if (!ac.a.userRhythm) {
+							var $temp$lineUnits = newLineUnits,
+								$temp$i = i + 1,
+								$temp$maapnee = maapnee,
+								$temp$mi = mi;
+							lineUnits = $temp$lineUnits;
+							i = $temp$i;
+							maapnee = $temp$maapnee;
+							mi = $temp$mi;
+							continue maatrikSetLineUnitsMaapnee;
+						} else {
+							return newLineUnits;
+						}
+					}
+				}
+			}
+		}
+	});
+var $author$project$Main$maatrikSetLineMaapnee = F2(
+	function (line, maapnee) {
+		return _Utils_update(
+			line,
+			{
+				units: A4($author$project$Main$maatrikSetLineUnitsMaapnee, line.units, 0, maapnee, 0)
+			});
+	});
 var $author$project$Main$maatrikProcessPoem = F3(
 	function (pom, oldPom, maapnee) {
+		var maapneeCharA = $elm$core$Array$fromList(
+			$elm$core$String$toList(maapnee));
+		var maapneeArray = A2($elm$core$Array$map, $author$project$Main$maapneeToInt, maapneeCharA);
 		var genericOld = $author$project$Main$genericGetData(oldPom);
 		var basic = $author$project$Main$genericGetData(
 			A2($author$project$Main$processPoem, pom, genericOld.lines));
-		var maatrikLinesWPattern = A2(
-			$elm$core$Array$map,
-			$author$project$Main$maatrikSetLinePattern,
-			A2($elm$core$Array$map, $author$project$Main$maatrikLFromPoemL, basic.lines));
+		var maatrikLines = A2($elm$core$Array$map, $author$project$Main$maatrikLFromPoemL, basic.lines);
+		var maatrikLinesWMaapnee = A3(
+			$elm_community$array_extra$Array$Extra$map2,
+			$author$project$Main$maatrikSetLineMaapnee,
+			maatrikLines,
+			A2(
+				$elm$core$Array$repeat,
+				$elm$core$Array$length(maatrikLines),
+				maapneeArray));
 		return $author$project$Main$MaatrikPoem(
-			{lines: maatrikLinesWPattern, maxLineLen: basic.maxLineLen});
+			{lines: maatrikLinesWMaapnee, maxLineLen: basic.maxLineLen});
 	});
 var $author$project$Main$preProcessPoem = F4(
 	function (pom, oldpom, pomType, maapnee) {
