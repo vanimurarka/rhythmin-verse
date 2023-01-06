@@ -344,7 +344,7 @@ maatrikSetLineUnitsPattern lineUnits i =
 
 maatrikSetLinePattern line =
   { line | units = maatrikSetLineUnitsPattern line.units 0}
-
+ 
 maatrikSetAksharMaapnee : MaatrikAkshar -> Int -> MaatrikAkshar -> MaapneeResult
 maatrikSetAksharMaapnee ac mc an =
   case mc of 
