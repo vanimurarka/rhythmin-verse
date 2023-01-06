@@ -256,9 +256,9 @@ function drawStyleCharBlock(c,colorBy)
 {
 	// debugger;
 	// space, comma
-	if (c.vowelNumber === -10)
+	if (c.txt == " ")
 	{
-		if (c.rhythmPatternValue == 0) // yati
+		if (c.rhythmPatternValue == -1) // yati
 			return "stroke:rgb(0,118,255);stroke-width:3";
 		else // do not display normal space, comma
 			return "display: none";

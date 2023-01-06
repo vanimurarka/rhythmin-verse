@@ -6608,10 +6608,13 @@ var $author$project$Main$mrgMChelper = F3(
 var $author$project$Main$mrgMCline = function (list) {
 	return A3($author$project$Main$mrgMChelper, list, 0, $elm$core$Array$empty);
 };
+var $author$project$Main$ChandraBindu = {$: 'ChandraBindu'};
 var $author$project$Main$Other = {$: 'Other'};
 var $author$project$Main$isBindu = function (c) {
-	var cd = $elm$core$Char$toCode(c);
-	return (cd === 2306) ? true : false;
+	return $elm$core$Char$toCode(c) === 2306;
+};
+var $author$project$Main$isChandraBindu = function (c) {
+	return $elm$core$Char$toCode(c) === 2305;
 };
 var $author$project$Main$isHalant = function (c) {
 	var cd = $elm$core$Char$toCode(c);
@@ -6619,15 +6622,15 @@ var $author$project$Main$isHalant = function (c) {
 };
 var $author$project$Main$isHindi = function (c) {
 	var cd = $elm$core$Char$toCode(c);
-	return ((cd >= 2306) && (cd <= 2399)) ? true : false;
+	return (cd >= 2305) && (cd <= 2399);
 };
 var $author$project$Main$isMaatraaVowel = function (c) {
 	var cd = $elm$core$Char$toCode(c);
-	return ((cd >= 2366) && (cd <= 2380)) ? true : false;
+	return (cd >= 2366) && (cd <= 2380);
 };
 var $author$project$Main$isPureVowel = function (c) {
 	var cd = $elm$core$Char$toCode(c);
-	return ((cd >= 2309) && (cd <= 2324)) ? true : false;
+	return (cd >= 2309) && (cd <= 2324);
 };
 var $author$project$Main$maatraaToVowel = function (c) {
 	switch (c.valueOf()) {
@@ -6711,14 +6714,16 @@ var $author$project$Main$processChar = function (c) {
 		a,
 		{aksharType: $author$project$Main$Half, rhythm: 0, userRhythm: 0}) : ($author$project$Main$isHalant(c) ? _Utils_update(
 		a,
-		{aksharType: $author$project$Main$Halant, rhythm: 0, userRhythm: 0}) : _Utils_update(
+		{aksharType: $author$project$Main$Halant, rhythm: 0, userRhythm: 0}) : ($author$project$Main$isChandraBindu(c) ? _Utils_update(
+		a,
+		{aksharType: $author$project$Main$ChandraBindu, rhythm: 0, userRhythm: 0}) : _Utils_update(
 		a,
 		{
 			aksharType: $author$project$Main$Consonant,
 			rhythm: aRhythm,
 			userRhythm: aRhythm,
 			vowel: _Utils_chr('अ')
-		}))))) : a;
+		})))))) : a;
 };
 var $elm$core$String$foldr = _String_foldr;
 var $elm$core$String$toList = function (string) {
@@ -7324,33 +7329,54 @@ var $author$project$Main$maapneeToInt = function (m) {
 			return 0;
 	}
 };
-var $elm$core$Debug$log = _Debug_log;
 var $author$project$Main$maatrikSetAksharMaapnee = F3(
 	function (ac, mc, an) {
-		var mc1 = A2($elm$core$Debug$log, 'mc ', mc);
-		var a1s = A2($elm$core$Debug$log, 'ac-s ', ac.a.str);
-		var a1r = A2($elm$core$Debug$log, 'ac-r ', ac.a.userRhythm);
-		return (mc === 1) ? ((ac.a.userRhythm === 1) ? {
-			a1: _Utils_update(
-				ac,
-				{patternValue: 1}),
-			a2: an,
-			set: 1
-		} : {a1: ac, a2: an, set: 0}) : ((ac.a.userRhythm === 2) ? {
-			a1: _Utils_update(
-				ac,
-				{patternValue: 2}),
-			a2: an,
-			set: 1
-		} : (((ac.a.userRhythm === 1) && (an.a.userRhythm === 1)) ? {
-			a1: _Utils_update(
-				ac,
-				{patternValue: 1.5}),
-			a2: _Utils_update(
-				an,
-				{patternValue: 1.5}),
-			set: 2
-		} : {a1: ac, a2: an, set: 0}));
+		switch (mc) {
+			case 1:
+				return (ac.a.userRhythm === 1) ? {
+					a1: _Utils_update(
+						ac,
+						{patternValue: 1}),
+					a2: an,
+					set: 1
+				} : {a1: ac, a2: an, set: 0};
+			case 2:
+				return (ac.a.userRhythm === 2) ? {
+					a1: _Utils_update(
+						ac,
+						{patternValue: 2}),
+					a2: an,
+					set: 1
+				} : (((ac.a.userRhythm === 1) && (an.a.userRhythm === 1)) ? {
+					a1: _Utils_update(
+						ac,
+						{patternValue: 1.5}),
+					a2: _Utils_update(
+						an,
+						{patternValue: 1.5}),
+					set: 2
+				} : {a1: ac, a2: an, set: 0});
+			case 0:
+				var _v1 = ac.a.aksharType;
+				switch (_v1.$) {
+					case 'Other':
+						return {
+							a1: _Utils_update(
+								ac,
+								{patternValue: -1}),
+							a2: an,
+							set: 1
+						};
+					case 'ChandraBindu':
+						return {a1: ac, a2: an, set: 0};
+					case 'Half':
+						return (!ac.a.userRhythm) ? {a1: ac, a2: an, set: 0} : {a1: ac, a2: an, set: -1};
+					default:
+						return {a1: ac, a2: an, set: -1};
+				}
+			default:
+				return {a1: ac, a2: an, set: 0};
+		}
 	});
 var $author$project$Main$maatrikSetLineUnitsMaapnee = F4(
 	function (lineUnits, i, maapnee, mi) {
@@ -7376,18 +7402,19 @@ var $author$project$Main$maatrikSetLineUnitsMaapnee = F4(
 				$elm$core$Array$length(lineUnits) - 1) > 0) {
 				return newLineUnits;
 			} else {
-				if (result.set === 2) {
-					var $temp$lineUnits = newLineUnits,
-						$temp$i = i + 2,
-						$temp$maapnee = maapnee,
-						$temp$mi = mi + 1;
-					lineUnits = $temp$lineUnits;
-					i = $temp$i;
-					maapnee = $temp$maapnee;
-					mi = $temp$mi;
-					continue maatrikSetLineUnitsMaapnee;
-				} else {
-					if (result.set === 1) {
+				var _v0 = result.set;
+				switch (_v0) {
+					case 2:
+						var $temp$lineUnits = newLineUnits,
+							$temp$i = i + 2,
+							$temp$maapnee = maapnee,
+							$temp$mi = mi + 1;
+						lineUnits = $temp$lineUnits;
+						i = $temp$i;
+						maapnee = $temp$maapnee;
+						mi = $temp$mi;
+						continue maatrikSetLineUnitsMaapnee;
+					case 1:
 						var $temp$lineUnits = newLineUnits,
 							$temp$i = i + 1,
 							$temp$maapnee = maapnee,
@@ -7397,21 +7424,32 @@ var $author$project$Main$maatrikSetLineUnitsMaapnee = F4(
 						maapnee = $temp$maapnee;
 						mi = $temp$mi;
 						continue maatrikSetLineUnitsMaapnee;
-					} else {
-						if (!ac.a.userRhythm) {
+					default:
+						if (_Utils_eq(result.set, -1)) {
 							var $temp$lineUnits = newLineUnits,
-								$temp$i = i + 1,
+								$temp$i = i,
 								$temp$maapnee = maapnee,
-								$temp$mi = mi;
+								$temp$mi = mi + 1;
 							lineUnits = $temp$lineUnits;
 							i = $temp$i;
 							maapnee = $temp$maapnee;
 							mi = $temp$mi;
 							continue maatrikSetLineUnitsMaapnee;
 						} else {
-							return newLineUnits;
+							if (!ac.a.userRhythm) {
+								var $temp$lineUnits = newLineUnits,
+									$temp$i = i + 1,
+									$temp$maapnee = maapnee,
+									$temp$mi = mi;
+								lineUnits = $temp$lineUnits;
+								i = $temp$i;
+								maapnee = $temp$maapnee;
+								mi = $temp$mi;
+								continue maatrikSetLineUnitsMaapnee;
+							} else {
+								return newLineUnits;
+							}
 						}
-					}
 				}
 			}
 		}

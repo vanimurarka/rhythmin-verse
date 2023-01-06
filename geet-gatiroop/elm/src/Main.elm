@@ -31,7 +31,7 @@ removePoornviraam string =
 cleanMaapnee string =
   userReplace "[^21२१ ]" (\_ -> "") string
 
-type AksharType  = PureVowel | Maatraa | Halant | Half | Consonant | Other | Empty
+type AksharType  = PureVowel | Maatraa | Halant | Half | Consonant | ChandraBindu | Other | Empty
 
 type alias Akshar =
   { str : String,
@@ -102,29 +102,25 @@ isHindi c =
   let 
     cd = Char.toCode c
   in
-    if (cd >= 2306) && (cd <= 2399) then True
-    else False
+    ((cd >= 2305) && (cd <= 2399))
       
 isPureVowel c =
   let 
     cd = Char.toCode c
   in
-    if (cd >= 2309) && (cd <= 2324) then True
-    else False
+    ((cd >= 2309) && (cd <= 2324))
       
 isMaatraaVowel c =
   let 
     cd = Char.toCode c
   in
-    if (cd >= 2366) && (cd <= 2380) then True
-    else False
+    ((cd >= 2366) && (cd <= 2380))
+
+isChandraBindu c =
+  ((Char.toCode c) == 2305)
 
 isBindu c =
-  let 
-    cd = Char.toCode c
-  in 
-    if (cd == 2306) then True
-    else False
+  ((Char.toCode c) == 2306)
 
 isHalant c =
   let 
@@ -204,8 +200,10 @@ processChar c =
           {a | aksharType = Half, rhythm = 0, userRhythm = 0}
         else if isHalant c then
             {a | aksharType = Halant, rhythm = 0, userRhythm = 0}
-          else
-            {a | aksharType = Consonant, vowel = 'अ', rhythm = aRhythm, userRhythm = aRhythm}
+          else if isChandraBindu c then
+            {a | aksharType = ChandraBindu, rhythm = 0, userRhythm = 0}
+            else
+              {a | aksharType = Consonant, vowel = 'अ', rhythm = aRhythm, userRhythm = aRhythm}
   else
     a
 
@@ -349,24 +347,26 @@ maatrikSetLinePattern line =
 
 maatrikSetAksharMaapnee : MaatrikAkshar -> Int -> MaatrikAkshar -> MaapneeResult
 maatrikSetAksharMaapnee ac mc an =
-  let
-   mc1 = Debug.log "mc " mc
-   a1s = Debug.log "ac-s " ac.a.str
-   a1r = Debug.log "ac-r " ac.a.userRhythm
-   
-  in 
-  if (mc == 1) then
-    if (ac.a.userRhythm == 1) then
-      {a1 = {ac | patternValue = 1}, a2 = an, set = 1}
-    else 
-      {a1 = ac, a2 = an, set = 0}
-  else -- all other mc values = 2
-    if (ac.a.userRhythm == 2) then
-      {a1 = {ac | patternValue = 2}, a2 = an, set = 1}
-    else if ((ac.a.userRhythm == 1) && (an.a.userRhythm == 1)) then
-        {a1 = {ac | patternValue = 1.5}, a2 = {an | patternValue = 1.5}, set = 2}
-      else
+  case mc of 
+    1 ->
+      if (ac.a.userRhythm == 1) then
+        {a1 = {ac | patternValue = 1}, a2 = an, set = 1}
+      else 
         {a1 = ac, a2 = an, set = 0}
+    2 -> 
+      if (ac.a.userRhythm == 2) then
+        {a1 = {ac | patternValue = 2}, a2 = an, set = 1}
+      else if ((ac.a.userRhythm == 1) && (an.a.userRhythm == 1)) then
+          {a1 = {ac | patternValue = 1.5}, a2 = {an | patternValue = 1.5}, set = 2}
+        else
+          {a1 = ac, a2 = an, set = 0}
+    0 -> 
+      case ac.a.aksharType of 
+        Other -> {a1 = {ac | patternValue = -1}, a2 = an, set = 1}
+        ChandraBindu -> {a1 = ac, a2 = an, set = 0}
+        Half -> if (ac.a.userRhythm == 0) then {a1 = ac, a2 = an, set = 0} else {a1 = ac, a2 = an, set = -1}
+        _ -> {a1 = ac, a2 = an, set = -1}
+    _ -> {a1 = ac, a2 = an, set = 0}
 
 type alias MaapneeResult = {a1 : MaatrikAkshar, a2 : MaatrikAkshar, set : Int}
 
@@ -383,14 +383,15 @@ maatrikSetLineUnitsMaapnee lineUnits i maapnee mi =
     if (i > (Array.length lineUnits - 1)) then
       newLineUnits
     else
-      if (result.set == 2) then
-        maatrikSetLineUnitsMaapnee newLineUnits (i+2) maapnee (mi+1)
-      else if (result.set == 1) then
-          maatrikSetLineUnitsMaapnee newLineUnits (i+1) maapnee (mi+1)
-        else if (ac.a.userRhythm == 0) then
-            maatrikSetLineUnitsMaapnee newLineUnits (i+1) maapnee mi
-          else 
-            newLineUnits
+      case result.set of
+        2 -> maatrikSetLineUnitsMaapnee newLineUnits (i+2) maapnee (mi+1)
+        1 -> maatrikSetLineUnitsMaapnee newLineUnits (i+1) maapnee (mi+1)
+        _ -> if (result.set == -1) then
+            maatrikSetLineUnitsMaapnee newLineUnits (i) maapnee (mi+1)
+          else if (ac.a.userRhythm == 0) then
+              maatrikSetLineUnitsMaapnee newLineUnits (i+1) maapnee mi
+            else 
+              newLineUnits
 
 maatrikSetLineMaapnee : MaatrikLine -> Array Int -> MaatrikLine
 maatrikSetLineMaapnee line maapnee =
