@@ -230,6 +230,15 @@ function draw()
     }    
     else  // normal - numbers are not clickable
     {
+
+    	if (pattern)
+		  {
+		  	gMap.append("svg:text")
+		        .attr("y", charH)
+		        .attr("x", function(d) {return charW*maxLen+(5);})
+		        .text(function(d) { return (dPoem.pattern.rhythmAmtCumulative > 0) ? dPoem.pattern.rhythmAmtCumulative : "";});
+		  }
+
       g.append("svg:text")            // line total maatraa, d = line
       .attr("y", charH)
       .attr("x", function(d) {return charW*maxLen+(5);})
