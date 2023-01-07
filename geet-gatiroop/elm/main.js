@@ -6268,13 +6268,6 @@ var $author$project$Main$maatrikSetLineMaapnee = F2(
 				units: A4($author$project$Main$maatrikSetLineUnitsMaapnee, line.units, 0, maapnee, 0)
 			});
 	});
-var $author$project$Main$maatrikSetLinePattern = function (line) {
-	return _Utils_update(
-		line,
-		{
-			units: A2($author$project$Main$maatrikSetLineUnitsPattern, line.units, 0)
-		});
-};
 var $author$project$Main$maatrikAdjustMaatraa = F3(
 	function (poemData, li, ci) {
 		var oldLine = A2(
@@ -6287,8 +6280,7 @@ var $author$project$Main$maatrikAdjustMaatraa = F3(
 			ci);
 		var newLine = A2(
 			$author$project$Main$maatrikSetLineMaapnee,
-			$author$project$Main$maatrikSetLinePattern(
-				$author$project$Main$maatrikLFromPoemL(newBasicLine)),
+			$author$project$Main$maatrikLFromPoemL(newBasicLine),
 			poemData.maapnee.units);
 		var newLines = A3($elm$core$Array$set, li, newLine, poemData.lines);
 		var newMaxLineLen = (_Utils_cmp(newLine.rhythmTotal, poemData.maxLineLen) > 0) ? newLine.rhythmTotal : poemData.maxLineLen;

@@ -429,7 +429,7 @@ maatrikAdjustMaatraa poemData li ci =
   let 
     oldLine = Maybe.withDefault emptyMLine (Array.get li poemData.lines)
     newBasicLine = adjustMaatraaLine (maatrikLToPoemL oldLine) ci
-    newLine = maatrikSetLineMaapnee (maatrikSetLinePattern (maatrikLFromPoemL newBasicLine)) poemData.maapnee.units
+    newLine = maatrikSetLineMaapnee (maatrikLFromPoemL newBasicLine) poemData.maapnee.units
     newLines = Array.set li newLine poemData.lines
     newMaxLineLen = if (newLine.rhythmTotal > poemData.maxLineLen) then
         newLine.rhythmTotal

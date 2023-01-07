@@ -44,7 +44,7 @@ function callProcessPoem()
 {
   poem = document.getElementById('poem').value;
   maapnee = document.getElementById('idMaapnee').value;
-  hpra.ports.getPoem.send(JSON.stringify({ poem: poem, poemType: "freeverse", maapnee : maapnee }));
+  hpra.ports.getPoem.send(JSON.stringify({ poem: poem, poemType: "maatrik", maapnee : maapnee }));
 }
 
 function callAdjustMaatraa(li, ci) { 
