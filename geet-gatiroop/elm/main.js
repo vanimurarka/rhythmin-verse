@@ -6087,6 +6087,55 @@ var $author$project$Main$maatrikLToPoemL = function (lineM) {
 			lineM.units));
 };
 var $author$project$Main$emptyMAkshar = A2($author$project$Main$MaatrikAkshar, $author$project$Main$emptyAkshar, 0);
+var $author$project$Main$maatrikSetAksharMaapnee = F3(
+	function (ac, mc, an) {
+		switch (mc) {
+			case 1:
+				return (ac.a.userRhythm === 1) ? {
+					a1: _Utils_update(
+						ac,
+						{patternValue: 1}),
+					a2: an,
+					set: 1
+				} : {a1: ac, a2: an, set: 0};
+			case 2:
+				return (ac.a.userRhythm === 2) ? {
+					a1: _Utils_update(
+						ac,
+						{patternValue: 2}),
+					a2: an,
+					set: 1
+				} : (((ac.a.userRhythm === 1) && (an.a.userRhythm === 1)) ? {
+					a1: _Utils_update(
+						ac,
+						{patternValue: 1.5}),
+					a2: _Utils_update(
+						an,
+						{patternValue: 1.5}),
+					set: 2
+				} : {a1: ac, a2: an, set: 0});
+			case 0:
+				var _v1 = ac.a.aksharType;
+				switch (_v1.$) {
+					case 'Other':
+						return {
+							a1: _Utils_update(
+								ac,
+								{patternValue: -1}),
+							a2: an,
+							set: 1
+						};
+					case 'ChandraBindu':
+						return {a1: ac, a2: an, set: 0};
+					case 'Half':
+						return (!ac.a.userRhythm) ? {a1: ac, a2: an, set: 0} : {a1: ac, a2: an, set: -1};
+					default:
+						return {a1: ac, a2: an, set: -1};
+				}
+			default:
+				return {a1: ac, a2: an, set: 0};
+		}
+	});
 var $author$project$Main$maatrikSetAksharPattern = F2(
 	function (ac, an) {
 		return ((ac.a.userRhythm === 1) && (an.a.userRhythm === 1)) ? {
@@ -6135,6 +6184,90 @@ var $author$project$Main$maatrikSetLineUnitsPattern = F2(
 			}
 		}
 	});
+var $author$project$Main$maatrikSetLineUnitsMaapnee = F4(
+	function (lineUnits, i, maapnee, mi) {
+		maatrikSetLineUnitsMaapnee:
+		while (true) {
+			var mc = A2(
+				$elm$core$Maybe$withDefault,
+				2,
+				A2($elm$core$Array$get, mi, maapnee));
+			var an = A2(
+				$elm$core$Maybe$withDefault,
+				$author$project$Main$emptyMAkshar,
+				A2($elm$core$Array$get, i + 1, lineUnits));
+			var ac = A2(
+				$elm$core$Maybe$withDefault,
+				$author$project$Main$emptyMAkshar,
+				A2($elm$core$Array$get, i, lineUnits));
+			var result = A3($author$project$Main$maatrikSetAksharMaapnee, ac, mc, an);
+			var lineUnits1 = A3($elm$core$Array$set, i, result.a1, lineUnits);
+			var newLineUnits = A3($elm$core$Array$set, i + 1, result.a2, lineUnits1);
+			if (_Utils_cmp(
+				i,
+				$elm$core$Array$length(lineUnits) - 1) > 0) {
+				return newLineUnits;
+			} else {
+				var _v0 = result.set;
+				switch (_v0) {
+					case 2:
+						var $temp$lineUnits = newLineUnits,
+							$temp$i = i + 2,
+							$temp$maapnee = maapnee,
+							$temp$mi = mi + 1;
+						lineUnits = $temp$lineUnits;
+						i = $temp$i;
+						maapnee = $temp$maapnee;
+						mi = $temp$mi;
+						continue maatrikSetLineUnitsMaapnee;
+					case 1:
+						var $temp$lineUnits = newLineUnits,
+							$temp$i = i + 1,
+							$temp$maapnee = maapnee,
+							$temp$mi = mi + 1;
+						lineUnits = $temp$lineUnits;
+						i = $temp$i;
+						maapnee = $temp$maapnee;
+						mi = $temp$mi;
+						continue maatrikSetLineUnitsMaapnee;
+					default:
+						if (_Utils_eq(result.set, -1)) {
+							var $temp$lineUnits = newLineUnits,
+								$temp$i = i,
+								$temp$maapnee = maapnee,
+								$temp$mi = mi + 1;
+							lineUnits = $temp$lineUnits;
+							i = $temp$i;
+							maapnee = $temp$maapnee;
+							mi = $temp$mi;
+							continue maatrikSetLineUnitsMaapnee;
+						} else {
+							if (!ac.a.userRhythm) {
+								var $temp$lineUnits = newLineUnits,
+									$temp$i = i + 1,
+									$temp$maapnee = maapnee,
+									$temp$mi = mi;
+								lineUnits = $temp$lineUnits;
+								i = $temp$i;
+								maapnee = $temp$maapnee;
+								mi = $temp$mi;
+								continue maatrikSetLineUnitsMaapnee;
+							} else {
+								return A2($author$project$Main$maatrikSetLineUnitsPattern, newLineUnits, i);
+							}
+						}
+				}
+			}
+		}
+	});
+var $author$project$Main$maatrikSetLineMaapnee = F2(
+	function (line, maapnee) {
+		return _Utils_update(
+			line,
+			{
+				units: A4($author$project$Main$maatrikSetLineUnitsMaapnee, line.units, 0, maapnee, 0)
+			});
+	});
 var $author$project$Main$maatrikSetLinePattern = function (line) {
 	return _Utils_update(
 		line,
@@ -6152,8 +6285,11 @@ var $author$project$Main$maatrikAdjustMaatraa = F3(
 			$author$project$Main$adjustMaatraaLine,
 			$author$project$Main$maatrikLToPoemL(oldLine),
 			ci);
-		var newLine = $author$project$Main$maatrikSetLinePattern(
-			$author$project$Main$maatrikLFromPoemL(newBasicLine));
+		var newLine = A2(
+			$author$project$Main$maatrikSetLineMaapnee,
+			$author$project$Main$maatrikSetLinePattern(
+				$author$project$Main$maatrikLFromPoemL(newBasicLine)),
+			poemData.maapnee.units);
 		var newLines = A3($elm$core$Array$set, li, newLine, poemData.lines);
 		var newMaxLineLen = (_Utils_cmp(newLine.rhythmTotal, poemData.maxLineLen) > 0) ? newLine.rhythmTotal : poemData.maxLineLen;
 		return $author$project$Main$MaatrikPoem(
@@ -7367,139 +7503,6 @@ var $author$project$Main$maapneeToInt = function (m) {
 			return 0;
 	}
 };
-var $author$project$Main$maatrikSetAksharMaapnee = F3(
-	function (ac, mc, an) {
-		switch (mc) {
-			case 1:
-				return (ac.a.userRhythm === 1) ? {
-					a1: _Utils_update(
-						ac,
-						{patternValue: 1}),
-					a2: an,
-					set: 1
-				} : {a1: ac, a2: an, set: 0};
-			case 2:
-				return (ac.a.userRhythm === 2) ? {
-					a1: _Utils_update(
-						ac,
-						{patternValue: 2}),
-					a2: an,
-					set: 1
-				} : (((ac.a.userRhythm === 1) && (an.a.userRhythm === 1)) ? {
-					a1: _Utils_update(
-						ac,
-						{patternValue: 1.5}),
-					a2: _Utils_update(
-						an,
-						{patternValue: 1.5}),
-					set: 2
-				} : {a1: ac, a2: an, set: 0});
-			case 0:
-				var _v1 = ac.a.aksharType;
-				switch (_v1.$) {
-					case 'Other':
-						return {
-							a1: _Utils_update(
-								ac,
-								{patternValue: -1}),
-							a2: an,
-							set: 1
-						};
-					case 'ChandraBindu':
-						return {a1: ac, a2: an, set: 0};
-					case 'Half':
-						return (!ac.a.userRhythm) ? {a1: ac, a2: an, set: 0} : {a1: ac, a2: an, set: -1};
-					default:
-						return {a1: ac, a2: an, set: -1};
-				}
-			default:
-				return {a1: ac, a2: an, set: 0};
-		}
-	});
-var $author$project$Main$maatrikSetLineUnitsMaapnee = F4(
-	function (lineUnits, i, maapnee, mi) {
-		maatrikSetLineUnitsMaapnee:
-		while (true) {
-			var mc = A2(
-				$elm$core$Maybe$withDefault,
-				2,
-				A2($elm$core$Array$get, mi, maapnee));
-			var an = A2(
-				$elm$core$Maybe$withDefault,
-				$author$project$Main$emptyMAkshar,
-				A2($elm$core$Array$get, i + 1, lineUnits));
-			var ac = A2(
-				$elm$core$Maybe$withDefault,
-				$author$project$Main$emptyMAkshar,
-				A2($elm$core$Array$get, i, lineUnits));
-			var result = A3($author$project$Main$maatrikSetAksharMaapnee, ac, mc, an);
-			var lineUnits1 = A3($elm$core$Array$set, i, result.a1, lineUnits);
-			var newLineUnits = A3($elm$core$Array$set, i + 1, result.a2, lineUnits1);
-			if (_Utils_cmp(
-				i,
-				$elm$core$Array$length(lineUnits) - 1) > 0) {
-				return newLineUnits;
-			} else {
-				var _v0 = result.set;
-				switch (_v0) {
-					case 2:
-						var $temp$lineUnits = newLineUnits,
-							$temp$i = i + 2,
-							$temp$maapnee = maapnee,
-							$temp$mi = mi + 1;
-						lineUnits = $temp$lineUnits;
-						i = $temp$i;
-						maapnee = $temp$maapnee;
-						mi = $temp$mi;
-						continue maatrikSetLineUnitsMaapnee;
-					case 1:
-						var $temp$lineUnits = newLineUnits,
-							$temp$i = i + 1,
-							$temp$maapnee = maapnee,
-							$temp$mi = mi + 1;
-						lineUnits = $temp$lineUnits;
-						i = $temp$i;
-						maapnee = $temp$maapnee;
-						mi = $temp$mi;
-						continue maatrikSetLineUnitsMaapnee;
-					default:
-						if (_Utils_eq(result.set, -1)) {
-							var $temp$lineUnits = newLineUnits,
-								$temp$i = i,
-								$temp$maapnee = maapnee,
-								$temp$mi = mi + 1;
-							lineUnits = $temp$lineUnits;
-							i = $temp$i;
-							maapnee = $temp$maapnee;
-							mi = $temp$mi;
-							continue maatrikSetLineUnitsMaapnee;
-						} else {
-							if (!ac.a.userRhythm) {
-								var $temp$lineUnits = newLineUnits,
-									$temp$i = i + 1,
-									$temp$maapnee = maapnee,
-									$temp$mi = mi;
-								lineUnits = $temp$lineUnits;
-								i = $temp$i;
-								maapnee = $temp$maapnee;
-								mi = $temp$mi;
-								continue maatrikSetLineUnitsMaapnee;
-							} else {
-								return newLineUnits;
-							}
-						}
-				}
-			}
-		}
-	});
-var $author$project$Main$maatrikSetLineMaapnee = F2(
-	function (line, maapnee) {
-		return _Utils_update(
-			line,
-			{
-				units: A4($author$project$Main$maatrikSetLineUnitsMaapnee, line.units, 0, maapnee, 0)
-			});
-	});
 var $author$project$Main$maatrikProcessPoem = F3(
 	function (pom, oldPom, maapnee) {
 		var maapneeCharA = $elm$core$Array$fromList(

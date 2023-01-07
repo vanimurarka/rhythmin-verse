@@ -10,7 +10,7 @@
 </head>
 
 <body style="background-color: black; color: white;">
-  Maapnee <input type="text" id='idMaapnee' value="21222122 21222122"><br>
+  Maapnee <input type="text" id='idMaapnee' value=""><br>
   <textarea id="poem" rows="5" cols="40">ज़िन्दगी के मोड़ पर यह प्यार का नाता हमारा।
 राह की वीरानियों को मिल गया आखिर सहारा।</textarea>
   <br>
@@ -44,7 +44,7 @@ function callProcessPoem()
 {
   poem = document.getElementById('poem').value;
   maapnee = document.getElementById('idMaapnee').value;
-  hpra.ports.getPoem.send(JSON.stringify({ poem: poem, poemType: "maatrik", maapnee : maapnee }));
+  hpra.ports.getPoem.send(JSON.stringify({ poem: poem, poemType: "freeverse", maapnee : maapnee }));
 }
 
 function callAdjustMaatraa(li, ci) { 

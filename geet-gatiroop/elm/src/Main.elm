@@ -398,7 +398,7 @@ maatrikSetLineUnitsMaapnee lineUnits i maapnee mi =
           else if (ac.a.userRhythm == 0) then
               maatrikSetLineUnitsMaapnee newLineUnits (i+1) maapnee mi
             else 
-              newLineUnits
+              maatrikSetLineUnitsPattern newLineUnits i 
 
 maatrikSetLineMaapnee : MaatrikLine -> Array Int -> MaatrikLine
 maatrikSetLineMaapnee line maapnee =
@@ -421,6 +421,7 @@ maatrikProcessPoem pom oldPom maapnee =
     maapneeArray = Array.map maapneeToInt maapneeCharA 
     maatrikLines = Array.map maatrikLFromPoemL basic.lines
     maatrikLinesWMaapnee = Array.map2 maatrikSetLineMaapnee maatrikLines (Array.repeat (Array.length maatrikLines) maapneeArray) 
+    --maatrikLinesWMaapnee = Array.map maatrikSetLinePattern maatrikLines
   in 
     MaatrikPoem { maxLineLen = basic.maxLineLen, lines = maatrikLinesWMaapnee, maapnee = {units = maapneeArray, str = maapnee} }    
 
@@ -428,7 +429,7 @@ maatrikAdjustMaatraa poemData li ci =
   let 
     oldLine = Maybe.withDefault emptyMLine (Array.get li poemData.lines)
     newBasicLine = adjustMaatraaLine (maatrikLToPoemL oldLine) ci
-    newLine = maatrikSetLinePattern (maatrikLFromPoemL newBasicLine)
+    newLine = maatrikSetLineMaapnee (maatrikSetLinePattern (maatrikLFromPoemL newBasicLine)) poemData.maapnee.units
     newLines = Array.set li newLine poemData.lines
     newMaxLineLen = if (newLine.rhythmTotal > poemData.maxLineLen) then
         newLine.rhythmTotal
