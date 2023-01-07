@@ -81,26 +81,22 @@ function draw()
 {	
 	const maxLen = dPoem.maxLineLen;
 	const lineCount = dPoem.lines.length;
+	const pattern = (typeof dPoem.pattern !== 'undefined') && (dPoem.pattern.subUnits.length > 0)
+	const iForPattern = pattern ? 1 : 0;
 	var chart = d3.select("#chart");
 	chart.select("svg").remove();
 	const svgW = fFreeVerse?(charW*maxLen)+80:(charW*maxLen)+30;
-	const svgH = fLineSpacing?(lineCount*(charH+lineSpacing))+(charH*2):(lineCount*charH)+(charH*2);
+	const svgH = fLineSpacing?((lineCount+iForPattern)*(charH+lineSpacing))+(charH*2):((lineCount+iForPattern)*charH)+(charH*2);
 	const svgViewBox = "0 0 "+svgW+" "+svgH;
 	const ratio = oVisual.availableW / svgW;
 	var svg;
 	// debugger;
 	if (oVisual.availableW <= 500) // in small screen width always make the vis autosized
-	{
 		oVisual.setMode("flexible",svgW,ratio);
-	}
 	else if ((ratio>=0.6)&&(ratio<=1)) // make vis autosized if ratio within a reasonable range (not too small or big) 
-	{
-		oVisual.setMode("flexible",svgW,ratio);
-	}
-	else // make vis fixed size
-	{
-		oVisual.setMode("fixed",svgW,ratio);
-	}
+			oVisual.setMode("flexible",svgW,ratio);
+		else // make vis fixed size
+			oVisual.setMode("fixed",svgW,ratio);
 
 	if (oVisual.userMode == '') // if user has no pref, do as per optimum calculation above
 	{
@@ -117,17 +113,28 @@ function draw()
 	    	svg = initSvgFlex(svgViewBox);
 	}
 
+	if (pattern)
+	{
+		var gMap = svg.append("svg:g")
+	  .attr("transform", function(d,i) 
+	    { 
+	      return "translate(" + paddingLeft + "," + ((charH+lineSpacing)) + ")"; 
+	    })
+	  .attr("id", function(d,i) { return "gPattern"});
+	}
+
 	// create the "g"s (svg groups) for each line
 	if (fLineSpacing)
 	{
-		var g = svg.selectAll("g")
+		var g = svg.selectAll("g.gLine")
 		.data(dPoem.lines)
 		.enter().append("svg:g")
 		  .attr("transform", function(d,i) 
 		    { 
-		      return "translate(" + paddingLeft + "," + ((i*(charH+lineSpacing))+(charH+lineSpacing)) + ")"; 
+		      return "translate(" + paddingLeft + "," + (((i+iForPattern)*(charH+lineSpacing))+(iForPattern+charH+lineSpacing)) + ")"; 
 		    })
-		  .attr("id", function(d,i) { return "gLine"+i});
+		  .attr("id", function(d,i) { return "gLine"+i})
+		  .attr("class", "gLine");
 	}
 	else
 	{
@@ -135,22 +142,46 @@ function draw()
 		.data(dPoem.lines)
 		.enter().append("svg:g")
 		  .attr("transform", function(d,i) 
-		    { return "translate(" + paddingLeft + "," + ((i*(charH))+(charH)) + ")" })
+		    { return "translate(" + paddingLeft + "," + (((i+iForPattern)*(charH))+(charH)) + ")" })
 		  .attr("id", function(d,i) { return "gLine"+i});
 	}
 
 	if (fShowText)
-    {
-        g.selectAll("text")               // char text
-          .data(function(d) {return d.subUnits;} )  // d = line, subsequent d = characters
-          .enter().append("svg:text")
-            .attr("y", charH-2)
-            .attr("x", function(d,i) {return drawCharTxtPos(d,i);})
-            .attr("class", "graphText3")
-            //.attr("dominant-baseline", "central")
-            .attr("text-anchor", "middle")
-            .text(function(d) {return d.txt;});
-    }
+  {
+  	if (pattern)
+		{
+			gMap.selectAll("text")               // char text
+      .data(dPoem.pattern.subUnits)
+      .enter().append("svg:text")
+        .attr("y", charH-2)
+        .attr("x", function(d,i) {return drawCharTxtPos(d,i);})
+        .attr("class", "graphText3")
+        .attr("text-anchor", "middle")
+        .text(function(d) {return d.txt;});
+		}
+
+    g.selectAll("text")               // char text
+      .data(function(d) {return d.subUnits;} )  // d = line, subsequent d = characters
+      .enter().append("svg:text")
+        .attr("y", charH-2)
+        .attr("x", function(d,i) {return drawCharTxtPos(d,i);})
+        .attr("class", "graphText3")
+        //.attr("dominant-baseline", "central")
+        .attr("text-anchor", "middle")
+        .text(function(d) {return d.txt;});
+  }
+
+  if (pattern)
+  {
+  	gMap.selectAll("path")
+      .data(dPoem.pattern.subUnits) // d = line, subsequent d = characters
+      .enter().append("path")
+        .attr("style", function(d,i) {
+            return drawStyleCharBlock(d,'consonant');
+        })
+        .attr("d", function(d,i) {return drawCharBlock(d,i);})
+        .attr("title", function(d,i) {return d.txt;});
+  }
 
     g.selectAll("path")
       .data(function(d) {return d.subUnits;} ) // d = line, subsequent d = characters

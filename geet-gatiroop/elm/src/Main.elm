@@ -46,13 +46,6 @@ type alias Akshar =
 emptyAkshar = Akshar " " 0 Empty ' ' ' ' 0 0
 space = Akshar " " 32 Other ' ' ' ' 0 0
 
-type alias MaatrikAkshar =
-  {
-    a : Akshar,
-    patternValue : Float
-  }
-emptyMAkshar = MaatrikAkshar emptyAkshar 0
-
 type alias PoemLine =
   { str : String
   , rhythmTotal : Int
@@ -60,14 +53,6 @@ type alias PoemLine =
   }
 
 emptyLine = PoemLine "" 0 Array.empty
-
-type alias MaatrikLine = 
-  { str : String
-  , rhythmTotal : Int
-  , units : Array.Array MaatrikAkshar
-  }
-
-emptyMLine = maatrikLFromPoemL emptyLine
 
 type alias Misraa =
   { line : PoemLine
@@ -90,7 +75,7 @@ type alias CompositeLine =
 
 type ProcessedPoem 
   = GenericPoem { maxLineLen : Int, lines : Array.Array PoemLine }
-  | MaatrikPoem { maxLineLen : Int, lines : Array.Array MaatrikLine }
+  | MaatrikPoem { maxLineLen : Int, lines : Array.Array MaatrikLine, maapnee : Maapnee }
   | Ghazal { maxLineLen: Int, lines: Array.Array Misraa, radeef : Array.Array Akshar, kaafiyaa : Array.Array Akshar}
   | FreeVerse {maxLineLen: Int, lines: Array.Array FreeVerseLine, composite : Array.Array CompositeLine, baseCount : Int }
 
@@ -304,6 +289,28 @@ processPoem pom oldLines =
 
 -- == MAATRIK == --
 
+type alias MaatrikAkshar =
+  {
+    a : Akshar,
+    patternValue : Float
+  }
+emptyMAkshar = MaatrikAkshar emptyAkshar 0
+
+type alias MaatrikLine = 
+  { str : String
+  , rhythmTotal : Int
+  , units : Array.Array MaatrikAkshar
+  }
+
+emptyMLine = maatrikLFromPoemL emptyLine
+
+type alias Maapnee =
+  { units : Array.Array Int
+  , str : String
+  }
+
+emptyMaapnee = { units = Array.empty, str = "" }
+
 genericGetData p =
   case p of
     GenericPoem data -> data
@@ -415,7 +422,7 @@ maatrikProcessPoem pom oldPom maapnee =
     maatrikLines = Array.map maatrikLFromPoemL basic.lines
     maatrikLinesWMaapnee = Array.map2 maatrikSetLineMaapnee maatrikLines (Array.repeat (Array.length maatrikLines) maapneeArray) 
   in 
-    MaatrikPoem { maxLineLen = basic.maxLineLen, lines = maatrikLinesWMaapnee }    
+    MaatrikPoem { maxLineLen = basic.maxLineLen, lines = maatrikLinesWMaapnee, maapnee = {units = maapneeArray, str = maapnee} }    
 
 maatrikAdjustMaatraa poemData li ci =
   let 
@@ -428,7 +435,7 @@ maatrikAdjustMaatraa poemData li ci =
       else
         poemData.maxLineLen 
   in 
-    MaatrikPoem {maxLineLen = newMaxLineLen, lines = newLines}
+    MaatrikPoem {maxLineLen = newMaxLineLen, lines = newLines, maapnee = poemData.maapnee}
 
 -- == GHAZAL == --
 
@@ -847,7 +854,7 @@ encodeMAkshar a =
     [ ("txt", E.string a.a.str)
     , ("systemRhythmAmt", E.int a.a.rhythm)
     , ("rhythmAmt", E.int a.a.userRhythm)
-    , ("isHalfLetter", if (a.a.aksharType == Half) then (E.bool True) else (E.bool False))
+    , ("isHalfLetter", E.bool (a.a.aksharType == Half))
     , ("rhythmPatternValue", E.float a.patternValue)
     ]
 
@@ -895,10 +902,25 @@ encodeGeneric m l =
     , ("poemType", E.string "GENERIC")
     ]
 
-encodeMaatrik m l =
+encodeMaapneeUnits mu =
   E.object
-    [("maxLineLen", E.int m)
-    , ("lines", E.array encodeMLine l)
+    [ ("txt", if (mu /= 0) then E.string (String.fromInt mu) else E.string " ")
+    , ("systemRhythmAmt", E.int mu)
+    , ("rhythmAmt", E.int mu)
+    , ("isHalfLetter", E.bool False)
+    , ("rhythmPatternValue", if (mu /= 0) then E.int mu else E.int -1)
+    ]  
+
+encodeMaapnee m =
+  E.object 
+    [("rhythmAmtCumulative",E.int (Array.foldl (+) 0 m.units))
+    , ("subUnits", E.array encodeMaapneeUnits m.units)]
+
+encodeMaatrik d =
+  E.object
+    [("maxLineLen", E.int d.maxLineLen)
+    , ("lines", E.array encodeMLine d.lines)
+    , ("pattern", encodeMaapnee d.maapnee)
     , ("poemType", E.string "MAATRIK")
     ]
 
@@ -930,7 +952,7 @@ encodePoem p =
     GenericPoem data -> encodeGeneric data.maxLineLen data.lines  
     Ghazal data -> encodeGhazal data.maxLineLen data.lines
     FreeVerse data -> encodeFreeVerse data.maxLineLen data.lines data.composite
-    MaatrikPoem data -> encodeMaatrik data.maxLineLen data.lines
+    MaatrikPoem data -> encodeMaatrik data
 
 encodeModel : Model -> E.Value
 encodeModel model =

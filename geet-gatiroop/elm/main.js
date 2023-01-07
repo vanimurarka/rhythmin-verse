@@ -5603,7 +5603,8 @@ var $author$project$Main$encodeMAkshar = function (a) {
 				$elm$json$Json$Encode$int(a.a.userRhythm)),
 				_Utils_Tuple2(
 				'isHalfLetter',
-				_Utils_eq(a.a.aksharType, $author$project$Main$Half) ? $elm$json$Json$Encode$bool(true) : $elm$json$Json$Encode$bool(false)),
+				$elm$json$Json$Encode$bool(
+					_Utils_eq(a.a.aksharType, $author$project$Main$Half))),
 				_Utils_Tuple2(
 				'rhythmPatternValue',
 				$elm$json$Json$Encode$float(a.patternValue))
@@ -5621,22 +5622,63 @@ var $author$project$Main$encodeMLine = function (al) {
 				A2($elm$json$Json$Encode$array, $author$project$Main$encodeMAkshar, al.units))
 			]));
 };
-var $author$project$Main$encodeMaatrik = F2(
-	function (m, l) {
-		return $elm$json$Json$Encode$object(
-			_List_fromArray(
-				[
-					_Utils_Tuple2(
-					'maxLineLen',
-					$elm$json$Json$Encode$int(m)),
-					_Utils_Tuple2(
-					'lines',
-					A2($elm$json$Json$Encode$array, $author$project$Main$encodeMLine, l)),
-					_Utils_Tuple2(
-					'poemType',
-					$elm$json$Json$Encode$string('MAATRIK'))
-				]));
-	});
+var $elm$core$Basics$negate = function (n) {
+	return -n;
+};
+var $elm$core$Basics$neq = _Utils_notEqual;
+var $author$project$Main$encodeMaapneeUnits = function (mu) {
+	return $elm$json$Json$Encode$object(
+		_List_fromArray(
+			[
+				_Utils_Tuple2(
+				'txt',
+				(!(!mu)) ? $elm$json$Json$Encode$string(
+					$elm$core$String$fromInt(mu)) : $elm$json$Json$Encode$string(' ')),
+				_Utils_Tuple2(
+				'systemRhythmAmt',
+				$elm$json$Json$Encode$int(mu)),
+				_Utils_Tuple2(
+				'rhythmAmt',
+				$elm$json$Json$Encode$int(mu)),
+				_Utils_Tuple2(
+				'isHalfLetter',
+				$elm$json$Json$Encode$bool(false)),
+				_Utils_Tuple2(
+				'rhythmPatternValue',
+				(!(!mu)) ? $elm$json$Json$Encode$int(mu) : $elm$json$Json$Encode$int(-1))
+			]));
+};
+var $author$project$Main$encodeMaapnee = function (m) {
+	return $elm$json$Json$Encode$object(
+		_List_fromArray(
+			[
+				_Utils_Tuple2(
+				'rhythmAmtCumulative',
+				$elm$json$Json$Encode$int(
+					A3($elm$core$Array$foldl, $elm$core$Basics$add, 0, m.units))),
+				_Utils_Tuple2(
+				'subUnits',
+				A2($elm$json$Json$Encode$array, $author$project$Main$encodeMaapneeUnits, m.units))
+			]));
+};
+var $author$project$Main$encodeMaatrik = function (d) {
+	return $elm$json$Json$Encode$object(
+		_List_fromArray(
+			[
+				_Utils_Tuple2(
+				'maxLineLen',
+				$elm$json$Json$Encode$int(d.maxLineLen)),
+				_Utils_Tuple2(
+				'lines',
+				A2($elm$json$Json$Encode$array, $author$project$Main$encodeMLine, d.lines)),
+				_Utils_Tuple2(
+				'pattern',
+				$author$project$Main$encodeMaapnee(d.maapnee)),
+				_Utils_Tuple2(
+				'poemType',
+				$elm$json$Json$Encode$string('MAATRIK'))
+			]));
+};
 var $author$project$Main$encodePoem = function (p) {
 	switch (p.$) {
 		case 'GenericPoem':
@@ -5650,7 +5692,7 @@ var $author$project$Main$encodePoem = function (p) {
 			return A3($author$project$Main$encodeFreeVerse, data.maxLineLen, data.lines, data.composite);
 		default:
 			var data = p.a;
-			return A2($author$project$Main$encodeMaatrik, data.maxLineLen, data.lines);
+			return $author$project$Main$encodeMaatrik(data);
 	}
 };
 var $author$project$Main$encodeModel = function (model) {
@@ -5909,9 +5951,6 @@ var $elm$core$Array$length = function (_v0) {
 	var len = _v0.a;
 	return len;
 };
-var $elm$core$Basics$negate = function (n) {
-	return -n;
-};
 var $elm$core$Basics$not = _Basics_not;
 var $author$project$Main$fvCalcCompositeRhythm = F4(
 	function (lines, li, compsiteLines, inProgress) {
@@ -6118,7 +6157,7 @@ var $author$project$Main$maatrikAdjustMaatraa = F3(
 		var newLines = A3($elm$core$Array$set, li, newLine, poemData.lines);
 		var newMaxLineLen = (_Utils_cmp(newLine.rhythmTotal, poemData.maxLineLen) > 0) ? newLine.rhythmTotal : poemData.maxLineLen;
 		return $author$project$Main$MaatrikPoem(
-			{lines: newLines, maxLineLen: newMaxLineLen});
+			{lines: newLines, maapnee: poemData.maapnee, maxLineLen: newMaxLineLen});
 	});
 var $author$project$Main$Misraa = F2(
 	function (line, rkUnits) {
@@ -6270,7 +6309,6 @@ var $author$project$Main$decodeWhichChar = A3(
 	$author$project$Main$WhichChar,
 	A2($elm$json$Json$Decode$field, 'lineI', $elm$json$Json$Decode$int),
 	A2($elm$json$Json$Decode$field, 'charI', $elm$json$Json$Decode$int));
-var $elm$core$Basics$neq = _Utils_notEqual;
 var $author$project$Main$fvCalcRemainderSingle = F2(
 	function (compositeLine, baseCount) {
 		var rhy = compositeLine.rhythm;
@@ -7480,7 +7518,11 @@ var $author$project$Main$maatrikProcessPoem = F3(
 				$elm$core$Array$length(maatrikLines),
 				maapneeArray));
 		return $author$project$Main$MaatrikPoem(
-			{lines: maatrikLinesWMaapnee, maxLineLen: basic.maxLineLen});
+			{
+				lines: maatrikLinesWMaapnee,
+				maapnee: {str: maapnee, units: maapneeArray},
+				maxLineLen: basic.maxLineLen
+			});
 	});
 var $author$project$Main$preProcessPoem = F4(
 	function (pom, oldpom, pomType, maapnee) {
