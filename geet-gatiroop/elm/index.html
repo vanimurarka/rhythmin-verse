@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <title>GG Elm</title>
-  <script type="text/javascript" src="main.js"></script>
+  <script type="text/javascript" src="mainopt.min1.js"></script>
   <script type="text/javascript" src="d3.v2.min.js"></script>
   <script type="text/javascript" src="hpv-draw.v8.0.js"></script>
 </head>
@@ -44,7 +44,7 @@ function callProcessPoem()
 {
   poem = document.getElementById('poem').value;
   maapnee = document.getElementById('idMaapnee').value;
-  hpra.ports.getPoem.send(JSON.stringify({ poem: poem, poemType: "freeverse", maapnee: maapnee }));
+  hpra.ports.getPoem.send(JSON.stringify({ poem: poem, poemType: "maatrik", maapnee: maapnee }));
 }
 
 function callAdjustMaatraa(li, ci) { 
