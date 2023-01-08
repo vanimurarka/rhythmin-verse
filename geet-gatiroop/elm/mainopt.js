@@ -7601,18 +7601,8 @@ var $author$project$Main$updateWithStorage = F2(
 					])));
 	});
 var $elm$html$Html$div = _VirtualDom_node('div');
-var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
-var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
 var $author$project$Main$view = function (model) {
-	return A2(
-		$elm$html$Html$div,
-		_List_fromArray(
-			[
-				A2($elm$html$Html$Attributes$style, 'background-color', 'black'),
-				A2($elm$html$Html$Attributes$style, 'color', 'white'),
-				A2($elm$html$Html$Attributes$style, 'padding', '5px')
-			]),
-		_List_Nil);
+	return A2($elm$html$Html$div, _List_Nil, _List_Nil);
 };
 var $author$project$Main$main = $elm$browser$Browser$element(
 	{a2: $author$project$Main$init, bc: $author$project$Main$subscriptions, be: $author$project$Main$updateWithStorage, bf: $author$project$Main$view});

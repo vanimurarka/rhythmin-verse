@@ -2,8 +2,7 @@ port module Main exposing (..)
 
 import Browser
 import Html exposing (..)
-import Html.Attributes exposing (..)
-import Html.Events exposing (..)
+--import Html.Attributes exposing (..)
 import Array exposing (Array)
 import Array.Extra as Array
 import Json.Decode as D
@@ -811,7 +810,7 @@ update msg model =
       Cmd.none)
 
 view model =
-  div [style "background-color" "black", style "color" "white", style "padding" "5px"][
+  div [][
      --div [style "padding" "inherit", style "white-space" "pre-wrap"] [text model.poem]
     --div [style "padding" "inherit"] [text (Debug.toString model.processedPoem)]
     ]
