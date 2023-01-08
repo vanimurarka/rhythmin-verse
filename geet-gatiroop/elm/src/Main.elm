@@ -1,8 +1,7 @@
 port module Main exposing (..)
 
 import Browser
-import Html exposing (..)
---import Html.Attributes exposing (..)
+import Html exposing (Html, div)
 import Array exposing (Array)
 import Array.Extra as Array
 import Json.Decode as D
