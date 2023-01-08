@@ -730,7 +730,7 @@ adjustMaatraaPoem poem li ci =
     case poem of
       GenericPoem _ -> GenericPoem {maxLineLen = newMaxLineLen, lines = newLines}
       Ghazal data -> Ghazal {data | maxLineLen = newMaxLineLen, lines = (Array.map2 misraaFromPoemLineWRK newLines (Array.map .rkUnits data.lines))}
-      FreeVerse data -> FreeVerse {maxLineLen = newMaxLineLen, lines = finalFVLines, composite = fvCalcCompositeRhythm finalFVLines 0 Array.empty False, baseCount = data.baseCount}
+      FreeVerse data -> FreeVerse {maxLineLen = newMaxLineLen, lines = finalFVLines, composite = fvCalcRemainderWhole (fvCalcCompositeRhythm finalFVLines 0 Array.empty False) data.baseCount 0, baseCount = data.baseCount}
       MaatrikPoem data -> maatrikAdjustMaatraa data li ci
 
 
@@ -970,7 +970,6 @@ decodeIncomingPoem =
     (D.field "poem" D.string)
     (D.field "poemType" D.string)
     (D.field "maapnee" D.string)
-
 
 type alias WhichChar = { lineI : Int, charI : Int}
 

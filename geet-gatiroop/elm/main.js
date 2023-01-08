@@ -6013,6 +6013,48 @@ var $author$project$Main$fvCalcCompositeRhythm = F4(
 			}
 		}
 	});
+var $author$project$Main$fvCalcRemainderSingle = F2(
+	function (compositeLine, baseCount) {
+		var rhy = compositeLine.rhythm;
+		var quo = rhy / baseCount;
+		var intQuo = (rhy / baseCount) | 0;
+		var r = quo - intQuo;
+		var useR = (r < 0.5) ? (rhy - (intQuo * baseCount)) : ((((intQuo + 1) * baseCount) - rhy) * (-1));
+		return (!(!useR)) ? _Utils_update(
+			compositeLine,
+			{multipleOfBase: false, remainder: useR}) : _Utils_update(
+			compositeLine,
+			{multipleOfBase: true, remainder: useR});
+	});
+var $author$project$Main$fvCalcRemainderWhole = F3(
+	function (composites, baseCount, i) {
+		fvCalcRemainderWhole:
+		while (true) {
+			var line = A2(
+				$elm$core$Maybe$withDefault,
+				A4($author$project$Main$CompositeLine, 0, 0, 0, false),
+				A2($elm$core$Array$get, i, composites));
+			var newLine = A2($author$project$Main$fvCalcRemainderSingle, line, baseCount);
+			var newComposites = A3($elm$core$Array$set, i, newLine, composites);
+			if (baseCount === 1) {
+				return composites;
+			} else {
+				if (_Utils_eq(
+					i,
+					$elm$core$Array$length(composites))) {
+					return composites;
+				} else {
+					var $temp$composites = newComposites,
+						$temp$baseCount = baseCount,
+						$temp$i = i + 1;
+					composites = $temp$composites;
+					baseCount = $temp$baseCount;
+					i = $temp$i;
+					continue fvCalcRemainderWhole;
+				}
+			}
+		}
+	});
 var $author$project$Main$fvLineFromLine = function (l) {
 	return A2($author$project$Main$FreeVerseLine, l, false);
 };
@@ -6374,7 +6416,11 @@ var $author$project$Main$adjustMaatraaPoem = F3(
 				return $author$project$Main$FreeVerse(
 					{
 						baseCount: data.baseCount,
-						composite: A4($author$project$Main$fvCalcCompositeRhythm, finalFVLines, 0, $elm$core$Array$empty, false),
+						composite: A3(
+							$author$project$Main$fvCalcRemainderWhole,
+							A4($author$project$Main$fvCalcCompositeRhythm, finalFVLines, 0, $elm$core$Array$empty, false),
+							data.baseCount,
+							0),
 						lines: finalFVLines,
 						maxLineLen: newMaxLineLen
 					});
@@ -6437,48 +6483,6 @@ var $author$project$Main$decodeWhichChar = A3(
 	$author$project$Main$WhichChar,
 	A2($elm$json$Json$Decode$field, 'lineI', $elm$json$Json$Decode$int),
 	A2($elm$json$Json$Decode$field, 'charI', $elm$json$Json$Decode$int));
-var $author$project$Main$fvCalcRemainderSingle = F2(
-	function (compositeLine, baseCount) {
-		var rhy = compositeLine.rhythm;
-		var quo = rhy / baseCount;
-		var intQuo = (rhy / baseCount) | 0;
-		var r = quo - intQuo;
-		var useR = (r < 0.5) ? (rhy - (intQuo * baseCount)) : ((((intQuo + 1) * baseCount) - rhy) * (-1));
-		return (!(!useR)) ? _Utils_update(
-			compositeLine,
-			{multipleOfBase: false, remainder: useR}) : _Utils_update(
-			compositeLine,
-			{multipleOfBase: true, remainder: useR});
-	});
-var $author$project$Main$fvCalcRemainderWhole = F3(
-	function (composites, baseCount, i) {
-		fvCalcRemainderWhole:
-		while (true) {
-			var line = A2(
-				$elm$core$Maybe$withDefault,
-				A4($author$project$Main$CompositeLine, 0, 0, 0, false),
-				A2($elm$core$Array$get, i, composites));
-			var newLine = A2($author$project$Main$fvCalcRemainderSingle, line, baseCount);
-			var newComposites = A3($elm$core$Array$set, i, newLine, composites);
-			if (baseCount === 1) {
-				return composites;
-			} else {
-				if (_Utils_eq(
-					i,
-					$elm$core$Array$length(composites))) {
-					return composites;
-				} else {
-					var $temp$composites = newComposites,
-						$temp$baseCount = baseCount,
-						$temp$i = i + 1;
-					composites = $temp$composites;
-					baseCount = $temp$baseCount;
-					i = $temp$i;
-					continue fvCalcRemainderWhole;
-				}
-			}
-		}
-	});
 var $author$project$Main$fvGetData = function (p) {
 	if (p.$ === 'FreeVerse') {
 		var data = p.a;
