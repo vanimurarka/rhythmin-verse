@@ -11,33 +11,46 @@
 
 <body style="background-color: black; color: white;">
   <div>
-    <select id="selPType">
-      <option value="maatrik" selected>कविता</option>
-      <option value="ghazal">ग़ज़ल</option>
-      <option value="freeverse">मुक्त-कविता</option>
-    </select>
-    <input type="checkbox" id="chkMaapnee" onclick="showHideMaapnee()">
-    <label for="chkMaapnee"> मापनी</label>
+    <div style="display: inline-block;">
+      <select id="selPType" onchange="pTypeChange()">
+        <option value="maatrik" selected>कविता</option>
+        <option value="ghazal">ग़ज़ल</option>
+        <option value="freeverse">मुक्त-कविता</option>
+      </select>
+    </div>
+    <div id="divChkMaapnee" style="display:inline-block;">
+      <input type="checkbox" id="chkMaapnee" onclick="showHideMaapnee()">
+      <label for="chkMaapnee"> मापनी</label>
+    </div>
   </div>
   <div id='divMaapnee' style="display: none;">मापनी <input type="text" id='idMaapnee' value=""></div>
   <textarea id="poem" rows="5" cols="40">ज़िन्दगी के मोड़ पर यह प्यार का नाता हमारा।
 राह की वीरानियों को मिल गया आखिर सहारा।</textarea>
   <br>
-  <button onclick="callProcessPoem()">Process Poem</button>
+  <button onclick="alert('btn');callProcessPoem();">प्रतिरूप देखें</button>
   <div id="myapp"></div>
   <div id="divVis"><div id="chart"></div></div>
-  <div>
+  <div id="divFV" style="display: none;">
     Base Count <input type="number" min="1" step="1" id='txtBase' value="1" onchange="callBaseChange()">
   </div>
 </body>
 
 <script type="text/javascript">
 
+function pTypeChange()
+{
+  poemType = document.getElementById('selPType').value;
+  divChk = document.getElementById("divChkMaapnee");
+  (poemType == "maatrik") ? divChk.style.display = 'inline-block' : divChk.style.display = 'none';
+  callProcessPoem();
+}
+
 function showHideMaapnee() {
   let chk = document.getElementById("chkMaapnee");
   let div = document.getElementById("divMaapnee");
 
-  (chk.checked == true) ? div.style.display = "block" : text.style.display = "none";
+  (chk.checked == true) ? div.style.display = "block" : div.style.display = "none";
+  callProcessPoem();
 }
 
 // Load the Elm Hindi Poem Rhythm Analyis code
@@ -56,8 +69,10 @@ hpv.ports.givePoemRhythm.subscribe(function(hpvResult) {
 function callProcessPoem()
 {
   poem = document.getElementById('poem').value;
-  poemType = document.getElementById('selPType').value
-  maapnee = document.getElementById('idMaapnee').value;
+  poemType = document.getElementById('selPType').value;
+  let chk = document.getElementById("chkMaapnee");
+  maapnee = "";
+  (chk.checked == true) ? maapnee = document.getElementById('idMaapnee').value : null;
   hpv.ports.getPoem.send(JSON.stringify({ poem: poem, poemType: poemType, maapnee: maapnee }));
 }
 
