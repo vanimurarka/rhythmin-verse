@@ -453,11 +453,9 @@ function drawStyleCharBlock(c,colorBy)
 // When user clicks char to adjust maatraa
 function adjustCharLen()
 {
-	// debugger;
 	let iChr = parseInt(this.getAttribute("id").substring(4));
 	let iLine = parseInt(this.parentNode.getAttribute("id").substring(5));
 	callAdjustMaatraa(iLine,iChr);
-	// draw();
 }
 
 /*
@@ -473,9 +471,7 @@ function markCompositeLine()
 	// if not marked as composite
 	if ((i < dPoem.lines.length-1) && (!dPoem.lines[i+1].isComposite))
 	{
-	  // dPoem.setComposite(i+1); // why is the next line marked composite? but it works
 	  callSetComposite(i+1);
-	  // draw();
 	} 
 }
 
@@ -536,7 +532,6 @@ function unmarkCompositeLine()
     if (i > 0)
     {
       callSetComposite(i); 
-      // draw();
     } 
   }
 
