@@ -5291,44 +5291,44 @@ var $elm$core$Task$perform = F2(
 			A2($elm$core$Task$map, toMessage, task));
 	});
 var $elm$browser$Browser$element = _Browser_element;
-var $author$project$Main$GenericPoem = function (a) {
+var $author$project$HPVCore$GenericPoem = function (a) {
 	return {$: 0, a: a};
 };
-var $author$project$Main$emptyPoem = $author$project$Main$GenericPoem(
+var $author$project$HPVCore$emptyPoem = $author$project$HPVCore$GenericPoem(
 	{a: $elm$core$Array$empty, e: 0});
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
-var $author$project$Main$init = function (flags) {
+var $author$project$HPVCore$init = function (flags) {
 	return _Utils_Tuple2(
-		{N: '', I: '', x: $author$project$Main$emptyPoem},
+		{N: '', I: '', x: $author$project$HPVCore$emptyPoem},
 		$elm$core$Platform$Cmd$none);
 };
-var $author$project$Main$AdjustMaatraa = function (a) {
+var $author$project$HPVCore$AdjustMaatraa = function (a) {
 	return {$: 1, a: a};
 };
-var $author$project$Main$ProcessPoem = function (a) {
+var $author$project$HPVCore$ProcessPoem = function (a) {
 	return {$: 0, a: a};
 };
-var $author$project$Main$SetBase = function (a) {
+var $author$project$HPVCore$SetBase = function (a) {
 	return {$: 3, a: a};
 };
-var $author$project$Main$SetComposite = function (a) {
+var $author$project$HPVCore$SetComposite = function (a) {
 	return {$: 2, a: a};
 };
 var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$json$Json$Decode$string = _Json_decodeString;
-var $author$project$Main$getMaatraaChange = _Platform_incomingPort('getMaatraaChange', $elm$json$Json$Decode$string);
-var $author$project$Main$getPoem = _Platform_incomingPort('getPoem', $elm$json$Json$Decode$string);
-var $author$project$Main$setBase = _Platform_incomingPort('setBase', $elm$json$Json$Decode$string);
-var $author$project$Main$setComposite = _Platform_incomingPort('setComposite', $elm$json$Json$Decode$string);
-var $author$project$Main$subscriptions = function (_v0) {
+var $author$project$HPVCore$getMaatraaChange = _Platform_incomingPort('getMaatraaChange', $elm$json$Json$Decode$string);
+var $author$project$HPVCore$getPoem = _Platform_incomingPort('getPoem', $elm$json$Json$Decode$string);
+var $author$project$HPVCore$setBase = _Platform_incomingPort('setBase', $elm$json$Json$Decode$string);
+var $author$project$HPVCore$setComposite = _Platform_incomingPort('setComposite', $elm$json$Json$Decode$string);
+var $author$project$HPVCore$subscriptions = function (_v0) {
 	return $elm$core$Platform$Sub$batch(
 		_List_fromArray(
 			[
-				$author$project$Main$getPoem($author$project$Main$ProcessPoem),
-				$author$project$Main$getMaatraaChange($author$project$Main$AdjustMaatraa),
-				$author$project$Main$setComposite($author$project$Main$SetComposite),
-				$author$project$Main$setBase($author$project$Main$SetBase)
+				$author$project$HPVCore$getPoem($author$project$HPVCore$ProcessPoem),
+				$author$project$HPVCore$getMaatraaChange($author$project$HPVCore$AdjustMaatraa),
+				$author$project$HPVCore$setComposite($author$project$HPVCore$SetComposite),
+				$author$project$HPVCore$setBase($author$project$HPVCore$SetBase)
 			]));
 };
 var $elm$core$Elm$JsArray$foldl = _JsArray_foldl;
@@ -5376,7 +5376,7 @@ var $elm$json$Json$Encode$object = function (pairs) {
 			_Json_emptyObject(0),
 			pairs));
 };
-var $author$project$Main$encodeComposite = function (c) {
+var $author$project$HPVCore$encodeComposite = function (c) {
 	return $elm$json$Json$Encode$object(
 		_List_fromArray(
 			[
@@ -5394,9 +5394,9 @@ var $author$project$Main$encodeComposite = function (c) {
 				$elm$json$Json$Encode$bool(c.ac))
 			]));
 };
-var $author$project$Main$Half = 3;
+var $author$project$HPVCore$Half = 3;
 var $elm$json$Json$Encode$string = _Json_wrap;
-var $author$project$Main$encodeAkshar = function (a) {
+var $author$project$HPVCore$encodeAkshar = function (a) {
 	return $elm$json$Json$Encode$object(
 		_List_fromArray(
 			[
@@ -5414,7 +5414,7 @@ var $author$project$Main$encodeAkshar = function (a) {
 				(a.f === 3) ? $elm$json$Json$Encode$bool(true) : $elm$json$Json$Encode$bool(false))
 			]));
 };
-var $author$project$Main$encodeFVLine = function (fvl) {
+var $author$project$HPVCore$encodeFVLine = function (fvl) {
 	return $elm$json$Json$Encode$object(
 		_List_fromArray(
 			[
@@ -5423,13 +5423,13 @@ var $author$project$Main$encodeFVLine = function (fvl) {
 				$elm$json$Json$Encode$int(fvl.h.m)),
 				_Utils_Tuple2(
 				'subUnits',
-				A2($elm$json$Json$Encode$array, $author$project$Main$encodeAkshar, fvl.h.b)),
+				A2($elm$json$Json$Encode$array, $author$project$HPVCore$encodeAkshar, fvl.h.b)),
 				_Utils_Tuple2(
 				'isComposite',
 				$elm$json$Json$Encode$bool(fvl.T))
 			]));
 };
-var $author$project$Main$encodeFreeVerse = F3(
+var $author$project$HPVCore$encodeFreeVerse = F3(
 	function (m, l, c) {
 		return $elm$json$Json$Encode$object(
 			_List_fromArray(
@@ -5439,16 +5439,16 @@ var $author$project$Main$encodeFreeVerse = F3(
 					$elm$json$Json$Encode$int(m)),
 					_Utils_Tuple2(
 					'lines',
-					A2($elm$json$Json$Encode$array, $author$project$Main$encodeFVLine, l)),
+					A2($elm$json$Json$Encode$array, $author$project$HPVCore$encodeFVLine, l)),
 					_Utils_Tuple2(
 					'compositeLines',
-					A2($elm$json$Json$Encode$array, $author$project$Main$encodeComposite, c)),
+					A2($elm$json$Json$Encode$array, $author$project$HPVCore$encodeComposite, c)),
 					_Utils_Tuple2(
 					'poemType',
 					$elm$json$Json$Encode$string('FREEVERSE'))
 				]));
 	});
-var $author$project$Main$encodeLine = function (al) {
+var $author$project$HPVCore$encodeLine = function (al) {
 	return $elm$json$Json$Encode$object(
 		_List_fromArray(
 			[
@@ -5457,10 +5457,10 @@ var $author$project$Main$encodeLine = function (al) {
 				$elm$json$Json$Encode$int(al.m)),
 				_Utils_Tuple2(
 				'subUnits',
-				A2($elm$json$Json$Encode$array, $author$project$Main$encodeAkshar, al.b))
+				A2($elm$json$Json$Encode$array, $author$project$HPVCore$encodeAkshar, al.b))
 			]));
 };
-var $author$project$Main$encodeGeneric = F2(
+var $author$project$HPVCore$encodeGeneric = F2(
 	function (m, l) {
 		return $elm$json$Json$Encode$object(
 			_List_fromArray(
@@ -5470,13 +5470,13 @@ var $author$project$Main$encodeGeneric = F2(
 					$elm$json$Json$Encode$int(m)),
 					_Utils_Tuple2(
 					'lines',
-					A2($elm$json$Json$Encode$array, $author$project$Main$encodeLine, l)),
+					A2($elm$json$Json$Encode$array, $author$project$HPVCore$encodeLine, l)),
 					_Utils_Tuple2(
 					'poemType',
 					$elm$json$Json$Encode$string('GENERIC'))
 				]));
 	});
-var $author$project$Main$combineAksharRK = F2(
+var $author$project$HPVCore$combineAksharRK = F2(
 	function (a, rk) {
 		return {f: a.f, d: a.d, aL: rk, g: a.g, c: a.c};
 	});
@@ -5484,7 +5484,7 @@ var $elm$core$String$cons = _String_cons;
 var $elm$core$String$fromChar = function (_char) {
 	return A2($elm$core$String$cons, _char, '');
 };
-var $author$project$Main$encodeAksharRK = function (a) {
+var $author$project$HPVCore$encodeAksharRK = function (a) {
 	return $elm$json$Json$Encode$object(
 		_List_fromArray(
 			[
@@ -5550,7 +5550,7 @@ var $elm_community$array_extra$Array$Extra$map2 = F3(
 				$elm$core$Array$toList(aArray),
 				$elm$core$Array$toList(bArray)));
 	});
-var $author$project$Main$encodeMisraa = function (m) {
+var $author$project$HPVCore$encodeMisraa = function (m) {
 	return $elm$json$Json$Encode$object(
 		_List_fromArray(
 			[
@@ -5561,11 +5561,11 @@ var $author$project$Main$encodeMisraa = function (m) {
 				'subUnits',
 				A2(
 					$elm$json$Json$Encode$array,
-					$author$project$Main$encodeAksharRK,
-					A3($elm_community$array_extra$Array$Extra$map2, $author$project$Main$combineAksharRK, m.h.b, m.D)))
+					$author$project$HPVCore$encodeAksharRK,
+					A3($elm_community$array_extra$Array$Extra$map2, $author$project$HPVCore$combineAksharRK, m.h.b, m.D)))
 			]));
 };
-var $author$project$Main$encodeGhazal = F2(
+var $author$project$HPVCore$encodeGhazal = F2(
 	function (m, l) {
 		return $elm$json$Json$Encode$object(
 			_List_fromArray(
@@ -5575,14 +5575,14 @@ var $author$project$Main$encodeGhazal = F2(
 					$elm$json$Json$Encode$int(m)),
 					_Utils_Tuple2(
 					'lines',
-					A2($elm$json$Json$Encode$array, $author$project$Main$encodeMisraa, l)),
+					A2($elm$json$Json$Encode$array, $author$project$HPVCore$encodeMisraa, l)),
 					_Utils_Tuple2(
 					'poemType',
 					$elm$json$Json$Encode$string('GHAZAL'))
 				]));
 	});
 var $elm$json$Json$Encode$float = _Json_wrap;
-var $author$project$Main$encodeMAkshar = function (a) {
+var $author$project$HPVCore$encodeMAkshar = function (a) {
 	return $elm$json$Json$Encode$object(
 		_List_fromArray(
 			[
@@ -5603,7 +5603,7 @@ var $author$project$Main$encodeMAkshar = function (a) {
 				$elm$json$Json$Encode$float(a.C))
 			]));
 };
-var $author$project$Main$encodeMLine = function (al) {
+var $author$project$HPVCore$encodeMLine = function (al) {
 	return $elm$json$Json$Encode$object(
 		_List_fromArray(
 			[
@@ -5612,14 +5612,14 @@ var $author$project$Main$encodeMLine = function (al) {
 				$elm$json$Json$Encode$int(al.m)),
 				_Utils_Tuple2(
 				'subUnits',
-				A2($elm$json$Json$Encode$array, $author$project$Main$encodeMAkshar, al.b))
+				A2($elm$json$Json$Encode$array, $author$project$HPVCore$encodeMAkshar, al.b))
 			]));
 };
 var $elm$core$Basics$negate = function (n) {
 	return -n;
 };
 var $elm$core$Basics$neq = _Utils_notEqual;
-var $author$project$Main$encodeMaapneeUnits = function (mu) {
+var $author$project$HPVCore$encodeMaapneeUnits = function (mu) {
 	return $elm$json$Json$Encode$object(
 		_List_fromArray(
 			[
@@ -5641,7 +5641,7 @@ var $author$project$Main$encodeMaapneeUnits = function (mu) {
 				(!(!mu)) ? $elm$json$Json$Encode$int(mu) : $elm$json$Json$Encode$int(-1))
 			]));
 };
-var $author$project$Main$encodeMaapnee = function (m) {
+var $author$project$HPVCore$encodeMaapnee = function (m) {
 	return $elm$json$Json$Encode$object(
 		_List_fromArray(
 			[
@@ -5651,10 +5651,10 @@ var $author$project$Main$encodeMaapnee = function (m) {
 					A3($elm$core$Array$foldl, $elm$core$Basics$add, 0, m.b))),
 				_Utils_Tuple2(
 				'subUnits',
-				A2($elm$json$Json$Encode$array, $author$project$Main$encodeMaapneeUnits, m.b))
+				A2($elm$json$Json$Encode$array, $author$project$HPVCore$encodeMaapneeUnits, m.b))
 			]));
 };
-var $author$project$Main$encodeMaatrik = function (d) {
+var $author$project$HPVCore$encodeMaatrik = function (d) {
 	return $elm$json$Json$Encode$object(
 		_List_fromArray(
 			[
@@ -5663,32 +5663,32 @@ var $author$project$Main$encodeMaatrik = function (d) {
 				$elm$json$Json$Encode$int(d.e)),
 				_Utils_Tuple2(
 				'lines',
-				A2($elm$json$Json$Encode$array, $author$project$Main$encodeMLine, d.a)),
+				A2($elm$json$Json$Encode$array, $author$project$HPVCore$encodeMLine, d.a)),
 				_Utils_Tuple2(
 				'pattern',
-				$author$project$Main$encodeMaapnee(d.G)),
+				$author$project$HPVCore$encodeMaapnee(d.G)),
 				_Utils_Tuple2(
 				'poemType',
 				$elm$json$Json$Encode$string('MAATRIK'))
 			]));
 };
-var $author$project$Main$encodePoem = function (p) {
+var $author$project$HPVCore$encodePoem = function (p) {
 	switch (p.$) {
 		case 0:
 			var data = p.a;
-			return A2($author$project$Main$encodeGeneric, data.e, data.a);
+			return A2($author$project$HPVCore$encodeGeneric, data.e, data.a);
 		case 2:
 			var data = p.a;
-			return A2($author$project$Main$encodeGhazal, data.e, data.a);
+			return A2($author$project$HPVCore$encodeGhazal, data.e, data.a);
 		case 3:
 			var data = p.a;
-			return A3($author$project$Main$encodeFreeVerse, data.e, data.a, data.L);
+			return A3($author$project$HPVCore$encodeFreeVerse, data.e, data.a, data.L);
 		default:
 			var data = p.a;
-			return $author$project$Main$encodeMaatrik(data);
+			return $author$project$HPVCore$encodeMaatrik(data);
 	}
 };
-var $author$project$Main$encodeModel = function (model) {
+var $author$project$HPVCore$encodeModel = function (model) {
 	return $elm$json$Json$Encode$object(
 		_List_fromArray(
 			[
@@ -5697,26 +5697,26 @@ var $author$project$Main$encodeModel = function (model) {
 				$elm$json$Json$Encode$string(model.I)),
 				_Utils_Tuple2(
 				'processedPoem',
-				$author$project$Main$encodePoem(model.x)),
+				$author$project$HPVCore$encodePoem(model.x)),
 				_Utils_Tuple2(
 				'lastAction',
 				$elm$json$Json$Encode$string(model.N))
 			]));
 };
-var $author$project$Main$givePoemRhythm = _Platform_outgoingPort('givePoemRhythm', $elm$core$Basics$identity);
-var $author$project$Main$FreeVerse = function (a) {
+var $author$project$HPVCore$givePoemRhythm = _Platform_outgoingPort('givePoemRhythm', $elm$core$Basics$identity);
+var $author$project$HPVCore$FreeVerse = function (a) {
 	return {$: 3, a: a};
 };
-var $author$project$Main$Ghazal = function (a) {
+var $author$project$HPVCore$Ghazal = function (a) {
 	return {$: 2, a: a};
 };
-var $author$project$Main$PoemLine = F3(
+var $author$project$HPVCore$PoemLine = F3(
 	function (str, rhythmTotal, units) {
 		return {m: rhythmTotal, g: str, b: units};
 	});
-var $author$project$Main$Consonant = 4;
-var $author$project$Main$PureVowel = 0;
-var $author$project$Main$adjustMaatraaChar = function (a) {
+var $author$project$HPVCore$Consonant = 4;
+var $author$project$HPVCore$PureVowel = 0;
+var $author$project$HPVCore$adjustMaatraaChar = function (a) {
 	return (a.f === 3) ? ((!a.c) ? _Utils_update(
 		a,
 		{c: 1}) : _Utils_update(
@@ -5727,12 +5727,12 @@ var $author$project$Main$adjustMaatraaChar = function (a) {
 		a,
 		{c: 2})) : a);
 };
-var $author$project$Main$Akshar = F7(
+var $author$project$HPVCore$Akshar = F7(
 	function (str, code, aksharType, mainChar, vowel, rhythm, userRhythm) {
 		return {f: aksharType, aq: code, U: mainChar, d: rhythm, g: str, c: userRhythm, A: vowel};
 	});
-var $author$project$Main$Empty = 7;
-var $author$project$Main$emptyAkshar = A7($author$project$Main$Akshar, ' ', 0, 7, ' ', ' ', 0, 0);
+var $author$project$HPVCore$Empty = 7;
+var $author$project$HPVCore$emptyAkshar = A7($author$project$HPVCore$Akshar, ' ', 0, 7, ' ', ' ', 0, 0);
 var $elm$core$Bitwise$and = _Bitwise_and;
 var $elm$core$Bitwise$shiftRightZfBy = _Bitwise_shiftRightZfBy;
 var $elm$core$Array$bitMask = 4294967295 >>> (32 - $elm$core$Array$shiftStep);
@@ -5827,24 +5827,24 @@ var $elm$core$Maybe$withDefault = F2(
 			return _default;
 		}
 	});
-var $author$project$Main$adjustMaatraaLine = F2(
+var $author$project$HPVCore$adjustMaatraaLine = F2(
 	function (oldLine, aI) {
 		var a = A2(
 			$elm$core$Maybe$withDefault,
-			$author$project$Main$emptyAkshar,
+			$author$project$HPVCore$emptyAkshar,
 			A2($elm$core$Array$get, aI, oldLine.b));
-		var aNew = $author$project$Main$adjustMaatraaChar(a);
+		var aNew = $author$project$HPVCore$adjustMaatraaChar(a);
 		var newAkshars = A3($elm$core$Array$set, aI, aNew, oldLine.b);
 		var diff = aNew.c - a.c;
 		var newRhythm = oldLine.m + diff;
-		return A3($author$project$Main$PoemLine, oldLine.g, newRhythm, newAkshars);
+		return A3($author$project$HPVCore$PoemLine, oldLine.g, newRhythm, newAkshars);
 	});
-var $author$project$Main$emptyLine = A3($author$project$Main$PoemLine, '', 0, $elm$core$Array$empty);
-var $author$project$Main$CompositeLine = F4(
+var $author$project$HPVCore$emptyLine = A3($author$project$HPVCore$PoemLine, '', 0, $elm$core$Array$empty);
+var $author$project$HPVCore$CompositeLine = F4(
 	function (originalLineI, rhythm, remainder, multipleOfBase) {
 		return {ac: multipleOfBase, aj: originalLineI, ad: remainder, d: rhythm};
 	});
-var $author$project$Main$FreeVerseLine = F2(
+var $author$project$HPVCore$FreeVerseLine = F2(
 	function (line, isComposite) {
 		return {T: isComposite, h: line};
 	});
@@ -5926,10 +5926,10 @@ var $elm$core$Array$push = F2(
 			A2($elm$core$Elm$JsArray$push, a, tail),
 			array);
 	});
-var $author$project$Main$fvAddComposite = F4(
+var $author$project$HPVCore$fvAddComposite = F4(
 	function (compsiteLines, li, r0, r1) {
-		var c1 = A4($author$project$Main$CompositeLine, li, r0 + r1, 0, true);
-		var c = A4($author$project$Main$CompositeLine, li, r0, 0, true);
+		var c1 = A4($author$project$HPVCore$CompositeLine, li, r0 + r1, 0, true);
+		var c = A4($author$project$HPVCore$CompositeLine, li, r0, 0, true);
 		return A2($elm$core$Array$push, c1, compsiteLines);
 	});
 var $elm$core$Array$length = function (_v0) {
@@ -5937,26 +5937,26 @@ var $elm$core$Array$length = function (_v0) {
 	return len;
 };
 var $elm$core$Basics$not = _Basics_not;
-var $author$project$Main$fvCalcCompositeRhythm = F4(
+var $author$project$HPVCore$fvCalcCompositeRhythm = F4(
 	function (lines, li, compsiteLines, inProgress) {
 		fvCalcCompositeRhythm:
 		while (true) {
 			var line0 = A2(
 				$elm$core$Maybe$withDefault,
-				A2($author$project$Main$FreeVerseLine, $author$project$Main$emptyLine, false),
+				A2($author$project$HPVCore$FreeVerseLine, $author$project$HPVCore$emptyLine, false),
 				A2($elm$core$Array$get, li - 1, lines));
 			var line = A2(
 				$elm$core$Maybe$withDefault,
-				A2($author$project$Main$FreeVerseLine, $author$project$Main$emptyLine, false),
+				A2($author$project$HPVCore$FreeVerseLine, $author$project$HPVCore$emptyLine, false),
 				A2($elm$core$Array$get, li, lines));
 			var compositesLastI = $elm$core$Array$length(compsiteLines) - 1;
 			var composite = A2(
 				$elm$core$Maybe$withDefault,
-				A4($author$project$Main$CompositeLine, -1, 0, 0, true),
+				A4($author$project$HPVCore$CompositeLine, -1, 0, 0, true),
 				A2($elm$core$Array$get, compositesLastI, compsiteLines));
-			var newComposite = A4($author$project$Main$CompositeLine, composite.aj, composite.d + line.h.m, 0, true);
+			var newComposite = A4($author$project$HPVCore$CompositeLine, composite.aj, composite.d + line.h.m, 0, true);
 			var updatedComposites = A3($elm$core$Array$set, compositesLastI, newComposite, compsiteLines);
-			var addedComposites = A4($author$project$Main$fvAddComposite, compsiteLines, li - 1, line0.h.m, line.h.m);
+			var addedComposites = A4($author$project$HPVCore$fvAddComposite, compsiteLines, li - 1, line0.h.m, line.h.m);
 			if (_Utils_cmp(
 				li,
 				$elm$core$Array$length(lines)) > 0) {
@@ -5998,7 +5998,7 @@ var $author$project$Main$fvCalcCompositeRhythm = F4(
 			}
 		}
 	});
-var $author$project$Main$fvCalcRemainderSingle = F2(
+var $author$project$HPVCore$fvCalcRemainderSingle = F2(
 	function (compositeLine, baseCount) {
 		var rhy = compositeLine.d;
 		var quo = rhy / baseCount;
@@ -6011,15 +6011,15 @@ var $author$project$Main$fvCalcRemainderSingle = F2(
 			compositeLine,
 			{ac: true, ad: useR});
 	});
-var $author$project$Main$fvCalcRemainderWhole = F3(
+var $author$project$HPVCore$fvCalcRemainderWhole = F3(
 	function (composites, baseCount, i) {
 		fvCalcRemainderWhole:
 		while (true) {
 			var line = A2(
 				$elm$core$Maybe$withDefault,
-				A4($author$project$Main$CompositeLine, 0, 0, 0, false),
+				A4($author$project$HPVCore$CompositeLine, 0, 0, 0, false),
 				A2($elm$core$Array$get, i, composites));
-			var newLine = A2($author$project$Main$fvCalcRemainderSingle, line, baseCount);
+			var newLine = A2($author$project$HPVCore$fvCalcRemainderSingle, line, baseCount);
 			var newComposites = A3($elm$core$Array$set, i, newLine, composites);
 			if (baseCount === 1) {
 				return composites;
@@ -6040,33 +6040,33 @@ var $author$project$Main$fvCalcRemainderWhole = F3(
 			}
 		}
 	});
-var $author$project$Main$fvLineFromLine = function (l) {
-	return A2($author$project$Main$FreeVerseLine, l, false);
+var $author$project$HPVCore$fvLineFromLine = function (l) {
+	return A2($author$project$HPVCore$FreeVerseLine, l, false);
 };
-var $author$project$Main$fvLineFromLineWFlag = F2(
+var $author$project$HPVCore$fvLineFromLineWFlag = F2(
 	function (l, f) {
-		return A2($author$project$Main$FreeVerseLine, l, f);
+		return A2($author$project$HPVCore$FreeVerseLine, l, f);
 	});
-var $author$project$Main$getBiggerLine = F2(
+var $author$project$HPVCore$getBiggerLine = F2(
 	function (line1, line2) {
 		return (_Utils_cmp(line1.m, line2.m) > 0) ? line1 : line2;
 	});
-var $author$project$Main$getMaxLineLen = function (lines) {
-	return A3($elm$core$Array$foldl, $author$project$Main$getBiggerLine, $author$project$Main$emptyLine, lines).m;
+var $author$project$HPVCore$getMaxLineLen = function (lines) {
+	return A3($elm$core$Array$foldl, $author$project$HPVCore$getBiggerLine, $author$project$HPVCore$emptyLine, lines).m;
 };
-var $author$project$Main$MaatrikPoem = function (a) {
+var $author$project$HPVCore$MaatrikPoem = function (a) {
 	return {$: 1, a: a};
 };
-var $author$project$Main$MaatrikLine = F3(
+var $author$project$HPVCore$MaatrikLine = F3(
 	function (str, rhythmTotal, units) {
 		return {m: rhythmTotal, g: str, b: units};
 	});
-var $author$project$Main$MaatrikAkshar = F2(
+var $author$project$HPVCore$MaatrikAkshar = F2(
 	function (a, patternValue) {
 		return {p: a, C: patternValue};
 	});
-var $author$project$Main$maatrikAksharFrmGA = function (a) {
-	return A2($author$project$Main$MaatrikAkshar, a, a.d);
+var $author$project$HPVCore$maatrikAksharFrmGA = function (a) {
+	return A2($author$project$HPVCore$MaatrikAkshar, a, a.d);
 };
 var $elm$core$Elm$JsArray$map = _JsArray_map;
 var $elm$core$Array$map = F2(
@@ -6093,17 +6093,17 @@ var $elm$core$Array$map = F2(
 			A2($elm$core$Elm$JsArray$map, helper, tree),
 			A2($elm$core$Elm$JsArray$map, func, tail));
 	});
-var $author$project$Main$maatrikLFromPoemL = function (lineP) {
+var $author$project$HPVCore$maatrikLFromPoemL = function (lineP) {
 	return A3(
-		$author$project$Main$MaatrikLine,
+		$author$project$HPVCore$MaatrikLine,
 		lineP.g,
 		lineP.m,
-		A2($elm$core$Array$map, $author$project$Main$maatrikAksharFrmGA, lineP.b));
+		A2($elm$core$Array$map, $author$project$HPVCore$maatrikAksharFrmGA, lineP.b));
 };
-var $author$project$Main$emptyMLine = $author$project$Main$maatrikLFromPoemL($author$project$Main$emptyLine);
-var $author$project$Main$maatrikLToPoemL = function (lineM) {
+var $author$project$HPVCore$emptyMLine = $author$project$HPVCore$maatrikLFromPoemL($author$project$HPVCore$emptyLine);
+var $author$project$HPVCore$maatrikLToPoemL = function (lineM) {
 	return A3(
-		$author$project$Main$PoemLine,
+		$author$project$HPVCore$PoemLine,
 		lineM.g,
 		lineM.m,
 		A2(
@@ -6113,8 +6113,8 @@ var $author$project$Main$maatrikLToPoemL = function (lineM) {
 			},
 			lineM.b));
 };
-var $author$project$Main$emptyMAkshar = A2($author$project$Main$MaatrikAkshar, $author$project$Main$emptyAkshar, 0);
-var $author$project$Main$maatrikSetAksharMaapnee = F3(
+var $author$project$HPVCore$emptyMAkshar = A2($author$project$HPVCore$MaatrikAkshar, $author$project$HPVCore$emptyAkshar, 0);
+var $author$project$HPVCore$maatrikSetAksharMaapnee = F3(
 	function (ac, mc, an) {
 		switch (mc) {
 			case 1:
@@ -6163,7 +6163,7 @@ var $author$project$Main$maatrikSetAksharMaapnee = F3(
 				return {n: ac, o: an, r: 0};
 		}
 	});
-var $author$project$Main$maatrikSetAksharPattern = F2(
+var $author$project$HPVCore$maatrikSetAksharPattern = F2(
 	function (ac, an) {
 		return ((ac.p.c === 1) && (an.p.c === 1)) ? {
 			n: _Utils_update(
@@ -6175,19 +6175,19 @@ var $author$project$Main$maatrikSetAksharPattern = F2(
 			ae: true
 		} : {n: ac, o: an, ae: false};
 	});
-var $author$project$Main$maatrikSetLineUnitsPattern = F2(
+var $author$project$HPVCore$maatrikSetLineUnitsPattern = F2(
 	function (lineUnits, i) {
 		maatrikSetLineUnitsPattern:
 		while (true) {
 			var an = A2(
 				$elm$core$Maybe$withDefault,
-				$author$project$Main$emptyMAkshar,
+				$author$project$HPVCore$emptyMAkshar,
 				A2($elm$core$Array$get, i + 1, lineUnits));
 			var ac = A2(
 				$elm$core$Maybe$withDefault,
-				$author$project$Main$emptyMAkshar,
+				$author$project$HPVCore$emptyMAkshar,
 				A2($elm$core$Array$get, i, lineUnits));
-			var result = A2($author$project$Main$maatrikSetAksharPattern, ac, an);
+			var result = A2($author$project$HPVCore$maatrikSetAksharPattern, ac, an);
 			var lineUnits1 = A3($elm$core$Array$set, i, result.n, lineUnits);
 			var newLineUnits = A3($elm$core$Array$set, i + 1, result.o, lineUnits1);
 			if (_Utils_cmp(
@@ -6211,7 +6211,7 @@ var $author$project$Main$maatrikSetLineUnitsPattern = F2(
 			}
 		}
 	});
-var $author$project$Main$maatrikSetLineUnitsMaapnee = F4(
+var $author$project$HPVCore$maatrikSetLineUnitsMaapnee = F4(
 	function (lineUnits, i, maapnee, mi) {
 		maatrikSetLineUnitsMaapnee:
 		while (true) {
@@ -6221,13 +6221,13 @@ var $author$project$Main$maatrikSetLineUnitsMaapnee = F4(
 				A2($elm$core$Array$get, mi, maapnee));
 			var an = A2(
 				$elm$core$Maybe$withDefault,
-				$author$project$Main$emptyMAkshar,
+				$author$project$HPVCore$emptyMAkshar,
 				A2($elm$core$Array$get, i + 1, lineUnits));
 			var ac = A2(
 				$elm$core$Maybe$withDefault,
-				$author$project$Main$emptyMAkshar,
+				$author$project$HPVCore$emptyMAkshar,
 				A2($elm$core$Array$get, i, lineUnits));
-			var result = A3($author$project$Main$maatrikSetAksharMaapnee, ac, mc, an);
+			var result = A3($author$project$HPVCore$maatrikSetAksharMaapnee, ac, mc, an);
 			var lineUnits1 = A3($elm$core$Array$set, i, result.n, lineUnits);
 			var newLineUnits = A3($elm$core$Array$set, i + 1, result.o, lineUnits1);
 			if (_Utils_cmp(
@@ -6280,49 +6280,49 @@ var $author$project$Main$maatrikSetLineUnitsMaapnee = F4(
 								mi = $temp$mi;
 								continue maatrikSetLineUnitsMaapnee;
 							} else {
-								return A2($author$project$Main$maatrikSetLineUnitsPattern, newLineUnits, i);
+								return A2($author$project$HPVCore$maatrikSetLineUnitsPattern, newLineUnits, i);
 							}
 						}
 				}
 			}
 		}
 	});
-var $author$project$Main$maatrikSetLineMaapnee = F2(
+var $author$project$HPVCore$maatrikSetLineMaapnee = F2(
 	function (line, maapnee) {
 		return _Utils_update(
 			line,
 			{
-				b: A4($author$project$Main$maatrikSetLineUnitsMaapnee, line.b, 0, maapnee, 0)
+				b: A4($author$project$HPVCore$maatrikSetLineUnitsMaapnee, line.b, 0, maapnee, 0)
 			});
 	});
-var $author$project$Main$maatrikAdjustMaatraa = F3(
+var $author$project$HPVCore$maatrikAdjustMaatraa = F3(
 	function (poemData, li, ci) {
 		var oldLine = A2(
 			$elm$core$Maybe$withDefault,
-			$author$project$Main$emptyMLine,
+			$author$project$HPVCore$emptyMLine,
 			A2($elm$core$Array$get, li, poemData.a));
 		var newBasicLine = A2(
-			$author$project$Main$adjustMaatraaLine,
-			$author$project$Main$maatrikLToPoemL(oldLine),
+			$author$project$HPVCore$adjustMaatraaLine,
+			$author$project$HPVCore$maatrikLToPoemL(oldLine),
 			ci);
 		var newLine = A2(
-			$author$project$Main$maatrikSetLineMaapnee,
-			$author$project$Main$maatrikLFromPoemL(newBasicLine),
+			$author$project$HPVCore$maatrikSetLineMaapnee,
+			$author$project$HPVCore$maatrikLFromPoemL(newBasicLine),
 			poemData.G.b);
 		var newLines = A3($elm$core$Array$set, li, newLine, poemData.a);
 		var newMaxLineLen = (_Utils_cmp(newLine.m, poemData.e) > 0) ? newLine.m : poemData.e;
-		return $author$project$Main$MaatrikPoem(
+		return $author$project$HPVCore$MaatrikPoem(
 			{a: newLines, G: poemData.G, e: newMaxLineLen});
 	});
-var $author$project$Main$Misraa = F2(
+var $author$project$HPVCore$Misraa = F2(
 	function (line, rkUnits) {
 		return {h: line, D: rkUnits};
 	});
-var $author$project$Main$misraaFromPoemLineWRK = F2(
+var $author$project$HPVCore$misraaFromPoemLineWRK = F2(
 	function (line, rk) {
-		return A2($author$project$Main$Misraa, line, rk);
+		return A2($author$project$HPVCore$Misraa, line, rk);
 	});
-var $author$project$Main$adjustMaatraaPoem = F3(
+var $author$project$HPVCore$adjustMaatraaPoem = F3(
 	function (poem, li, ci) {
 		var lines = function () {
 			switch (poem.$) {
@@ -6347,22 +6347,22 @@ var $author$project$Main$adjustMaatraaPoem = F3(
 						data.a);
 				default:
 					var data = poem.a;
-					return A2($elm$core$Array$map, $author$project$Main$maatrikLToPoemL, data.a);
+					return A2($elm$core$Array$map, $author$project$HPVCore$maatrikLToPoemL, data.a);
 			}
 		}();
 		var oldLine = A2(
 			$elm$core$Maybe$withDefault,
-			$author$project$Main$emptyLine,
+			$author$project$HPVCore$emptyLine,
 			A2($elm$core$Array$get, li, lines));
-		var newLine = A2($author$project$Main$adjustMaatraaLine, oldLine, ci);
+		var newLine = A2($author$project$HPVCore$adjustMaatraaLine, oldLine, ci);
 		var newLines = A3($elm$core$Array$set, li, newLine, lines);
-		var newMaxLineLen = $author$project$Main$getMaxLineLen(newLines);
+		var newMaxLineLen = $author$project$HPVCore$getMaxLineLen(newLines);
 		var finalFVLines = function () {
 			if (poem.$ === 3) {
 				var data = poem.a;
 				return A3(
 					$elm_community$array_extra$Array$Extra$map2,
-					$author$project$Main$fvLineFromLineWFlag,
+					$author$project$HPVCore$fvLineFromLineWFlag,
 					newLines,
 					A2(
 						$elm$core$Array$map,
@@ -6371,22 +6371,22 @@ var $author$project$Main$adjustMaatraaPoem = F3(
 						},
 						data.a));
 			} else {
-				return A2($elm$core$Array$map, $author$project$Main$fvLineFromLine, newLines);
+				return A2($elm$core$Array$map, $author$project$HPVCore$fvLineFromLine, newLines);
 			}
 		}();
 		switch (poem.$) {
 			case 0:
-				return $author$project$Main$GenericPoem(
+				return $author$project$HPVCore$GenericPoem(
 					{a: newLines, e: newMaxLineLen});
 			case 2:
 				var data = poem.a;
-				return $author$project$Main$Ghazal(
+				return $author$project$HPVCore$Ghazal(
 					_Utils_update(
 						data,
 						{
 							a: A3(
 								$elm_community$array_extra$Array$Extra$map2,
-								$author$project$Main$misraaFromPoemLineWRK,
+								$author$project$HPVCore$misraaFromPoemLineWRK,
 								newLines,
 								A2(
 									$elm$core$Array$map,
@@ -6398,12 +6398,12 @@ var $author$project$Main$adjustMaatraaPoem = F3(
 						}));
 			case 3:
 				var data = poem.a;
-				return $author$project$Main$FreeVerse(
+				return $author$project$HPVCore$FreeVerse(
 					{
 						v: data.v,
 						L: A3(
-							$author$project$Main$fvCalcRemainderWhole,
-							A4($author$project$Main$fvCalcCompositeRhythm, finalFVLines, 0, $elm$core$Array$empty, false),
+							$author$project$HPVCore$fvCalcRemainderWhole,
+							A4($author$project$HPVCore$fvCalcCompositeRhythm, finalFVLines, 0, $elm$core$Array$empty, false),
 							data.v,
 							0),
 						a: finalFVLines,
@@ -6411,7 +6411,7 @@ var $author$project$Main$adjustMaatraaPoem = F3(
 					});
 			default:
 				var data = poem.a;
-				return A3($author$project$Main$maatrikAdjustMaatraa, data, li, ci);
+				return A3($author$project$HPVCore$maatrikAdjustMaatraa, data, li, ci);
 		}
 	});
 var $elm$regex$Regex$Match = F4(
@@ -6426,7 +6426,7 @@ var $elm$regex$Regex$fromString = function (string) {
 		string);
 };
 var $elm$regex$Regex$replace = _Regex_replaceAtMost(_Regex_infinity);
-var $author$project$Main$userReplace = F3(
+var $author$project$HPVCore$userReplace = F3(
 	function (userRegex, replacer, string) {
 		var _v0 = $elm$regex$Regex$fromString(userRegex);
 		if (_v0.$ === 1) {
@@ -6436,39 +6436,39 @@ var $author$project$Main$userReplace = F3(
 			return A3($elm$regex$Regex$replace, regex, replacer, string);
 		}
 	});
-var $author$project$Main$cleanMaapnee = function (string) {
+var $author$project$HPVCore$cleanMaapnee = function (string) {
 	return A3(
-		$author$project$Main$userReplace,
+		$author$project$HPVCore$userReplace,
 		'[^21२१ ]',
 		function (_v0) {
 			return '';
 		},
 		string);
 };
-var $author$project$Main$IncomingPoem = F3(
+var $author$project$HPVCore$IncomingPoem = F3(
 	function (poem, poemType, maapnee) {
 		return {G: maapnee, I: poem, ak: poemType};
 	});
 var $elm$json$Json$Decode$field = _Json_decodeField;
 var $elm$json$Json$Decode$map3 = _Json_map3;
-var $author$project$Main$decodeIncomingPoem = A4(
+var $author$project$HPVCore$decodeIncomingPoem = A4(
 	$elm$json$Json$Decode$map3,
-	$author$project$Main$IncomingPoem,
+	$author$project$HPVCore$IncomingPoem,
 	A2($elm$json$Json$Decode$field, 'poem', $elm$json$Json$Decode$string),
 	A2($elm$json$Json$Decode$field, 'poemType', $elm$json$Json$Decode$string),
 	A2($elm$json$Json$Decode$field, 'maapnee', $elm$json$Json$Decode$string));
 var $elm$json$Json$Decode$decodeString = _Json_runOnString;
-var $author$project$Main$WhichChar = F2(
+var $author$project$HPVCore$WhichChar = F2(
 	function (lineI, charI) {
 		return {af: charI, ag: lineI};
 	});
 var $elm$json$Json$Decode$int = _Json_decodeInt;
-var $author$project$Main$decodeWhichChar = A3(
+var $author$project$HPVCore$decodeWhichChar = A3(
 	$elm$json$Json$Decode$map2,
-	$author$project$Main$WhichChar,
+	$author$project$HPVCore$WhichChar,
 	A2($elm$json$Json$Decode$field, 'lineI', $elm$json$Json$Decode$int),
 	A2($elm$json$Json$Decode$field, 'charI', $elm$json$Json$Decode$int));
-var $author$project$Main$fvGetData = function (p) {
+var $author$project$HPVCore$fvGetData = function (p) {
 	if (p.$ === 3) {
 		var data = p.a;
 		return data;
@@ -6476,27 +6476,27 @@ var $author$project$Main$fvGetData = function (p) {
 		return {v: 1, L: $elm$core$Array$empty, a: $elm$core$Array$empty, e: 0};
 	}
 };
-var $author$project$Main$fvSetBase = F2(
+var $author$project$HPVCore$fvSetBase = F2(
 	function (pom, base) {
-		var data = $author$project$Main$fvGetData(pom);
-		var compositeWRemainder = A3($author$project$Main$fvCalcRemainderWhole, data.L, base, 0);
-		return $author$project$Main$FreeVerse(
+		var data = $author$project$HPVCore$fvGetData(pom);
+		var compositeWRemainder = A3($author$project$HPVCore$fvCalcRemainderWhole, data.L, base, 0);
+		return $author$project$HPVCore$FreeVerse(
 			_Utils_update(
 				data,
 				{v: base, L: compositeWRemainder}));
 	});
-var $author$project$Main$fvSetComposite = F2(
+var $author$project$HPVCore$fvSetComposite = F2(
 	function (pom, li) {
-		var data = $author$project$Main$fvGetData(pom);
+		var data = $author$project$HPVCore$fvGetData(pom);
 		var line = A2(
 			$elm$core$Maybe$withDefault,
-			A2($author$project$Main$FreeVerseLine, $author$project$Main$emptyLine, false),
+			A2($author$project$HPVCore$FreeVerseLine, $author$project$HPVCore$emptyLine, false),
 			A2($elm$core$Array$get, li, data.a));
-		var newLine = A2($author$project$Main$FreeVerseLine, line.h, !line.T);
+		var newLine = A2($author$project$HPVCore$FreeVerseLine, line.h, !line.T);
 		var newLines = A3($elm$core$Array$set, li, newLine, data.a);
-		var composite = A4($author$project$Main$fvCalcCompositeRhythm, newLines, 0, $elm$core$Array$empty, false);
-		var compositeWRemainder = A3($author$project$Main$fvCalcRemainderWhole, composite, data.v, 0);
-		return $author$project$Main$FreeVerse(
+		var composite = A4($author$project$HPVCore$fvCalcCompositeRhythm, newLines, 0, $elm$core$Array$empty, false);
+		var compositeWRemainder = A3($author$project$HPVCore$fvCalcRemainderWhole, composite, data.v, 0);
+		return $author$project$HPVCore$FreeVerse(
 			{v: data.v, L: compositeWRemainder, a: newLines, e: data.e});
 	});
 var $elm$core$Elm$JsArray$appendN = _JsArray_appendN;
@@ -6602,7 +6602,7 @@ var $elm$core$Array$append = F2(
 						bTree)));
 		}
 	});
-var $author$project$Main$genericGetData = function (p) {
+var $author$project$HPVCore$genericGetData = function (p) {
 	switch (p.$) {
 		case 0:
 			var data = p.a;
@@ -6632,13 +6632,13 @@ var $author$project$Main$genericGetData = function (p) {
 		default:
 			var data = p.a;
 			return {
-				a: A2($elm$core$Array$map, $author$project$Main$maatrikLToPoemL, data.a),
+				a: A2($elm$core$Array$map, $author$project$HPVCore$maatrikLToPoemL, data.a),
 				e: data.e
 			};
 	}
 };
 var $elm$core$String$lines = _String_lines;
-var $author$project$Main$calcHalfAksharRhythm = F3(
+var $author$project$HPVCore$calcHalfAksharRhythm = F3(
 	function (ac, ap, an) {
 		return (ac.f !== 3) ? ac : ((((ac.U === 'म') && (an.U === 'ह')) || ((ac.U === 'न') && (an.U === 'ह'))) ? ac : (((ap.d === 1) && (ap.f !== 3)) ? _Utils_update(
 			ac,
@@ -6646,7 +6646,7 @@ var $author$project$Main$calcHalfAksharRhythm = F3(
 			ac,
 			{d: 1, c: 1}) : ac)));
 	});
-var $author$project$Main$calcHalfAksharRhythmLine = F3(
+var $author$project$HPVCore$calcHalfAksharRhythmLine = F3(
 	function (line, i, r) {
 		calcHalfAksharRhythmLine:
 		while (true) {
@@ -6654,17 +6654,17 @@ var $author$project$Main$calcHalfAksharRhythmLine = F3(
 			var maxI = len - 1;
 			var ap = A2(
 				$elm$core$Maybe$withDefault,
-				$author$project$Main$emptyAkshar,
+				$author$project$HPVCore$emptyAkshar,
 				A2($elm$core$Array$get, i - 1, line));
 			var an = A2(
 				$elm$core$Maybe$withDefault,
-				$author$project$Main$emptyAkshar,
+				$author$project$HPVCore$emptyAkshar,
 				A2($elm$core$Array$get, i + 1, line));
 			var ac = A2(
 				$elm$core$Maybe$withDefault,
-				$author$project$Main$emptyAkshar,
+				$author$project$HPVCore$emptyAkshar,
 				A2($elm$core$Array$get, i, line));
-			var aNew = A3($author$project$Main$calcHalfAksharRhythm, ac, ap, an);
+			var aNew = A3($author$project$HPVCore$calcHalfAksharRhythm, ac, ap, an);
 			var newline = A3($elm$core$Array$set, i, aNew, line);
 			if (_Utils_cmp(i, maxI) > 0) {
 				return _Utils_Tuple2(line, r);
@@ -6679,9 +6679,9 @@ var $author$project$Main$calcHalfAksharRhythmLine = F3(
 			}
 		}
 	});
-var $author$project$Main$Halant = 2;
-var $author$project$Main$Maatraa = 1;
-var $author$project$Main$mrgMCakshar = F2(
+var $author$project$HPVCore$Halant = 2;
+var $author$project$HPVCore$Maatraa = 1;
+var $author$project$HPVCore$mrgMCakshar = F2(
 	function (aL, aM) {
 		var aC = _Utils_update(
 			aM,
@@ -6701,7 +6701,7 @@ var $elm$core$Tuple$second = function (_v0) {
 	var y = _v0.b;
 	return y;
 };
-var $author$project$Main$mrgMChelper = F3(
+var $author$project$HPVCore$mrgMChelper = F3(
 	function (list, iStart, mList) {
 		mrgMChelper:
 		while (true) {
@@ -6709,13 +6709,13 @@ var $author$project$Main$mrgMChelper = F3(
 			var iNext = iStart + 1;
 			var aM = A2(
 				$elm$core$Maybe$withDefault,
-				$author$project$Main$emptyAkshar,
+				$author$project$HPVCore$emptyAkshar,
 				A2($elm$core$Array$get, mListLen - 1, mList));
 			var aL = A2(
 				$elm$core$Maybe$withDefault,
-				$author$project$Main$emptyAkshar,
+				$author$project$HPVCore$emptyAkshar,
 				A2($elm$core$Array$get, iStart, list));
-			var mrgResult = A2($author$project$Main$mrgMCakshar, aL, aM);
+			var mrgResult = A2($author$project$HPVCore$mrgMCakshar, aL, aM);
 			var aC = mrgResult.b;
 			if (_Utils_eq(
 				iStart,
@@ -6752,34 +6752,34 @@ var $author$project$Main$mrgMChelper = F3(
 			}
 		}
 	});
-var $author$project$Main$mrgMCline = function (list) {
-	return A3($author$project$Main$mrgMChelper, list, 0, $elm$core$Array$empty);
+var $author$project$HPVCore$mrgMCline = function (list) {
+	return A3($author$project$HPVCore$mrgMChelper, list, 0, $elm$core$Array$empty);
 };
-var $author$project$Main$ChandraBindu = 5;
-var $author$project$Main$Other = 6;
-var $author$project$Main$isBindu = function (c) {
+var $author$project$HPVCore$ChandraBindu = 5;
+var $author$project$HPVCore$Other = 6;
+var $author$project$HPVCore$isBindu = function (c) {
 	return $elm$core$Char$toCode(c) === 2306;
 };
-var $author$project$Main$isChandraBindu = function (c) {
+var $author$project$HPVCore$isChandraBindu = function (c) {
 	return $elm$core$Char$toCode(c) === 2305;
 };
-var $author$project$Main$isHalant = function (c) {
+var $author$project$HPVCore$isHalant = function (c) {
 	var cd = $elm$core$Char$toCode(c);
 	return (cd === 2381) ? true : false;
 };
-var $author$project$Main$isHindi = function (c) {
+var $author$project$HPVCore$isHindi = function (c) {
 	var cd = $elm$core$Char$toCode(c);
 	return (cd >= 2305) && (cd <= 2399);
 };
-var $author$project$Main$isMaatraaVowel = function (c) {
+var $author$project$HPVCore$isMaatraaVowel = function (c) {
 	var cd = $elm$core$Char$toCode(c);
 	return (cd >= 2366) && (cd <= 2380);
 };
-var $author$project$Main$isPureVowel = function (c) {
+var $author$project$HPVCore$isPureVowel = function (c) {
 	var cd = $elm$core$Char$toCode(c);
 	return (cd >= 2309) && (cd <= 2324);
 };
-var $author$project$Main$maatraaToVowel = function (c) {
+var $author$project$HPVCore$maatraaToVowel = function (c) {
 	switch (c) {
 		case 'ा':
 			return 'आ';
@@ -6807,7 +6807,7 @@ var $author$project$Main$maatraaToVowel = function (c) {
 			return c;
 	}
 };
-var $author$project$Main$vowelRhythm = function (c) {
+var $author$project$HPVCore$vowelRhythm = function (c) {
 	switch (c) {
 		case 'अ':
 			return 1;
@@ -6837,10 +6837,10 @@ var $author$project$Main$vowelRhythm = function (c) {
 			return 0;
 	}
 };
-var $author$project$Main$processChar = function (c) {
+var $author$project$HPVCore$processChar = function (c) {
 	var m = 0;
 	var cd = $elm$core$Char$toCode(c);
-	var aRhythm = $author$project$Main$vowelRhythm('अ');
+	var aRhythm = $author$project$HPVCore$vowelRhythm('अ');
 	var a = {
 		f: 6,
 		aq: cd,
@@ -6850,17 +6850,17 @@ var $author$project$Main$processChar = function (c) {
 		c: 0,
 		A: c
 	};
-	var newRhythm = $author$project$Main$isPureVowel(c) ? $author$project$Main$vowelRhythm(a.A) : ($author$project$Main$isMaatraaVowel(c) ? $author$project$Main$vowelRhythm(
-		$author$project$Main$maatraaToVowel(a.A)) : 0);
-	return $author$project$Main$isHindi(c) ? ($author$project$Main$isPureVowel(c) ? _Utils_update(
+	var newRhythm = $author$project$HPVCore$isPureVowel(c) ? $author$project$HPVCore$vowelRhythm(a.A) : ($author$project$HPVCore$isMaatraaVowel(c) ? $author$project$HPVCore$vowelRhythm(
+		$author$project$HPVCore$maatraaToVowel(a.A)) : 0);
+	return $author$project$HPVCore$isHindi(c) ? ($author$project$HPVCore$isPureVowel(c) ? _Utils_update(
 		a,
-		{f: 0, d: newRhythm, c: newRhythm}) : ($author$project$Main$isMaatraaVowel(c) ? _Utils_update(
+		{f: 0, d: newRhythm, c: newRhythm}) : ($author$project$HPVCore$isMaatraaVowel(c) ? _Utils_update(
 		a,
-		{f: 1, d: newRhythm, c: newRhythm}) : ($author$project$Main$isBindu(c) ? _Utils_update(
+		{f: 1, d: newRhythm, c: newRhythm}) : ($author$project$HPVCore$isBindu(c) ? _Utils_update(
 		a,
-		{f: 3, d: 0, c: 0}) : ($author$project$Main$isHalant(c) ? _Utils_update(
+		{f: 3, d: 0, c: 0}) : ($author$project$HPVCore$isHalant(c) ? _Utils_update(
 		a,
-		{f: 2, d: 0, c: 0}) : ($author$project$Main$isChandraBindu(c) ? _Utils_update(
+		{f: 2, d: 0, c: 0}) : ($author$project$HPVCore$isChandraBindu(c) ? _Utils_update(
 		a,
 		{f: 5, d: 0, c: 0}) : _Utils_update(
 		a,
@@ -6870,35 +6870,35 @@ var $elm$core$String$foldr = _String_foldr;
 var $elm$core$String$toList = function (string) {
 	return A3($elm$core$String$foldr, $elm$core$List$cons, _List_Nil, string);
 };
-var $author$project$Main$processLine = function (pomLine) {
+var $author$project$HPVCore$processLine = function (pomLine) {
 	var pChars = $elm$core$String$toList(pomLine);
-	var pPoem = A2($elm$core$List$map, $author$project$Main$processChar, pChars);
+	var pPoem = A2($elm$core$List$map, $author$project$HPVCore$processChar, pChars);
 	var pPoemA = $elm$core$Array$fromList(pPoem);
-	var mergedLine = $author$project$Main$mrgMCline(pPoemA);
-	var _final = A3($author$project$Main$calcHalfAksharRhythmLine, mergedLine, 0, 0);
-	return A3($author$project$Main$PoemLine, pomLine, _final.b, _final.a);
+	var mergedLine = $author$project$HPVCore$mrgMCline(pPoemA);
+	var _final = A3($author$project$HPVCore$calcHalfAksharRhythmLine, mergedLine, 0, 0);
+	return A3($author$project$HPVCore$PoemLine, pomLine, _final.b, _final.a);
 };
-var $author$project$Main$removeExtraSpaces = function (string) {
+var $author$project$HPVCore$removeExtraSpaces = function (string) {
 	return A3(
-		$author$project$Main$userReplace,
+		$author$project$HPVCore$userReplace,
 		'\\s+',
 		function (_v0) {
 			return ' ';
 		},
 		string);
 };
-var $author$project$Main$removeNonDevanagari = function (string) {
+var $author$project$HPVCore$removeNonDevanagari = function (string) {
 	return A3(
-		$author$project$Main$userReplace,
+		$author$project$HPVCore$userReplace,
 		'[^\u0900-\u097F]',
 		function (_v0) {
 			return ' ';
 		},
 		string);
 };
-var $author$project$Main$removePoornviraam = function (string) {
+var $author$project$HPVCore$removePoornviraam = function (string) {
 	return A3(
-		$author$project$Main$userReplace,
+		$author$project$HPVCore$userReplace,
 		'।',
 		function (_v0) {
 			return ' ';
@@ -6906,13 +6906,13 @@ var $author$project$Main$removePoornviraam = function (string) {
 		string);
 };
 var $elm$core$String$trim = _String_trim;
-var $author$project$Main$preProcessLine = F2(
+var $author$project$HPVCore$preProcessLine = F2(
 	function (pomLine, oldLine) {
 		var pCleaned = $elm$core$String$trim(
-			$author$project$Main$removeExtraSpaces(
-				$author$project$Main$removePoornviraam(
-					$author$project$Main$removeNonDevanagari(pomLine))));
-		return _Utils_eq(pCleaned, oldLine.g) ? oldLine : $author$project$Main$processLine(pCleaned);
+			$author$project$HPVCore$removeExtraSpaces(
+				$author$project$HPVCore$removePoornviraam(
+					$author$project$HPVCore$removeNonDevanagari(pomLine))));
+		return _Utils_eq(pCleaned, oldLine.g) ? oldLine : $author$project$HPVCore$processLine(pCleaned);
 	});
 var $elm$core$Array$repeat = F2(
 	function (n, e) {
@@ -6923,7 +6923,7 @@ var $elm$core$Array$repeat = F2(
 				return e;
 			});
 	});
-var $author$project$Main$processPoem = F2(
+var $author$project$HPVCore$processPoem = F2(
 	function (pom, oldLines) {
 		var pLines = $elm$core$Array$fromList(
 			$elm$core$String$lines(pom));
@@ -6931,36 +6931,36 @@ var $author$project$Main$processPoem = F2(
 		var paddedOldPoem = (diff > 0) ? A2(
 			$elm$core$Array$append,
 			oldLines,
-			A2($elm$core$Array$repeat, diff, $author$project$Main$emptyLine)) : oldLines;
-		var processedLines = A3($elm_community$array_extra$Array$Extra$map2, $author$project$Main$preProcessLine, pLines, paddedOldPoem);
-		var maxLineLen = $author$project$Main$getMaxLineLen(processedLines);
-		return $author$project$Main$GenericPoem(
+			A2($elm$core$Array$repeat, diff, $author$project$HPVCore$emptyLine)) : oldLines;
+		var processedLines = A3($elm_community$array_extra$Array$Extra$map2, $author$project$HPVCore$preProcessLine, pLines, paddedOldPoem);
+		var maxLineLen = $author$project$HPVCore$getMaxLineLen(processedLines);
+		return $author$project$HPVCore$GenericPoem(
 			{a: processedLines, e: maxLineLen});
 	});
-var $author$project$Main$fvProcess = F2(
+var $author$project$HPVCore$fvProcess = F2(
 	function (pom, oldPom) {
-		var oldFVData = $author$project$Main$fvGetData(oldPom);
+		var oldFVData = $author$project$HPVCore$fvGetData(oldPom);
 		var oldFVFlags = A2(
 			$elm$core$Array$map,
 			function ($) {
 				return $.T;
 			},
 			oldFVData.a);
-		var basicOldLines = $author$project$Main$genericGetData(oldPom).a;
-		var basicProcessed = $author$project$Main$genericGetData(
-			A2($author$project$Main$processPoem, pom, basicOldLines));
+		var basicOldLines = $author$project$HPVCore$genericGetData(oldPom).a;
+		var basicProcessed = $author$project$HPVCore$genericGetData(
+			A2($author$project$HPVCore$processPoem, pom, basicOldLines));
 		var diff = $elm$core$Array$length(basicProcessed.a) - $elm$core$Array$length(oldFVData.a);
 		var paddedOldFlags = (diff > 0) ? A2(
 			$elm$core$Array$append,
 			oldFVFlags,
 			A2($elm$core$Array$repeat, diff, false)) : oldFVFlags;
-		var newFVLines = A3($elm_community$array_extra$Array$Extra$map2, $author$project$Main$fvLineFromLineWFlag, basicProcessed.a, paddedOldFlags);
-		var composite = A4($author$project$Main$fvCalcCompositeRhythm, newFVLines, 0, $elm$core$Array$empty, false);
-		var compositeWRemainder = A3($author$project$Main$fvCalcRemainderWhole, composite, oldFVData.v, 0);
-		return $author$project$Main$FreeVerse(
+		var newFVLines = A3($elm_community$array_extra$Array$Extra$map2, $author$project$HPVCore$fvLineFromLineWFlag, basicProcessed.a, paddedOldFlags);
+		var composite = A4($author$project$HPVCore$fvCalcCompositeRhythm, newFVLines, 0, $elm$core$Array$empty, false);
+		var compositeWRemainder = A3($author$project$HPVCore$fvCalcRemainderWhole, composite, oldFVData.v, 0);
+		return $author$project$HPVCore$FreeVerse(
 			{v: oldFVData.v, L: compositeWRemainder, a: newFVLines, e: basicProcessed.e});
 	});
-var $author$project$Main$aksharVowelCompare = F2(
+var $author$project$HPVCore$aksharVowelCompare = F2(
 	function (a, b) {
 		return _Utils_eq(a.A, b.A) ? true : false;
 	});
@@ -7164,28 +7164,28 @@ var $elm$core$Array$slice = F3(
 			correctFrom,
 			A2($elm$core$Array$sliceRight, correctTo, array));
 	});
-var $author$project$Main$unitsLast = function (akshar) {
+var $author$project$HPVCore$unitsLast = function (akshar) {
 	return A2(
 		$elm$core$Maybe$withDefault,
-		$author$project$Main$emptyAkshar,
+		$author$project$HPVCore$emptyAkshar,
 		A2(
 			$elm$core$Array$get,
 			$elm$core$Array$length(akshar) - 1,
 			akshar));
 };
-var $author$project$Main$ghazalCalcKaafiyaa = F3(
+var $author$project$HPVCore$ghazalCalcKaafiyaa = F3(
 	function (kaafiyaa, line0, line1) {
 		ghazalCalcKaafiyaa:
 		while (true) {
 			var poppedLine1 = A3($elm$core$Array$slice, 0, -1, line1);
 			var poppedLine0 = A3($elm$core$Array$slice, 0, -1, line0);
-			var b = $author$project$Main$unitsLast(line1);
-			var a = $author$project$Main$unitsLast(line0);
+			var b = $author$project$HPVCore$unitsLast(line1);
+			var a = $author$project$HPVCore$unitsLast(line0);
 			var appendArray = A2($elm$core$Array$repeat, 1, a);
 			if ((!$elm$core$Array$length(line0)) || (!$elm$core$Array$length(line1))) {
 				return kaafiyaa;
 			} else {
-				if (A2($author$project$Main$aksharVowelCompare, a, b)) {
+				if (A2($author$project$HPVCore$aksharVowelCompare, a, b)) {
 					var $temp$kaafiyaa = A2($elm$core$Array$append, appendArray, kaafiyaa),
 						$temp$line0 = poppedLine0,
 						$temp$line1 = poppedLine1;
@@ -7199,23 +7199,23 @@ var $author$project$Main$ghazalCalcKaafiyaa = F3(
 			}
 		}
 	});
-var $author$project$Main$aksharCompare = F2(
+var $author$project$HPVCore$aksharCompare = F2(
 	function (a, b) {
 		return _Utils_eq(a.g, b.g) ? true : false;
 	});
-var $author$project$Main$ghazalCalcRadeef = F3(
+var $author$project$HPVCore$ghazalCalcRadeef = F3(
 	function (radeef, line0, line1) {
 		ghazalCalcRadeef:
 		while (true) {
 			var poppedLine1 = A3($elm$core$Array$slice, 0, -1, line1);
 			var poppedLine0 = A3($elm$core$Array$slice, 0, -1, line0);
-			var b = $author$project$Main$unitsLast(line1);
-			var a = $author$project$Main$unitsLast(line0);
+			var b = $author$project$HPVCore$unitsLast(line1);
+			var a = $author$project$HPVCore$unitsLast(line0);
 			var appendArray = A2($elm$core$Array$repeat, 1, a);
 			if ((!$elm$core$Array$length(line0)) || (!$elm$core$Array$length(line1))) {
 				return radeef;
 			} else {
-				if (A2($author$project$Main$aksharCompare, a, b)) {
+				if (A2($author$project$HPVCore$aksharCompare, a, b)) {
 					var $temp$radeef = A2($elm$core$Array$append, appendArray, radeef),
 						$temp$line0 = poppedLine0,
 						$temp$line1 = poppedLine1;
@@ -7229,26 +7229,26 @@ var $author$project$Main$ghazalCalcRadeef = F3(
 			}
 		}
 	});
-var $author$project$Main$ghazalSetMisraaKaafiyaa = F4(
+var $author$project$HPVCore$ghazalSetMisraaKaafiyaa = F4(
 	function (misraa, radeefLen, kaafiyaa, kaafiyaaI) {
 		ghazalSetMisraaKaafiyaa:
 		while (true) {
 			var ki = ($elm$core$Array$length(kaafiyaa) - kaafiyaaI) - 1;
 			var k = A2(
 				$elm$core$Maybe$withDefault,
-				$author$project$Main$emptyAkshar,
+				$author$project$HPVCore$emptyAkshar,
 				A2($elm$core$Array$get, ki, kaafiyaa));
 			var ai = (($elm$core$Array$length(misraa.h.b) - radeefLen) - kaafiyaaI) - 1;
 			var a = A2(
 				$elm$core$Maybe$withDefault,
-				$author$project$Main$emptyAkshar,
+				$author$project$HPVCore$emptyAkshar,
 				A2($elm$core$Array$get, ai, misraa.h.b));
 			if (_Utils_eq(
 				$elm$core$Array$length(kaafiyaa),
 				kaafiyaaI)) {
 				return misraa;
 			} else {
-				if (A2($author$project$Main$aksharVowelCompare, a, k)) {
+				if (A2($author$project$HPVCore$aksharVowelCompare, a, k)) {
 					var $temp$misraa = _Utils_update(
 						misraa,
 						{
@@ -7268,15 +7268,15 @@ var $author$project$Main$ghazalSetMisraaKaafiyaa = F4(
 			}
 		}
 	});
-var $author$project$Main$ghazalSetKaafiyaa = F4(
+var $author$project$HPVCore$ghazalSetKaafiyaa = F4(
 	function (misre, radeefLen, kaafiyaa, mi) {
 		ghazalSetKaafiyaa:
 		while (true) {
 			var misraa = A2(
 				$elm$core$Maybe$withDefault,
-				{h: $author$project$Main$emptyLine, D: $elm$core$Array$empty},
+				{h: $author$project$HPVCore$emptyLine, D: $elm$core$Array$empty},
 				A2($elm$core$Array$get, mi, misre));
-			var newMisraa = A4($author$project$Main$ghazalSetMisraaKaafiyaa, misraa, radeefLen, kaafiyaa, 0);
+			var newMisraa = A4($author$project$HPVCore$ghazalSetMisraaKaafiyaa, misraa, radeefLen, kaafiyaa, 0);
 			var misre1 = A3($elm$core$Array$set, mi, newMisraa, misre);
 			var iNext = (!mi) ? (mi + 1) : (mi + 3);
 			if (_Utils_cmp(
@@ -7296,26 +7296,26 @@ var $author$project$Main$ghazalSetKaafiyaa = F4(
 			}
 		}
 	});
-var $author$project$Main$ghazalSetMisraaRadeef = F3(
+var $author$project$HPVCore$ghazalSetMisraaRadeef = F3(
 	function (misraa, radeef, radeefI) {
 		ghazalSetMisraaRadeef:
 		while (true) {
 			var ri = ($elm$core$Array$length(radeef) - radeefI) - 1;
 			var r = A2(
 				$elm$core$Maybe$withDefault,
-				$author$project$Main$emptyAkshar,
+				$author$project$HPVCore$emptyAkshar,
 				A2($elm$core$Array$get, ri, radeef));
 			var ai = ($elm$core$Array$length(misraa.h.b) - radeefI) - 1;
 			var a = A2(
 				$elm$core$Maybe$withDefault,
-				$author$project$Main$emptyAkshar,
+				$author$project$HPVCore$emptyAkshar,
 				A2($elm$core$Array$get, ai, misraa.h.b));
 			if (_Utils_eq(
 				$elm$core$Array$length(radeef),
 				radeefI)) {
 				return misraa;
 			} else {
-				if (A2($author$project$Main$aksharCompare, a, r)) {
+				if (A2($author$project$HPVCore$aksharCompare, a, r)) {
 					var $temp$misraa = _Utils_update(
 						misraa,
 						{
@@ -7333,15 +7333,15 @@ var $author$project$Main$ghazalSetMisraaRadeef = F3(
 			}
 		}
 	});
-var $author$project$Main$ghazalSetRadeef = F3(
+var $author$project$HPVCore$ghazalSetRadeef = F3(
 	function (misre, radeef, mi) {
 		ghazalSetRadeef:
 		while (true) {
 			var misraa = A2(
 				$elm$core$Maybe$withDefault,
-				{h: $author$project$Main$emptyLine, D: $elm$core$Array$empty},
+				{h: $author$project$HPVCore$emptyLine, D: $elm$core$Array$empty},
 				A2($elm$core$Array$get, mi, misre));
-			var newMisraa = A3($author$project$Main$ghazalSetMisraaRadeef, misraa, radeef, 0);
+			var newMisraa = A3($author$project$HPVCore$ghazalSetMisraaRadeef, misraa, radeef, 0);
 			var misre1 = A3($elm$core$Array$set, mi, newMisraa, misre);
 			var iNext = (!mi) ? (mi + 1) : (mi + 3);
 			if (_Utils_cmp(
@@ -7368,8 +7368,8 @@ var $elm_community$array_extra$Array$Extra$member = function (needle) {
 			}),
 		false);
 };
-var $author$project$Main$space = A7($author$project$Main$Akshar, ' ', 32, 6, ' ', ' ', 0, 0);
-var $author$project$Main$ghazalTruncRadeef = F2(
+var $author$project$HPVCore$space = A7($author$project$HPVCore$Akshar, ' ', 32, 6, ' ', ' ', 0, 0);
+var $author$project$HPVCore$ghazalTruncRadeef = F2(
 	function (radeef, line) {
 		ghazalTruncRadeef:
 		while (true) {
@@ -7377,9 +7377,9 @@ var $author$project$Main$ghazalTruncRadeef = F2(
 			var ci = $elm$core$Array$length(line) - len;
 			var a = A2(
 				$elm$core$Maybe$withDefault,
-				$author$project$Main$emptyAkshar,
+				$author$project$HPVCore$emptyAkshar,
 				A2($elm$core$Array$get, ci, line));
-			if (A2($elm_community$array_extra$Array$Extra$member, $author$project$Main$space, radeef)) {
+			if (A2($elm_community$array_extra$Array$Extra$member, $author$project$HPVCore$space, radeef)) {
 				if ((a.f === 6) || (a.f === 7)) {
 					return A3(
 						$elm$core$Array$slice,
@@ -7402,45 +7402,45 @@ var $author$project$Main$ghazalTruncRadeef = F2(
 			}
 		}
 	});
-var $author$project$Main$emptyRKUnit = ' ';
-var $author$project$Main$misraaFromPoemLine = function (line) {
+var $author$project$HPVCore$emptyRKUnit = ' ';
+var $author$project$HPVCore$misraaFromPoemLine = function (line) {
 	var rkUnits = A2(
 		$elm$core$Array$repeat,
 		$elm$core$Array$length(line.b),
-		$author$project$Main$emptyRKUnit);
-	return A2($author$project$Main$Misraa, line, rkUnits);
+		$author$project$HPVCore$emptyRKUnit);
+	return A2($author$project$HPVCore$Misraa, line, rkUnits);
 };
-var $author$project$Main$ghazalProcess = F2(
+var $author$project$HPVCore$ghazalProcess = F2(
 	function (pom, oldPom) {
-		var basic = $author$project$Main$genericGetData(
-			A2($author$project$Main$processPoem, pom, oldPom));
+		var basic = $author$project$HPVCore$genericGetData(
+			A2($author$project$HPVCore$processPoem, pom, oldPom));
 		var line0 = A2(
 			$elm$core$Maybe$withDefault,
-			$author$project$Main$emptyLine,
+			$author$project$HPVCore$emptyLine,
 			A2($elm$core$Array$get, 0, basic.a));
 		var line1 = A2(
 			$elm$core$Maybe$withDefault,
-			$author$project$Main$emptyLine,
+			$author$project$HPVCore$emptyLine,
 			A2($elm$core$Array$get, 1, basic.a));
-		var preRadeef = A3($author$project$Main$ghazalCalcRadeef, $elm$core$Array$empty, line0.b, line1.b);
-		var radeef = A2($author$project$Main$ghazalTruncRadeef, preRadeef, line0.b);
+		var preRadeef = A3($author$project$HPVCore$ghazalCalcRadeef, $elm$core$Array$empty, line0.b, line1.b);
+		var radeef = A2($author$project$HPVCore$ghazalTruncRadeef, preRadeef, line0.b);
 		var l0i = $elm$core$Array$length(line0.b) - $elm$core$Array$length(radeef);
 		var cutLine0 = A3($elm$core$Array$slice, 0, l0i, line0.b);
 		var l1i = $elm$core$Array$length(line1.b) - $elm$core$Array$length(radeef);
 		var cutLine1 = A3($elm$core$Array$slice, 0, l1i, line1.b);
-		var kaafiyaa = A3($author$project$Main$ghazalCalcKaafiyaa, $elm$core$Array$empty, cutLine0, cutLine1);
-		var misre = A2($elm$core$Array$map, $author$project$Main$misraaFromPoemLine, basic.a);
-		var misre1 = A3($author$project$Main$ghazalSetRadeef, misre, radeef, 0);
+		var kaafiyaa = A3($author$project$HPVCore$ghazalCalcKaafiyaa, $elm$core$Array$empty, cutLine0, cutLine1);
+		var misre = A2($elm$core$Array$map, $author$project$HPVCore$misraaFromPoemLine, basic.a);
+		var misre1 = A3($author$project$HPVCore$ghazalSetRadeef, misre, radeef, 0);
 		var misre2 = A4(
-			$author$project$Main$ghazalSetKaafiyaa,
+			$author$project$HPVCore$ghazalSetKaafiyaa,
 			misre1,
 			$elm$core$Array$length(radeef),
 			kaafiyaa,
 			0);
-		return $author$project$Main$Ghazal(
+		return $author$project$HPVCore$Ghazal(
 			{ax: kaafiyaa, a: misre2, e: basic.e, aI: radeef});
 	});
-var $author$project$Main$maapneeToInt = function (m) {
+var $author$project$HPVCore$maapneeToInt = function (m) {
 	switch (m) {
 		case '1':
 			return 1;
@@ -7454,58 +7454,58 @@ var $author$project$Main$maapneeToInt = function (m) {
 			return 0;
 	}
 };
-var $author$project$Main$maatrikProcessPoem = F3(
+var $author$project$HPVCore$maatrikProcessPoem = F3(
 	function (pom, oldPom, maapnee) {
 		var maapneeCharA = $elm$core$Array$fromList(
 			$elm$core$String$toList(maapnee));
-		var maapneeArray = A2($elm$core$Array$map, $author$project$Main$maapneeToInt, maapneeCharA);
-		var genericOld = $author$project$Main$genericGetData(oldPom);
-		var basic = $author$project$Main$genericGetData(
-			A2($author$project$Main$processPoem, pom, genericOld.a));
-		var maatrikLines = A2($elm$core$Array$map, $author$project$Main$maatrikLFromPoemL, basic.a);
+		var maapneeArray = A2($elm$core$Array$map, $author$project$HPVCore$maapneeToInt, maapneeCharA);
+		var genericOld = $author$project$HPVCore$genericGetData(oldPom);
+		var basic = $author$project$HPVCore$genericGetData(
+			A2($author$project$HPVCore$processPoem, pom, genericOld.a));
+		var maatrikLines = A2($elm$core$Array$map, $author$project$HPVCore$maatrikLFromPoemL, basic.a);
 		var maatrikLinesWMaapnee = A3(
 			$elm_community$array_extra$Array$Extra$map2,
-			$author$project$Main$maatrikSetLineMaapnee,
+			$author$project$HPVCore$maatrikSetLineMaapnee,
 			maatrikLines,
 			A2(
 				$elm$core$Array$repeat,
 				$elm$core$Array$length(maatrikLines),
 				maapneeArray));
-		return $author$project$Main$MaatrikPoem(
+		return $author$project$HPVCore$MaatrikPoem(
 			{
 				a: maatrikLinesWMaapnee,
 				G: {g: maapnee, b: maapneeArray},
 				e: basic.e
 			});
 	});
-var $author$project$Main$preProcessPoem = F4(
+var $author$project$HPVCore$preProcessPoem = F4(
 	function (pom, oldpom, pomType, maapnee) {
 		switch (pomType) {
 			case 'GHAZAL':
 				return A2(
-					$author$project$Main$ghazalProcess,
+					$author$project$HPVCore$ghazalProcess,
 					pom,
-					$author$project$Main$genericGetData(oldpom).a);
+					$author$project$HPVCore$genericGetData(oldpom).a);
 			case 'FREEVERSE':
-				return A2($author$project$Main$fvProcess, pom, oldpom);
+				return A2($author$project$HPVCore$fvProcess, pom, oldpom);
 			case 'MAATRIK':
-				return A3($author$project$Main$maatrikProcessPoem, pom, oldpom, maapnee);
+				return A3($author$project$HPVCore$maatrikProcessPoem, pom, oldpom, maapnee);
 			default:
 				return A2(
-					$author$project$Main$processPoem,
+					$author$project$HPVCore$processPoem,
 					pom,
-					$author$project$Main$genericGetData(oldpom).a);
+					$author$project$HPVCore$genericGetData(oldpom).a);
 		}
 	});
 var $elm$core$String$toUpper = _String_toUpper;
-var $author$project$Main$update = F2(
+var $author$project$HPVCore$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
 			case 0:
 				var str = msg.a;
 				var oldPoem = model.x;
 				var incomingPoem = function () {
-					var _v1 = A2($elm$json$Json$Decode$decodeString, $author$project$Main$decodeIncomingPoem, str);
+					var _v1 = A2($elm$json$Json$Decode$decodeString, $author$project$HPVCore$decodeIncomingPoem, str);
 					if (!_v1.$) {
 						var result = _v1.a;
 						return result;
@@ -7514,8 +7514,8 @@ var $author$project$Main$update = F2(
 					}
 				}();
 				var maapnee = $elm$core$String$trim(
-					$author$project$Main$removeExtraSpaces(
-						$author$project$Main$cleanMaapnee(incomingPoem.G)));
+					$author$project$HPVCore$removeExtraSpaces(
+						$author$project$HPVCore$cleanMaapnee(incomingPoem.G)));
 				var poemType = $elm$core$String$toUpper(incomingPoem.ak);
 				return _Utils_Tuple2(
 					_Utils_update(
@@ -7523,13 +7523,13 @@ var $author$project$Main$update = F2(
 						{
 							N: 'Poem Processed',
 							I: incomingPoem.I,
-							x: A4($author$project$Main$preProcessPoem, incomingPoem.I, oldPoem, poemType, maapnee)
+							x: A4($author$project$HPVCore$preProcessPoem, incomingPoem.I, oldPoem, poemType, maapnee)
 						}),
 					$elm$core$Platform$Cmd$none);
 			case 1:
 				var str = msg.a;
 				var whichChar = function () {
-					var _v2 = A2($elm$json$Json$Decode$decodeString, $author$project$Main$decodeWhichChar, str);
+					var _v2 = A2($elm$json$Json$Decode$decodeString, $author$project$HPVCore$decodeWhichChar, str);
 					if (!_v2.$) {
 						var result = _v2.a;
 						return result;
@@ -7542,7 +7542,7 @@ var $author$project$Main$update = F2(
 						model,
 						{
 							N: 'Maatraa Adjusted ' + str,
-							x: A3($author$project$Main$adjustMaatraaPoem, model.x, whichChar.ag, whichChar.af)
+							x: A3($author$project$HPVCore$adjustMaatraaPoem, model.x, whichChar.ag, whichChar.af)
 						}),
 					$elm$core$Platform$Cmd$none);
 			case 2:
@@ -7561,7 +7561,7 @@ var $author$project$Main$update = F2(
 						model,
 						{
 							N: 'Composite Set ' + str,
-							x: A2($author$project$Main$fvSetComposite, model.x, lineI)
+							x: A2($author$project$HPVCore$fvSetComposite, model.x, lineI)
 						}),
 					$elm$core$Platform$Cmd$none);
 			default:
@@ -7580,14 +7580,14 @@ var $author$project$Main$update = F2(
 						model,
 						{
 							N: 'BaseCount Set ' + str,
-							x: A2($author$project$Main$fvSetBase, model.x, base)
+							x: A2($author$project$HPVCore$fvSetBase, model.x, base)
 						}),
 					$elm$core$Platform$Cmd$none);
 		}
 	});
-var $author$project$Main$updateWithStorage = F2(
+var $author$project$HPVCore$updateWithStorage = F2(
 	function (msg, oldModel) {
-		var _v0 = A2($author$project$Main$update, msg, oldModel);
+		var _v0 = A2($author$project$HPVCore$update, msg, oldModel);
 		var newModel = _v0.a;
 		var cmds = _v0.b;
 		return _Utils_Tuple2(
@@ -7595,16 +7595,16 @@ var $author$project$Main$updateWithStorage = F2(
 			$elm$core$Platform$Cmd$batch(
 				_List_fromArray(
 					[
-						$author$project$Main$givePoemRhythm(
-						$author$project$Main$encodeModel(newModel)),
+						$author$project$HPVCore$givePoemRhythm(
+						$author$project$HPVCore$encodeModel(newModel)),
 						cmds
 					])));
 	});
 var $elm$html$Html$div = _VirtualDom_node('div');
-var $author$project$Main$view = function (model) {
+var $author$project$HPVCore$view = function (model) {
 	return A2($elm$html$Html$div, _List_Nil, _List_Nil);
 };
-var $author$project$Main$main = $elm$browser$Browser$element(
-	{a2: $author$project$Main$init, bc: $author$project$Main$subscriptions, be: $author$project$Main$updateWithStorage, bf: $author$project$Main$view});
-_Platform_export({'Main':{'init':$author$project$Main$main(
+var $author$project$HPVCore$main = $elm$browser$Browser$element(
+	{a2: $author$project$HPVCore$init, bc: $author$project$HPVCore$subscriptions, be: $author$project$HPVCore$updateWithStorage, bf: $author$project$HPVCore$view});
+_Platform_export({'HPVCore':{'init':$author$project$HPVCore$main(
 	$elm$json$Json$Decode$succeed(0))(0)}});}(this));

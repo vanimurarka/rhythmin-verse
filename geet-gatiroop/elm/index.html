@@ -4,60 +4,74 @@
 <head>
   <meta charset="UTF-8">
   <title>GG Elm</title>
-  <script type="text/javascript" src="mainopt.js"></script>
+  <script type="text/javascript" src="hpv-core.v7.4.min.js"></script>
   <script type="text/javascript" src="d3.v2.min.js"></script>
-  <script type="text/javascript" src="hpv-draw.v8.0.js"></script>
+  <script type="text/javascript" src="hpv-draw.v7.4.min.js"></script>
 </head>
 
 <body style="background-color: black; color: white;">
-  Maapnee <input type="text" id='idMaapnee' value=""><br>
+  <div>
+    <select id="selPType">
+      <option value="maatrik" selected>कविता</option>
+      <option value="ghazal">ग़ज़ल</option>
+      <option value="freeverse">मुक्त-कविता</option>
+    </select>
+    <input type="checkbox" id="chkMaapnee" onclick="showHideMaapnee()">
+    <label for="chkMaapnee"> मापनी</label>
+  </div>
+  <div id='divMaapnee' style="display: none;">मापनी <input type="text" id='idMaapnee' value=""></div>
   <textarea id="poem" rows="5" cols="40">ज़िन्दगी के मोड़ पर यह प्यार का नाता हमारा।
 राह की वीरानियों को मिल गया आखिर सहारा।</textarea>
   <br>
   <button onclick="callProcessPoem()">Process Poem</button>
   <div id="myapp"></div>
-  <div id="right">
-    <div id="chart"></div>
+  <div id="divVis"><div id="chart"></div></div>
+  <div>
+    Base Count <input type="number" min="1" step="1" id='txtBase' value="1" onchange="callBaseChange()">
   </div>
-  <br>
-  Base Count <input type="number" min="1" step="1" id='txtBase' value="1" onchange="callBaseChange()">
 </body>
 
 <script type="text/javascript">
 
+function showHideMaapnee() {
+  let chk = document.getElementById("chkMaapnee");
+  let div = document.getElementById("divMaapnee");
+
+  (chk.checked == true) ? div.style.display = "block" : text.style.display = "none";
+}
+
 // Load the Elm Hindi Poem Rhythm Analyis code
-var hpra = Elm.Main.init({
+var hpv = Elm.HPVCore.init({
 	node: document.getElementById('myapp'),
 });
 
 // Listen for commands from the `setStorage` port.
 // Turn the data to a string and put it in localStorage.
-hpra.ports.givePoemRhythm.subscribe(function(hpraResult) {
-    console.log(hpraResult);
-    // localStorage.setItem('gg-elm-js-interop', JSON.stringify(state));
-    let visDiv = document.getElementById("right");
+hpv.ports.givePoemRhythm.subscribe(function(hpvResult) {
+    let visDiv = document.getElementById("divVis");
     let axvailableW = visDiv.clientWidth;
-    visualize(hpraResult.processedPoem, axvailableW);
+    visualize(hpvResult.processedPoem, axvailableW);
 });
 
 function callProcessPoem()
 {
   poem = document.getElementById('poem').value;
+  poemType = document.getElementById('selPType').value
   maapnee = document.getElementById('idMaapnee').value;
-  hpra.ports.getPoem.send(JSON.stringify({ poem: poem, poemType: "maatrik", maapnee: maapnee }));
+  hpv.ports.getPoem.send(JSON.stringify({ poem: poem, poemType: poemType, maapnee: maapnee }));
 }
 
 function callAdjustMaatraa(li, ci) { 
-  hpra.ports.getMaatraaChange.send(JSON.stringify({ lineI: li, charI: ci })); 
+  hpv.ports.getMaatraaChange.send(JSON.stringify({ lineI: li, charI: ci })); 
 }
 
 function callSetComposite(li) {
-  hpra.ports.setComposite.send(JSON.stringify(li)); 
+  hpv.ports.setComposite.send(JSON.stringify(li)); 
 }
 
 function callBaseChange() {
   base = parseInt(document.getElementById('txtBase').value)
-  hpra.ports.setBase.send(JSON.stringify(base));
+  hpv.ports.setBase.send(JSON.stringify(base));
 }
 
 </script>

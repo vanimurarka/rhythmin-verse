@@ -1,4 +1,4 @@
-port module Main exposing (..)
+port module HPVCore exposing (..)
 
 import Browser
 import Html exposing (Html, div)
