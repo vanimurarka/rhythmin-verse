@@ -1,7 +1,7 @@
 port module HPVCore exposing (..)
 
-import Browser
-import Html exposing (Html, div)
+--import Browser
+--import Html exposing (Html, div)
 import Array exposing (Array)
 import Array.Extra as Array
 import Json.Decode as D
@@ -734,13 +734,21 @@ adjustMaatraaPoem poem li ci =
 
 
 -- ELM ARCHITECTURE
-main =
-  Browser.element
-    { init = init
-    , view = view
-    , update = updateWithStorage
+--main =
+--  Browser.element
+--    { init = init
+--    , view = view
+--    , update = updateWithStorage
+--    , subscriptions = subscriptions
+--    }
+
+main = 
+  Platform.worker
+  {
+    init = init
     , subscriptions = subscriptions
-    }
+    , update = updateWithStorage
+  }
 
 type alias Model =
   { poem : String
@@ -808,11 +816,11 @@ update msg model =
          lastAction = "BaseCount Set " ++ str }, 
       Cmd.none)
 
-view model =
-  div [][
-     --div [style "padding" "inherit", style "white-space" "pre-wrap"] [text model.poem]
-    --div [style "padding" "inherit"] [text (Debug.toString model.processedPoem)]
-    ]
+--view model =
+--  div [][
+--     --div [style "padding" "inherit", style "white-space" "pre-wrap"] [text model.poem]
+--    --div [style "padding" "inherit"] [text (Debug.toString model.processedPoem)]
+--    ]
 
 -- PORTS
 port givePoemRhythm : E.Value -> Cmd msg
