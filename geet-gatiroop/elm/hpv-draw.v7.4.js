@@ -85,7 +85,7 @@ function draw()
 	const iForPattern = pattern ? 1 : 0;
 	var chart = d3.select("#chart");
 	chart.select("svg").remove();
-	const svgW = fFreeVerse?(charW*maxLen)+80:(charW*maxLen)+30;
+	const svgW = fFreeVerse?(charW*maxLen)+80:(charW*maxLen)+40;
 	const svgH = fLineSpacing?((lineCount+iForPattern)*(charH+lineSpacing))+(charH*2):((lineCount+iForPattern)*charH)+(charH*2);
 	const svgViewBox = "0 0 "+svgW+" "+svgH;
 	const ratio = oVisual.availableW / svgW;
@@ -118,7 +118,10 @@ function draw()
 		var gMap = svg.append("svg:g")
 	  .attr("transform", function(d,i) 
 	    { 
-	      return "translate(" + paddingLeft + "," + ((charH+lineSpacing)) + ")"; 
+	      if (fLineSpacing)
+	      	return "translate(" + paddingLeft + "," + ((charH+lineSpacing)) + ")";
+	      else
+	      	return "translate(" + paddingLeft + "," + charH + ")";
 	    })
 	  .attr("id", function(d,i) { return "gPattern"});
 	}
@@ -138,12 +141,13 @@ function draw()
 	}
 	else
 	{
-		var g = svg.selectAll("g")
+		var g = svg.selectAll("g.gLine")
 		.data(dPoem.lines)
 		.enter().append("svg:g")
 		  .attr("transform", function(d,i) 
 		    { return "translate(" + paddingLeft + "," + (((i+iForPattern)*(charH))+(charH)) + ")" })
-		  .attr("id", function(d,i) { return "gLine"+i});
+		  .attr("id", function(d,i) { return "gLine"+i})
+		  .attr("class", "gLine");
 	}
 
 	if (fShowText)
