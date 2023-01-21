@@ -305,6 +305,7 @@ emptyMLine = maatrikLFromPoemL emptyLine
 type alias Maapnee =
   { units : Array.Array Int
   , str : String
+  , len : Int
   }
 
 emptyMaapnee = { units = Array.empty, str = "" }
@@ -419,9 +420,11 @@ maatrikProcessPoem pom oldPom maapnee =
     maapneeArray = Array.map maapneeToInt maapneeCharA 
     maatrikLines = Array.map maatrikLFromPoemL basic.lines
     maatrikLinesWMaapnee = Array.map2 maatrikSetLineMaapnee maatrikLines (Array.repeat (Array.length maatrikLines) maapneeArray) 
-    --maatrikLinesWMaapnee = Array.map maatrikSetLinePattern maatrikLines
+    maapneeLen = Array.foldl (+) 0 maapneeArray
   in 
-    MaatrikPoem { maxLineLen = basic.maxLineLen, lines = maatrikLinesWMaapnee, maapnee = {units = maapneeArray, str = maapnee} }    
+    MaatrikPoem { 
+      maxLineLen = if (maapneeLen > basic.maxLineLen) then maapneeLen else basic.maxLineLen
+      , lines = maatrikLinesWMaapnee, maapnee = {units = maapneeArray, str = maapnee, len = maapneeLen} }    
 
 maatrikAdjustMaatraa poemData li ci =
   let 
@@ -920,7 +923,7 @@ encodeMaapneeUnits mu =
 
 encodeMaapnee m =
   E.object 
-    [("rhythmAmtCumulative",E.int (Array.foldl (+) 0 m.units))
+    [("rhythmAmtCumulative",E.int m.len)
     , ("subUnits", E.array encodeMaapneeUnits m.units)]
 
 encodeMaatrik d =

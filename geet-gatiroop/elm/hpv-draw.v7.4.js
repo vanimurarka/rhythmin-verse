@@ -72,7 +72,8 @@ function visualize(givenPoem, dAvailableW, dPoemType)
 		fFreeVerse= true;
 
 	oVisual = new cVisual(dAvailableW);
-	draw();	
+	if (dPoem.maxLineLen > 0)
+		draw();	
 }
 
 // Function: draw

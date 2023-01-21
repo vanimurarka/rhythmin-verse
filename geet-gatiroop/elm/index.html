@@ -66,6 +66,7 @@ var hpv = Elm.HPVCore.init();
 // Listen for commands from the `setStorage` port.
 // Turn the data to a string and put it in localStorage.
 hpv.ports.givePoemRhythm.subscribe(function(hpvResult) {
+    console.log(hpvResult);
     let visDiv = document.getElementById("divVis");
     let axvailableW = visDiv.clientWidth;
     visualize(hpvResult.processedPoem, axvailableW);
