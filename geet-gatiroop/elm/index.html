@@ -1,0 +1,100 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>GG Elm</title>
+  <script type="text/javascript" src="hpv-core.js"></script>
+  <script type="text/javascript" src="d3.v2.min.js"></script>
+  <script type="text/javascript" src="hpv-draw.v7.4.js"></script>
+</head>
+
+<body style="background-color: black; color: white;">
+  <div>
+    <div style="display: inline-block;">
+      <select id="selPType" onchange="pTypeChange()">
+        <option value="maatrik" selected>कविता</option>
+        <option value="ghazal">ग़ज़ल</option>
+        <option value="freeverse">मुक्त-कविता</option>
+      </select>
+    </div>
+    <div id="divChkMaapnee" style="display:inline-block;">
+      <input type="checkbox" id="chkMaapnee" checked onclick="showHideMaapnee()">
+      <label for="chkMaapnee"> मापनी</label>
+    </div>
+  </div>
+  <div id='divMaapnee' style="display: block">मापनी <input type="text" id='idMaapnee' value="21222122 21222122"></div>
+  <textarea id="poem" rows="5" cols="40">ज़िन्दगी के मोड़ पर यह प्यार का नाता हमारा। 
+राह की वीरानियों को मिल गया आखिर सहारा। 
+मैं तुम्ही को खोजता हूँ, चाँद की परछाइयों में। 
+बाट तकता हूँ तुम्हारी, रात की तनहाइयों में। 
+आज मेरी कामनाओं ने तुम्हे कितना पुकारा।</textarea>
+  <br>
+  <button onclick="callProcessPoem();">प्रतिरूप देखें</button>
+  <div id="myapp"></div>
+  <div id="divVis"><div id="chart"></div></div>
+  <div id="divFV" style="display: none;">
+    Base Count <input type="number" min="1" step="1" id='txtBase' value="1" onchange="callBaseChange()">
+  </div>
+</body>
+
+<script type="text/javascript">
+
+function pTypeChange()
+{
+  poemType = document.getElementById('selPType').value;
+  divChk = document.getElementById("divChkMaapnee");
+  (poemType == "maatrik") ? divChk.style.display = 'inline-block' : divChk.style.display = 'none';
+  callProcessPoem();
+}
+
+function showHideMaapnee() {
+  let chk = document.getElementById("chkMaapnee");
+  let div = document.getElementById("divMaapnee");
+
+  (chk.checked == true) ? div.style.display = "block" : div.style.display = "none";
+  callProcessPoem();
+}
+
+// Load the Elm Hindi Poem Rhythm Analyis code
+// var hpv = Elm.HPVCore.init({
+// 	node: document.getElementById('myapp'),
+// });
+
+var hpv = Elm.HPVCore.init();
+
+// Listen for commands from the `setStorage` port.
+// Turn the data to a string and put it in localStorage.
+hpv.ports.givePoemRhythm.subscribe(function(hpvResult) {
+    console.log(hpvResult);
+    let visDiv = document.getElementById("divVis");
+    let axvailableW = visDiv.clientWidth;
+    visualize(hpvResult.processedPoem, axvailableW);
+});
+
+function callProcessPoem()
+{
+  poem = document.getElementById('poem').value;
+  poemType = document.getElementById('selPType').value;
+  let chk = document.getElementById("chkMaapnee");
+  maapnee = "";
+  (chk.checked == true) ? maapnee = document.getElementById('idMaapnee').value : null;
+  hpv.ports.getPoem.send(JSON.stringify({ poem: poem, poemType: poemType, maapnee: maapnee }));
+}
+
+function callAdjustMaatraa(li, ci) { 
+  hpv.ports.getMaatraaChange.send(JSON.stringify({ lineI: li, charI: ci })); 
+}
+
+function callSetComposite(li) {
+  hpv.ports.setComposite.send(JSON.stringify(li)); 
+}
+
+function callBaseChange() {
+  base = parseInt(document.getElementById('txtBase').value)
+  hpv.ports.setBase.send(JSON.stringify(base));
+}
+
+</script>
+
+</html>

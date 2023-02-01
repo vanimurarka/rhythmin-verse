@@ -983,7 +983,7 @@ class cFreeVerse extends cPoem {
 			let i = 0;
 			for (i = 1; i < this.lines.length; i++)
 			{
-			if (this.lines[i].isComposite)  // is part of composite line
+				if (this.lines[i].isComposite)  // is part of composite line
 				{
 					// debugger;
 					let len = this.compositeLines.length;
