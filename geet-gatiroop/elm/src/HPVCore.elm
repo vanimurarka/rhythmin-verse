@@ -29,7 +29,7 @@ removePoornviraam string =
 cleanMaapnee string =
   userReplace "[^21२१ ]" (\_ -> "") string
 
-type AksharType  = PureVowel | Maatraa | Halant | Half | Consonant | ChandraBindu | BottomBindi | Other | Empty
+type AksharType  = PureVowel | Maatraa | Halant | Half | Consonant | ChandraBindu | Other | Empty
 
 type alias Akshar =
   { str : String,
@@ -81,13 +81,22 @@ emptyPoem = GenericPoem {maxLineLen = 0, lines = Array.empty}
 
 -- BASIC --
 
-isHindi cd =
+isHindi c =
+  let 
+    cd = Char.toCode c
+  in
     ((cd >= 2305) && (cd <= 2399))
       
-isPureVowel cd =
+isPureVowel c =
+  let 
+    cd = Char.toCode c
+  in
     ((cd >= 2309) && (cd <= 2324))
       
-isMaatraaVowel cd =
+isMaatraaVowel c =
+  let 
+    cd = Char.toCode c
+  in
     ((cd >= 2366) && (cd <= 2380))
 
 isChandraBindu c =
@@ -96,11 +105,12 @@ isChandraBindu c =
 isBindu c =
   ((Char.toCode c) == 2306)
 
-isHalant cd =
-    (cd == 2381)
-
-isBottomBindi cd =
-    (cd == 2364)
+isHalant c =
+  let 
+    cd = Char.toCode c
+  in 
+    if (cd == 2381) then True
+    else False
 
 vowelRhythm c =
   case c of
@@ -156,27 +166,25 @@ processChar c =
         vowel = c,
         rhythm = 0,
         userRhythm = 0 }
-    newRhythm = if isPureVowel cd then
+    newRhythm = if isPureVowel c then
         vowelRhythm a.vowel
-      else if isMaatraaVowel cd then
+      else if isMaatraaVowel c then
         vowelRhythm (maatraaToVowel a.vowel)
       else
         0
     aRhythm = vowelRhythm 'अ'
   in
-  if isHindi cd then
-    if isPureVowel cd then
+  if isHindi c then
+    if isPureVowel c then
       {a | aksharType = PureVowel, rhythm = newRhythm, userRhythm = newRhythm}
-    else if isMaatraaVowel cd then
+    else if isMaatraaVowel c then
         {a | aksharType = Maatraa, rhythm = newRhythm, userRhythm = newRhythm}
       else if isBindu c then
           {a | aksharType = Half, rhythm = 0, userRhythm = 0}
-        else if isHalant cd then
+        else if isHalant c then
             {a | aksharType = Halant, rhythm = 0, userRhythm = 0}
           else if isChandraBindu c then
-              {a | aksharType = ChandraBindu, rhythm = 0, userRhythm = 0}
-            else if isBottomBindi cd then
-              {a | aksharType = BottomBindi, rhythm = 0, userRhythm = 0} 
+            {a | aksharType = ChandraBindu, rhythm = 0, userRhythm = 0}
             else
               {a | aksharType = Consonant, vowel = 'अ', rhythm = aRhythm, userRhythm = aRhythm}
   else
@@ -193,27 +201,27 @@ mrgMCakshar aL aM =
     else
       (False, aL)
 
-mrgMChelper inAr iStart collectAr =
+mrgMChelper list iStart mList =
   let
-   collectArLen = Array.length collectAr
-   aL = Maybe.withDefault emptyAkshar (Array.get iStart inAr) -- akshar to start merging with
-   aM = Maybe.withDefault emptyAkshar (Array.get (collectArLen - 1) collectAr) -- last akshar in collected Array
+   mListLen = Array.length mList
+   aL = Maybe.withDefault emptyAkshar (Array.get iStart list)
+   aM = Maybe.withDefault emptyAkshar (Array.get (mListLen - 1) mList)
    mrgResult = mrgMCakshar aL aM
    aC = Tuple.second mrgResult
    iNext = iStart + 1
   in
-    if (iStart == Array.length inAr) then
-      collectAr
-    else if Array.length inAr == 1 then
-      mrgMChelper inAr iNext (Array.push aL collectAr)
+    if (iStart == Array.length list) then
+      mList
+    else if Array.length list == 1 then
+      mrgMChelper list iNext (Array.push aL mList)
     else
       if (Tuple.first mrgResult) then
-        mrgMChelper inAr iNext (Array.set (collectArLen - 1) aC collectAr)
+        mrgMChelper list iNext (Array.set (mListLen - 1) aC mList)
       else
-        mrgMChelper inAr iNext (Array.push aC collectAr)
+        mrgMChelper list iNext (Array.push aC mList)
 
-mrgMCline inputArray =
- mrgMChelper inputArray 0 Array.empty
+mrgMCline list =
+ mrgMChelper list 0 Array.empty
 
 calcHalfAksharRhythm ac ap an =
   if (ac.aksharType /= Half) then
@@ -252,7 +260,6 @@ processLine pomLine =
   let
     pChars = String.toList pomLine
     pPoem = List.map processChar pChars -- list of akshars
-    pps = Debug.log "processChar " (Debug.toString pPoem)
     pPoemA = Array.fromList pPoem -- as array
     mergedLine = mrgMCline pPoemA -- merge Maatraa and Consonant akshars
     final = calcHalfAksharRhythmLine mergedLine 0 0
