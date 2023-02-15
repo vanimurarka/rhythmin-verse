@@ -1,7 +1,5 @@
 port module HPVCore exposing (..)
 
---import Browser
---import Html exposing (Html, div)
 import Array exposing (Array)
 import Array.Extra as Array
 import Json.Decode as D
@@ -51,25 +49,6 @@ type alias PoemLine =
   }
 
 emptyLine = PoemLine "" 0 Array.empty
-
-type alias Misraa =
-  { line : PoemLine
-  , rkUnits : Array.Array Char
-  }
-
-emptyRKUnit = ' '
-
-type alias FreeVerseLine =
-  { line : PoemLine
-  , isComposite : Bool
-  }
-
-type alias CompositeLine =
-  { originalLineI : Int 
-  , rhythm : Int 
-  , remainder : Int
-  , multipleOfBase : Bool
-  }
 
 type ProcessedPoem 
   = GenericPoem { maxLineLen : Int, lines : Array.Array PoemLine }
@@ -139,8 +118,8 @@ aksharCompare a b =
 aksharVowelCompare a b =
   if (a.vowel == b.vowel) then True else False
 
-unitsLast akshar =
-  Maybe.withDefault emptyAkshar (Array.get (Array.length akshar - 1) akshar)
+unitsLast akshars =
+  Maybe.withDefault emptyAkshar (Array.get (Array.length akshars - 1) akshars)
 
 setRhythm a =
   {a | rhythm = vowelRhythm a.vowel}
@@ -182,18 +161,27 @@ processChar c =
   else
     a
 
-mrgMCakshar aL aM =
+mergeBottomBindi aB aC aPartlyPrepared =
+  if (aB.rhythm > 0) then 
+    aPartlyPrepared 
+  else 
+    {aPartlyPrepared | rhythm = aC.rhythm, userRhythm = aC.rhythm, vowel = aC.vowel}
+
+-- to merge maatraa and consonant
+-- but also handles the case where there is a halant or a bottom bindi (specially in mobile keyboards)
+-- aM is probably a maatraa, aC is probably a consonant into which aM has to merge
+mrgMCakshar aM aC =
   let 
-    aC = {aM | rhythm = aL.rhythm, userRhythm = aL.rhythm, str = aM.str ++ aL.str, vowel = aL.vowel}
+    aNew = {aC | rhythm = aM.rhythm, userRhythm = aM.rhythm, str = aC.str ++ aM.str, vowel = aM.vowel}
   in
-    if (aM.aksharType == Consonant) && (aL.aksharType == Maatraa) then
-      (True, aC)
-    else if (aM.aksharType == Consonant) && (aL.aksharType == Halant) then
-      (True, {aC | aksharType = Half})
-    else if (aM.aksharType == Consonant) && (aL.aksharType == BottomBindi) then
-      if (aL.rhythm > 0) then (True, aC) else (True, {aC | rhythm = aM.rhythm, userRhythm = aM.rhythm, vowel = aM.vowel})
+    if (aC.aksharType == Consonant) then
+     case aM.aksharType of 
+      Maatraa -> (True, aNew)
+      Halant -> (True, {aNew | aksharType = Half})
+      BottomBindi -> (True, mergeBottomBindi aM aC aNew)
+      _ -> (False, aM)
     else
-      (False, aL)
+      (False, aM)
 
 mrgMChelper inAr iStart collectAr =
   let
@@ -435,6 +423,13 @@ maatrikAdjustMaatraa poemData li ci =
 
 -- == GHAZAL == --
 
+type alias Misraa =
+  { line : PoemLine
+  , rkUnits : Array.Array Char
+  }
+
+emptyRKUnit = ' ' -- radeef kaafiyaa unit
+
 ghazalGetData p =
   case p of
     Ghazal data -> data
@@ -571,6 +566,18 @@ ghazalProcess pom oldPom =
     Ghazal {maxLineLen = basic.maxLineLen, lines = misre2, radeef = radeef, kaafiyaa = kaafiyaa}
 
 -- == FREE VERSE == --
+
+type alias FreeVerseLine =
+  { line : PoemLine
+  , isComposite : Bool
+  }
+
+type alias CompositeLine =
+  { originalLineI : Int 
+  , rhythm : Int 
+  , remainder : Int
+  , multipleOfBase : Bool
+  }
 
 fvGetData p =
   case p of
