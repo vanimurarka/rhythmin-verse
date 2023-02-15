@@ -4,266 +4,26 @@ import Array exposing (Array)
 import Array.Extra as Array
 import Json.Decode as D
 import Json.Encode as E
-import Regex
-
-userReplace : String -> (Regex.Match -> String) -> String -> String
-userReplace userRegex replacer string =
-  case Regex.fromString userRegex of
-    Nothing -> string
-    Just regex -> Regex.replace regex replacer string
-
-removeExtraSpaces string =
-  userReplace "\\s+" (\_ -> " ") string
-
--- Hindi Poem Vis
-
-removeNonDevanagari : String -> String
-removeNonDevanagari string =
-  userReplace "[^\u{0900}-\u{097F}]" (\_ -> " ") string
-
-removePoornviraam string =
-  userReplace "।" (\_ -> " ") string
-
-cleanMaapnee string =
-  userReplace "[^21२१ ]" (\_ -> "") string
-
-type AksharType  = PureVowel | Maatraa | Halant | Half | Consonant | ChandraBindu | BottomBindi | Other | Empty
-
-type alias Akshar =
-  { str : String,
-    code : Int,
-    aksharType : AksharType,
-    mainChar : Char,
-    vowel : Char,
-    rhythm : Int,
-    userRhythm : Int
-  }
-  
-emptyAkshar = Akshar " " 0 Empty ' ' ' ' 0 0
-space = Akshar " " 32 Other ' ' ' ' 0 0
-
-type alias PoemLine =
-  { str : String
-  , rhythmTotal : Int
-  , units : Array.Array Akshar
-  }
-
-emptyLine = PoemLine "" 0 Array.empty
+import HPVLine as L
+import Akshar as A
 
 type ProcessedPoem 
-  = GenericPoem { maxLineLen : Int, lines : Array.Array PoemLine }
+  = GenericPoem { maxLineLen : Int, lines : Array.Array L.PoemLine }
   | MaatrikPoem { maxLineLen : Int, lines : Array.Array MaatrikLine, maapnee : Maapnee }
-  | Ghazal { maxLineLen: Int, lines: Array.Array Misraa, radeef : Array.Array Akshar, kaafiyaa : Array.Array Akshar}
+  | Ghazal { maxLineLen: Int, lines: Array.Array Misraa, radeef : Array.Array A.Akshar, kaafiyaa : Array.Array A.Akshar}
   | FreeVerse {maxLineLen: Int, lines: Array.Array FreeVerseLine, composite : Array.Array CompositeLine, baseCount : Int }
 
 emptyPoem = GenericPoem {maxLineLen = 0, lines = Array.empty}
 
 -- BASIC --
 
-isHindi cd =
-    ((cd >= 2305) && (cd <= 2399))
-      
-isPureVowel cd =
-    ((cd >= 2309) && (cd <= 2324))
-      
-isMaatraaVowel cd =
-    ((cd >= 2366) && (cd <= 2380))
-
-isChandraBindu c =
-  ((Char.toCode c) == 2305)
-
-isBindu c =
-  ((Char.toCode c) == 2306)
-
-isHalant cd =
-    (cd == 2381)
-
-isBottomBindi cd =
-    (cd == 2364)
-
-vowelRhythm c =
-  case c of
-    'अ' -> 1
-    'आ' -> 2
-    'इ' -> 1
-    'ई' -> 2
-    'उ' -> 1
-    'ऊ' -> 2
-    'ए' -> 2
-    'ऐ' -> 2
-    'ओ' -> 2
-    'औ' -> 2
-    'ऑ' -> 2
-    'ऋ' -> 1
-    _ -> 0
-    
-maatraaToVowel c =
-  case c of
-    'ा' -> 'आ'
-    'ि' -> 'इ'
-    'ी' -> 'ई'
-    'ु' -> 'उ'
-    'ू' -> 'ऊ'
-    'े' ->'ए'
-    'ै' -> 'ऐ'
-    'ो' -> 'ओ'
-    'ौ' ->'औ'
-    'ॉ' ->'ऑ'
-    'ृ' -> 'ऋ'
-    _ -> c
-
-aksharCompare a b =
-  if (a.str == b.str) then True else False
-
-aksharVowelCompare a b =
-  if (a.vowel == b.vowel) then True else False
-
-unitsLast akshars =
-  Maybe.withDefault emptyAkshar (Array.get (Array.length akshars - 1) akshars)
-
-setRhythm a =
-  {a | rhythm = vowelRhythm a.vowel}
-
-processChar c =
-  let 
-    cd = Char.toCode c
-    m = 0
-    a = { str = String.fromChar c,
-        code = cd,
-        aksharType = Other,
-        mainChar = c,
-        vowel = c,
-        rhythm = 0,
-        userRhythm = 0 }
-    newRhythm = if isPureVowel cd then
-        vowelRhythm a.vowel
-      else if isMaatraaVowel cd then
-        vowelRhythm (maatraaToVowel a.vowel)
-      else
-        0
-    aRhythm = vowelRhythm 'अ'
-  in
-  if isHindi cd then
-    if isPureVowel cd then
-      {a | aksharType = PureVowel, rhythm = newRhythm, userRhythm = newRhythm}
-    else if isMaatraaVowel cd then
-        {a | aksharType = Maatraa, rhythm = newRhythm, userRhythm = newRhythm}
-      else if isBindu c then
-          {a | aksharType = Half, rhythm = 0, userRhythm = 0}
-        else if isHalant cd then
-            {a | aksharType = Halant, rhythm = 0, userRhythm = 0}
-          else if isChandraBindu c then
-              {a | aksharType = ChandraBindu, rhythm = 0, userRhythm = 0}
-            else if isBottomBindi cd then
-              {a | aksharType = BottomBindi, rhythm = 0, userRhythm = 0} 
-            else
-              {a | aksharType = Consonant, vowel = 'अ', rhythm = aRhythm, userRhythm = aRhythm}
-  else
-    a
-
-mergeBottomBindi aB aC aPartlyPrepared =
-  if (aB.rhythm > 0) then 
-    aPartlyPrepared 
-  else 
-    {aPartlyPrepared | rhythm = aC.rhythm, userRhythm = aC.rhythm, vowel = aC.vowel}
-
--- to merge maatraa and consonant
--- but also handles the case where there is a halant or a bottom bindi (specially in mobile keyboards)
--- aM is probably a maatraa, aC is probably a consonant into which aM has to merge
-mrgMCakshar aM aC =
-  let 
-    aNew = {aC | rhythm = aM.rhythm, userRhythm = aM.rhythm, str = aC.str ++ aM.str, vowel = aM.vowel}
-  in
-    if (aC.aksharType == Consonant) then
-     case aM.aksharType of 
-      Maatraa -> (True, aNew)
-      Halant -> (True, {aNew | aksharType = Half})
-      BottomBindi -> (True, mergeBottomBindi aM aC aNew)
-      _ -> (False, aM)
-    else
-      (False, aM)
-
-mrgMChelper inAr iStart collectAr =
-  let
-   collectArLen = Array.length collectAr
-   aL = Maybe.withDefault emptyAkshar (Array.get iStart inAr) -- akshar to start merging with
-   aM = Maybe.withDefault emptyAkshar (Array.get (collectArLen - 1) collectAr) -- last akshar in collected Array
-   mrgResult = mrgMCakshar aL aM
-   aC = Tuple.second mrgResult
-   iNext = iStart + 1
-  in
-    if (iStart == Array.length inAr) then
-      collectAr
-    else if Array.length inAr == 1 then
-      mrgMChelper inAr iNext (Array.push aL collectAr)
-    else
-      if (Tuple.first mrgResult) then
-        mrgMChelper inAr iNext (Array.set (collectArLen - 1) aC collectAr)
-      else
-        mrgMChelper inAr iNext (Array.push aC collectAr)
-
-mrgMCline inputArray =
- mrgMChelper inputArray 0 Array.empty
-
-calcHalfAksharRhythm ac ap an =
-  if (ac.aksharType /= Half) then
-    ac
-  else if ((ac.mainChar == 'म') && (an.mainChar == 'ह')) || ((ac.mainChar == 'न') && (an.mainChar == 'ह')) then
-      ac
-    else if (ap.rhythm == 1) && (ap.aksharType /= Half) then
-        {ac | rhythm = 1, userRhythm = 1}
-      else if (ap.rhythm == 2) && (an.rhythm == 2) then
-          {ac | rhythm = 1, userRhythm = 1}
-        else
-          ac
-
-calcHalfAksharRhythmLine line i r =
-  let 
-    len = Array.length line
-    maxI = len - 1
-    ac = Maybe.withDefault emptyAkshar (Array.get i line)
-    ap = Maybe.withDefault emptyAkshar (Array.get (i-1) line)
-    an = Maybe.withDefault emptyAkshar (Array.get (i+1) line)
-    aNew = calcHalfAksharRhythm ac ap an
-    newline = Array.set i aNew line
-  in 
-    if (i > maxI) then
-      (line, r)
-    else
-      calcHalfAksharRhythmLine newline (i+1) (r+aNew.rhythm)
-
-getBiggerLine line1 line2 = 
-  if (line1.rhythmTotal) > (line2.rhythmTotal) then line1
-    else line2
-
-getMaxLineLen lines = (Array.foldl getBiggerLine emptyLine lines).rhythmTotal
- 
-processLine pomLine =
-  let
-    pChars = String.toList pomLine
-    pPoem = List.map processChar pChars -- list of akshars
-    pPoemA = Array.fromList pPoem -- as array
-    mergedLine = mrgMCline pPoemA -- merge Maatraa and Consonant akshars
-    final = calcHalfAksharRhythmLine mergedLine 0 0
-  in
-    PoemLine pomLine (Tuple.second final) (Tuple.first final)
-
-preProcessLine pomLine oldLine =
-  let 
-    pCleaned = String.trim (removeExtraSpaces (removePoornviraam (removeNonDevanagari pomLine)))
-  in
-    if (pCleaned == oldLine.str) then
-      oldLine
-    else
-      processLine pCleaned
-
 processPoem pom oldLines =
   let
     pLines = Array.fromList (String.lines pom)
     diff = (Array.length pLines) - (Array.length oldLines)
-    paddedOldPoem = if (diff > 0) then Array.append oldLines (Array.repeat diff emptyLine) else oldLines
-    processedLines = Array.map2 preProcessLine pLines paddedOldPoem
-    maxLineLen = getMaxLineLen processedLines
+    paddedOldPoem = if (diff > 0) then Array.append oldLines (Array.repeat diff L.emptyLine) else oldLines
+    processedLines = Array.map2 L.preProcessLine pLines paddedOldPoem
+    maxLineLen = L.calcMaxLineLen processedLines
   in 
     GenericPoem {maxLineLen = maxLineLen, lines = processedLines}
 
@@ -271,10 +31,10 @@ processPoem pom oldLines =
 
 type alias MaatrikAkshar =
   {
-    a : Akshar,
+    a : A.Akshar,
     patternValue : Float
   }
-emptyMAkshar = MaatrikAkshar emptyAkshar 0
+emptyMAkshar = MaatrikAkshar A.emptyAkshar 0
 
 type alias MaatrikLine = 
   { str : String
@@ -282,7 +42,7 @@ type alias MaatrikLine =
   , units : Array.Array MaatrikAkshar
   }
 
-emptyMLine = maatrikLFromPoemL emptyLine
+emptyMLine = maatrikLFromPoemL L.emptyLine
 
 type alias Maapnee =
   { units : Array.Array Int
@@ -303,7 +63,7 @@ maatrikAksharFrmGA a =
   MaatrikAkshar a (toFloat a.rhythm)
 
 maatrikLToPoemL lineM =
-  PoemLine lineM.str lineM.rhythmTotal (Array.map .a lineM.units)
+  L.PoemLine lineM.str lineM.rhythmTotal (Array.map .a lineM.units)
 
 maatrikLFromPoemL lineP =
   MaatrikLine lineP.str lineP.rhythmTotal (Array.map maatrikAksharFrmGA lineP.units)
@@ -350,9 +110,9 @@ maatrikSetAksharMaapnee ac mc an =
           {a1 = ac, a2 = an, set = 0}
     0 -> 
       case ac.a.aksharType of 
-        Other -> {a1 = {ac | patternValue = -1}, a2 = an, set = 1}
-        ChandraBindu -> {a1 = ac, a2 = an, set = 0}
-        Half -> if (ac.a.userRhythm == 0) then {a1 = ac, a2 = an, set = 0} else {a1 = ac, a2 = an, set = -1}
+        A.Other -> {a1 = {ac | patternValue = -1}, a2 = an, set = 1}
+        A.ChandraBindu -> {a1 = ac, a2 = an, set = 0}
+        A.Half -> if (ac.a.userRhythm == 0) then {a1 = ac, a2 = an, set = 0} else {a1 = ac, a2 = an, set = -1}
         _ -> {a1 = ac, a2 = an, set = -1}
     _ -> {a1 = ac, a2 = an, set = 0}
 
@@ -424,7 +184,7 @@ maatrikAdjustMaatraa poemData li ci =
 -- == GHAZAL == --
 
 type alias Misraa =
-  { line : PoemLine
+  { line : L.PoemLine
   , rkUnits : Array.Array Char
   }
 
@@ -437,8 +197,8 @@ ghazalGetData p =
 
 ghazalCalcRadeef radeef line0 line1 =
   let 
-    a = unitsLast line0
-    b = unitsLast line1
+    a = A.unitsLast line0
+    b = A.unitsLast line1
     poppedLine0 = Array.slice 0 -1 line0
     poppedLine1 = Array.slice 0 -1 line1
     appendArray = Array.repeat 1 a
@@ -446,7 +206,7 @@ ghazalCalcRadeef radeef line0 line1 =
     if ((Array.length line0) == 0) || ((Array.length line1) == 0) then
       radeef
     else
-      if (aksharCompare a b) then
+      if (A.compare a b) then
         ghazalCalcRadeef (Array.append appendArray radeef) poppedLine0 poppedLine1
       else
         radeef
@@ -455,10 +215,10 @@ ghazalTruncRadeef radeef line =
   let 
     len = Array.length radeef
     ci = (Array.length line) - len
-    a = Maybe.withDefault emptyAkshar (Array.get ci line)
+    a = Maybe.withDefault A.emptyAkshar (Array.get ci line)
   in 
-    if (Array.member space radeef) then
-      if (a.aksharType == Other) || (a.aksharType == Empty) then
+    if (Array.member A.space radeef) then
+      if (a.aksharType == A.Other) || (a.aksharType == A.Empty) then
         (Array.slice 1 (Array.length radeef) radeef)
       else
         ghazalTruncRadeef (Array.slice 1 (Array.length radeef) radeef) line
@@ -476,8 +236,8 @@ misraaFromPoemLineWRK line rk =
 
 ghazalCalcKaafiyaa kaafiyaa line0 line1 =
   let
-    a = unitsLast line0
-    b = unitsLast line1
+    a = A.unitsLast line0
+    b = A.unitsLast line1
     poppedLine0 = Array.slice 0 -1 line0
     poppedLine1 = Array.slice 0 -1 line1
     appendArray = Array.repeat 1 a
@@ -485,7 +245,7 @@ ghazalCalcKaafiyaa kaafiyaa line0 line1 =
     if ((Array.length line0) == 0) || ((Array.length line1) == 0) then
       kaafiyaa
     else
-      if (aksharVowelCompare a b) then
+      if (A.vowelCompare a b) then
         ghazalCalcKaafiyaa (Array.append appendArray kaafiyaa) poppedLine0 poppedLine1
       else
         kaafiyaa
@@ -494,12 +254,12 @@ ghazalSetMisraaRadeef misraa radeef radeefI =
   let 
     ri = Array.length radeef - radeefI - 1
     ai = Array.length misraa.line.units - radeefI - 1
-    r = Maybe.withDefault emptyAkshar (Array.get ri radeef)
-    a = Maybe.withDefault emptyAkshar (Array.get ai misraa.line.units)
+    r = Maybe.withDefault A.emptyAkshar (Array.get ri radeef)
+    a = Maybe.withDefault A.emptyAkshar (Array.get ai misraa.line.units)
   in 
     if ((Array.length radeef) == radeefI) then
       misraa
-    else if (aksharCompare a r) then
+    else if (A.compare a r) then
         ghazalSetMisraaRadeef { misraa | rkUnits = Array.set ai 'r' misraa.rkUnits} radeef (radeefI + 1)
       else
         misraa
@@ -508,19 +268,19 @@ ghazalSetMisraaKaafiyaa misraa radeefLen kaafiyaa kaafiyaaI =
   let 
     ki = Array.length kaafiyaa - kaafiyaaI - 1
     ai = Array.length misraa.line.units - radeefLen - kaafiyaaI - 1
-    k = Maybe.withDefault emptyAkshar (Array.get ki kaafiyaa)
-    a = Maybe.withDefault emptyAkshar (Array.get ai misraa.line.units)
+    k = Maybe.withDefault A.emptyAkshar (Array.get ki kaafiyaa)
+    a = Maybe.withDefault A.emptyAkshar (Array.get ai misraa.line.units)
   in 
     if ((Array.length kaafiyaa) == kaafiyaaI) then
       misraa
-    else if (aksharVowelCompare a k) then
+    else if (A.vowelCompare a k) then
         ghazalSetMisraaKaafiyaa { misraa | rkUnits = Array.set ai 'k' misraa.rkUnits} radeefLen kaafiyaa (kaafiyaaI + 1)
       else
         misraa
 
 ghazalSetRadeef misre radeef mi =
   let
-    misraa = Maybe.withDefault {line = emptyLine, rkUnits = Array.empty} (Array.get mi misre)
+    misraa = Maybe.withDefault {line = L.emptyLine, rkUnits = Array.empty} (Array.get mi misre)
     newMisraa = ghazalSetMisraaRadeef misraa radeef 0
     misre1 = Array.set mi newMisraa misre
     iNext = if (mi == 0) then mi + 1
@@ -533,7 +293,7 @@ ghazalSetRadeef misre radeef mi =
 
 ghazalSetKaafiyaa misre radeefLen kaafiyaa mi =
   let
-    misraa = Maybe.withDefault {line = emptyLine, rkUnits = Array.empty} (Array.get mi misre)
+    misraa = Maybe.withDefault {line = L.emptyLine, rkUnits = Array.empty} (Array.get mi misre)
     newMisraa = ghazalSetMisraaKaafiyaa misraa radeefLen kaafiyaa 0
     misre1 = Array.set mi newMisraa misre
     iNext = if (mi == 0) then mi + 1
@@ -548,8 +308,8 @@ ghazalProcess pom oldPom =
   let 
     basic = genericGetData (processPoem pom oldPom) 
 
-    line0 = Maybe.withDefault emptyLine (Array.get 0 basic.lines)
-    line1 = Maybe.withDefault emptyLine (Array.get 1 basic.lines)
+    line0 = Maybe.withDefault L.emptyLine (Array.get 0 basic.lines)
+    line1 = Maybe.withDefault L.emptyLine (Array.get 1 basic.lines)
     preRadeef = ghazalCalcRadeef Array.empty line0.units line1.units
     radeef = ghazalTruncRadeef preRadeef line0.units
 
@@ -568,7 +328,7 @@ ghazalProcess pom oldPom =
 -- == FREE VERSE == --
 
 type alias FreeVerseLine =
-  { line : PoemLine
+  { line : L.PoemLine
   , isComposite : Bool
   }
 
@@ -607,7 +367,7 @@ fvProcess pom oldPom =
 fvSetComposite pom li =
   let 
     data = fvGetData pom
-    line = Maybe.withDefault (FreeVerseLine emptyLine False) (Array.get li data.lines)
+    line = Maybe.withDefault (FreeVerseLine L.emptyLine False) (Array.get li data.lines)
     newLine = FreeVerseLine line.line (not line.isComposite)
     newLines = Array.set li newLine data.lines
     composite = fvCalcCompositeRhythm newLines 0 Array.empty False
@@ -624,8 +384,8 @@ fvAddComposite compsiteLines li r0 r1 =
 
 fvCalcCompositeRhythm lines li compsiteLines inProgress =
   let 
-    line = Maybe.withDefault (FreeVerseLine emptyLine False) (Array.get li lines)
-    line0 = Maybe.withDefault (FreeVerseLine emptyLine False) (Array.get (li-1) lines)
+    line = Maybe.withDefault (FreeVerseLine L.emptyLine False) (Array.get li lines)
+    line0 = Maybe.withDefault (FreeVerseLine L.emptyLine False) (Array.get (li-1) lines)
     addedComposites = fvAddComposite compsiteLines (li-1) line0.line.rhythmTotal line.line.rhythmTotal
     compositesLastI = (Array.length compsiteLines) - 1
     composite = Maybe.withDefault (CompositeLine -1 0 0 True) (Array.get compositesLastI compsiteLines)
@@ -688,30 +448,15 @@ preProcessPoem pom oldpom pomType maapnee =
     "MAATRIK" -> maatrikProcessPoem pom oldpom maapnee
     _ -> processPoem pom (genericGetData oldpom).lines
 
-
-adjustMaatraaChar a =
-  if (a.aksharType == Half) then
-    if (a.userRhythm == 0) then
-      {a | userRhythm = 1}
-    else
-      {a | userRhythm = 0}
-  else if ((a.aksharType == Consonant) || (a.aksharType == PureVowel)) && (a.rhythm == 2) then
-    if (a.userRhythm == 2) then
-      {a | userRhythm = 1}
-    else
-      {a | userRhythm = 2}
-  else
-    a
-
 adjustMaatraaLine oldLine aI =
   let 
-    a = Maybe.withDefault emptyAkshar (Array.get aI oldLine.units)
-    aNew = adjustMaatraaChar a
+    a = Maybe.withDefault A.emptyAkshar (Array.get aI oldLine.units)
+    aNew = A.adjustMaatraa a
     diff = aNew.userRhythm - a.userRhythm
     newRhythm = oldLine.rhythmTotal + diff
     newAkshars = Array.set aI aNew oldLine.units
   in
-    PoemLine oldLine.str newRhythm newAkshars
+    L.PoemLine oldLine.str newRhythm newAkshars
 
 adjustMaatraaPoem poem li ci =
   let 
@@ -720,10 +465,10 @@ adjustMaatraaPoem poem li ci =
       Ghazal data -> Array.map .line data.lines
       FreeVerse data -> Array.map .line data.lines
       MaatrikPoem data -> Array.map maatrikLToPoemL data.lines
-    oldLine = Maybe.withDefault emptyLine (Array.get li lines)
+    oldLine = Maybe.withDefault L.emptyLine (Array.get li lines)
     newLine = adjustMaatraaLine oldLine ci
     newLines = Array.set li newLine lines
-    newMaxLineLen = getMaxLineLen newLines
+    newMaxLineLen = L.calcMaxLineLen newLines
     finalFVLines = 
       case poem of
         FreeVerse data -> Array.map2 fvLineFromLineWFlag newLines (Array.map .isComposite data.lines)
@@ -782,7 +527,7 @@ update msg model =
           Err _ -> {poem = "", poemType = "", maapnee = ""}
         poemType = String.toUpper incomingPoem.poemType
         oldPoem = model.processedPoem
-        maapnee = String.trim (removeExtraSpaces (cleanMaapnee incomingPoem.maapnee))
+        maapnee = String.trim (L.removeExtraSpaces (L.cleanMaapnee incomingPoem.maapnee))
       in
       ({ model | 
         poem = incomingPoem.poem, 
@@ -857,7 +602,7 @@ encodeAkshar a =
     [ ("txt", E.string a.str)
     , ("systemRhythmAmt", E.int a.rhythm)
     , ("rhythmAmt", E.int a.userRhythm)
-    , ("isHalfLetter", if (a.aksharType == Half) then (E.bool True) else (E.bool False))
+    , ("isHalfLetter", if (a.aksharType == A.Half) then (E.bool True) else (E.bool False))
     ]
 
 encodeMAkshar a =
@@ -865,7 +610,7 @@ encodeMAkshar a =
     [ ("txt", E.string a.a.str)
     , ("systemRhythmAmt", E.int a.a.rhythm)
     , ("rhythmAmt", E.int a.a.userRhythm)
-    , ("isHalfLetter", E.bool (a.a.aksharType == Half))
+    , ("isHalfLetter", E.bool (a.a.aksharType == A.Half))
     , ("rhythmPatternValue", E.float a.patternValue)
     ]
 
@@ -877,7 +622,7 @@ encodeAksharRK a =
     [ ("txt", E.string a.str)
     , ("systemRhythmAmt", E.int a.rhythm)
     , ("rhythmAmt", E.int a.userRhythm)
-    , ("isHalfLetter", if (a.aksharType == Half) then (E.bool True) else (E.bool False))
+    , ("isHalfLetter", if (a.aksharType == A.Half) then (E.bool True) else (E.bool False))
     , ("rk", E.string (String.fromChar a.rk))
     ]
 
