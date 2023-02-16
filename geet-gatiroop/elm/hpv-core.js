@@ -3517,7 +3517,7 @@ var $elm$core$Maybe$withDefault = F2(
 			return _default;
 		}
 	});
-var $author$project$HPVCore$adjustMaatraaLine = F2(
+var $author$project$HPVLine$adjustMaatraa = F2(
 	function (oldLine, aI) {
 		var a = A2(
 			$elm$core$Maybe$withDefault,
@@ -3992,7 +3992,7 @@ var $author$project$HPVCore$maatrikAdjustMaatraa = F3(
 			$author$project$HPVMaatrikLine$emptyLine,
 			A2($elm$core$Array$get, li, poemData.lines));
 		var newBasicLine = A2(
-			$author$project$HPVCore$adjustMaatraaLine,
+			$author$project$HPVLine$adjustMaatraa,
 			$author$project$HPVMaatrikLine$toBasicL(oldLine),
 			ci);
 		var newLine = A2(
@@ -4044,7 +4044,7 @@ var $author$project$HPVCore$adjustMaatraaPoem = F3(
 			$elm$core$Maybe$withDefault,
 			$author$project$HPVLine$emptyLine,
 			A2($elm$core$Array$get, li, lines));
-		var newLine = A2($author$project$HPVCore$adjustMaatraaLine, oldLine, ci);
+		var newLine = A2($author$project$HPVLine$adjustMaatraa, oldLine, ci);
 		var newLines = A3($elm$core$Array$set, li, newLine, lines);
 		var newMaxLineLen = $author$project$HPVLine$calcMaxLineLen(newLines);
 		var finalFVLines = function () {

@@ -98,6 +98,16 @@ preProcessLine pomLine oldLine =
     else
       processLine pCleaned
 
+adjustMaatraa oldLine aI =
+  let 
+    a = Maybe.withDefault A.emptyAkshar (Array.get aI oldLine.units)
+    aNew = A.adjustMaatraa a
+    diff = aNew.userRhythm - a.userRhythm
+    newRhythm = oldLine.rhythmTotal + diff
+    newAkshars = Array.set aI aNew oldLine.units
+  in
+    PoemLine oldLine.str newRhythm newAkshars
+
 -- JSON ENCODE/DECODE
 encodeLine al =
   E.object

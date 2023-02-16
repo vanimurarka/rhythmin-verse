@@ -57,7 +57,7 @@ maatrikProcessPoem pom oldPom maapnee =
 maatrikAdjustMaatraa poemData li ci =
   let 
     oldLine = Maybe.withDefault ML.emptyLine (Array.get li poemData.lines)
-    newBasicLine = adjustMaatraaLine (ML.toBasicL oldLine) ci
+    newBasicLine = L.adjustMaatraa (ML.toBasicL oldLine) ci
     newLine = ML.setLineMaapnee (ML.fromBasicL newBasicLine) poemData.maapnee.units
     newLines = Array.set li newLine poemData.lines
     newMaxLineLen = if (newLine.rhythmTotal > poemData.maxLineLen) then
@@ -172,16 +172,6 @@ preProcessPoem pom oldpom pomType maapnee =
     "MAATRIK" -> maatrikProcessPoem pom oldpom maapnee
     _ -> processPoem pom (genericGetData oldpom).lines
 
-adjustMaatraaLine oldLine aI =
-  let 
-    a = Maybe.withDefault A.emptyAkshar (Array.get aI oldLine.units)
-    aNew = A.adjustMaatraa a
-    diff = aNew.userRhythm - a.userRhythm
-    newRhythm = oldLine.rhythmTotal + diff
-    newAkshars = Array.set aI aNew oldLine.units
-  in
-    L.PoemLine oldLine.str newRhythm newAkshars
-
 adjustMaatraaPoem poem li ci =
   let 
     lines = case poem of
@@ -190,7 +180,7 @@ adjustMaatraaPoem poem li ci =
       FreeVerse data -> Array.map .line data.lines
       MaatrikPoem data -> Array.map ML.toBasicL data.lines
     oldLine = Maybe.withDefault L.emptyLine (Array.get li lines)
-    newLine = adjustMaatraaLine oldLine ci
+    newLine = L.adjustMaatraa oldLine ci
     newLines = Array.set li newLine lines
     newMaxLineLen = L.calcMaxLineLen newLines
     finalFVLines = 
