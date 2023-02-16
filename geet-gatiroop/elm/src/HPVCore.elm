@@ -4,15 +4,18 @@ import Array exposing (Array)
 import Array.Extra as Array
 import Json.Decode as D
 import Json.Encode as E
+
 import Akshar as A
 import HPVLine as L
 import HPVMaatrikLine as ML
+import HPVGhazal as Gh
+import HPVFreeVerse as FV
 
 type ProcessedPoem 
   = GenericPoem { maxLineLen : Int, lines : Array.Array L.PoemLine }
   | MaatrikPoem { maxLineLen : Int, lines : Array.Array ML.PoemLine, maapnee : ML.Maapnee }
-  | Ghazal { maxLineLen: Int, lines: Array.Array Misraa, radeef : Array.Array A.Akshar, kaafiyaa : Array.Array A.Akshar}
-  | FreeVerse {maxLineLen: Int, lines: Array.Array FreeVerseLine, composite : Array.Array CompositeLine, baseCount : Int }
+  | Ghazal { maxLineLen: Int, lines: Array.Array Gh.Misraa, radeef : Array.Array A.Akshar, kaafiyaa : Array.Array A.Akshar}
+  | FreeVerse {maxLineLen: Int, lines: Array.Array FV.Line, composite : Array.Array FV.CompositeLine, baseCount : Int }
 
 emptyPoem = GenericPoem {maxLineLen = 0, lines = Array.empty}
 
@@ -66,105 +69,15 @@ maatrikAdjustMaatraa poemData li ci =
 
 -- == GHAZAL == --
 
-type alias Misraa =
-  { line : L.PoemLine
-  , rkUnits : Array.Array Char
-  }
-
-emptyRKUnit = ' ' -- radeef kaafiyaa unit
-
 ghazalGetData p =
   case p of
     Ghazal data -> data
     _ -> { maxLineLen = 0, lines = Array.empty, radeef = Array.empty, kaafiyaa = Array.empty}
 
-ghazalCalcRadeef radeef line0 line1 =
-  let 
-    a = A.unitsLast line0
-    b = A.unitsLast line1
-    poppedLine0 = Array.slice 0 -1 line0
-    poppedLine1 = Array.slice 0 -1 line1
-    appendArray = Array.repeat 1 a
-  in
-    if ((Array.length line0) == 0) || ((Array.length line1) == 0) then
-      radeef
-    else
-      if (A.compare a b) then
-        ghazalCalcRadeef (Array.append appendArray radeef) poppedLine0 poppedLine1
-      else
-        radeef
-
-ghazalTruncRadeef radeef line =
-  let 
-    len = Array.length radeef
-    ci = (Array.length line) - len
-    a = Maybe.withDefault A.emptyAkshar (Array.get ci line)
-  in 
-    if (Array.member A.space radeef) then
-      if (a.aksharType == A.Other) || (a.aksharType == A.Empty) then
-        (Array.slice 1 (Array.length radeef) radeef)
-      else
-        ghazalTruncRadeef (Array.slice 1 (Array.length radeef) radeef) line
-    else
-      radeef
-
-misraaFromPoemLine line =
-  let 
-    rkUnits = Array.repeat (Array.length line.units) emptyRKUnit
-  in
-    Misraa line rkUnits
-
-misraaFromPoemLineWRK line rk =
-  Misraa line rk
-
-ghazalCalcKaafiyaa kaafiyaa line0 line1 =
-  let
-    a = A.unitsLast line0
-    b = A.unitsLast line1
-    poppedLine0 = Array.slice 0 -1 line0
-    poppedLine1 = Array.slice 0 -1 line1
-    appendArray = Array.repeat 1 a
-  in 
-    if ((Array.length line0) == 0) || ((Array.length line1) == 0) then
-      kaafiyaa
-    else
-      if (A.vowelCompare a b) then
-        ghazalCalcKaafiyaa (Array.append appendArray kaafiyaa) poppedLine0 poppedLine1
-      else
-        kaafiyaa
-
-ghazalSetMisraaRadeef misraa radeef radeefI =
-  let 
-    ri = Array.length radeef - radeefI - 1
-    ai = Array.length misraa.line.units - radeefI - 1
-    r = Maybe.withDefault A.emptyAkshar (Array.get ri radeef)
-    a = Maybe.withDefault A.emptyAkshar (Array.get ai misraa.line.units)
-  in 
-    if ((Array.length radeef) == radeefI) then
-      misraa
-    else if (A.compare a r) then
-        ghazalSetMisraaRadeef { misraa | rkUnits = Array.set ai 'r' misraa.rkUnits} radeef (radeefI + 1)
-      else
-        misraa
-
-ghazalSetMisraaKaafiyaa misraa radeefLen kaafiyaa kaafiyaaI =
-  let 
-    ki = Array.length kaafiyaa - kaafiyaaI - 1
-    ai = Array.length misraa.line.units - radeefLen - kaafiyaaI - 1
-    k = Maybe.withDefault A.emptyAkshar (Array.get ki kaafiyaa)
-    a = Maybe.withDefault A.emptyAkshar (Array.get ai misraa.line.units)
-  in 
-    if ((Array.length kaafiyaa) == kaafiyaaI) then
-      misraa
-    else if (A.vowelCompare a k) then
-        ghazalSetMisraaKaafiyaa { misraa | rkUnits = Array.set ai 'k' misraa.rkUnits} radeefLen kaafiyaa (kaafiyaaI + 1)
-      else
-        misraa
-
 ghazalSetRadeef misre radeef mi =
   let
     misraa = Maybe.withDefault {line = L.emptyLine, rkUnits = Array.empty} (Array.get mi misre)
-    newMisraa = ghazalSetMisraaRadeef misraa radeef 0
+    newMisraa = Gh.setMisraaRadeef misraa radeef 0
     misre1 = Array.set mi newMisraa misre
     iNext = if (mi == 0) then mi + 1
               else mi + 3
@@ -177,7 +90,7 @@ ghazalSetRadeef misre radeef mi =
 ghazalSetKaafiyaa misre radeefLen kaafiyaa mi =
   let
     misraa = Maybe.withDefault {line = L.emptyLine, rkUnits = Array.empty} (Array.get mi misre)
-    newMisraa = ghazalSetMisraaKaafiyaa misraa radeefLen kaafiyaa 0
+    newMisraa = Gh.setMisraaKaafiyaa misraa radeefLen kaafiyaa 0
     misre1 = Array.set mi newMisraa misre
     iNext = if (mi == 0) then mi + 1
               else mi + 3
@@ -193,16 +106,16 @@ ghazalProcess pom oldPom =
 
     line0 = Maybe.withDefault L.emptyLine (Array.get 0 basic.lines)
     line1 = Maybe.withDefault L.emptyLine (Array.get 1 basic.lines)
-    preRadeef = ghazalCalcRadeef Array.empty line0.units line1.units
-    radeef = ghazalTruncRadeef preRadeef line0.units
+    preRadeef = Gh.calcRadeef Array.empty line0.units line1.units
+    radeef = Gh.truncRadeef preRadeef line0.units
 
     l0i = (Array.length line0.units) - (Array.length radeef)
     l1i = (Array.length line1.units) - (Array.length radeef)
     cutLine0 = Array.slice 0 l0i line0.units
     cutLine1 = Array.slice 0 l1i line1.units
-    kaafiyaa = ghazalCalcKaafiyaa Array.empty cutLine0 cutLine1
+    kaafiyaa = Gh.calcKaafiyaa Array.empty cutLine0 cutLine1
 
-    misre = Array.map misraaFromPoemLine basic.lines
+    misre = Array.map Gh.misraaFromLine basic.lines
     misre1 = ghazalSetRadeef misre radeef 0
     misre2 = ghazalSetKaafiyaa misre1 (Array.length radeef) kaafiyaa 0
   in 
@@ -210,28 +123,10 @@ ghazalProcess pom oldPom =
 
 -- == FREE VERSE == --
 
-type alias FreeVerseLine =
-  { line : L.PoemLine
-  , isComposite : Bool
-  }
-
-type alias CompositeLine =
-  { originalLineI : Int 
-  , rhythm : Int 
-  , remainder : Int
-  , multipleOfBase : Bool
-  }
-
 fvGetData p =
   case p of
     FreeVerse data -> data 
     _ -> { maxLineLen = 0, lines = Array.empty, composite = Array.empty, baseCount = 1}
-
-fvLineFromLine l =
-  FreeVerseLine l False
-
-fvLineFromLineWFlag l f =
-  FreeVerseLine l f
 
 fvProcess pom oldPom =
   let
@@ -241,85 +136,31 @@ fvProcess pom oldPom =
     diff = (Array.length basicProcessed.lines) - (Array.length oldFVData.lines)
     oldFVFlags = Array.map .isComposite oldFVData.lines
     paddedOldFlags = if (diff > 0) then Array.append oldFVFlags (Array.repeat diff False) else oldFVFlags
-    newFVLines = Array.map2 fvLineFromLineWFlag basicProcessed.lines paddedOldFlags
-    composite = fvCalcCompositeRhythm newFVLines 0 Array.empty False
-    compositeWRemainder = fvCalcRemainderWhole composite oldFVData.baseCount 0
+    newFVLines = Array.map2 FV.fromLineWFlag basicProcessed.lines paddedOldFlags
+    composite = FV.calcCompositeRhythm newFVLines 0 Array.empty False
+    compositeWRemainder = FV.calcRemainderWhole composite oldFVData.baseCount 0
   in 
     FreeVerse {maxLineLen = basicProcessed.maxLineLen, lines = newFVLines, composite = compositeWRemainder, baseCount = oldFVData.baseCount}
 
 fvSetComposite pom li =
   let 
     data = fvGetData pom
-    line = Maybe.withDefault (FreeVerseLine L.emptyLine False) (Array.get li data.lines)
-    newLine = FreeVerseLine line.line (not line.isComposite)
+    line = Maybe.withDefault (FV.Line L.emptyLine False) (Array.get li data.lines)
+    newLine = FV.Line line.line (not line.isComposite)
     newLines = Array.set li newLine data.lines
-    composite = fvCalcCompositeRhythm newLines 0 Array.empty False
-    compositeWRemainder = fvCalcRemainderWhole composite data.baseCount 0
+    composite = FV.calcCompositeRhythm newLines 0 Array.empty False
+    compositeWRemainder = FV.calcRemainderWhole composite data.baseCount 0
   in
     FreeVerse {maxLineLen = data.maxLineLen, lines = newLines, composite = compositeWRemainder, baseCount = data.baseCount}
-
-fvAddComposite compsiteLines li r0 r1 =
-  let
-    c = CompositeLine li r0 0 True
-    c1 = CompositeLine li (r0+r1) 0 True 
-  in
-    Array.push c1 compsiteLines
-
-fvCalcCompositeRhythm lines li compsiteLines inProgress =
-  let 
-    line = Maybe.withDefault (FreeVerseLine L.emptyLine False) (Array.get li lines)
-    line0 = Maybe.withDefault (FreeVerseLine L.emptyLine False) (Array.get (li-1) lines)
-    addedComposites = fvAddComposite compsiteLines (li-1) line0.line.rhythmTotal line.line.rhythmTotal
-    compositesLastI = (Array.length compsiteLines) - 1
-    composite = Maybe.withDefault (CompositeLine -1 0 0 True) (Array.get compositesLastI compsiteLines)
-    newComposite = CompositeLine composite.originalLineI (composite.rhythm + line.line.rhythmTotal) 0 True
-    updatedComposites = Array.set compositesLastI newComposite compsiteLines
-  in  
-  if (li > (Array.length lines)) then
-    compsiteLines
-  else if (line.isComposite) then
-      if (not inProgress) then -- new composite added
-        fvCalcCompositeRhythm lines (li + 1) addedComposites True
-      else 
-        fvCalcCompositeRhythm lines (li + 1) updatedComposites True
-    else
-      fvCalcCompositeRhythm lines (li+1) compsiteLines False
 
 fvSetBase pom base =
   let 
     data = fvGetData pom
-    compositeWRemainder = fvCalcRemainderWhole data.composite base 0
+    compositeWRemainder = FV.calcRemainderWhole data.composite base 0
   in 
     FreeVerse  {data | composite = compositeWRemainder, baseCount = base}
 
-fvCalcRemainderWhole composites baseCount i =
-  let
-    line = Maybe.withDefault (CompositeLine 0 0 0 False) (Array.get i composites)
-    newLine = fvCalcRemainderSingle line baseCount
-    newComposites = Array.set i newLine composites
-  in 
-  if (baseCount == 1) then
-    composites
-  else if (i == (Array.length composites)) then
-      composites
-    else
-      fvCalcRemainderWhole newComposites baseCount (i+1)
 
-fvCalcRemainderSingle compositeLine baseCount =
-    let 
-      rhy = compositeLine.rhythm
-      quo = (toFloat rhy) / (toFloat baseCount)
-      intQuo = rhy // baseCount
-      r = quo - (toFloat intQuo)
-      useR = if (r < 0.5) then 
-          (rhy - (intQuo * baseCount))
-        else
-          (((intQuo + 1) * baseCount) - rhy) * -1
-    in 
-      if (useR /= 0) then
-        {compositeLine | remainder = useR, multipleOfBase = False }
-      else
-        {compositeLine | remainder = useR, multipleOfBase = True}
 
 -- == MASTER == --
 
@@ -354,13 +195,13 @@ adjustMaatraaPoem poem li ci =
     newMaxLineLen = L.calcMaxLineLen newLines
     finalFVLines = 
       case poem of
-        FreeVerse data -> Array.map2 fvLineFromLineWFlag newLines (Array.map .isComposite data.lines)
-        _ -> Array.map fvLineFromLine newLines
+        FreeVerse data -> Array.map2 FV.fromLineWFlag newLines (Array.map .isComposite data.lines)
+        _ -> Array.map FV.fromLine newLines
   in
     case poem of
       GenericPoem _ -> GenericPoem {maxLineLen = newMaxLineLen, lines = newLines}
-      Ghazal data -> Ghazal {data | maxLineLen = newMaxLineLen, lines = (Array.map2 misraaFromPoemLineWRK newLines (Array.map .rkUnits data.lines))}
-      FreeVerse data -> FreeVerse {maxLineLen = newMaxLineLen, lines = finalFVLines, composite = fvCalcRemainderWhole (fvCalcCompositeRhythm finalFVLines 0 Array.empty False) data.baseCount 0, baseCount = data.baseCount}
+      Ghazal data -> Ghazal {data | maxLineLen = newMaxLineLen, lines = (Array.map2 Gh.misraaFromLineWRK newLines (Array.map .rkUnits data.lines))}
+      FreeVerse data -> FreeVerse {maxLineLen = newMaxLineLen, lines = finalFVLines, composite = FV.calcRemainderWhole (FV.calcCompositeRhythm finalFVLines 0 Array.empty False) data.baseCount 0, baseCount = data.baseCount}
       MaatrikPoem data -> maatrikAdjustMaatraa data li ci
 
 
@@ -480,109 +321,34 @@ subscriptions _ =
     ]
 
 -- JSON ENCODE/DECODE
-encodeAkshar a =
-  E.object
-    [ ("txt", E.string a.str)
-    , ("systemRhythmAmt", E.int a.rhythm)
-    , ("rhythmAmt", E.int a.userRhythm)
-    , ("isHalfLetter", if (a.aksharType == A.Half) then (E.bool True) else (E.bool False))
-    ]
-
-encodeMAkshar a =
-  E.object
-    [ ("txt", E.string a.a.str)
-    , ("systemRhythmAmt", E.int a.a.rhythm)
-    , ("rhythmAmt", E.int a.a.userRhythm)
-    , ("isHalfLetter", E.bool (a.a.aksharType == A.Half))
-    , ("rhythmPatternValue", E.float a.patternValue)
-    ]
-
-combineAksharRK a rk =
-  { str = a.str, rhythm = a.rhythm, userRhythm = a.userRhythm, aksharType = a.aksharType, rk = rk }
-
-encodeAksharRK a =
-  E.object
-    [ ("txt", E.string a.str)
-    , ("systemRhythmAmt", E.int a.rhythm)
-    , ("rhythmAmt", E.int a.userRhythm)
-    , ("isHalfLetter", if (a.aksharType == A.Half) then (E.bool True) else (E.bool False))
-    , ("rk", E.string (String.fromChar a.rk))
-    ]
-
-encodeLine al =
-  E.object
-    [("rhythmAmtCumulative",E.int al.rhythmTotal)
-    , ("subUnits", E.array encodeAkshar al.units)
-    ]
-
-encodeMLine al =
-  E.object
-    [("rhythmAmtCumulative",E.int al.rhythmTotal)
-    , ("subUnits", E.array encodeMAkshar al.units)
-    ]
-
-encodeMisraa m =
-  E.object
-    [("rhythmAmtCumulative",E.int m.line.rhythmTotal)
-    , ("subUnits", E.array encodeAksharRK (Array.map2 combineAksharRK m.line.units m.rkUnits))
-    ]
-
-encodeFVLine fvl =
-  E.object
-    [("rhythmAmtCumulative",E.int fvl.line.rhythmTotal)
-    , ("subUnits", E.array encodeAkshar fvl.line.units)
-    , ("isComposite", E.bool fvl.isComposite)
-    ]
 
 encodeGeneric m l =
   E.object 
     [("maxLineLen", E.int m)
-    , ("lines", E.array encodeLine l)
+    , ("lines", E.array L.encodeLine l)
     , ("poemType", E.string "GENERIC")
     ]
-
-encodeMaapneeUnits mu =
-  E.object
-    [ ("txt", if (mu /= 0) then E.string (String.fromInt mu) else E.string " ")
-    , ("systemRhythmAmt", E.int mu)
-    , ("rhythmAmt", E.int mu)
-    , ("isHalfLetter", E.bool False)
-    , ("rhythmPatternValue", if (mu /= 0) then E.int mu else E.int -1)
-    ]  
-
-encodeMaapnee m =
-  E.object 
-    [("rhythmAmtCumulative",E.int m.len)
-    , ("subUnits", E.array encodeMaapneeUnits m.units)]
 
 encodeMaatrik d =
   E.object
     [("maxLineLen", E.int d.maxLineLen)
-    , ("lines", E.array encodeMLine d.lines)
-    , ("pattern", encodeMaapnee d.maapnee)
+    , ("lines", E.array ML.encodeLine d.lines)
+    , ("pattern", ML.encodeMaapnee d.maapnee)
     , ("poemType", E.string "MAATRIK")
     ]
 
 encodeGhazal m l =
   E.object 
     [ ("maxLineLen", E.int m)
-    , ("lines", E.array encodeMisraa l)
+    , ("lines", E.array Gh.encodeMisraa l)
     , ("poemType", E.string "GHAZAL")
-    ]
-
-encodeComposite c =
-  E.object
-    [ ("originalLineIdx", E.int c.originalLineI)
-    , ("rhythmAmtCumulative", E.int c.rhythm)
-    , ("remainder", E.int c.remainder)
-    , ("multipleOfBaseCount", E.bool c.multipleOfBase)
     ]
 
 encodeFreeVerse m l c =
   E.object
     [ ("maxLineLen", E.int m)
-    , ("lines", E.array encodeFVLine l)
-    , ("compositeLines", E.array encodeComposite c)
+    , ("lines", E.array FV.encodeLine l)
+    , ("compositeLines", E.array FV.encodeComposite c)
     , ("poemType", E.string "FREEVERSE")
     ]
 

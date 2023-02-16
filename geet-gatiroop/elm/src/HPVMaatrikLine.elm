@@ -1,6 +1,7 @@
 module HPVMaatrikLine exposing (..)
 
 import Array exposing (Array)
+import Json.Encode as E
 import HPVLine as L
 import Akshar as A
 
@@ -121,3 +122,33 @@ maatrikSetLineUnitsPattern lineUnits i =
         maatrikSetLineUnitsPattern newLineUnits (i+2)
       else
         maatrikSetLineUnitsPattern newLineUnits (i+1)
+
+-- JSON ENCODE/DECODE
+encodeAkshar a =
+  E.object
+    [ ("txt", E.string a.a.str)
+    , ("systemRhythmAmt", E.int a.a.rhythm)
+    , ("rhythmAmt", E.int a.a.userRhythm)
+    , ("isHalfLetter", E.bool (a.a.aksharType == A.Half))
+    , ("rhythmPatternValue", E.float a.patternValue)
+    ]
+
+encodeLine al =
+  E.object
+    [("rhythmAmtCumulative",E.int al.rhythmTotal)
+    , ("subUnits", E.array encodeAkshar al.units)
+    ]
+
+encodeMaapneeUnits mu =
+  E.object
+    [ ("txt", if (mu /= 0) then E.string (String.fromInt mu) else E.string " ")
+    , ("systemRhythmAmt", E.int mu)
+    , ("rhythmAmt", E.int mu)
+    , ("isHalfLetter", E.bool False)
+    , ("rhythmPatternValue", if (mu /= 0) then E.int mu else E.int -1)
+    ]  
+
+encodeMaapnee m =
+  E.object 
+    [("rhythmAmtCumulative",E.int m.len)
+    , ("subUnits", E.array encodeMaapneeUnits m.units)]

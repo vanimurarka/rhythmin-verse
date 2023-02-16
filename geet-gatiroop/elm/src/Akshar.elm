@@ -1,6 +1,7 @@
 module Akshar exposing (..)
 
 import Array exposing (Array)
+import Json.Encode as E
 
 type AksharType  = PureVowel | Maatraa | Halant | Half | Consonant | ChandraBindu | BottomBindi | Other | Empty
 
@@ -167,3 +168,12 @@ adjustMaatraa a =
       {a | userRhythm = 2}
   else
     a
+
+-- JSON ENCODE/DECODE
+encodeAkshar a =
+  E.object
+    [ ("txt", E.string a.str)
+    , ("systemRhythmAmt", E.int a.rhythm)
+    , ("rhythmAmt", E.int a.userRhythm)
+    , ("isHalfLetter", if (a.aksharType == Half) then (E.bool True) else (E.bool False))
+    ]

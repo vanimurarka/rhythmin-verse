@@ -2,6 +2,8 @@ module HPVLine exposing(..)
 
 import Array exposing (Array)
 import Regex
+import Json.Encode as E
+
 import Akshar as A
 
 userReplace : String -> (Regex.Match -> String) -> String -> String
@@ -96,3 +98,9 @@ preProcessLine pomLine oldLine =
     else
       processLine pCleaned
 
+-- JSON ENCODE/DECODE
+encodeLine al =
+  E.object
+    [("rhythmAmtCumulative",E.int al.rhythmTotal)
+    , ("subUnits", E.array A.encodeAkshar al.units)
+    ]
