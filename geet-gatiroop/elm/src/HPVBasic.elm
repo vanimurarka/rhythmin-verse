@@ -1,4 +1,4 @@
-module HPVLine exposing(..)
+module HPVBasic exposing(..)
 
 import Array exposing (Array)
 import Regex
@@ -33,6 +33,9 @@ type alias PoemLine =
   }
 
 emptyLine = PoemLine "" 0 Array.empty
+
+
+
 
 mrgMChelper inAr iStart collectAr =
   let

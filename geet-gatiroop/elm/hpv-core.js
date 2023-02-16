@@ -3747,16 +3747,16 @@ var $author$project$HPVCore$fvLineFromLineWFlag = F2(
 var $author$project$HPVCore$MaatrikPoem = function (a) {
 	return {$: 'MaatrikPoem', a: a};
 };
-var $author$project$HPVCore$MaatrikLine = F3(
+var $author$project$HPVMaatrikLine$PoemLine = F3(
 	function (str, rhythmTotal, units) {
 		return {rhythmTotal: rhythmTotal, str: str, units: units};
 	});
-var $author$project$HPVCore$MaatrikAkshar = F2(
+var $author$project$HPVMaatrikLine$Akshar = F2(
 	function (a, patternValue) {
 		return {a: a, patternValue: patternValue};
 	});
-var $author$project$HPVCore$maatrikAksharFrmGA = function (a) {
-	return A2($author$project$HPVCore$MaatrikAkshar, a, a.rhythm);
+var $author$project$HPVMaatrikLine$maatrikAksharFrmGA = function (a) {
+	return A2($author$project$HPVMaatrikLine$Akshar, a, a.rhythm);
 };
 var $elm$core$Elm$JsArray$map = _JsArray_map;
 var $elm$core$Array$map = F2(
@@ -3783,28 +3783,16 @@ var $elm$core$Array$map = F2(
 			A2($elm$core$Elm$JsArray$map, helper, tree),
 			A2($elm$core$Elm$JsArray$map, func, tail));
 	});
-var $author$project$HPVCore$maatrikLFromPoemL = function (lineP) {
+var $author$project$HPVMaatrikLine$fromBasicL = function (lineP) {
 	return A3(
-		$author$project$HPVCore$MaatrikLine,
+		$author$project$HPVMaatrikLine$PoemLine,
 		lineP.str,
 		lineP.rhythmTotal,
-		A2($elm$core$Array$map, $author$project$HPVCore$maatrikAksharFrmGA, lineP.units));
+		A2($elm$core$Array$map, $author$project$HPVMaatrikLine$maatrikAksharFrmGA, lineP.units));
 };
-var $author$project$HPVCore$emptyMLine = $author$project$HPVCore$maatrikLFromPoemL($author$project$HPVLine$emptyLine);
-var $author$project$HPVCore$maatrikLToPoemL = function (lineM) {
-	return A3(
-		$author$project$HPVLine$PoemLine,
-		lineM.str,
-		lineM.rhythmTotal,
-		A2(
-			$elm$core$Array$map,
-			function ($) {
-				return $.a;
-			},
-			lineM.units));
-};
-var $author$project$HPVCore$emptyMAkshar = A2($author$project$HPVCore$MaatrikAkshar, $author$project$Akshar$emptyAkshar, 0);
-var $author$project$HPVCore$maatrikSetAksharMaapnee = F3(
+var $author$project$HPVMaatrikLine$emptyLine = $author$project$HPVMaatrikLine$fromBasicL($author$project$HPVLine$emptyLine);
+var $author$project$HPVMaatrikLine$emptyAkshar = A2($author$project$HPVMaatrikLine$Akshar, $author$project$Akshar$emptyAkshar, 0);
+var $author$project$HPVMaatrikLine$maatrikSetAksharMaapnee = F3(
 	function (ac, mc, an) {
 		switch (mc) {
 			case 1:
@@ -3853,7 +3841,7 @@ var $author$project$HPVCore$maatrikSetAksharMaapnee = F3(
 				return {a1: ac, a2: an, set: 0};
 		}
 	});
-var $author$project$HPVCore$maatrikSetAksharPattern = F2(
+var $author$project$HPVMaatrikLine$maatrikSetAksharPattern = F2(
 	function (ac, an) {
 		return ((ac.a.userRhythm === 1) && (an.a.userRhythm === 1)) ? {
 			a1: _Utils_update(
@@ -3865,19 +3853,19 @@ var $author$project$HPVCore$maatrikSetAksharPattern = F2(
 			changed: true
 		} : {a1: ac, a2: an, changed: false};
 	});
-var $author$project$HPVCore$maatrikSetLineUnitsPattern = F2(
+var $author$project$HPVMaatrikLine$maatrikSetLineUnitsPattern = F2(
 	function (lineUnits, i) {
 		maatrikSetLineUnitsPattern:
 		while (true) {
 			var an = A2(
 				$elm$core$Maybe$withDefault,
-				$author$project$HPVCore$emptyMAkshar,
+				$author$project$HPVMaatrikLine$emptyAkshar,
 				A2($elm$core$Array$get, i + 1, lineUnits));
 			var ac = A2(
 				$elm$core$Maybe$withDefault,
-				$author$project$HPVCore$emptyMAkshar,
+				$author$project$HPVMaatrikLine$emptyAkshar,
 				A2($elm$core$Array$get, i, lineUnits));
-			var result = A2($author$project$HPVCore$maatrikSetAksharPattern, ac, an);
+			var result = A2($author$project$HPVMaatrikLine$maatrikSetAksharPattern, ac, an);
 			var lineUnits1 = A3($elm$core$Array$set, i, result.a1, lineUnits);
 			var newLineUnits = A3($elm$core$Array$set, i + 1, result.a2, lineUnits1);
 			if (_Utils_cmp(
@@ -3901,7 +3889,7 @@ var $author$project$HPVCore$maatrikSetLineUnitsPattern = F2(
 			}
 		}
 	});
-var $author$project$HPVCore$maatrikSetLineUnitsMaapnee = F4(
+var $author$project$HPVMaatrikLine$maatrikSetLineUnitsMaapnee = F4(
 	function (lineUnits, i, maapnee, mi) {
 		maatrikSetLineUnitsMaapnee:
 		while (true) {
@@ -3911,13 +3899,13 @@ var $author$project$HPVCore$maatrikSetLineUnitsMaapnee = F4(
 				A2($elm$core$Array$get, mi, maapnee));
 			var an = A2(
 				$elm$core$Maybe$withDefault,
-				$author$project$HPVCore$emptyMAkshar,
+				$author$project$HPVMaatrikLine$emptyAkshar,
 				A2($elm$core$Array$get, i + 1, lineUnits));
 			var ac = A2(
 				$elm$core$Maybe$withDefault,
-				$author$project$HPVCore$emptyMAkshar,
+				$author$project$HPVMaatrikLine$emptyAkshar,
 				A2($elm$core$Array$get, i, lineUnits));
-			var result = A3($author$project$HPVCore$maatrikSetAksharMaapnee, ac, mc, an);
+			var result = A3($author$project$HPVMaatrikLine$maatrikSetAksharMaapnee, ac, mc, an);
 			var lineUnits1 = A3($elm$core$Array$set, i, result.a1, lineUnits);
 			var newLineUnits = A3($elm$core$Array$set, i + 1, result.a2, lineUnits1);
 			if (_Utils_cmp(
@@ -3970,34 +3958,46 @@ var $author$project$HPVCore$maatrikSetLineUnitsMaapnee = F4(
 								mi = $temp$mi;
 								continue maatrikSetLineUnitsMaapnee;
 							} else {
-								return A2($author$project$HPVCore$maatrikSetLineUnitsPattern, newLineUnits, i);
+								return A2($author$project$HPVMaatrikLine$maatrikSetLineUnitsPattern, newLineUnits, i);
 							}
 						}
 				}
 			}
 		}
 	});
-var $author$project$HPVCore$maatrikSetLineMaapnee = F2(
+var $author$project$HPVMaatrikLine$setLineMaapnee = F2(
 	function (line, maapnee) {
 		return _Utils_update(
 			line,
 			{
-				units: A4($author$project$HPVCore$maatrikSetLineUnitsMaapnee, line.units, 0, maapnee, 0)
+				units: A4($author$project$HPVMaatrikLine$maatrikSetLineUnitsMaapnee, line.units, 0, maapnee, 0)
 			});
 	});
+var $author$project$HPVMaatrikLine$toBasicL = function (lineM) {
+	return A3(
+		$author$project$HPVLine$PoemLine,
+		lineM.str,
+		lineM.rhythmTotal,
+		A2(
+			$elm$core$Array$map,
+			function ($) {
+				return $.a;
+			},
+			lineM.units));
+};
 var $author$project$HPVCore$maatrikAdjustMaatraa = F3(
 	function (poemData, li, ci) {
 		var oldLine = A2(
 			$elm$core$Maybe$withDefault,
-			$author$project$HPVCore$emptyMLine,
+			$author$project$HPVMaatrikLine$emptyLine,
 			A2($elm$core$Array$get, li, poemData.lines));
 		var newBasicLine = A2(
 			$author$project$HPVCore$adjustMaatraaLine,
-			$author$project$HPVCore$maatrikLToPoemL(oldLine),
+			$author$project$HPVMaatrikLine$toBasicL(oldLine),
 			ci);
 		var newLine = A2(
-			$author$project$HPVCore$maatrikSetLineMaapnee,
-			$author$project$HPVCore$maatrikLFromPoemL(newBasicLine),
+			$author$project$HPVMaatrikLine$setLineMaapnee,
+			$author$project$HPVMaatrikLine$fromBasicL(newBasicLine),
 			poemData.maapnee.units);
 		var newLines = A3($elm$core$Array$set, li, newLine, poemData.lines);
 		var newMaxLineLen = (_Utils_cmp(newLine.rhythmTotal, poemData.maxLineLen) > 0) ? newLine.rhythmTotal : poemData.maxLineLen;
@@ -4037,7 +4037,7 @@ var $author$project$HPVCore$adjustMaatraaPoem = F3(
 						data.lines);
 				default:
 					var data = poem.a;
-					return A2($elm$core$Array$map, $author$project$HPVCore$maatrikLToPoemL, data.lines);
+					return A2($elm$core$Array$map, $author$project$HPVMaatrikLine$toBasicL, data.lines);
 			}
 		}();
 		var oldLine = A2(
@@ -4323,7 +4323,7 @@ var $author$project$HPVCore$genericGetData = function (p) {
 		default:
 			var data = p.a;
 			return {
-				lines: A2($elm$core$Array$map, $author$project$HPVCore$maatrikLToPoemL, data.lines),
+				lines: A2($elm$core$Array$map, $author$project$HPVMaatrikLine$toBasicL, data.lines),
 				maxLineLen: data.maxLineLen
 			};
 	}
@@ -5254,7 +5254,7 @@ var $author$project$HPVCore$ghazalProcess = F2(
 		return $author$project$HPVCore$Ghazal(
 			{kaafiyaa: kaafiyaa, lines: misre2, maxLineLen: basic.maxLineLen, radeef: radeef});
 	});
-var $author$project$HPVCore$maapneeToInt = function (m) {
+var $author$project$HPVMaatrikLine$maapneeToInt = function (m) {
 	switch (m.valueOf()) {
 		case '1':
 			return 1;
@@ -5272,15 +5272,15 @@ var $author$project$HPVCore$maatrikProcessPoem = F3(
 	function (pom, oldPom, maapnee) {
 		var maapneeCharA = $elm$core$Array$fromList(
 			$elm$core$String$toList(maapnee));
-		var maapneeArray = A2($elm$core$Array$map, $author$project$HPVCore$maapneeToInt, maapneeCharA);
+		var maapneeArray = A2($elm$core$Array$map, $author$project$HPVMaatrikLine$maapneeToInt, maapneeCharA);
 		var maapneeLen = A3($elm$core$Array$foldl, $elm$core$Basics$add, 0, maapneeArray);
 		var genericOld = $author$project$HPVCore$genericGetData(oldPom);
 		var basic = $author$project$HPVCore$genericGetData(
 			A2($author$project$HPVCore$processPoem, pom, genericOld.lines));
-		var maatrikLines = A2($elm$core$Array$map, $author$project$HPVCore$maatrikLFromPoemL, basic.lines);
+		var maatrikLines = A2($elm$core$Array$map, $author$project$HPVMaatrikLine$fromBasicL, basic.lines);
 		var maatrikLinesWMaapnee = A3(
 			$elm_community$array_extra$Array$Extra$map2,
-			$author$project$HPVCore$maatrikSetLineMaapnee,
+			$author$project$HPVMaatrikLine$setLineMaapnee,
 			maatrikLines,
 			A2(
 				$elm$core$Array$repeat,

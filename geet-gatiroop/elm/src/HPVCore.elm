@@ -4,12 +4,13 @@ import Array exposing (Array)
 import Array.Extra as Array
 import Json.Decode as D
 import Json.Encode as E
-import HPVLine as L
 import Akshar as A
+import HPVLine as L
+import HPVMaatrikLine as ML
 
 type ProcessedPoem 
   = GenericPoem { maxLineLen : Int, lines : Array.Array L.PoemLine }
-  | MaatrikPoem { maxLineLen : Int, lines : Array.Array MaatrikLine, maapnee : Maapnee }
+  | MaatrikPoem { maxLineLen : Int, lines : Array.Array ML.PoemLine, maapnee : ML.Maapnee }
   | Ghazal { maxLineLen: Int, lines: Array.Array Misraa, radeef : Array.Array A.Akshar, kaafiyaa : Array.Array A.Akshar}
   | FreeVerse {maxLineLen: Int, lines: Array.Array FreeVerseLine, composite : Array.Array CompositeLine, baseCount : Int }
 
@@ -29,139 +30,21 @@ processPoem pom oldLines =
 
 -- == MAATRIK == --
 
-type alias MaatrikAkshar =
-  {
-    a : A.Akshar,
-    patternValue : Float
-  }
-emptyMAkshar = MaatrikAkshar A.emptyAkshar 0
-
-type alias MaatrikLine = 
-  { str : String
-  , rhythmTotal : Int
-  , units : Array.Array MaatrikAkshar
-  }
-
-emptyMLine = maatrikLFromPoemL L.emptyLine
-
-type alias Maapnee =
-  { units : Array.Array Int
-  , str : String
-  , len : Int
-  }
-
-emptyMaapnee = { units = Array.empty, str = "" }
-
 genericGetData p =
   case p of
     GenericPoem data -> data
     Ghazal data -> { maxLineLen = data.maxLineLen, lines = Array.map .line data.lines }
     FreeVerse data -> { maxLineLen = data.maxLineLen, lines = Array.map .line data.lines }
-    MaatrikPoem data -> { maxLineLen = data.maxLineLen, lines = Array.map maatrikLToPoemL data.lines }
-
-maatrikAksharFrmGA a =
-  MaatrikAkshar a (toFloat a.rhythm)
-
-maatrikLToPoemL lineM =
-  L.PoemLine lineM.str lineM.rhythmTotal (Array.map .a lineM.units)
-
-maatrikLFromPoemL lineP =
-  MaatrikLine lineP.str lineP.rhythmTotal (Array.map maatrikAksharFrmGA lineP.units)
-
-maatrikSetAksharPattern ac an =
-  if ((ac.a.userRhythm == 1) && (an.a.userRhythm == 1)) then
-    {a1 = {ac | patternValue = 1.5}, a2 = {an | patternValue = 1.5}, changed = True}
-  else
-    {a1 = ac, a2 = an, changed = False}
-
-maatrikSetLineUnitsPattern lineUnits i =
-  let 
-    ac = Maybe.withDefault emptyMAkshar (Array.get i lineUnits)
-    an = Maybe.withDefault emptyMAkshar (Array.get (i+1) lineUnits)
-    result = maatrikSetAksharPattern ac an 
-    lineUnits1 = Array.set i result.a1 lineUnits
-    newLineUnits = Array.set (i+1) result.a2 lineUnits1
-  in 
-    if (i > (Array.length lineUnits - 1)) then
-      lineUnits
-    else
-      if (result.changed) then
-        maatrikSetLineUnitsPattern newLineUnits (i+2)
-      else
-        maatrikSetLineUnitsPattern newLineUnits (i+1)
-
-maatrikSetLinePattern line =
-  { line | units = maatrikSetLineUnitsPattern line.units 0}
- 
-maatrikSetAksharMaapnee : MaatrikAkshar -> Int -> MaatrikAkshar -> MaapneeResult
-maatrikSetAksharMaapnee ac mc an =
-  case mc of 
-    1 ->
-      if (ac.a.userRhythm == 1) then
-        {a1 = {ac | patternValue = 1}, a2 = an, set = 1}
-      else 
-        {a1 = ac, a2 = an, set = 0}
-    2 -> 
-      if (ac.a.userRhythm == 2) then
-        {a1 = {ac | patternValue = 2}, a2 = an, set = 1}
-      else if ((ac.a.userRhythm == 1) && (an.a.userRhythm == 1)) then
-          {a1 = {ac | patternValue = 1.5}, a2 = {an | patternValue = 1.5}, set = 2}
-        else
-          {a1 = ac, a2 = an, set = 0}
-    0 -> 
-      case ac.a.aksharType of 
-        A.Other -> {a1 = {ac | patternValue = -1}, a2 = an, set = 1}
-        A.ChandraBindu -> {a1 = ac, a2 = an, set = 0}
-        A.Half -> if (ac.a.userRhythm == 0) then {a1 = ac, a2 = an, set = 0} else {a1 = ac, a2 = an, set = -1}
-        _ -> {a1 = ac, a2 = an, set = -1}
-    _ -> {a1 = ac, a2 = an, set = 0}
-
-type alias MaapneeResult = {a1 : MaatrikAkshar, a2 : MaatrikAkshar, set : Int}
-
-maatrikSetLineUnitsMaapnee : Array MaatrikAkshar -> Int -> Array Int -> Int -> Array MaatrikAkshar
-maatrikSetLineUnitsMaapnee lineUnits i maapnee mi =
-  let 
-    ac = Maybe.withDefault emptyMAkshar (Array.get i lineUnits)
-    an = Maybe.withDefault emptyMAkshar (Array.get (i+1) lineUnits)
-    mc = Maybe.withDefault 2 (Array.get mi maapnee)
-    result = maatrikSetAksharMaapnee ac mc an
-    lineUnits1 = Array.set i result.a1 lineUnits
-    newLineUnits = Array.set (i+1) result.a2 lineUnits1
-  in 
-    if (i > (Array.length lineUnits - 1)) then
-      newLineUnits
-    else
-      case result.set of
-        2 -> maatrikSetLineUnitsMaapnee newLineUnits (i+2) maapnee (mi+1)
-        1 -> maatrikSetLineUnitsMaapnee newLineUnits (i+1) maapnee (mi+1)
-        _ -> if (result.set == -1) then
-            maatrikSetLineUnitsMaapnee newLineUnits (i) maapnee (mi+1)
-          else if (ac.a.userRhythm == 0) then
-              maatrikSetLineUnitsMaapnee newLineUnits (i+1) maapnee mi
-            else 
-              maatrikSetLineUnitsPattern newLineUnits i 
-
-maatrikSetLineMaapnee : MaatrikLine -> Array Int -> MaatrikLine
-maatrikSetLineMaapnee line maapnee =
-  { line | units = maatrikSetLineUnitsMaapnee line.units 0 maapnee 0}
-
-maapneeToInt m = 
-  case m of 
-    '1' -> 1
-    '2' -> 2
-    '१' -> 1
-    '२' -> 2
-    _ -> 0
-
+    MaatrikPoem data -> { maxLineLen = data.maxLineLen, lines = Array.map ML.toBasicL data.lines }
 
 maatrikProcessPoem pom oldPom maapnee =
   let 
     genericOld = genericGetData oldPom
     basic = genericGetData (processPoem pom genericOld.lines)
     maapneeCharA = Array.fromList (String.toList maapnee)
-    maapneeArray = Array.map maapneeToInt maapneeCharA 
-    maatrikLines = Array.map maatrikLFromPoemL basic.lines
-    maatrikLinesWMaapnee = Array.map2 maatrikSetLineMaapnee maatrikLines (Array.repeat (Array.length maatrikLines) maapneeArray) 
+    maapneeArray = Array.map ML.maapneeToInt maapneeCharA 
+    maatrikLines = Array.map ML.fromBasicL basic.lines
+    maatrikLinesWMaapnee = Array.map2 ML.setLineMaapnee maatrikLines (Array.repeat (Array.length maatrikLines) maapneeArray) 
     maapneeLen = Array.foldl (+) 0 maapneeArray
   in 
     MaatrikPoem { 
@@ -170,9 +53,9 @@ maatrikProcessPoem pom oldPom maapnee =
 
 maatrikAdjustMaatraa poemData li ci =
   let 
-    oldLine = Maybe.withDefault emptyMLine (Array.get li poemData.lines)
-    newBasicLine = adjustMaatraaLine (maatrikLToPoemL oldLine) ci
-    newLine = maatrikSetLineMaapnee (maatrikLFromPoemL newBasicLine) poemData.maapnee.units
+    oldLine = Maybe.withDefault ML.emptyLine (Array.get li poemData.lines)
+    newBasicLine = adjustMaatraaLine (ML.toBasicL oldLine) ci
+    newLine = ML.setLineMaapnee (ML.fromBasicL newBasicLine) poemData.maapnee.units
     newLines = Array.set li newLine poemData.lines
     newMaxLineLen = if (newLine.rhythmTotal > poemData.maxLineLen) then
         newLine.rhythmTotal
@@ -464,7 +347,7 @@ adjustMaatraaPoem poem li ci =
       GenericPoem data -> data.lines
       Ghazal data -> Array.map .line data.lines
       FreeVerse data -> Array.map .line data.lines
-      MaatrikPoem data -> Array.map maatrikLToPoemL data.lines
+      MaatrikPoem data -> Array.map ML.toBasicL data.lines
     oldLine = Maybe.withDefault L.emptyLine (Array.get li lines)
     newLine = adjustMaatraaLine oldLine ci
     newLines = Array.set li newLine lines
