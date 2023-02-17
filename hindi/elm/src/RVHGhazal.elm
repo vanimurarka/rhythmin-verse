@@ -1,10 +1,10 @@
-module HPVGhazal exposing (..)
+module RVHGhazal exposing (..)
 
 import Array exposing (Array)
 import Array.Extra as Array
 import Json.Encode as E
 
-import HPVLine as L
+import RVHLine as L
 import Akshar as A
 
 type alias Misraa =

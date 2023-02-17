@@ -1,8 +1,8 @@
-module HPVMaatrikLine exposing (..)
+module RVHMaatrikLine exposing (..)
 
 import Array exposing (Array)
 import Json.Encode as E
-import HPVLine as L
+import RVHLine as L
 import Akshar as A
 
 type alias Akshar =
@@ -29,22 +29,6 @@ type alias PoemLine =
   }
 
 emptyLine = fromBasicL L.emptyLine
-
-type alias Maapnee =
-  { units : Array.Array Int
-  , str : String
-  , len : Int
-  }
-
-emptyMaapnee = { units = Array.empty, str = "" }
-
-maapneeToInt m = 
-  case m of 
-    '1' -> 1
-    '2' -> 2
-    '१' -> 1
-    '२' -> 2
-    _ -> 0
 
 type alias MaapneeResult = {a1 : Akshar, a2 : Akshar, set : Int}
 
@@ -139,16 +123,3 @@ encodeLine al =
     , ("subUnits", E.array encodeAkshar al.units)
     ]
 
-encodeMaapneeUnits mu =
-  E.object
-    [ ("txt", if (mu /= 0) then E.string (String.fromInt mu) else E.string " ")
-    , ("systemRhythmAmt", E.int mu)
-    , ("rhythmAmt", E.int mu)
-    , ("isHalfLetter", E.bool False)
-    , ("rhythmPatternValue", if (mu /= 0) then E.int mu else E.int -1)
-    ]  
-
-encodeMaapnee m =
-  E.object 
-    [("rhythmAmtCumulative",E.int m.len)
-    , ("subUnits", E.array encodeMaapneeUnits m.units)]

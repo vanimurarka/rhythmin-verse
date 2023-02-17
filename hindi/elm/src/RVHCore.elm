@@ -1,4 +1,4 @@
-port module HPVCore exposing (..)
+port module RVHCore exposing (..)
 
 import Array exposing (Array)
 import Array.Extra as Array
@@ -6,15 +6,16 @@ import Json.Decode as D
 import Json.Encode as E
 
 import Akshar as A
-import HPVLine as L
-import HPVMaatrikLine as ML
-import HPVPattern as P
-import HPVGhazal as Gh
-import HPVFreeVerse as FV
+import RVHLine as L
+import RVHMaatrikLine as ML
+import RVHVarnikLine as VL
+import RVHPattern as P
+import RVHGhazal as Gh
+import RVHFreeVerse as FV
 
 type ProcessedPoem 
   = GenericPoem { maxLineLen : Int, lines : Array.Array L.PoemLine }
-  | MaatrikPoem { maxLineLen : Int, lines : Array.Array ML.PoemLine, maapnee : ML.Maapnee }
+  | MaatrikPoem { maxLineLen : Int, lines : Array.Array ML.PoemLine, maapnee : P.Maapnee }
   | Ghazal { maxLineLen: Int, lines: Array.Array Gh.Misraa, radeef : Array.Array A.Akshar, kaafiyaa : Array.Array A.Akshar}
   | FreeVerse {maxLineLen: Int, lines: Array.Array FV.Line, composite : Array.Array FV.CompositeLine, baseCount : Int }
 
@@ -46,7 +47,7 @@ maatrikProcessPoem pom oldPom maapnee =
     genericOld = genericGetData oldPom
     basic = genericGetData (processPoem pom genericOld.lines)
     maapneeCharA = Array.fromList (String.toList maapnee)
-    maapneeArray = Array.map ML.maapneeToInt maapneeCharA 
+    maapneeArray = Array.map P.maapneeToInt maapneeCharA 
     maatrikLines = Array.map ML.fromBasicL basic.lines
     maatrikLinesWMaapnee = Array.map2 ML.setLineMaapnee maatrikLines (Array.repeat (Array.length maatrikLines) maapneeArray) 
     maapneeLen = Array.foldl (+) 0 maapneeArray
@@ -324,7 +325,7 @@ encodeMaatrik d =
   E.object
     [("maxLineLen", E.int d.maxLineLen)
     , ("lines", E.array ML.encodeLine d.lines)
-    , ("pattern", ML.encodeMaapnee d.maapnee)
+    , ("pattern", P.encodeMaapnee d.maapnee)
     , ("poemType", E.string "MAATRIK")
     ]
 

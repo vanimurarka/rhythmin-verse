@@ -1,9 +1,9 @@
-module HPVFreeVerse exposing (..)
+module RVHFreeVerse exposing (..)
 
 import Array exposing (Array)
 import Json.Encode as E
 
-import HPVLine as L
+import RVHLine as L
 import Akshar as A
 
 type alias Line =

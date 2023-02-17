@@ -1,4 +1,4 @@
-module HPVLine exposing(..)
+module RVHLine exposing(..)
 
 import Array exposing (Array)
 import Regex
