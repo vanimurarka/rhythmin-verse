@@ -8,6 +8,7 @@ import Json.Encode as E
 import Akshar as A
 import HPVLine as L
 import HPVMaatrikLine as ML
+import HPVPattern as P
 import HPVGhazal as Gh
 import HPVFreeVerse as FV
 
@@ -325,6 +326,14 @@ encodeMaatrik d =
     , ("lines", E.array ML.encodeLine d.lines)
     , ("pattern", ML.encodeMaapnee d.maapnee)
     , ("poemType", E.string "MAATRIK")
+    ]
+
+encodeVarnik p =
+  E.object
+    [ ("maxLineLen", E.int p.maxLineLen)
+    , ("lines", E.array VL.encodeLine p.lines)
+    , ("pattern", P.encodeMaapnee p.maapnee)
+    , ("poemType", E.string "VARNIK")
     ]
 
 encodeGhazal m l =
