@@ -4,9 +4,9 @@
 <head>
   <meta charset="UTF-8">
   <title>GG Elm</title>
-  <script type="text/javascript" src="hpv-core.js"></script>
+  <script type="text/javascript" src="rvh-core.js"></script>
   <script type="text/javascript" src="d3.v2.min.js"></script>
-  <script type="text/javascript" src="hpv-draw.v7.4.js"></script>
+  <script type="text/javascript" src="rvh-draw.v7.4.js"></script>
 </head>
 
 <body style="background-color: black; color: white;">
@@ -81,19 +81,19 @@ function showHideMaapnee() {
 }
 
 // Load the Elm Hindi Poem Rhythm Analyis code
-// var hpv = Elm.HPVCore.init({
+// var rvh = Elm.RVHCore.init({
 // 	node: document.getElementById('myapp'),
 // });
 
-var hpv = Elm.HPVCore.init();
+var rvh = Elm.RVHCore.init();
 
 // Listen for commands from the `setStorage` port.
 // Turn the data to a string and put it in localStorage.
-hpv.ports.givePoemRhythm.subscribe(function(hpvResult) {
-    console.log(hpvResult);
+rvh.ports.givePoemRhythm.subscribe(function(rvhResult) {
+    console.log(rvhResult);
     let visDiv = document.getElementById("divVis");
     let axvailableW = visDiv.clientWidth;
-    visualize(hpvResult.processedPoem, axvailableW);
+    visualize(rvhResult.processedPoem, axvailableW);
 });
 
 function callProcessPoem()
@@ -103,20 +103,20 @@ function callProcessPoem()
   let chk = document.getElementById("chkMaapnee");
   maapnee = "";
   (chk.checked == true) ? maapnee = document.getElementById('idMaapnee').value : null;
-  hpv.ports.getPoem.send(JSON.stringify({ poem: poem, poemType: poemType, maapnee: maapnee }));
+  rvh.ports.getPoem.send(JSON.stringify({ poem: poem, poemType: poemType, maapnee: maapnee }));
 }
 
 function callAdjustMaatraa(li, ci) { 
-  hpv.ports.getMaatraaChange.send(JSON.stringify({ lineI: li, charI: ci })); 
+  rvh.ports.getMaatraaChange.send(JSON.stringify({ lineI: li, charI: ci })); 
 }
 
 function callSetComposite(li) {
-  hpv.ports.setComposite.send(JSON.stringify(li)); 
+  rvh.ports.setComposite.send(JSON.stringify(li)); 
 }
 
 function callBaseChange() {
   base = parseInt(document.getElementById('txtBase').value)
-  hpv.ports.setBase.send(JSON.stringify(base));
+  rvh.ports.setBase.send(JSON.stringify(base));
 }
 
 </script>
