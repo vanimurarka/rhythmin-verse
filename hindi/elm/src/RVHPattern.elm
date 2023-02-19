@@ -9,7 +9,7 @@ type alias Maapnee =
   , len : Int
   }
 
-emptyMaapnee = { units = Array.empty, str = "" }
+emptyMaapnee = { units = Array.empty, str = "", len = 0 }
 
 maapneeToInt m = 
   case m of 
@@ -18,6 +18,14 @@ maapneeToInt m =
     '१' -> 1
     '२' -> 2
     _ -> 0
+
+process m =
+  let
+    maapneeCharA = Array.fromList (String.toList m)
+    maapneeArray = Array.map maapneeToInt maapneeCharA
+    maapneeLen = Array.foldl (+) 0 maapneeArray
+  in
+    Maapnee maapneeArray m maapneeLen
 
 -- JSON ENCODE/DECODE
 

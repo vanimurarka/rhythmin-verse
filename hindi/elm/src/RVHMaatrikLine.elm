@@ -12,7 +12,7 @@ type alias Akshar =
   }
 emptyAkshar = Akshar A.emptyAkshar 0
 
-maatrikAksharFrmGA a =
+aksharFrmBA a =
   Akshar a (toFloat a.rhythm)
 
 maatrikSetAksharPattern ac an =
@@ -63,7 +63,7 @@ maatrikSetAksharMaapnee ac mc an =
     _ -> {a1 = ac, a2 = an, set = 0}
 
 fromBasicL lineP =
-  PoemLine lineP.str lineP.rhythmTotal (Array.map maatrikAksharFrmGA lineP.units)
+  PoemLine lineP.str lineP.rhythmTotal (Array.map aksharFrmBA lineP.units)
 
 toBasicL lineM =
   L.PoemLine lineM.str lineM.rhythmTotal (Array.map .a lineM.units)

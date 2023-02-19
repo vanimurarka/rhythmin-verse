@@ -3351,6 +3351,99 @@ var $author$project$RVHCore$encodeMaatrik = function (d) {
 				$elm$json$Json$Encode$string('MAATRIK'))
 			]));
 };
+var $author$project$RVHVarnikLine$encodeAkshar = function (a) {
+	return $elm$json$Json$Encode$object(
+		_List_fromArray(
+			[
+				_Utils_Tuple2(
+				'txt',
+				$elm$json$Json$Encode$string(a.a.str)),
+				_Utils_Tuple2(
+				'systemRhythmAmt',
+				$elm$json$Json$Encode$int(a.a.rhythm)),
+				_Utils_Tuple2(
+				'rhythmAmt',
+				$elm$json$Json$Encode$int(a.a.userRhythm)),
+				_Utils_Tuple2(
+				'isHalfLetter',
+				$elm$json$Json$Encode$bool(
+					_Utils_eq(a.a.aksharType, $author$project$Akshar$Half))),
+				_Utils_Tuple2(
+				'gan',
+				$elm$json$Json$Encode$string(a.gan))
+			]));
+};
+var $author$project$RVHVarnikLine$encodeLine = function (al) {
+	return $elm$json$Json$Encode$object(
+		_List_fromArray(
+			[
+				_Utils_Tuple2(
+				'rhythmAmtCumulative',
+				$elm$json$Json$Encode$int(al.rhythmTotal)),
+				_Utils_Tuple2(
+				'subUnits',
+				A2($elm$json$Json$Encode$array, $author$project$RVHVarnikLine$encodeAkshar, al.units))
+			]));
+};
+var $author$project$RVHVarnikLine$combinePatternGan = F2(
+	function (mu, g) {
+		return {g: g, u: mu};
+	});
+var $author$project$RVHVarnikLine$encodeMaapneeUnits = function (mu) {
+	return $elm$json$Json$Encode$object(
+		_List_fromArray(
+			[
+				_Utils_Tuple2(
+				'txt',
+				(!(!mu.u)) ? $elm$json$Json$Encode$string(
+					$elm$core$String$fromInt(mu.u)) : $elm$json$Json$Encode$string(' ')),
+				_Utils_Tuple2(
+				'systemRhythmAmt',
+				$elm$json$Json$Encode$int(mu.u)),
+				_Utils_Tuple2(
+				'rhythmAmt',
+				$elm$json$Json$Encode$int(mu.u)),
+				_Utils_Tuple2(
+				'isHalfLetter',
+				$elm$json$Json$Encode$bool(false)),
+				_Utils_Tuple2(
+				'belongsToGan',
+				$elm$json$Json$Encode$string(mu.g))
+			]));
+};
+var $author$project$RVHVarnikLine$encodeMaapnee = function (m) {
+	return $elm$json$Json$Encode$object(
+		_List_fromArray(
+			[
+				_Utils_Tuple2(
+				'rhythmAmtCumulative',
+				$elm$json$Json$Encode$int(m.base.len)),
+				_Utils_Tuple2(
+				'subUnits',
+				A2(
+					$elm$json$Json$Encode$array,
+					$author$project$RVHVarnikLine$encodeMaapneeUnits,
+					A3($elm_community$array_extra$Array$Extra$map2, $author$project$RVHVarnikLine$combinePatternGan, m.base.units, m.gan)))
+			]));
+};
+var $author$project$RVHCore$encodeVarnik = function (p) {
+	return $elm$json$Json$Encode$object(
+		_List_fromArray(
+			[
+				_Utils_Tuple2(
+				'maxLineLen',
+				$elm$json$Json$Encode$int(p.maxLineLen)),
+				_Utils_Tuple2(
+				'lines',
+				A2($elm$json$Json$Encode$array, $author$project$RVHVarnikLine$encodeLine, p.lines)),
+				_Utils_Tuple2(
+				'pattern',
+				$author$project$RVHVarnikLine$encodeMaapnee(p.maapnee)),
+				_Utils_Tuple2(
+				'poemType',
+				$elm$json$Json$Encode$string('VARNIK'))
+			]));
+};
 var $author$project$RVHCore$encodePoem = function (p) {
 	switch (p.$) {
 		case 'GenericPoem':
@@ -3362,9 +3455,12 @@ var $author$project$RVHCore$encodePoem = function (p) {
 		case 'FreeVerse':
 			var data = p.a;
 			return A3($author$project$RVHCore$encodeFreeVerse, data.maxLineLen, data.lines, data.composite);
-		default:
+		case 'MaatrikPoem':
 			var data = p.a;
 			return $author$project$RVHCore$encodeMaatrik(data);
+		default:
+			var data = p.a;
+			return $author$project$RVHCore$encodeVarnik(data);
 	}
 };
 var $author$project$RVHCore$encodeModel = function (model) {
@@ -3737,6 +3833,13 @@ var $author$project$RVHFreeVerse$calcRemainderWhole = F3(
 			}
 		}
 	});
+var $author$project$RVHCore$VarnikPoem = function (a) {
+	return {$: 'VarnikPoem', a: a};
+};
+var $author$project$RVHPattern$emptyMaapnee = {len: 0, str: '', units: $elm$core$Array$empty};
+var $author$project$RVHVarnikLine$emptyMaapnee = {base: $author$project$RVHPattern$emptyMaapnee, gan: $elm$core$Array$empty};
+var $author$project$RVHCore$emptyVarnik = $author$project$RVHCore$VarnikPoem(
+	{lines: $elm$core$Array$empty, maapnee: $author$project$RVHVarnikLine$emptyMaapnee, maxLineLen: 0});
 var $author$project$RVHFreeVerse$fromLine = function (l) {
 	return A2($author$project$RVHFreeVerse$Line, l, false);
 };
@@ -3755,7 +3858,7 @@ var $author$project$RVHMaatrikLine$Akshar = F2(
 	function (a, patternValue) {
 		return {a: a, patternValue: patternValue};
 	});
-var $author$project$RVHMaatrikLine$maatrikAksharFrmGA = function (a) {
+var $author$project$RVHMaatrikLine$aksharFrmBA = function (a) {
 	return A2($author$project$RVHMaatrikLine$Akshar, a, a.rhythm);
 };
 var $elm$core$Elm$JsArray$map = _JsArray_map;
@@ -3788,7 +3891,7 @@ var $author$project$RVHMaatrikLine$fromBasicL = function (lineP) {
 		$author$project$RVHMaatrikLine$PoemLine,
 		lineP.str,
 		lineP.rhythmTotal,
-		A2($elm$core$Array$map, $author$project$RVHMaatrikLine$maatrikAksharFrmGA, lineP.units));
+		A2($elm$core$Array$map, $author$project$RVHMaatrikLine$aksharFrmBA, lineP.units));
 };
 var $author$project$RVHMaatrikLine$emptyLine = $author$project$RVHMaatrikLine$fromBasicL($author$project$RVHLine$emptyLine);
 var $author$project$RVHMaatrikLine$emptyAkshar = A2($author$project$RVHMaatrikLine$Akshar, $author$project$Akshar$emptyAkshar, 0);
@@ -4012,6 +4115,18 @@ var $author$project$RVHGhazal$misraaFromLineWRK = F2(
 	function (line, rk) {
 		return A2($author$project$RVHGhazal$Misraa, line, rk);
 	});
+var $author$project$RVHVarnikLine$toBasicL = function (lineV) {
+	return A3(
+		$author$project$RVHLine$PoemLine,
+		lineV.str,
+		lineV.rhythmTotal,
+		A2(
+			$elm$core$Array$map,
+			function ($) {
+				return $.a;
+			},
+			lineV.units));
+};
 var $author$project$RVHCore$adjustMaatraaPoem = F3(
 	function (poem, li, ci) {
 		var lines = function () {
@@ -4035,9 +4150,12 @@ var $author$project$RVHCore$adjustMaatraaPoem = F3(
 							return $.line;
 						},
 						data.lines);
-				default:
+				case 'MaatrikPoem':
 					var data = poem.a;
 					return A2($elm$core$Array$map, $author$project$RVHMaatrikLine$toBasicL, data.lines);
+				default:
+					var data = poem.a;
+					return A2($elm$core$Array$map, $author$project$RVHVarnikLine$toBasicL, data.lines);
 			}
 		}();
 		var oldLine = A2(
@@ -4099,9 +4217,12 @@ var $author$project$RVHCore$adjustMaatraaPoem = F3(
 						lines: finalFVLines,
 						maxLineLen: newMaxLineLen
 					});
-			default:
+			case 'MaatrikPoem':
 				var data = poem.a;
 				return A3($author$project$RVHCore$maatrikAdjustMaatraa, data, li, ci);
+			default:
+				var data = poem.a;
+				return $author$project$RVHCore$emptyVarnik;
 		}
 	});
 var $elm$regex$Regex$Match = F4(
@@ -4320,10 +4441,16 @@ var $author$project$RVHCore$genericGetData = function (p) {
 					data.lines),
 				maxLineLen: data.maxLineLen
 			};
-		default:
+		case 'MaatrikPoem':
 			var data = p.a;
 			return {
 				lines: A2($elm$core$Array$map, $author$project$RVHMaatrikLine$toBasicL, data.lines),
+				maxLineLen: data.maxLineLen
+			};
+		default:
+			var data = p.a;
+			return {
+				lines: A2($elm$core$Array$map, $author$project$RVHVarnikLine$toBasicL, data.lines),
 				maxLineLen: data.maxLineLen
 			};
 	}
@@ -5254,6 +5381,10 @@ var $author$project$RVHCore$ghazalProcess = F2(
 		return $author$project$RVHCore$Ghazal(
 			{kaafiyaa: kaafiyaa, lines: misre2, maxLineLen: basic.maxLineLen, radeef: radeef});
 	});
+var $author$project$RVHPattern$Maapnee = F3(
+	function (units, str, len) {
+		return {len: len, str: str, units: units};
+	});
 var $author$project$RVHPattern$maapneeToInt = function (m) {
 	switch (m.valueOf()) {
 		case '1':
@@ -5268,12 +5399,16 @@ var $author$project$RVHPattern$maapneeToInt = function (m) {
 			return 0;
 	}
 };
+var $author$project$RVHPattern$process = function (m) {
+	var maapneeCharA = $elm$core$Array$fromList(
+		$elm$core$String$toList(m));
+	var maapneeArray = A2($elm$core$Array$map, $author$project$RVHPattern$maapneeToInt, maapneeCharA);
+	var maapneeLen = A3($elm$core$Array$foldl, $elm$core$Basics$add, 0, maapneeArray);
+	return A3($author$project$RVHPattern$Maapnee, maapneeArray, m, maapneeLen);
+};
 var $author$project$RVHCore$maatrikProcessPoem = F3(
 	function (pom, oldPom, maapnee) {
-		var maapneeCharA = $elm$core$Array$fromList(
-			$elm$core$String$toList(maapnee));
-		var maapneeArray = A2($elm$core$Array$map, $author$project$RVHPattern$maapneeToInt, maapneeCharA);
-		var maapneeLen = A3($elm$core$Array$foldl, $elm$core$Basics$add, 0, maapneeArray);
+		var processedMaapnee = $author$project$RVHPattern$process(maapnee);
 		var genericOld = $author$project$RVHCore$genericGetData(oldPom);
 		var basic = $author$project$RVHCore$genericGetData(
 			A2($author$project$RVHCore$processPoem, pom, genericOld.lines));
@@ -5285,12 +5420,56 @@ var $author$project$RVHCore$maatrikProcessPoem = F3(
 			A2(
 				$elm$core$Array$repeat,
 				$elm$core$Array$length(maatrikLines),
-				maapneeArray));
+				processedMaapnee.units));
 		return $author$project$RVHCore$MaatrikPoem(
 			{
 				lines: maatrikLinesWMaapnee,
-				maapnee: {len: maapneeLen, str: maapnee, units: maapneeArray},
-				maxLineLen: (_Utils_cmp(maapneeLen, basic.maxLineLen) > 0) ? maapneeLen : basic.maxLineLen
+				maapnee: processedMaapnee,
+				maxLineLen: (_Utils_cmp(processedMaapnee.len, basic.maxLineLen) > 0) ? processedMaapnee.len : basic.maxLineLen
+			});
+	});
+var $author$project$RVHVarnikLine$PoemLine = F3(
+	function (str, rhythmTotal, units) {
+		return {rhythmTotal: rhythmTotal, str: str, units: units};
+	});
+var $author$project$RVHVarnikLine$Akshar = F2(
+	function (a, gan) {
+		return {a: a, gan: gan};
+	});
+var $author$project$RVHVarnikLine$aksharFrmBA = function (a) {
+	return A2($author$project$RVHVarnikLine$Akshar, a, 'y');
+};
+var $author$project$RVHVarnikLine$fromBasicL = function (lineP) {
+	return A3(
+		$author$project$RVHVarnikLine$PoemLine,
+		lineP.str,
+		lineP.rhythmTotal,
+		A2($elm$core$Array$map, $author$project$RVHVarnikLine$aksharFrmBA, lineP.units));
+};
+var $author$project$RVHVarnikLine$pGan = function (u) {
+	return (u === 2) ? 'r' : 'y';
+};
+var $author$project$RVHVarnikLine$pFromBP = function (p) {
+	return {
+		base: p,
+		gan: A2($elm$core$Array$map, $author$project$RVHVarnikLine$pGan, p.units)
+	};
+};
+var $author$project$RVHVarnikLine$process = function (maapnee) {
+	return $author$project$RVHVarnikLine$pFromBP(
+		$author$project$RVHPattern$process(maapnee));
+};
+var $author$project$RVHCore$varnikProcessPoem = F3(
+	function (pom, oldPom, maapnee) {
+		var processedMaapnee = $author$project$RVHVarnikLine$process(maapnee);
+		var genericOld = $author$project$RVHCore$genericGetData(oldPom);
+		var basic = $author$project$RVHCore$genericGetData(
+			A2($author$project$RVHCore$processPoem, pom, genericOld.lines));
+		return $author$project$RVHCore$VarnikPoem(
+			{
+				lines: A2($elm$core$Array$map, $author$project$RVHVarnikLine$fromBasicL, basic.lines),
+				maapnee: processedMaapnee,
+				maxLineLen: (_Utils_cmp(processedMaapnee.base.len, basic.maxLineLen) > 0) ? processedMaapnee.base.len : basic.maxLineLen
 			});
 	});
 var $author$project$RVHCore$preProcessPoem = F4(
@@ -5305,6 +5484,8 @@ var $author$project$RVHCore$preProcessPoem = F4(
 				return A2($author$project$RVHCore$fvProcess, pom, oldpom);
 			case 'MAATRIK':
 				return A3($author$project$RVHCore$maatrikProcessPoem, pom, oldpom, maapnee);
+			case 'VARNIK':
+				return A3($author$project$RVHCore$varnikProcessPoem, pom, oldpom, maapnee);
 			default:
 				return A2(
 					$author$project$RVHCore$processPoem,

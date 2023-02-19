@@ -16,6 +16,7 @@ import RVHFreeVerse as FV
 type ProcessedPoem 
   = GenericPoem { maxLineLen : Int, lines : Array.Array L.PoemLine }
   | MaatrikPoem { maxLineLen : Int, lines : Array.Array ML.PoemLine, maapnee : P.Maapnee }
+  | VarnikPoem {maxLineLen : Int, lines : Array.Array VL.PoemLine, maapnee : VL.Maapnee }
   | Ghazal { maxLineLen: Int, lines: Array.Array Gh.Misraa, radeef : Array.Array A.Akshar, kaafiyaa : Array.Array A.Akshar}
   | FreeVerse {maxLineLen: Int, lines: Array.Array FV.Line, composite : Array.Array FV.CompositeLine, baseCount : Int }
 
@@ -41,20 +42,19 @@ genericGetData p =
     Ghazal data -> { maxLineLen = data.maxLineLen, lines = Array.map .line data.lines }
     FreeVerse data -> { maxLineLen = data.maxLineLen, lines = Array.map .line data.lines }
     MaatrikPoem data -> { maxLineLen = data.maxLineLen, lines = Array.map ML.toBasicL data.lines }
+    VarnikPoem data -> { maxLineLen = data.maxLineLen, lines = Array.map VL.toBasicL data.lines}
 
 maatrikProcessPoem pom oldPom maapnee =
   let 
     genericOld = genericGetData oldPom
     basic = genericGetData (processPoem pom genericOld.lines)
-    maapneeCharA = Array.fromList (String.toList maapnee)
-    maapneeArray = Array.map P.maapneeToInt maapneeCharA 
+    processedMaapnee = P.process maapnee
     maatrikLines = Array.map ML.fromBasicL basic.lines
-    maatrikLinesWMaapnee = Array.map2 ML.setLineMaapnee maatrikLines (Array.repeat (Array.length maatrikLines) maapneeArray) 
-    maapneeLen = Array.foldl (+) 0 maapneeArray
+    maatrikLinesWMaapnee = Array.map2 ML.setLineMaapnee maatrikLines (Array.repeat (Array.length maatrikLines) processedMaapnee.units) 
   in 
     MaatrikPoem { 
-      maxLineLen = if (maapneeLen > basic.maxLineLen) then maapneeLen else basic.maxLineLen
-      , lines = maatrikLinesWMaapnee, maapnee = {units = maapneeArray, str = maapnee, len = maapneeLen} }    
+      maxLineLen = if (processedMaapnee.len > basic.maxLineLen) then processedMaapnee.len else basic.maxLineLen
+      , lines = maatrikLinesWMaapnee, maapnee = processedMaapnee}    
 
 maatrikAdjustMaatraa poemData li ci =
   let 
@@ -162,7 +162,19 @@ fvSetBase pom base =
   in 
     FreeVerse  {data | composite = compositeWRemainder, baseCount = base}
 
+-- == VARNIK == --
 
+emptyVarnik = VarnikPoem {maxLineLen = 0, lines = Array.empty, maapnee = VL.emptyMaapnee}
+
+varnikProcessPoem pom oldPom maapnee =
+  let
+    genericOld = genericGetData oldPom
+    basic = genericGetData (processPoem pom genericOld.lines)
+    processedMaapnee = VL.process maapnee
+  in
+    VarnikPoem {
+      maxLineLen = if (processedMaapnee.base.len > basic.maxLineLen) then processedMaapnee.base.len else basic.maxLineLen, lines = Array.map VL.fromBasicL basic.lines, maapnee = processedMaapnee
+    }
 
 -- == MASTER == --
 
@@ -172,6 +184,7 @@ preProcessPoem pom oldpom pomType maapnee =
         ghazalProcess pom (genericGetData oldpom).lines
     "FREEVERSE" -> fvProcess pom oldpom 
     "MAATRIK" -> maatrikProcessPoem pom oldpom maapnee
+    "VARNIK" -> varnikProcessPoem pom oldpom maapnee
     _ -> processPoem pom (genericGetData oldpom).lines
 
 adjustMaatraaPoem poem li ci =
@@ -181,6 +194,7 @@ adjustMaatraaPoem poem li ci =
       Ghazal data -> Array.map .line data.lines
       FreeVerse data -> Array.map .line data.lines
       MaatrikPoem data -> Array.map ML.toBasicL data.lines
+      VarnikPoem data -> Array.map VL.toBasicL data.lines
     oldLine = Maybe.withDefault L.emptyLine (Array.get li lines)
     newLine = L.adjustMaatraa oldLine ci
     newLines = Array.set li newLine lines
@@ -195,6 +209,7 @@ adjustMaatraaPoem poem li ci =
       Ghazal data -> Ghazal {data | maxLineLen = newMaxLineLen, lines = (Array.map2 Gh.misraaFromLineWRK newLines (Array.map .rkUnits data.lines))}
       FreeVerse data -> FreeVerse {maxLineLen = newMaxLineLen, lines = finalFVLines, composite = FV.calcRemainderWhole (FV.calcCompositeRhythm finalFVLines 0 Array.empty False) data.baseCount 0, baseCount = data.baseCount}
       MaatrikPoem data -> maatrikAdjustMaatraa data li ci
+      VarnikPoem data -> emptyVarnik
 
 
 
@@ -333,7 +348,7 @@ encodeVarnik p =
   E.object
     [ ("maxLineLen", E.int p.maxLineLen)
     , ("lines", E.array VL.encodeLine p.lines)
-    , ("pattern", P.encodeMaapnee p.maapnee)
+    , ("pattern", VL.encodeMaapnee p.maapnee)
     , ("poemType", E.string "VARNIK")
     ]
 
@@ -358,6 +373,7 @@ encodePoem p =
     Ghazal data -> encodeGhazal data.maxLineLen data.lines
     FreeVerse data -> encodeFreeVerse data.maxLineLen data.lines data.composite
     MaatrikPoem data -> encodeMaatrik data
+    VarnikPoem data -> encodeVarnik data
 
 encodeModel : Model -> E.Value
 encodeModel model =
