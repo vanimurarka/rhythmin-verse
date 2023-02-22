@@ -170,7 +170,7 @@ varnikProcessPoem pom oldPom maapnee =
   let
     genericOld = genericGetData oldPom
     basic = genericGetData (processPoem pom genericOld.lines)
-    processedMaapnee = VL.process maapnee
+    processedMaapnee = VL.pProcess maapnee
   in
     VarnikPoem {
       maxLineLen = if (processedMaapnee.base.len > basic.maxLineLen) then processedMaapnee.base.len else basic.maxLineLen, lines = Array.map VL.fromBasicL basic.lines, maapnee = processedMaapnee

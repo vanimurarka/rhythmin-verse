@@ -5446,22 +5446,125 @@ var $author$project$RVHVarnikLine$fromBasicL = function (lineP) {
 		lineP.rhythmTotal,
 		A2($elm$core$Array$map, $author$project$RVHVarnikLine$aksharFrmBA, lineP.units));
 };
-var $author$project$RVHVarnikLine$pGan = function (u) {
-	return (u === 2) ? 'r' : 'y';
-};
+var $author$project$RVHVarnikLine$Maapnee = F2(
+	function (base, gan) {
+		return {base: base, gan: gan};
+	});
 var $author$project$RVHVarnikLine$pFromBP = function (p) {
-	return {
-		base: p,
-		gan: A2($elm$core$Array$map, $author$project$RVHVarnikLine$pGan, p.units)
-	};
+	return A2(
+		$author$project$RVHVarnikLine$Maapnee,
+		p,
+		A2(
+			$elm$core$Array$repeat,
+			$elm$core$Array$length(p.units),
+			''));
 };
-var $author$project$RVHVarnikLine$process = function (maapnee) {
-	return $author$project$RVHVarnikLine$pFromBP(
-		$author$project$RVHPattern$process(maapnee));
+var $author$project$RVHVarnikLine$getGan = function (ganSig) {
+	switch (ganSig) {
+		case '122':
+			return 'y';
+		case '222':
+			return 'm';
+		case '221':
+			return 't';
+		case '212':
+			return 'r';
+		case '121':
+			return 'j';
+		case '211':
+			return 'b';
+		case '111':
+			return 'n';
+		case '112':
+			return 's';
+		case '1':
+			return 'l';
+		case '2':
+			return 'g';
+		default:
+			return '';
+	}
+};
+var $elm$core$Tuple$pair = F2(
+	function (a, b) {
+		return _Utils_Tuple2(a, b);
+	});
+var $author$project$RVHVarnikLine$pfindNextRealUnit = F2(
+	function (punits, i) {
+		pfindNextRealUnit:
+		while (true) {
+			var u = A2(
+				$elm$core$Maybe$withDefault,
+				0,
+				A2($elm$core$Array$get, i, punits));
+			if (_Utils_cmp(
+				i,
+				$elm$core$Array$length(punits) - 1) > 0) {
+				return A2($elm$core$Tuple$pair, '0', -1);
+			} else {
+				if (u > 0) {
+					return A2(
+						$elm$core$Tuple$pair,
+						$elm$core$String$fromInt(u),
+						i);
+				} else {
+					var $temp$punits = punits,
+						$temp$i = i + 1;
+					punits = $temp$punits;
+					i = $temp$i;
+					continue pfindNextRealUnit;
+				}
+			}
+		}
+	});
+var $author$project$RVHVarnikLine$set3Gan = F5(
+	function (g, i1, i2, i3, a) {
+		return A3(
+			$elm$core$Array$set,
+			i3,
+			g,
+			A3(
+				$elm$core$Array$set,
+				i2,
+				g,
+				A3($elm$core$Array$set, i1, g, a)));
+	});
+var $author$project$RVHVarnikLine$setPGan = F2(
+	function (p, i) {
+		setPGan:
+		while (true) {
+			var tup1 = A2($author$project$RVHVarnikLine$pfindNextRealUnit, p.base.units, i);
+			var tup2 = A2($author$project$RVHVarnikLine$pfindNextRealUnit, p.base.units, tup1.b + 1);
+			var tup3 = A2($author$project$RVHVarnikLine$pfindNextRealUnit, p.base.units, tup2.b + 1);
+			var newI = tup3.b + 1;
+			var ganSig = _Utils_ap(
+				tup1.a,
+				_Utils_ap(tup2.a, tup3.a));
+			var gan = $author$project$RVHVarnikLine$getGan(ganSig);
+			var newPGan = A5($author$project$RVHVarnikLine$set3Gan, gan, tup1.b, tup2.b, tup3.b, p.gan);
+			if (_Utils_cmp(
+				newI,
+				$elm$core$Array$length(p.gan) - 1) > 0) {
+				return A2($author$project$RVHVarnikLine$Maapnee, p.base, newPGan);
+			} else {
+				var $temp$p = A2($author$project$RVHVarnikLine$Maapnee, p.base, newPGan),
+					$temp$i = newI;
+				p = $temp$p;
+				i = $temp$i;
+				continue setPGan;
+			}
+		}
+	});
+var $author$project$RVHVarnikLine$pProcess = function (maapnee) {
+	return A2(
+		$author$project$RVHVarnikLine$setPGan,
+		$author$project$RVHVarnikLine$pFromBP(
+			$author$project$RVHPattern$process(maapnee)),
+		0);
 };
 var $author$project$RVHCore$varnikProcessPoem = F3(
 	function (pom, oldPom, maapnee) {
-		var processedMaapnee = $author$project$RVHVarnikLine$process(maapnee);
+		var processedMaapnee = $author$project$RVHVarnikLine$pProcess(maapnee);
 		var genericOld = $author$project$RVHCore$genericGetData(oldPom);
 		var basic = $author$project$RVHCore$genericGetData(
 			A2($author$project$RVHCore$processPoem, pom, genericOld.lines));
