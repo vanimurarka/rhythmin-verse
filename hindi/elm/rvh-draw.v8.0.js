@@ -182,9 +182,14 @@ function draw()
       .data(dPoem.pattern.subUnits) // d = line, subsequent d = characters
       .enter().append("path")
         .attr("style", function(d,i) {
-            return drawStyleCharBlock(d,'consonant');
+        		// debugger;
+        		let r = drawStyleCharBlock(d,'consonant')
+            return r;
         })
-        .attr("d", function(d,i) {return drawCharBlock(d,i);})
+        .attr("d", function(d,i) {
+        	// debugger;
+        	let r = drawCharBlock(d,i);
+        	return r;})
         .attr("title", function(d,i) {return d.txt;});
   }
 
@@ -356,7 +361,7 @@ function drawStyleCharBlock(c,colorBy)
 	  					fillOp = "0.4";
 	  					break;
 	  				case "t":
-	  					color = "#bd7ebe";
+	  					color = "#f52cf8";
 	  					fillOp = "0.5";
 	  					break;
 	  				case "r":
@@ -368,7 +373,7 @@ function drawStyleCharBlock(c,colorBy)
 	  					fillOp = "0.5";
 	  					break;
 	  				case "b":
-	  					color = "#7eb0d5";
+	  					color = "#00f6a7";
 	  					fillOp = "0.5";
 	  					break;
 	  				case "n":
@@ -376,7 +381,7 @@ function drawStyleCharBlock(c,colorBy)
 	  					fillOp = "0.3";
 	  					break;
 	  				case "s":
-	  					color = "#CC9900";
+	  					color = "#793d22";
 	  					fillOp = "0.4";
 	  					break;
 	  				case "l":

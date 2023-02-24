@@ -164,16 +164,16 @@ fvSetBase pom base =
 
 -- == VARNIK == --
 
-emptyVarnik = VarnikPoem {maxLineLen = 0, lines = Array.empty, maapnee = VL.emptyMaapnee}
+emptyVarnik = VarnikPoem {maxLineLen = 0, lines = Array.empty, maapnee = P.emptyMaapnee}
 
 varnikProcessPoem pom oldPom maapnee =
   let
     genericOld = genericGetData oldPom
     basic = genericGetData (processPoem pom genericOld.lines)
-    processedMaapnee = VL.pProcess maapnee
+    processedMaapnee = VL.pProcess (P.process maapnee)
   in
     VarnikPoem {
-      maxLineLen = if (processedMaapnee.base.len > basic.maxLineLen) then processedMaapnee.base.len else basic.maxLineLen, lines = Array.map VL.fromBasicL basic.lines, maapnee = processedMaapnee
+      maxLineLen = if (processedMaapnee.len > basic.maxLineLen) then processedMaapnee.len else basic.maxLineLen, lines = Array.map VL.fromBasicL basic.lines, maapnee = processedMaapnee
     }
 
 -- == MASTER == --

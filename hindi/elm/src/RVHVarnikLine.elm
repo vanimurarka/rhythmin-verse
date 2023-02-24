@@ -22,60 +22,51 @@ type alias PoemLine =
   , units : Array.Array Akshar
   }
 
+-- record of maapnee unit (u) and its index (i)
+type alias UI = {u : String, i : Int, g : String}
+
 type alias Maapnee =
-  { base : P.Maapnee
-  , gan : Array.Array String
+  { units : Array.Array {u : Int, i : Int, g : String}
+  , str : String
+  , len : Int
   }
 
-emptyMaapnee = {base=P.emptyMaapnee, gan=Array.empty}
 
---pGan u =
---  if (u == 2) then "r" else "y"
-
---pFromBP p = 
---  {base = p, gan = Array.map pGan p.units}
-
-pFromBP p =
-  Maapnee p (Array.repeat (Array.length p.units) "")
-
-pProcess maapnee =
-  setPGan (pFromBP (P.process maapnee)) 0
-
-pfindNextRealUnit punits i =
-  let 
-    u = Maybe.withDefault 0 (Array.get i punits)
-  in
-    if (i > ((Array.length punits) - 1)) then -- end of line
-      Tuple.pair "0" -1
-    else 
-      if (u > 0) then
-        Tuple.pair (String.fromInt u) i
-      else
-        pfindNextRealUnit punits (i+1)
-
-set3Gan g i1 i2 i3 a =
-  Array.set i3 g (Array.set i2 g (Array.set i1 g a))
-
--- p = Maapnee
--- i = index to start with
-setPGan p i =
+-- convert maapnee array of integers to array of UIs
+pUI i a a1 =
   let
-    tup1 = pfindNextRealUnit p.base.units i
-    tup2 = pfindNextRealUnit p.base.units ((Tuple.second tup1) + 1)
-    tup3 = pfindNextRealUnit p.base.units ((Tuple.second tup2) + 1)
-    ganSig = (Tuple.first tup1) ++ (Tuple.first tup2) ++ (Tuple.first tup3)
-    gan = getGan ganSig
-    newPGan = set3Gan gan (Tuple.second tup1) (Tuple.second tup2) (Tuple.second tup3) p.gan
-    newI = (Tuple.second tup3) + 1
+    u = Maybe.withDefault -100 (Array.get i a)
   in
-    if (newI > ((Array.length p.gan) - 1)) then
-      Maapnee p.base newPGan
+    if (u == -100) then
+      a1
     else
-      setPGan (Maapnee p.base newPGan) newI
-
-
-getGan ganSig =
-  case ganSig of
+      pUI (i+1) a (Array.push (UI (String.fromInt u) i "") a1)
+      
+-- to test if a is zero
+pRUI el =
+  (el.u /= "0")
+  
+-- break maapnee array into sets of gans
+ganSets a na =
+  let
+    len = Array.length a
+    na3a3 = Array.splitAt 3 a
+    na3 = Tuple.first na3a3
+    a3 = Tuple.second na3a3
+    na1a1 = Array.splitAt 1 a
+    na1 = Tuple.first na1a1
+    a1 = Tuple.second na1a1
+  in
+    if (len == 0) then
+      na
+    else
+      if (len >= 3) then
+        ganSets a3 (Array.push na3 na)
+      else
+        ganSets a1 (Array.push na1 na)
+    
+ganSigToGan sig =
+  case sig of
     "122" -> "y"
     "222" -> "m"
     "221" -> "t"
@@ -86,7 +77,65 @@ getGan ganSig =
     "112" -> "s"
     "1" -> "l"
     "2" -> "g"
-    _ -> "" 
+    _ -> ""
+
+ganSetToGanName ganset =
+  let 
+    -- get the gan signature as string for a set of gan
+    sig = Array.foldr (++) "" (Array.map .u ganset)
+  in
+    ganSigToGan sig
+
+setGanameToGanset gs gn i ns =
+  let
+    len = Array.length gs
+    ui = Maybe.withDefault (UI "0" -1 "") (Array.get i gs)
+    newUI = {ui | g = gn}
+    ns1 = Array.push newUI ns
+  in
+    if (i >= len) then
+      ns
+    else
+      setGanameToGanset gs gn (i+1) ns1
+      
+ganSetWGaname gs gn =
+  setGanameToGanset gs gn 0 Array.empty
+ 
+padUIAwithZero : Array UI -> Int -> Array {u:Int,i:Int,g:String} -> Array {u:Int,i:Int,g:String}
+padUIAwithZero uia i uia1 =
+  let
+    len = Array.length uia
+    ui1 = Maybe.withDefault (UI "0" -1 "") (Array.get i uia)
+    ui2 = Maybe.withDefault (UI "0" -1 "") (Array.get (i+1) uia)
+    u1Int = Maybe.withDefault 0 (String.toInt ui1.u)
+    ui1Int = {u = u1Int, i = ui1.i, g = ui1.g}
+    uia11 = Array.push ui1Int uia1
+  in
+    if (i >= len) then
+      uia1
+    else if (i == (len - 1)) then
+      uia11
+    else if (ui1.i == (ui2.i - 1)) then
+      padUIAwithZero uia (i+1) uia11
+    else
+      padUIAwithZero uia (i+1) (Array.push {u=0,i=(i+1),g=""} uia11)
+    
+    
+---
+
+pProcess : P.Maapnee -> Maapnee
+pProcess bmaapnee =
+  let  
+    prui = (Array.filter pRUI (pUI 0 bmaapnee.units Array.empty))
+    gansets = ganSets prui Array.empty
+    gans = Array.map ganSetToGanName gansets
+    gansetsWgan = Array.map2 ganSetWGaname gansets gans
+    uisWgan = Array.foldr (Array.append) Array.empty gansetsWgan
+    uisWganWZ = padUIAwithZero uisWgan 0 Array.empty
+  in  
+    Maapnee uisWganWZ bmaapnee.str bmaapnee.len
+
+---
 
 toBasicL lineV =
   L.PoemLine lineV.str lineV.rhythmTotal (Array.map .a lineV.units)
@@ -119,11 +168,12 @@ encodeMaapneeUnits mu =
     [ ("txt", if (mu.u /= 0) then E.string (String.fromInt mu.u) else E.string " ")
     , ("systemRhythmAmt", E.int mu.u)
     , ("rhythmAmt", E.int mu.u)
+    , ("rhythmPatternValue", E.float (if (mu.u == 0) then (toFloat -1) else (toFloat mu.u)))
     , ("isHalfLetter", E.bool False)
     , ("belongsToGan", E.string mu.g)
     ]  
 
 encodeMaapnee m =
   E.object 
-    [("rhythmAmtCumulative",E.int m.base.len)
-    , ("subUnits", E.array encodeMaapneeUnits (Array.map2 combinePatternGan m.base.units m.gan))]
+    [("rhythmAmtCumulative",E.int m.len)
+    , ("subUnits", E.array encodeMaapneeUnits m.units)]
