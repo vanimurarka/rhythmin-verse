@@ -69,6 +69,27 @@ maatrikAdjustMaatraa poemData li ci =
   in 
     MaatrikPoem {maxLineLen = newMaxLineLen, lines = newLines, maapnee = poemData.maapnee}
 
+-- == VARNIK == --
+
+emptyVarnik = VarnikPoem {maxLineLen = 0, lines = Array.empty, maapnee = P.emptyMaapnee}
+
+varnikProcessPoem pom oldPom maapnee =
+  let
+    genericOld = genericGetData oldPom
+    basic = genericGetData (processPoem pom genericOld.lines)
+    processedMaapnee = VL.mProcess (P.process maapnee)
+    vaarnikLines = Array.map VL.lineProcess (Array.map VL.fromBasicL basic.lines)
+  in
+    VarnikPoem {
+      maxLineLen = 
+        if (processedMaapnee.len > basic.maxLineLen) then 
+          processedMaapnee.len 
+        else 
+          basic.maxLineLen, 
+      lines = vaarnikLines, 
+      maapnee = processedMaapnee
+    }
+
 -- == GHAZAL == --
 
 ghazalGetData p =
@@ -162,19 +183,6 @@ fvSetBase pom base =
   in 
     FreeVerse  {data | composite = compositeWRemainder, baseCount = base}
 
--- == VARNIK == --
-
-emptyVarnik = VarnikPoem {maxLineLen = 0, lines = Array.empty, maapnee = P.emptyMaapnee}
-
-varnikProcessPoem pom oldPom maapnee =
-  let
-    genericOld = genericGetData oldPom
-    basic = genericGetData (processPoem pom genericOld.lines)
-    processedMaapnee = VL.pProcess (P.process maapnee)
-  in
-    VarnikPoem {
-      maxLineLen = if (processedMaapnee.len > basic.maxLineLen) then processedMaapnee.len else basic.maxLineLen, lines = Array.map VL.fromBasicL basic.lines, maapnee = processedMaapnee
-    }
 
 -- == MASTER == --
 

@@ -3369,7 +3369,7 @@ var $author$project$RVHVarnikLine$encodeAkshar = function (a) {
 				$elm$json$Json$Encode$bool(
 					_Utils_eq(a.a.aksharType, $author$project$Akshar$Half))),
 				_Utils_Tuple2(
-				'gan',
+				'belongsToGan',
 				$elm$json$Json$Encode$string(a.gan))
 			]));
 };
@@ -5428,12 +5428,12 @@ var $author$project$RVHVarnikLine$PoemLine = F3(
 	function (str, rhythmTotal, units) {
 		return {rhythmTotal: rhythmTotal, str: str, units: units};
 	});
-var $author$project$RVHVarnikLine$Akshar = F2(
-	function (a, gan) {
-		return {a: a, gan: gan};
+var $author$project$RVHVarnikLine$Akshar = F3(
+	function (a, gan, idx) {
+		return {a: a, gan: gan, idx: idx};
 	});
 var $author$project$RVHVarnikLine$aksharFrmBA = function (a) {
-	return A2($author$project$RVHVarnikLine$Akshar, a, 'y');
+	return A3($author$project$RVHVarnikLine$Akshar, a, '', 0);
 };
 var $author$project$RVHVarnikLine$fromBasicL = function (lineP) {
 	return A3(
@@ -5442,10 +5442,6 @@ var $author$project$RVHVarnikLine$fromBasicL = function (lineP) {
 		lineP.rhythmTotal,
 		A2($elm$core$Array$map, $author$project$RVHVarnikLine$aksharFrmBA, lineP.units));
 };
-var $author$project$RVHVarnikLine$Maapnee = F3(
-	function (units, str, len) {
-		return {len: len, str: str, units: units};
-	});
 var $elm$core$Array$filter = F2(
 	function (isGood, array) {
 		return $elm$core$Array$fromList(
@@ -5458,6 +5454,12 @@ var $elm$core$Array$filter = F2(
 				_List_Nil,
 				array));
 	});
+var $author$project$RVHVarnikLine$laFilterZero = function (el) {
+	return !(!el.a.userRhythm);
+};
+var $author$project$RVHVarnikLine$arStr = function (a) {
+	return $elm$core$String$fromInt(a.a.userRhythm);
+};
 var $author$project$RVHVarnikLine$ganSigToGan = function (sig) {
 	switch (sig) {
 		case '122':
@@ -5484,36 +5486,28 @@ var $author$project$RVHVarnikLine$ganSigToGan = function (sig) {
 			return '';
 	}
 };
-var $author$project$RVHVarnikLine$ganSetToGanName = function (ganset) {
+var $author$project$RVHVarnikLine$laGanSetToGanName = function (ganset) {
 	var sig = A3(
 		$elm$core$Array$foldr,
 		$elm$core$Basics$append,
 		'',
-		A2(
-			$elm$core$Array$map,
-			function ($) {
-				return $.u;
-			},
-			ganset));
+		A2($elm$core$Array$map, $author$project$RVHVarnikLine$arStr, ganset));
 	return $author$project$RVHVarnikLine$ganSigToGan(sig);
 };
-var $author$project$RVHVarnikLine$UI = F3(
-	function (u, i, g) {
-		return {g: g, i: i, u: u};
-	});
-var $author$project$RVHVarnikLine$setGanameToGanset = F4(
+var $author$project$RVHVarnikLine$emptyAkshar = $author$project$RVHVarnikLine$aksharFrmBA($author$project$Akshar$emptyAkshar);
+var $author$project$RVHVarnikLine$laSetGanameToGanset = F4(
 	function (gs, gn, i, ns) {
-		setGanameToGanset:
+		laSetGanameToGanset:
 		while (true) {
-			var ui = A2(
-				$elm$core$Maybe$withDefault,
-				A3($author$project$RVHVarnikLine$UI, '0', -1, ''),
-				A2($elm$core$Array$get, i, gs));
-			var newUI = _Utils_update(
-				ui,
-				{g: gn});
-			var ns1 = A2($elm$core$Array$push, newUI, ns);
 			var len = $elm$core$Array$length(gs);
+			var a = A2(
+				$elm$core$Maybe$withDefault,
+				$author$project$RVHVarnikLine$emptyAkshar,
+				A2($elm$core$Array$get, i, gs));
+			var newAkshar = _Utils_update(
+				a,
+				{gan: gn});
+			var ns1 = A2($elm$core$Array$push, newAkshar, ns);
 			if (_Utils_cmp(i, len) > -1) {
 				return ns;
 			} else {
@@ -5525,13 +5519,39 @@ var $author$project$RVHVarnikLine$setGanameToGanset = F4(
 				gn = $temp$gn;
 				i = $temp$i;
 				ns = $temp$ns;
-				continue setGanameToGanset;
+				continue laSetGanameToGanset;
 			}
 		}
 	});
-var $author$project$RVHVarnikLine$ganSetWGaname = F2(
+var $author$project$RVHVarnikLine$laGanSetWGaname = F2(
 	function (gs, gn) {
-		return A4($author$project$RVHVarnikLine$setGanameToGanset, gs, gn, 0, $elm$core$Array$empty);
+		return A4($author$project$RVHVarnikLine$laSetGanameToGanset, gs, gn, 0, $elm$core$Array$empty);
+	});
+var $author$project$RVHVarnikLine$laWithIdx = F3(
+	function (lus, i, lus1) {
+		laWithIdx:
+		while (true) {
+			var u = A2(
+				$elm$core$Maybe$withDefault,
+				$author$project$RVHVarnikLine$emptyAkshar,
+				A2($elm$core$Array$get, i, lus));
+			if (_Utils_eq(u, $author$project$RVHVarnikLine$emptyAkshar)) {
+				return lus1;
+			} else {
+				var $temp$lus = lus,
+					$temp$i = i + 1,
+					$temp$lus1 = A2(
+					$elm$core$Array$push,
+					_Utils_update(
+						u,
+						{idx: i}),
+					lus1);
+				lus = $temp$lus;
+				i = $temp$i;
+				lus1 = $temp$lus1;
+				continue laWithIdx;
+			}
+		}
 	});
 var $elm_community$array_extra$Array$Extra$sliceFrom = function (lengthDropped) {
 	return function (array) {
@@ -5558,9 +5578,9 @@ var $elm_community$array_extra$Array$Extra$splitAt = function (index) {
 			A2($elm_community$array_extra$Array$Extra$sliceFrom, index, array)) : _Utils_Tuple2($elm$core$Array$empty, array);
 	};
 };
-var $author$project$RVHVarnikLine$ganSets = F2(
+var $author$project$RVHVarnikLine$toGanSets = F2(
 	function (a, na) {
-		ganSets:
+		toGanSets:
 		while (true) {
 			var na3a3 = A2($elm_community$array_extra$Array$Extra$splitAt, 3, a);
 			var na3 = na3a3.a;
@@ -5577,60 +5597,99 @@ var $author$project$RVHVarnikLine$ganSets = F2(
 						$temp$na = A2($elm$core$Array$push, na3, na);
 					a = $temp$a;
 					na = $temp$na;
-					continue ganSets;
+					continue toGanSets;
 				} else {
 					var $temp$a = a1,
 						$temp$na = A2($elm$core$Array$push, na1, na);
 					a = $temp$a;
 					na = $temp$na;
-					continue ganSets;
+					continue toGanSets;
 				}
 			}
 		}
 	});
-var $author$project$RVHVarnikLine$pRUI = function (el) {
-	return el.u !== '0';
+var $author$project$RVHVarnikLine$lineProcess = function (l) {
+	var lWOZero = A2(
+		$elm$core$Array$filter,
+		$author$project$RVHVarnikLine$laFilterZero,
+		A3($author$project$RVHVarnikLine$laWithIdx, l.units, 0, $elm$core$Array$empty));
+	var lGanSets = A2($author$project$RVHVarnikLine$toGanSets, lWOZero, $elm$core$Array$empty);
+	var l1 = _Utils_Tuple0;
+	var gans = A2($elm$core$Array$map, $author$project$RVHVarnikLine$laGanSetToGanName, lGanSets);
+	var lGanSetsWGan = A3($elm_community$array_extra$Array$Extra$map2, $author$project$RVHVarnikLine$laGanSetWGaname, lGanSets, gans);
+	var lWOZero1 = A3($elm$core$Array$foldr, $elm$core$Array$append, $elm$core$Array$empty, lGanSetsWGan);
+	return _Utils_update(
+		l,
+		{units: lWOZero1});
 };
-var $author$project$RVHVarnikLine$pUI = F3(
-	function (i, a, a1) {
-		pUI:
+var $author$project$RVHVarnikLine$Maapnee = F3(
+	function (units, str, len) {
+		return {len: len, str: str, units: units};
+	});
+var $author$project$RVHVarnikLine$MUwIdx = F3(
+	function (u, i, g) {
+		return {g: g, i: i, u: u};
+	});
+var $author$project$RVHVarnikLine$setGanameToGanset = F4(
+	function (gs, gn, i, ns) {
+		setGanameToGanset:
 		while (true) {
-			var u = A2(
+			var ui = A2(
 				$elm$core$Maybe$withDefault,
-				-100,
-				A2($elm$core$Array$get, i, a));
-			if (_Utils_eq(u, -100)) {
-				return a1;
+				A3($author$project$RVHVarnikLine$MUwIdx, '0', -1, ''),
+				A2($elm$core$Array$get, i, gs));
+			var newMUwIdx = _Utils_update(
+				ui,
+				{g: gn});
+			var ns1 = A2($elm$core$Array$push, newMUwIdx, ns);
+			var len = $elm$core$Array$length(gs);
+			if (_Utils_cmp(i, len) > -1) {
+				return ns;
 			} else {
-				var $temp$i = i + 1,
-					$temp$a = a,
-					$temp$a1 = A2(
-					$elm$core$Array$push,
-					A3(
-						$author$project$RVHVarnikLine$UI,
-						$elm$core$String$fromInt(u),
-						i,
-						''),
-					a1);
+				var $temp$gs = gs,
+					$temp$gn = gn,
+					$temp$i = i + 1,
+					$temp$ns = ns1;
+				gs = $temp$gs;
+				gn = $temp$gn;
 				i = $temp$i;
-				a = $temp$a;
-				a1 = $temp$a1;
-				continue pUI;
+				ns = $temp$ns;
+				continue setGanameToGanset;
 			}
 		}
 	});
+var $author$project$RVHVarnikLine$ganSetWGaname = F2(
+	function (gs, gn) {
+		return A4($author$project$RVHVarnikLine$setGanameToGanset, gs, gn, 0, $elm$core$Array$empty);
+	});
+var $author$project$RVHVarnikLine$mGanSetToGanName = function (ganset) {
+	var sig = A3(
+		$elm$core$Array$foldr,
+		$elm$core$Basics$append,
+		'',
+		A2(
+			$elm$core$Array$map,
+			function ($) {
+				return $.u;
+			},
+			ganset));
+	return $author$project$RVHVarnikLine$ganSigToGan(sig);
+};
+var $author$project$RVHVarnikLine$mUFilterZero = function (el) {
+	return el.u !== '0';
+};
 var $elm$core$String$toInt = _String_toInt;
-var $author$project$RVHVarnikLine$padUIAwithZero = F3(
+var $author$project$RVHVarnikLine$mUReInsertZero = F3(
 	function (uia, i, uia1) {
-		padUIAwithZero:
+		mUReInsertZero:
 		while (true) {
 			var ui2 = A2(
 				$elm$core$Maybe$withDefault,
-				A3($author$project$RVHVarnikLine$UI, '0', -1, ''),
+				A3($author$project$RVHVarnikLine$MUwIdx, '0', -1, ''),
 				A2($elm$core$Array$get, i + 1, uia));
 			var ui1 = A2(
 				$elm$core$Maybe$withDefault,
-				A3($author$project$RVHVarnikLine$UI, '0', -1, ''),
+				A3($author$project$RVHVarnikLine$MUwIdx, '0', -1, ''),
 				A2($elm$core$Array$get, i, uia));
 			var u1Int = A2(
 				$elm$core$Maybe$withDefault,
@@ -5652,7 +5711,7 @@ var $author$project$RVHVarnikLine$padUIAwithZero = F3(
 						uia = $temp$uia;
 						i = $temp$i;
 						uia1 = $temp$uia1;
-						continue padUIAwithZero;
+						continue mUReInsertZero;
 					} else {
 						var $temp$uia = uia,
 							$temp$i = i + 1,
@@ -5663,34 +5722,66 @@ var $author$project$RVHVarnikLine$padUIAwithZero = F3(
 						uia = $temp$uia;
 						i = $temp$i;
 						uia1 = $temp$uia1;
-						continue padUIAwithZero;
+						continue mUReInsertZero;
 					}
 				}
 			}
 		}
 	});
-var $author$project$RVHVarnikLine$pProcess = function (bmaapnee) {
-	var prui = A2(
+var $author$project$RVHVarnikLine$mUtoUwIx = F3(
+	function (a, i, a1) {
+		mUtoUwIx:
+		while (true) {
+			var u = A2(
+				$elm$core$Maybe$withDefault,
+				-100,
+				A2($elm$core$Array$get, i, a));
+			if (_Utils_eq(u, -100)) {
+				return a1;
+			} else {
+				var $temp$a = a,
+					$temp$i = i + 1,
+					$temp$a1 = A2(
+					$elm$core$Array$push,
+					A3(
+						$author$project$RVHVarnikLine$MUwIdx,
+						$elm$core$String$fromInt(u),
+						i,
+						''),
+					a1);
+				a = $temp$a;
+				i = $temp$i;
+				a1 = $temp$a1;
+				continue mUtoUwIx;
+			}
+		}
+	});
+var $author$project$RVHVarnikLine$mProcess = function (bmaapnee) {
+	var muWOZero = A2(
 		$elm$core$Array$filter,
-		$author$project$RVHVarnikLine$pRUI,
-		A3($author$project$RVHVarnikLine$pUI, 0, bmaapnee.units, $elm$core$Array$empty));
-	var gansets = A2($author$project$RVHVarnikLine$ganSets, prui, $elm$core$Array$empty);
-	var gans = A2($elm$core$Array$map, $author$project$RVHVarnikLine$ganSetToGanName, gansets);
+		$author$project$RVHVarnikLine$mUFilterZero,
+		A3($author$project$RVHVarnikLine$mUtoUwIx, bmaapnee.units, 0, $elm$core$Array$empty));
+	var gansets = A2($author$project$RVHVarnikLine$toGanSets, muWOZero, $elm$core$Array$empty);
+	var gans = A2($elm$core$Array$map, $author$project$RVHVarnikLine$mGanSetToGanName, gansets);
 	var gansetsWgan = A3($elm_community$array_extra$Array$Extra$map2, $author$project$RVHVarnikLine$ganSetWGaname, gansets, gans);
 	var uisWgan = A3($elm$core$Array$foldr, $elm$core$Array$append, $elm$core$Array$empty, gansetsWgan);
-	var uisWganWZ = A3($author$project$RVHVarnikLine$padUIAwithZero, uisWgan, 0, $elm$core$Array$empty);
+	var uisWganWZ = A3($author$project$RVHVarnikLine$mUReInsertZero, uisWgan, 0, $elm$core$Array$empty);
 	return A3($author$project$RVHVarnikLine$Maapnee, uisWganWZ, bmaapnee.str, bmaapnee.len);
 };
 var $author$project$RVHCore$varnikProcessPoem = F3(
 	function (pom, oldPom, maapnee) {
-		var processedMaapnee = $author$project$RVHVarnikLine$pProcess(
+		var processedMaapnee = $author$project$RVHVarnikLine$mProcess(
 			$author$project$RVHPattern$process(maapnee));
 		var genericOld = $author$project$RVHCore$genericGetData(oldPom);
 		var basic = $author$project$RVHCore$genericGetData(
 			A2($author$project$RVHCore$processPoem, pom, genericOld.lines));
+		var vaarnikLines = A2(
+			$elm$core$Array$map,
+			$author$project$RVHVarnikLine$lineProcess,
+			A2($elm$core$Array$map, $author$project$RVHVarnikLine$fromBasicL, basic.lines));
 		return $author$project$RVHCore$VarnikPoem(
 			{
-				lines: A2($elm$core$Array$map, $author$project$RVHVarnikLine$fromBasicL, basic.lines),
+				lines: vaarnikLines,
 				maapnee: processedMaapnee,
 				maxLineLen: (_Utils_cmp(processedMaapnee.len, basic.maxLineLen) > 0) ? processedMaapnee.len : basic.maxLineLen
 			});
