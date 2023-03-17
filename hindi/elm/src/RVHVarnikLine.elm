@@ -15,7 +15,7 @@ type alias Akshar =
 
 -- varnik akshar from basic akshar
 aksharFrmBA a =
-  Akshar a "" 0
+  Akshar a "" -1
 
 emptyAkshar = aksharFrmBA A.emptyAkshar
 
@@ -24,6 +24,8 @@ type alias PoemLine =
   , rhythmTotal : Int
   , units : Array.Array Akshar
   }
+
+emptyLine = PoemLine "" 0 Array.empty
 
 type alias Maapnee =
   { units : Array.Array {u : Int, i : Int, g : String}
@@ -151,7 +153,7 @@ laWithIdx lus i lus1 =
   let 
     u = Maybe.withDefault emptyAkshar (Array.get i lus)
   in 
-    if (u == emptyAkshar) then
+    if i >= (Array.length lus) then
       lus1
     else
       laWithIdx lus (i+1) (Array.push {u | idx = i} lus1)
@@ -184,16 +186,74 @@ laSetGanameToGanset gs gn i ns =
 laGanSetWGaname gs gn =
   laSetGanameToGanset gs gn 0 Array.empty
 
+-- insert emptyAkshar where two adjacent akshars do not have adjacent idx
+laInsertEmpty i la1 la =
+  let
+    len = Array.length la
+    a1 = Maybe.withDefault emptyAkshar (Array.get i la)
+    a2 = Maybe.withDefault emptyAkshar (Array.get (i+1) la)
+    an = {emptyAkshar | idx = (i+1)}
+    la11 = Array.push a1 la1 -- a1 added to la1
+  in 
+    if (i >= len) then
+      la1
+    else if (i == (len - 1)) then -- last i
+      la11
+    else if (a1.idx == (a2.idx - 1)) then -- adjacent a have adjacent idx
+      laInsertEmpty (i+1) la11 la 
+    else
+      laInsertEmpty (i+1) (Array.push an la11) la -- emptyAkshar added to la11
+
+laPadLeftEmpty la =
+  let
+    a0 = Maybe.withDefault emptyAkshar (Array.get 0 la)
+    a01 = {emptyAkshar | idx = 0}
+  in
+    if (Array.length la) > 0 then
+      if (a0.idx == 0) then
+        la
+      else
+        Array.append (Array.fromList [a01]) la
+    else
+      la
+
+laPadRightEmpty lasti la =
+  let
+    alast = Maybe.withDefault emptyAkshar (Array.get ((Array.length la)-1) la)
+  in 
+    if (Array.length la) > 0 then
+      if (alast.idx == lasti) then
+        la
+      else
+        Array.push {emptyAkshar | idx = lasti} la
+    else
+      la
+
+aReInsert0RAs la1 i1 lan i2 la2 =
+  let 
+    a1 = Maybe.withDefault emptyAkshar (Array.get i1 la1)
+    a2 = Maybe.withDefault emptyAkshar (Array.get i2 la2)
+  in 
+    if (i1 >= (Array.length la1)) then
+      lan
+    else if (a1.idx == a2.idx) then
+      aReInsert0RAs la1 (i1+1) (Array.push a2 lan) (i2+1) la2
+    else
+      aReInsert0RAs la1 (i1+1) (Array.push a1 lan) (i2) la2
+
 lineProcess l =
   let
-    lWOZero = (Array.filter laFilterZero (laWithIdx l.units 0 Array.empty))
+    laWIdx = Debug.log "lawi " (laWithIdx l.units 0 Array.empty)
+    len = Debug.log "len " (Array.length laWIdx)
+    lWOZero = (Array.filter laFilterZero laWIdx)
     lGanSets = toGanSets lWOZero Array.empty
     gans = Array.map laGanSetToGanName lGanSets
     lGanSetsWGan = Array.map2 laGanSetWGaname lGanSets gans
-    lWOZero1 = Array.foldr (Array.append) Array.empty lGanSetsWGan
-    l1 = ()
+    l1 = Debug.log "l1 " ((Array.foldr (Array.append) Array.empty lGanSetsWGan)
+      |> aReInsert0RAs laWIdx 0 Array.empty 0)
+    len1 = Debug.log "len1 " (Array.length l1)
   in
-    {l | units = lWOZero1} 
+    {l | units = l1} 
 
 -- JSON ENCODE/DECODE
 
@@ -220,7 +280,9 @@ encodeMaapneeUnits mu =
     [ ("txt", if (mu.u /= 0) then E.string (String.fromInt mu.u) else E.string " ")
     , ("systemRhythmAmt", E.int mu.u)
     , ("rhythmAmt", E.int mu.u)
-    , ("rhythmPatternValue", E.float (if (mu.u == 0) then (toFloat -1) else (toFloat mu.u)))
+    , ("rhythmPatternValue", E.float 
+        (if (mu.u == 0) then (toFloat -1) else (toFloat mu.u))
+      )
     , ("isHalfLetter", E.bool False)
     , ("belongsToGan", E.string mu.g)
     ]  
