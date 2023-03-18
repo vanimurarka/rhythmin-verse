@@ -10,14 +10,33 @@ import RVHPattern as P
 type alias Akshar =
   { a : A.Akshar
   , gan : String
-  , idx : Int
+  --, idx : Int
   }
 
 -- varnik akshar from basic akshar
 aksharFrmBA a =
-  Akshar a "" -1
+  Akshar a ""
 
 emptyAkshar = aksharFrmBA A.emptyAkshar
+
+type alias Varna =
+  { a : Array.Array A.Akshar
+  , rhythm : Int
+  , gan : String
+  , idx : Int
+  }
+
+-- varnik akshar from basic akshar
+varnaFrmAkshar a =
+  Varna (Array.fromList [a]) a.userRhythm "" -1
+
+emptyVarna = varnaFrmAkshar A.emptyAkshar
+
+aksharsFromVarna v =
+  let 
+    g = v.gan 
+  in
+    Array.map (\a -> Akshar a g) v.a
 
 type alias PoemLine = 
   { str : String
@@ -143,15 +162,61 @@ mProcess bmaapnee =
 --- LINE ---
 
 toBasicL lineV =
-  L.PoemLine lineV.str lineV.rhythmTotal (Array.map .a lineV.units)
+  let 
+    u = Debug.log "u " lineV.units
+    u1 = Debug.log "u1 " (Array.foldl (Array.append) Array.empty lineV.units)
+  in
+    L.PoemLine lineV.str lineV.rhythmTotal (Array.map .a u1)
 
 fromBasicL lineP =
-  PoemLine lineP.str lineP.rhythmTotal (Array.map aksharFrmBA lineP.units)
+  let 
+    vUnits = Array.map varnaFrmAkshar lineP.units
+      |> mergeHalfIntoPriorLaghu 0 Array.empty
+      |> processLineUnits 
+    aUnits = Debug.log "aUnits " (unravelVarnasToAkshars vUnits)
+  in
+    PoemLine lineP.str lineP.rhythmTotal aUnits
 
--- lus: line units, i.e akshars
+unravelVarnasToAkshars vUnits =
+  let 
+    akshars2D = Array.map aksharsFromVarna vUnits
+  in 
+    Array.foldr (Array.append) Array.empty akshars2D
+
+mergeHalfIntoPriorLaghu i van va =
+  let
+    v1 = Maybe.withDefault emptyVarna (Array.get i va)
+    a1 = Maybe.withDefault A.emptyAkshar (Array.get 0 v1.a)
+    v2 = Maybe.withDefault emptyVarna (Array.get (i+1) va)
+    a2 = Maybe.withDefault A.emptyAkshar (Array.get 0 v2.a)
+    van1 = Array.push (Varna (Array.fromList [a1,a2]) 2 "" -1) van
+  in 
+    if i < (Array.length va) then
+      if (a1.userRhythm == 1) && (a2.userRhythm == 1) && (a2.aksharType == A.Half) then
+        mergeHalfIntoPriorLaghu (i+2) van1 va
+      else
+        mergeHalfIntoPriorLaghu (i+1) (Array.push (varnaFrmAkshar a1) van) va
+    else
+      van
+
+processLineUnits units =
+  let
+    laWIdx = Debug.log "lawi " (laWithIdx units 0 Array.empty)
+    len = Debug.log "len " (Array.length laWIdx)
+    lWOZero = (Array.filter laFilterZero laWIdx)
+    lGanSets = toGanSets lWOZero Array.empty
+    gans = Array.map laGanSetToGanName lGanSets
+    lGanSetsWGan = Array.map2 laGanSetWGaname lGanSets gans
+    l1 = Debug.log "l1 " ((Array.foldr (Array.append) Array.empty lGanSetsWGan)
+      |> aReInsert0RAs laWIdx 0 Array.empty 0)
+    len1 = Debug.log "len1 " (Array.length l1)
+  in
+    l1
+
+-- lus: line units, i.e varnas
 laWithIdx lus i lus1 =
   let 
-    u = Maybe.withDefault emptyAkshar (Array.get i lus)
+    u = Maybe.withDefault emptyVarna (Array.get i lus)
   in 
     if i >= (Array.length lus) then
       lus1
@@ -159,10 +224,10 @@ laWithIdx lus i lus1 =
       laWithIdx lus (i+1) (Array.push {u | idx = i} lus1)
 
 laFilterZero el =
-  (el.a.userRhythm /= 0)
+  (el.rhythm /= 0)
 
--- userRhythm of akshar as String
-arStr a = String.fromInt a.a.userRhythm
+-- rhythm of varna as String
+arStr a = String.fromInt a.rhythm
 
 laGanSetToGanName ganset =
   let 
@@ -174,9 +239,9 @@ laGanSetToGanName ganset =
 laSetGanameToGanset gs gn i ns =
   let
     len = Array.length gs
-    a = Maybe.withDefault emptyAkshar (Array.get i gs)
-    newAkshar = {a | gan = gn}
-    ns1 = Array.push newAkshar ns
+    a = Maybe.withDefault emptyVarna (Array.get i gs)
+    newVarna = {a | gan = gn}
+    ns1 = Array.push newVarna ns
   in
     if (i >= len) then
       ns
@@ -187,52 +252,52 @@ laGanSetWGaname gs gn =
   laSetGanameToGanset gs gn 0 Array.empty
 
 -- insert emptyAkshar where two adjacent akshars do not have adjacent idx
-laInsertEmpty i la1 la =
-  let
-    len = Array.length la
-    a1 = Maybe.withDefault emptyAkshar (Array.get i la)
-    a2 = Maybe.withDefault emptyAkshar (Array.get (i+1) la)
-    an = {emptyAkshar | idx = (i+1)}
-    la11 = Array.push a1 la1 -- a1 added to la1
-  in 
-    if (i >= len) then
-      la1
-    else if (i == (len - 1)) then -- last i
-      la11
-    else if (a1.idx == (a2.idx - 1)) then -- adjacent a have adjacent idx
-      laInsertEmpty (i+1) la11 la 
-    else
-      laInsertEmpty (i+1) (Array.push an la11) la -- emptyAkshar added to la11
+--laInsertEmpty i la1 la =
+--  let
+--    len = Array.length la
+--    a1 = Maybe.withDefault emptyAkshar (Array.get i la)
+--    a2 = Maybe.withDefault emptyAkshar (Array.get (i+1) la)
+--    an = {emptyAkshar | idx = (i+1)}
+--    la11 = Array.push a1 la1 -- a1 added to la1
+--  in 
+--    if (i >= len) then
+--      la1
+--    else if (i == (len - 1)) then -- last i
+--      la11
+--    else if (a1.idx == (a2.idx - 1)) then -- adjacent a have adjacent idx
+--      laInsertEmpty (i+1) la11 la 
+--    else
+--      laInsertEmpty (i+1) (Array.push an la11) la -- emptyAkshar added to la11
 
-laPadLeftEmpty la =
-  let
-    a0 = Maybe.withDefault emptyAkshar (Array.get 0 la)
-    a01 = {emptyAkshar | idx = 0}
-  in
-    if (Array.length la) > 0 then
-      if (a0.idx == 0) then
-        la
-      else
-        Array.append (Array.fromList [a01]) la
-    else
-      la
+--laPadLeftEmpty la =
+--  let
+--    a0 = Maybe.withDefault emptyAkshar (Array.get 0 la)
+--    a01 = {emptyAkshar | idx = 0}
+--  in
+--    if (Array.length la) > 0 then
+--      if (a0.idx == 0) then
+--        la
+--      else
+--        Array.append (Array.fromList [a01]) la
+--    else
+--      la
 
-laPadRightEmpty lasti la =
-  let
-    alast = Maybe.withDefault emptyAkshar (Array.get ((Array.length la)-1) la)
-  in 
-    if (Array.length la) > 0 then
-      if (alast.idx == lasti) then
-        la
-      else
-        Array.push {emptyAkshar | idx = lasti} la
-    else
-      la
+--laPadRightEmpty lasti la =
+--  let
+--    alast = Maybe.withDefault emptyAkshar (Array.get ((Array.length la)-1) la)
+--  in 
+--    if (Array.length la) > 0 then
+--      if (alast.idx == lasti) then
+--        la
+--      else
+--        Array.push {emptyAkshar | idx = lasti} la
+--    else
+--      la
 
 aReInsert0RAs la1 i1 lan i2 la2 =
   let 
-    a1 = Maybe.withDefault emptyAkshar (Array.get i1 la1)
-    a2 = Maybe.withDefault emptyAkshar (Array.get i2 la2)
+    a1 = Maybe.withDefault emptyVarna (Array.get i1 la1)
+    a2 = Maybe.withDefault emptyVarna (Array.get i2 la2)
   in 
     if (i1 >= (Array.length la1)) then
       lan
@@ -241,19 +306,7 @@ aReInsert0RAs la1 i1 lan i2 la2 =
     else
       aReInsert0RAs la1 (i1+1) (Array.push a1 lan) (i2) la2
 
-lineProcess l =
-  let
-    laWIdx = Debug.log "lawi " (laWithIdx l.units 0 Array.empty)
-    len = Debug.log "len " (Array.length laWIdx)
-    lWOZero = (Array.filter laFilterZero laWIdx)
-    lGanSets = toGanSets lWOZero Array.empty
-    gans = Array.map laGanSetToGanName lGanSets
-    lGanSetsWGan = Array.map2 laGanSetWGaname lGanSets gans
-    l1 = Debug.log "l1 " ((Array.foldr (Array.append) Array.empty lGanSetsWGan)
-      |> aReInsert0RAs laWIdx 0 Array.empty 0)
-    len1 = Debug.log "len1 " (Array.length l1)
-  in
-    {l | units = l1} 
+
 
 -- JSON ENCODE/DECODE
 
@@ -272,8 +325,8 @@ encodeLine al =
     , ("subUnits", E.array encodeAkshar al.units)
     ]
 
-combinePatternGan mu g =
-  { u = mu, g = g}
+--combinePatternGan mu g =
+--  { u = mu, g = g}
 
 encodeMaapneeUnits mu =
   E.object

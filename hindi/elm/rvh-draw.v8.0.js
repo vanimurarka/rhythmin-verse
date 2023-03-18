@@ -338,16 +338,16 @@ function drawStyleCharBlock(c,colorBy)
 					fillOp = "0.2";
 				}
 	  		// color = "rgb(0,220,255)"; // blue
-	  		if ((c.rhymeLevel > 0) && (fRhymingLines))
-	  		{
-	  			color = rhymeColors[c.rhymeGroup];
-	  			fillOp = "0.4";
-	  			if (color === undefined) // undo color assignment
-	  			{
-	  				color = "white";
-	  				fillOp = "0.2";
-	  			}
-	  		}
+	  		// if ((c.rhymeLevel > 0) && (fRhymingLines))
+	  		// {
+	  		// 	color = rhymeColors[c.rhymeGroup];
+	  		// 	fillOp = "0.4";
+	  		// 	if (color === undefined) // undo color assignment
+	  		// 	{
+	  		// 		color = "white";
+	  		// 		fillOp = "0.2";
+	  		// 	}
+	  		// }
 	  		if ((typeof c.belongsToGan !== 'undefined') && (c.belongsToGan.length > 0))
 	  		{
 	  			switch (c.belongsToGan)
@@ -385,12 +385,12 @@ function drawStyleCharBlock(c,colorBy)
 	  					fillOp = "0.4";
 	  					break;
 	  				case "l":
-	  					color: "rgb(0,220,255)";
+	  					color = "rgb(0,220,255)";
 	  					fillOp = "0.5";
 	  					break;
 	  				case "g":
-	  					color: "rgb(0,255,0)";
-	  					fillOp: "0.5";
+	  					color = "rgb(0,255,0)";
+	  					fillOp = "0.5";
 	  					break;
 	  				default:
 	  					color = "rgb(255,255,255)";
