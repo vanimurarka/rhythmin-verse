@@ -162,20 +162,16 @@ mProcess bmaapnee =
 --- LINE ---
 
 toBasicL lineV =
-  let 
-    u = Debug.log "u " lineV.units
-    u1 = Debug.log "u1 " (Array.foldl (Array.append) Array.empty lineV.units)
-  in
-    L.PoemLine lineV.str lineV.rhythmTotal (Array.map .a u1)
+  L.PoemLine lineV.str lineV.rhythmTotal (Array.map .a lineV.units)
 
 fromBasicL lineP =
   let 
     vUnits = Array.map varnaFrmAkshar lineP.units
       |> mergeHalfIntoPriorLaghu 0 Array.empty
       |> processLineUnits 
-    aUnits = Debug.log "aUnits " (unravelVarnasToAkshars vUnits)
+    avUnits = unravelVarnasToAkshars vUnits
   in
-    PoemLine lineP.str lineP.rhythmTotal aUnits
+    PoemLine lineP.str lineP.rhythmTotal avUnits
 
 unravelVarnasToAkshars vUnits =
   let 
