@@ -3370,7 +3370,10 @@ var $author$project$RVHVarnikLine$encodeAkshar = function (a) {
 					_Utils_eq(a.a.aksharType, $author$project$Akshar$Half))),
 				_Utils_Tuple2(
 				'belongsToGan',
-				$elm$json$Json$Encode$string(a.gan))
+				$elm$json$Json$Encode$string(a.gan)),
+				_Utils_Tuple2(
+				'rhythmPatternValue',
+				$elm$json$Json$Encode$int(a.patternValue))
 			]));
 };
 var $author$project$RVHVarnikLine$encodeLine = function (al) {
@@ -4113,19 +4116,20 @@ var $author$project$RVHVarnikLine$PoemLine = F3(
 		return {rhythmTotal: rhythmTotal, str: str, units: units};
 	});
 var $author$project$RVHVarnikLine$emptyLine = A3($author$project$RVHVarnikLine$PoemLine, '', 0, $elm$core$Array$empty);
-var $author$project$RVHVarnikLine$Varna = F4(
-	function (a, rhythm, gan, idx) {
-		return {a: a, gan: gan, idx: idx, rhythm: rhythm};
+var $author$project$RVHVarnikLine$Varna = F5(
+	function (a, rhythm, gan, idx, patternValue) {
+		return {a: a, gan: gan, idx: idx, patternValue: patternValue, rhythm: rhythm};
 	});
 var $author$project$RVHVarnikLine$varnaFrmAkshar = function (a) {
-	return A4(
+	return A5(
 		$author$project$RVHVarnikLine$Varna,
 		$elm$core$Array$fromList(
 			_List_fromArray(
 				[a])),
 		a.userRhythm,
 		'',
-		-1);
+		-1,
+		0);
 };
 var $author$project$RVHVarnikLine$emptyVarna = $author$project$RVHVarnikLine$varnaFrmAkshar($author$project$Akshar$emptyAkshar);
 var $author$project$RVHVarnikLine$mergeHalfIntoPriorLaghu = F3(
@@ -4150,14 +4154,15 @@ var $author$project$RVHVarnikLine$mergeHalfIntoPriorLaghu = F3(
 				A2($elm$core$Array$get, 0, v1.a));
 			var van1 = A2(
 				$elm$core$Array$push,
-				A4(
+				A5(
 					$author$project$RVHVarnikLine$Varna,
 					$elm$core$Array$fromList(
 						_List_fromArray(
 							[a1, a2])),
 					2,
 					'',
-					-1),
+					-1,
+					0),
 				van);
 			if (_Utils_cmp(
 				i,
@@ -4736,24 +4741,82 @@ var $author$project$RVHVarnikLine$processLineUnits = function (units) {
 		$elm$core$Array$length(l1));
 	return l1;
 };
+var $author$project$RVHVarnikLine$setYati = function (varna) {
+	return _Utils_update(
+		varna,
+		{patternValue: -1});
+};
 var $author$project$RVHVarnikLine$setLineYati = F4(
 	function (vUnits, vi, mUnits, mi) {
-		return ((_Utils_cmp(
-			vi,
-			$elm$core$Array$length(vUnits)) > -1) || (_Utils_cmp(
-			mi,
-			$elm$core$Array$length(mUnits)) > -1)) ? vUnits : vUnits;
+		setLineYati:
+		while (true) {
+			var vu = A2(
+				$elm$core$Maybe$withDefault,
+				$author$project$RVHVarnikLine$emptyVarna,
+				A2($elm$core$Array$get, vi, vUnits));
+			var vun = $author$project$RVHVarnikLine$setYati(vu);
+			var mu = A2(
+				$elm$core$Maybe$withDefault,
+				{g: '', idx: -1, unitVal: -2},
+				A2($elm$core$Array$get, mi, mUnits));
+			if ((_Utils_cmp(
+				vi,
+				$elm$core$Array$length(vUnits)) > -1) || (_Utils_cmp(
+				mi,
+				$elm$core$Array$length(mUnits)) > -1)) {
+				return vUnits;
+			} else {
+				if ((!vu.rhythm) && (!(!mu.unitVal))) {
+					var $temp$vUnits = vUnits,
+						$temp$vi = vi + 1,
+						$temp$mUnits = mUnits,
+						$temp$mi = mi;
+					vUnits = $temp$vUnits;
+					vi = $temp$vi;
+					mUnits = $temp$mUnits;
+					mi = $temp$mi;
+					continue setLineYati;
+				} else {
+					if ((!(!vu.rhythm)) && _Utils_eq(mu.unitVal, vu.rhythm)) {
+						var $temp$vUnits = vUnits,
+							$temp$vi = vi + 1,
+							$temp$mUnits = mUnits,
+							$temp$mi = mi + 1;
+						vUnits = $temp$vUnits;
+						vi = $temp$vi;
+						mUnits = $temp$mUnits;
+						mi = $temp$mi;
+						continue setLineYati;
+					} else {
+						if ((!vu.rhythm) && _Utils_eq(mu.unitVal, vu.rhythm)) {
+							var $temp$vUnits = A3($elm$core$Array$set, vi, vun, vUnits),
+								$temp$vi = vi + 1,
+								$temp$mUnits = mUnits,
+								$temp$mi = mi + 1;
+							vUnits = $temp$vUnits;
+							vi = $temp$vi;
+							mUnits = $temp$mUnits;
+							mi = $temp$mi;
+							continue setLineYati;
+						} else {
+							return vUnits;
+						}
+					}
+				}
+			}
+		}
 	});
-var $author$project$RVHVarnikLine$Akshar = F2(
-	function (a, gan) {
-		return {a: a, gan: gan};
+var $author$project$RVHVarnikLine$Akshar = F3(
+	function (a, gan, patternValue) {
+		return {a: a, gan: gan, patternValue: patternValue};
 	});
 var $author$project$RVHVarnikLine$aksharsFromVarna = function (v) {
+	var yatival = v.patternValue;
 	var g = v.gan;
 	return A2(
 		$elm$core$Array$map,
 		function (a) {
-			return A2($author$project$RVHVarnikLine$Akshar, a, g);
+			return A3($author$project$RVHVarnikLine$Akshar, a, g, yatival);
 		},
 		v.a);
 };

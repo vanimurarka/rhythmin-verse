@@ -10,12 +10,13 @@ import RVHPattern as P
 type alias Akshar =
   { a : A.Akshar
   , gan : String
+  , patternValue : Int -- only to capture yati = -1
   --, idx : Int
   }
 
 -- varnik akshar from basic akshar
 aksharFrmBA a =
-  Akshar a ""
+  Akshar a "" 0
 
 emptyAkshar = aksharFrmBA A.emptyAkshar
 
@@ -24,19 +25,21 @@ type alias Varna =
   , rhythm : Int
   , gan : String
   , idx : Int
+  , patternValue : Int -- only to capture yati = -1
   }
 
 -- varnik akshar from basic akshar
 varnaFrmAkshar a =
-  Varna (Array.fromList [a]) a.userRhythm "" -1
+  Varna (Array.fromList [a]) a.userRhythm "" -1 0
 
 emptyVarna = varnaFrmAkshar A.emptyAkshar
 
 aksharsFromVarna v =
   let 
     g = v.gan 
+    yatival = v.patternValue
   in
-    Array.map (\a -> Akshar a g) v.a
+    Array.map (\a -> Akshar a g yatival) v.a
 
 type alias PoemLine = 
   { str : String
@@ -189,7 +192,7 @@ mergeHalfIntoPriorLaghu i van va =
     a1 = Maybe.withDefault A.emptyAkshar (Array.get 0 v1.a)
     v2 = Maybe.withDefault emptyVarna (Array.get (i+1) va)
     a2 = Maybe.withDefault A.emptyAkshar (Array.get 0 v2.a)
-    van1 = Array.push (Varna (Array.fromList [a1,a2]) 2 "" -1) van
+    van1 = Array.push (Varna (Array.fromList [a1,a2]) 2 "" -1 0) van
   in 
     if i < (Array.length va) then
       if (a1.userRhythm == 1) && (a2.userRhythm == 1) && (a2.aksharType == A.Half) then
@@ -214,13 +217,25 @@ processLineUnits units =
     l1
 
 setLineYati vUnits vi mUnits mi =
-  if (vi >= (Array.length vUnits)) || (mi >= (Array.length mUnits)) then
-    vUnits
-  else 
-    vUnits
+  let 
+    vu = Maybe.withDefault emptyVarna (Array.get vi vUnits)
+    mu = Maybe.withDefault {unitVal = -2, idx = -1, g = ""} (Array.get mi mUnits)
+    vun = setYati vu
+  in 
+    if (vi >= (Array.length vUnits)) || (mi >= (Array.length mUnits)) then -- end of maapnee or varna units, end loop
+      vUnits
+    else if (vu.rhythm == 0) && (mu.unitVal /= 0) then -- just some empty char in line, increase vi
+      setLineYati vUnits (vi+1) mUnits mi
+    else if (vu.rhythm /= 0) && (mu.unitVal == vu.rhythm) then -- varna as per maapnee unit, increase vi and mi
+      setLineYati vUnits (vi+1) mUnits (mi+1)
+    else if (vu.rhythm == 0) && (mu.unitVal == vu.rhythm) then -- yati found! set yati value in akshar
+      setLineYati (Array.set vi vun vUnits) (vi+1) mUnits (mi+1)
+    else -- bad code. dont know when this situation will come, exit loop.
+      vUnits
 
---setYati varna mUnit =
---  if (varna.rhythm == mUnit)
+
+setYati varna =
+  {varna | patternValue = -1}
 
 -- lus: line units, i.e varnas
 laWithIdx lus i lus1 =
@@ -283,6 +298,7 @@ encodeAkshar a =
     , ("rhythmAmt", E.int a.a.userRhythm)
     , ("isHalfLetter", E.bool (a.a.aksharType == A.Half))
     , ("belongsToGan", E.string a.gan)
+    , ("rhythmPatternValue", E.int a.patternValue)
     ]
 
 encodeLine al =
