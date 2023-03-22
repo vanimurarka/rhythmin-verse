@@ -47,7 +47,7 @@ type alias PoemLine =
 emptyLine = PoemLine "" 0 Array.empty
 
 type alias Maapnee =
-  { units : Array.Array {u : Int, i : Int, g : String}
+  { units : Array.Array {unitVal : Int, idx : Int, g : String}
   , str : String
   , len : Int
   }
@@ -126,14 +126,13 @@ setGanameToGanset gs gn i ns =
 ganSetWGaname gs gn =
   setGanameToGanset gs gn 0 Array.empty
  
-mUReInsertZero : Array MUwIdx -> Int -> Array {u:Int,i:Int,g:String} -> Array {u:Int,i:Int,g:String}
 mUReInsertZero uia i uia1 =
   let
     len = Array.length uia
     ui1 = Maybe.withDefault (MUwIdx "0" -1 "") (Array.get i uia)
     ui2 = Maybe.withDefault (MUwIdx "0" -1 "") (Array.get (i+1) uia)
     u1Int = Maybe.withDefault 0 (String.toInt ui1.u)
-    ui1Int = {u = u1Int, i = ui1.i, g = ui1.g}
+    ui1Int = {unitVal = u1Int, idx = ui1.i, g = ui1.g}
     uia11 = Array.push ui1Int uia1
   in
     if (i >= len) then
@@ -143,7 +142,7 @@ mUReInsertZero uia i uia1 =
     else if (ui1.i == (ui2.i - 1)) then
       mUReInsertZero uia (i+1) uia11
     else
-      mUReInsertZero uia (i+1) (Array.push {u=0,i=(i+1),g=""} uia11)
+      mUReInsertZero uia (i+1) (Array.push {unitVal=0,idx=(i+1),g=""} uia11)
     
 
 mProcess : P.Maapnee -> Maapnee
@@ -164,12 +163,17 @@ mProcess bmaapnee =
 toBasicL lineV =
   L.PoemLine lineV.str lineV.rhythmTotal (Array.map .a lineV.units)
 
-fromBasicL lineP =
+fromBasicL lineP maapneeUnits =
   let 
     vUnits = Array.map varnaFrmAkshar lineP.units
       |> mergeHalfIntoPriorLaghu 0 Array.empty
       |> processLineUnits 
-    avUnits = unravelVarnasToAkshars vUnits
+    vUnits1 = 
+      if (Array.length maapneeUnits) > 0 then
+        setLineYati vUnits 0 maapneeUnits 0
+      else 
+        vUnits
+    avUnits = unravelVarnasToAkshars vUnits1
   in
     PoemLine lineP.str lineP.rhythmTotal avUnits
 
@@ -209,6 +213,15 @@ processLineUnits units =
   in
     l1
 
+setLineYati vUnits vi mUnits mi =
+  if (vi >= (Array.length vUnits)) || (mi >= (Array.length mUnits)) then
+    vUnits
+  else 
+    vUnits
+
+--setYati varna mUnit =
+--  if (varna.rhythm == mUnit)
+
 -- lus: line units, i.e varnas
 laWithIdx lus i lus1 =
   let 
@@ -247,49 +260,6 @@ laSetGanameToGanset gs gn i ns =
 laGanSetWGaname gs gn =
   laSetGanameToGanset gs gn 0 Array.empty
 
--- insert emptyAkshar where two adjacent akshars do not have adjacent idx
---laInsertEmpty i la1 la =
---  let
---    len = Array.length la
---    a1 = Maybe.withDefault emptyAkshar (Array.get i la)
---    a2 = Maybe.withDefault emptyAkshar (Array.get (i+1) la)
---    an = {emptyAkshar | idx = (i+1)}
---    la11 = Array.push a1 la1 -- a1 added to la1
---  in 
---    if (i >= len) then
---      la1
---    else if (i == (len - 1)) then -- last i
---      la11
---    else if (a1.idx == (a2.idx - 1)) then -- adjacent a have adjacent idx
---      laInsertEmpty (i+1) la11 la 
---    else
---      laInsertEmpty (i+1) (Array.push an la11) la -- emptyAkshar added to la11
-
---laPadLeftEmpty la =
---  let
---    a0 = Maybe.withDefault emptyAkshar (Array.get 0 la)
---    a01 = {emptyAkshar | idx = 0}
---  in
---    if (Array.length la) > 0 then
---      if (a0.idx == 0) then
---        la
---      else
---        Array.append (Array.fromList [a01]) la
---    else
---      la
-
---laPadRightEmpty lasti la =
---  let
---    alast = Maybe.withDefault emptyAkshar (Array.get ((Array.length la)-1) la)
---  in 
---    if (Array.length la) > 0 then
---      if (alast.idx == lasti) then
---        la
---      else
---        Array.push {emptyAkshar | idx = lasti} la
---    else
---      la
-
 aReInsert0RAs la1 i1 lan i2 la2 =
   let 
     a1 = Maybe.withDefault emptyVarna (Array.get i1 la1)
@@ -326,11 +296,11 @@ encodeLine al =
 
 encodeMaapneeUnits mu =
   E.object
-    [ ("txt", if (mu.u /= 0) then E.string (String.fromInt mu.u) else E.string " ")
-    , ("systemRhythmAmt", E.int mu.u)
-    , ("rhythmAmt", E.int mu.u)
+    [ ("txt", if (mu.unitVal /= 0) then E.string (String.fromInt mu.unitVal) else E.string " ")
+    , ("systemRhythmAmt", E.int mu.unitVal)
+    , ("rhythmAmt", E.int mu.unitVal)
     , ("rhythmPatternValue", E.float 
-        (if (mu.u == 0) then (toFloat -1) else (toFloat mu.u))
+        (if (mu.unitVal == 0) then (toFloat -1) else (toFloat mu.unitVal))
       )
     , ("isHalfLetter", E.bool False)
     , ("belongsToGan", E.string mu.g)

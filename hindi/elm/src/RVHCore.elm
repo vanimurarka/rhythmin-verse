@@ -79,7 +79,8 @@ varnikProcessPoem pom oldPom maapnee =
     genericOld = genericGetData oldPom
     basic = genericGetData (processPoem pom genericOld.lines)
     processedMaapnee = VL.mProcess (P.process maapnee)
-    vaarnikLines = Debug.log "vl " (Array.map VL.fromBasicL basic.lines)
+    repeatedMaapnees = Array.repeat (Array.length basic.lines) processedMaapnee.units
+    vaarnikLines = Debug.log "vl " (Array.map2 VL.fromBasicL basic.lines repeatedMaapnees)
   in
     VarnikPoem {
       maxLineLen = 
@@ -95,7 +96,7 @@ vaarnikAdjustMaatraa poemData li ci =
   let 
     oldLine = Maybe.withDefault VL.emptyLine (Array.get li poemData.lines)
     newBasicLine = L.adjustMaatraa (VL.toBasicL oldLine) ci
-    newLine = VL.fromBasicL newBasicLine
+    newLine = VL.fromBasicL newBasicLine poemData.maapnee.units
     newLines = Array.set li newLine poemData.lines
     newMaxLineLen = if (newLine.rhythmTotal > poemData.maxLineLen) then
         newLine.rhythmTotal

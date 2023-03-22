@@ -3391,18 +3391,18 @@ var $author$project$RVHVarnikLine$encodeMaapneeUnits = function (mu) {
 			[
 				_Utils_Tuple2(
 				'txt',
-				(!(!mu.u)) ? $elm$json$Json$Encode$string(
-					$elm$core$String$fromInt(mu.u)) : $elm$json$Json$Encode$string(' ')),
+				(!(!mu.unitVal)) ? $elm$json$Json$Encode$string(
+					$elm$core$String$fromInt(mu.unitVal)) : $elm$json$Json$Encode$string(' ')),
 				_Utils_Tuple2(
 				'systemRhythmAmt',
-				$elm$json$Json$Encode$int(mu.u)),
+				$elm$json$Json$Encode$int(mu.unitVal)),
 				_Utils_Tuple2(
 				'rhythmAmt',
-				$elm$json$Json$Encode$int(mu.u)),
+				$elm$json$Json$Encode$int(mu.unitVal)),
 				_Utils_Tuple2(
 				'rhythmPatternValue',
 				$elm$json$Json$Encode$float(
-					(!mu.u) ? (-1) : mu.u)),
+					(!mu.unitVal) ? (-1) : mu.unitVal)),
 				_Utils_Tuple2(
 				'isHalfLetter',
 				$elm$json$Json$Encode$bool(false)),
@@ -4736,6 +4736,14 @@ var $author$project$RVHVarnikLine$processLineUnits = function (units) {
 		$elm$core$Array$length(l1));
 	return l1;
 };
+var $author$project$RVHVarnikLine$setLineYati = F4(
+	function (vUnits, vi, mUnits, mi) {
+		return ((_Utils_cmp(
+			vi,
+			$elm$core$Array$length(vUnits)) > -1) || (_Utils_cmp(
+			mi,
+			$elm$core$Array$length(mUnits)) > -1)) ? vUnits : vUnits;
+	});
 var $author$project$RVHVarnikLine$Akshar = F2(
 	function (a, gan) {
 		return {a: a, gan: gan};
@@ -4753,16 +4761,18 @@ var $author$project$RVHVarnikLine$unravelVarnasToAkshars = function (vUnits) {
 	var akshars2D = A2($elm$core$Array$map, $author$project$RVHVarnikLine$aksharsFromVarna, vUnits);
 	return A3($elm$core$Array$foldr, $elm$core$Array$append, $elm$core$Array$empty, akshars2D);
 };
-var $author$project$RVHVarnikLine$fromBasicL = function (lineP) {
-	var vUnits = $author$project$RVHVarnikLine$processLineUnits(
-		A3(
-			$author$project$RVHVarnikLine$mergeHalfIntoPriorLaghu,
-			0,
-			$elm$core$Array$empty,
-			A2($elm$core$Array$map, $author$project$RVHVarnikLine$varnaFrmAkshar, lineP.units)));
-	var avUnits = $author$project$RVHVarnikLine$unravelVarnasToAkshars(vUnits);
-	return A3($author$project$RVHVarnikLine$PoemLine, lineP.str, lineP.rhythmTotal, avUnits);
-};
+var $author$project$RVHVarnikLine$fromBasicL = F2(
+	function (lineP, maapneeUnits) {
+		var vUnits = $author$project$RVHVarnikLine$processLineUnits(
+			A3(
+				$author$project$RVHVarnikLine$mergeHalfIntoPriorLaghu,
+				0,
+				$elm$core$Array$empty,
+				A2($elm$core$Array$map, $author$project$RVHVarnikLine$varnaFrmAkshar, lineP.units)));
+		var vUnits1 = ($elm$core$Array$length(maapneeUnits) > 0) ? A4($author$project$RVHVarnikLine$setLineYati, vUnits, 0, maapneeUnits, 0) : vUnits;
+		var avUnits = $author$project$RVHVarnikLine$unravelVarnasToAkshars(vUnits1);
+		return A3($author$project$RVHVarnikLine$PoemLine, lineP.str, lineP.rhythmTotal, avUnits);
+	});
 var $author$project$RVHVarnikLine$toBasicL = function (lineV) {
 	return A3(
 		$author$project$RVHLine$PoemLine,
@@ -4785,7 +4795,7 @@ var $author$project$RVHCore$vaarnikAdjustMaatraa = F3(
 			$author$project$RVHLine$adjustMaatraa,
 			$author$project$RVHVarnikLine$toBasicL(oldLine),
 			ci);
-		var newLine = $author$project$RVHVarnikLine$fromBasicL(newBasicLine);
+		var newLine = A2($author$project$RVHVarnikLine$fromBasicL, newBasicLine, poemData.maapnee.units);
 		var newLines = A3($elm$core$Array$set, li, newLine, poemData.lines);
 		var newMaxLineLen = (_Utils_cmp(newLine.rhythmTotal, poemData.maxLineLen) > 0) ? newLine.rhythmTotal : poemData.maxLineLen;
 		return $author$project$RVHCore$VarnikPoem(
@@ -5857,7 +5867,7 @@ var $author$project$RVHVarnikLine$mUReInsertZero = F3(
 				$elm$core$Maybe$withDefault,
 				0,
 				$elm$core$String$toInt(ui1.u));
-			var ui1Int = {g: ui1.g, i: ui1.i, u: u1Int};
+			var ui1Int = {g: ui1.g, idx: ui1.i, unitVal: u1Int};
 			var uia11 = A2($elm$core$Array$push, ui1Int, uia1);
 			var len = $elm$core$Array$length(uia);
 			if (_Utils_cmp(i, len) > -1) {
@@ -5879,7 +5889,7 @@ var $author$project$RVHVarnikLine$mUReInsertZero = F3(
 							$temp$i = i + 1,
 							$temp$uia1 = A2(
 							$elm$core$Array$push,
-							{g: '', i: i + 1, u: 0},
+							{g: '', idx: i + 1, unitVal: 0},
 							uia11);
 						uia = $temp$uia;
 						i = $temp$i;
@@ -5937,10 +5947,14 @@ var $author$project$RVHCore$varnikProcessPoem = F3(
 		var genericOld = $author$project$RVHCore$genericGetData(oldPom);
 		var basic = $author$project$RVHCore$genericGetData(
 			A2($author$project$RVHCore$processPoem, pom, genericOld.lines));
+		var repeatedMaapnees = A2(
+			$elm$core$Array$repeat,
+			$elm$core$Array$length(basic.lines),
+			processedMaapnee.units);
 		var vaarnikLines = A2(
 			$elm$core$Debug$log,
 			'vl ',
-			A2($elm$core$Array$map, $author$project$RVHVarnikLine$fromBasicL, basic.lines));
+			A3($elm_community$array_extra$Array$Extra$map2, $author$project$RVHVarnikLine$fromBasicL, basic.lines, repeatedMaapnees));
 		return $author$project$RVHCore$VarnikPoem(
 			{
 				lines: vaarnikLines,

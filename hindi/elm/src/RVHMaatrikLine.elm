@@ -39,6 +39,7 @@ setLineMaapnee : PoemLine -> Array Int -> PoemLine
 setLineMaapnee line maapnee =
   { line | units = maatrikSetLineUnitsMaapnee line.units 0 maapnee 0}
 
+-- mc = maapnee count, i.e. maapnee value, 1, 2, or 0
 maatrikSetAksharMaapnee : Akshar -> Int -> Akshar -> MaapneeResult
 maatrikSetAksharMaapnee ac mc an =
   case mc of 
