@@ -26,11 +26,12 @@ type alias Varna =
   , gan : String
   , idx : Int
   , patternValue : Int -- only to capture yati = -1
+  , varnaType : A.AksharType
   }
 
 -- varnik akshar from basic akshar
 varnaFrmAkshar a =
-  Varna (Array.fromList [a]) a.userRhythm "" -1 0
+  Varna (Array.fromList [a]) a.userRhythm "" -1 0 a.aksharType
 
 emptyVarna = varnaFrmAkshar A.emptyAkshar
 
@@ -192,7 +193,7 @@ mergeHalfIntoPriorLaghu i van va =
     a1 = Maybe.withDefault A.emptyAkshar (Array.get 0 v1.a)
     v2 = Maybe.withDefault emptyVarna (Array.get (i+1) va)
     a2 = Maybe.withDefault A.emptyAkshar (Array.get 0 v2.a)
-    van1 = Array.push (Varna (Array.fromList [a1,a2]) 2 "" -1 0) van
+    van1 = Array.push (Varna (Array.fromList [a1,a2]) 2 "" -1 0 A.Consonant) van
   in 
     if i < (Array.length va) then
       if (a1.userRhythm == 1) && (a2.userRhythm == 1) && (a2.aksharType == A.Half) then
@@ -204,35 +205,38 @@ mergeHalfIntoPriorLaghu i van va =
 
 processLineUnits units =
   let
-    laWIdx = Debug.log "lawi " (laWithIdx units 0 Array.empty)
-    len = Debug.log "len " (Array.length laWIdx)
+    laWIdx = laWithIdx units 0 Array.empty
     lWOZero = (Array.filter laFilterZero laWIdx)
     lGanSets = toGanSets lWOZero Array.empty
     gans = Array.map laGanSetToGanName lGanSets
     lGanSetsWGan = Array.map2 laGanSetWGaname lGanSets gans
-    l1 = Debug.log "l1 " ((Array.foldr (Array.append) Array.empty lGanSetsWGan)
-      |> aReInsert0RAs laWIdx 0 Array.empty 0)
-    len1 = Debug.log "len1 " (Array.length l1)
+    l1 = (Array.foldr (Array.append) Array.empty lGanSetsWGan)
+      |> aReInsert0RAs laWIdx 0 Array.empty 0
   in
     l1
 
 setLineYati vUnits vi mUnits mi =
   let 
-    vu = Maybe.withDefault emptyVarna (Array.get vi vUnits)
+    vu = Debug.log "vu " (Maybe.withDefault emptyVarna (Array.get vi vUnits))
     mu = Maybe.withDefault {unitVal = -2, idx = -1, g = ""} (Array.get mi mUnits)
     vun = setYati vu
   in 
     if (vi >= (Array.length vUnits)) || (mi >= (Array.length mUnits)) then -- end of maapnee or varna units, end loop
       vUnits
-    else if (vu.rhythm == 0) && (mu.unitVal /= 0) then -- just some empty char in line, increase vi
-      setLineYati vUnits (vi+1) mUnits mi
-    else if (vu.rhythm /= 0) && (mu.unitVal == vu.rhythm) then -- varna as per maapnee unit, increase vi and mi
-      setLineYati vUnits (vi+1) mUnits (mi+1)
-    else if (vu.rhythm == 0) && (mu.unitVal == vu.rhythm) then -- yati found! set yati value in akshar
-      setLineYati (Array.set vi vun vUnits) (vi+1) mUnits (mi+1)
-    else -- bad code. dont know when this situation will come, exit loop.
-      vUnits
-
+    else 
+      if (vu.rhythm == 0) then
+        if (mu.unitVal == 0) then
+          if (vu.varnaType == A.Other) then -- yati found! set yati value in varna and go ahead
+            setLineYati (Array.set vi vun vUnits) (vi+1) mUnits (mi+1)
+          else -- just some empty char in line, increase vi
+            setLineYati vUnits (vi+1) mUnits mi
+        else -- just some empty char in line, increase vi
+          setLineYati vUnits (vi+1) mUnits mi
+      else 
+        if (mu.unitVal == vu.rhythm) then -- varna as per maapnee unit, increase vi and mi
+          setLineYati vUnits (vi+1) mUnits (mi+1)
+        else -- varna not as per maapnee, abort
+          vUnits
 
 setYati varna =
   {varna | patternValue = -1}

@@ -4116,12 +4116,12 @@ var $author$project$RVHVarnikLine$PoemLine = F3(
 		return {rhythmTotal: rhythmTotal, str: str, units: units};
 	});
 var $author$project$RVHVarnikLine$emptyLine = A3($author$project$RVHVarnikLine$PoemLine, '', 0, $elm$core$Array$empty);
-var $author$project$RVHVarnikLine$Varna = F5(
-	function (a, rhythm, gan, idx, patternValue) {
-		return {a: a, gan: gan, idx: idx, patternValue: patternValue, rhythm: rhythm};
+var $author$project$RVHVarnikLine$Varna = F6(
+	function (a, rhythm, gan, idx, patternValue, varnaType) {
+		return {a: a, gan: gan, idx: idx, patternValue: patternValue, rhythm: rhythm, varnaType: varnaType};
 	});
 var $author$project$RVHVarnikLine$varnaFrmAkshar = function (a) {
-	return A5(
+	return A6(
 		$author$project$RVHVarnikLine$Varna,
 		$elm$core$Array$fromList(
 			_List_fromArray(
@@ -4129,7 +4129,8 @@ var $author$project$RVHVarnikLine$varnaFrmAkshar = function (a) {
 		a.userRhythm,
 		'',
 		-1,
-		0);
+		0,
+		a.aksharType);
 };
 var $author$project$RVHVarnikLine$emptyVarna = $author$project$RVHVarnikLine$varnaFrmAkshar($author$project$Akshar$emptyAkshar);
 var $author$project$RVHVarnikLine$mergeHalfIntoPriorLaghu = F3(
@@ -4154,7 +4155,7 @@ var $author$project$RVHVarnikLine$mergeHalfIntoPriorLaghu = F3(
 				A2($elm$core$Array$get, 0, v1.a));
 			var van1 = A2(
 				$elm$core$Array$push,
-				A5(
+				A6(
 					$author$project$RVHVarnikLine$Varna,
 					$elm$core$Array$fromList(
 						_List_fromArray(
@@ -4162,7 +4163,8 @@ var $author$project$RVHVarnikLine$mergeHalfIntoPriorLaghu = F3(
 					2,
 					'',
 					-1,
-					0),
+					0,
+					$author$project$Akshar$Consonant),
 				van);
 			if (_Utils_cmp(
 				i,
@@ -4452,7 +4454,6 @@ var $author$project$RVHVarnikLine$laWithIdx = F3(
 			}
 		}
 	});
-var $elm$core$Debug$log = _Debug_log;
 var $elm$core$Tuple$second = function (_v0) {
 	var y = _v0.b;
 	return y;
@@ -4713,34 +4714,22 @@ var $author$project$RVHVarnikLine$toGanSets = F2(
 		}
 	});
 var $author$project$RVHVarnikLine$processLineUnits = function (units) {
-	var laWIdx = A2(
-		$elm$core$Debug$log,
-		'lawi ',
-		A3($author$project$RVHVarnikLine$laWithIdx, units, 0, $elm$core$Array$empty));
-	var len = A2(
-		$elm$core$Debug$log,
-		'len ',
-		$elm$core$Array$length(laWIdx));
+	var laWIdx = A3($author$project$RVHVarnikLine$laWithIdx, units, 0, $elm$core$Array$empty);
 	var lWOZero = A2($elm$core$Array$filter, $author$project$RVHVarnikLine$laFilterZero, laWIdx);
 	var lGanSets = A2($author$project$RVHVarnikLine$toGanSets, lWOZero, $elm$core$Array$empty);
 	var gans = A2($elm$core$Array$map, $author$project$RVHVarnikLine$laGanSetToGanName, lGanSets);
 	var lGanSetsWGan = A3($elm_community$array_extra$Array$Extra$map2, $author$project$RVHVarnikLine$laGanSetWGaname, lGanSets, gans);
-	var l1 = A2(
-		$elm$core$Debug$log,
-		'l1 ',
-		A5(
-			$author$project$RVHVarnikLine$aReInsert0RAs,
-			laWIdx,
-			0,
-			$elm$core$Array$empty,
-			0,
-			A3($elm$core$Array$foldr, $elm$core$Array$append, $elm$core$Array$empty, lGanSetsWGan)));
-	var len1 = A2(
-		$elm$core$Debug$log,
-		'len1 ',
-		$elm$core$Array$length(l1));
+	var l1 = A5(
+		$author$project$RVHVarnikLine$aReInsert0RAs,
+		laWIdx,
+		0,
+		$elm$core$Array$empty,
+		0,
+		A3($elm$core$Array$foldr, $elm$core$Array$append, $elm$core$Array$empty, lGanSetsWGan));
 	return l1;
 };
+var $author$project$Akshar$Other = {$: 'Other'};
+var $elm$core$Debug$log = _Debug_log;
 var $author$project$RVHVarnikLine$setYati = function (varna) {
 	return _Utils_update(
 		varna,
@@ -4751,9 +4740,12 @@ var $author$project$RVHVarnikLine$setLineYati = F4(
 		setLineYati:
 		while (true) {
 			var vu = A2(
-				$elm$core$Maybe$withDefault,
-				$author$project$RVHVarnikLine$emptyVarna,
-				A2($elm$core$Array$get, vi, vUnits));
+				$elm$core$Debug$log,
+				'vu ',
+				A2(
+					$elm$core$Maybe$withDefault,
+					$author$project$RVHVarnikLine$emptyVarna,
+					A2($elm$core$Array$get, vi, vUnits)));
 			var vun = $author$project$RVHVarnikLine$setYati(vu);
 			var mu = A2(
 				$elm$core$Maybe$withDefault,
@@ -4766,29 +4758,9 @@ var $author$project$RVHVarnikLine$setLineYati = F4(
 				$elm$core$Array$length(mUnits)) > -1)) {
 				return vUnits;
 			} else {
-				if ((!vu.rhythm) && (!(!mu.unitVal))) {
-					var $temp$vUnits = vUnits,
-						$temp$vi = vi + 1,
-						$temp$mUnits = mUnits,
-						$temp$mi = mi;
-					vUnits = $temp$vUnits;
-					vi = $temp$vi;
-					mUnits = $temp$mUnits;
-					mi = $temp$mi;
-					continue setLineYati;
-				} else {
-					if ((!(!vu.rhythm)) && _Utils_eq(mu.unitVal, vu.rhythm)) {
-						var $temp$vUnits = vUnits,
-							$temp$vi = vi + 1,
-							$temp$mUnits = mUnits,
-							$temp$mi = mi + 1;
-						vUnits = $temp$vUnits;
-						vi = $temp$vi;
-						mUnits = $temp$mUnits;
-						mi = $temp$mi;
-						continue setLineYati;
-					} else {
-						if ((!vu.rhythm) && _Utils_eq(mu.unitVal, vu.rhythm)) {
+				if (!vu.rhythm) {
+					if (!mu.unitVal) {
+						if (_Utils_eq(vu.varnaType, $author$project$Akshar$Other)) {
 							var $temp$vUnits = A3($elm$core$Array$set, vi, vun, vUnits),
 								$temp$vi = vi + 1,
 								$temp$mUnits = mUnits,
@@ -4799,8 +4771,40 @@ var $author$project$RVHVarnikLine$setLineYati = F4(
 							mi = $temp$mi;
 							continue setLineYati;
 						} else {
-							return vUnits;
+							var $temp$vUnits = vUnits,
+								$temp$vi = vi + 1,
+								$temp$mUnits = mUnits,
+								$temp$mi = mi;
+							vUnits = $temp$vUnits;
+							vi = $temp$vi;
+							mUnits = $temp$mUnits;
+							mi = $temp$mi;
+							continue setLineYati;
 						}
+					} else {
+						var $temp$vUnits = vUnits,
+							$temp$vi = vi + 1,
+							$temp$mUnits = mUnits,
+							$temp$mi = mi;
+						vUnits = $temp$vUnits;
+						vi = $temp$vi;
+						mUnits = $temp$mUnits;
+						mi = $temp$mi;
+						continue setLineYati;
+					}
+				} else {
+					if (_Utils_eq(mu.unitVal, vu.rhythm)) {
+						var $temp$vUnits = vUnits,
+							$temp$vi = vi + 1,
+							$temp$mUnits = mUnits,
+							$temp$mi = mi + 1;
+						vUnits = $temp$vUnits;
+						vi = $temp$vi;
+						mUnits = $temp$mUnits;
+						mi = $temp$mi;
+						continue setLineYati;
+					} else {
+						return vUnits;
 					}
 				}
 			}
@@ -5303,7 +5307,6 @@ var $author$project$Akshar$BottomBindi = {$: 'BottomBindi'};
 var $author$project$Akshar$ChandraBindu = {$: 'ChandraBindu'};
 var $author$project$Akshar$Halant = {$: 'Halant'};
 var $author$project$Akshar$Maatraa = {$: 'Maatraa'};
-var $author$project$Akshar$Other = {$: 'Other'};
 var $author$project$Akshar$isBindu = function (c) {
 	return $elm$core$Char$toCode(c) === 2306;
 };
