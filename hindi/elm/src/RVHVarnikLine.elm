@@ -29,7 +29,7 @@ type alias Varna =
   , varnaType : A.AksharType
   }
 
--- varnik akshar from basic akshar
+-- varna from basic akshar
 varnaFrmAkshar a =
   Varna (Array.fromList [a]) a.userRhythm "" -1 0 a.aksharType
 
@@ -44,11 +44,12 @@ aksharsFromVarna v =
 
 type alias PoemLine = 
   { str : String
-  , rhythmTotal : Int
+  , rhythmTotal : Int -- number of maatraas
+  , varnaCount : Int
   , units : Array.Array Akshar
   }
 
-emptyLine = PoemLine "" 0 Array.empty
+emptyLine = PoemLine "" 0 0 Array.empty
 
 type alias Maapnee =
   { units : Array.Array {unitVal : Int, idx : Int, g : String}
@@ -164,22 +165,25 @@ mProcess bmaapnee =
 
 --- LINE ---
 
+-- convert varnik line to basic line
 toBasicL lineV =
   L.PoemLine lineV.str lineV.rhythmTotal (Array.map .a lineV.units)
 
+-- convert basic line to varnik line
 fromBasicL lineP maapneeUnits =
   let 
     vUnits = Array.map varnaFrmAkshar lineP.units
-      |> mergeHalfIntoPriorLaghu 0 Array.empty
-      |> processLineUnits 
+      |> mergeHalfIntoPriorLaghu 0 Array.empty -- the last arg in this fn call is the result of the prev line of code
+    vProcessedLineNVarnaCount = processLineUnits vUnits 
     vUnits1 = 
       if (Array.length maapneeUnits) > 0 then
-        setLineYati vUnits 0 maapneeUnits 0
+        setLineYati (Tuple.first vProcessedLineNVarnaCount) 0 maapneeUnits 0
       else 
-        vUnits
+        Tuple.first vProcessedLineNVarnaCount
     avUnits = unravelVarnasToAkshars vUnits1
+    varnaCount = Tuple.second vProcessedLineNVarnaCount
   in
-    PoemLine lineP.str lineP.rhythmTotal avUnits
+    PoemLine lineP.str lineP.rhythmTotal varnaCount avUnits
 
 unravelVarnasToAkshars vUnits =
   let 
@@ -187,6 +191,7 @@ unravelVarnasToAkshars vUnits =
   in 
     Array.foldr (Array.append) Array.empty akshars2D
 
+-- va = incoming varna array, van = new varna array
 mergeHalfIntoPriorLaghu i van va =
   let
     v1 = Maybe.withDefault emptyVarna (Array.get i va)
@@ -203,6 +208,7 @@ mergeHalfIntoPriorLaghu i van va =
     else
       van
 
+-- identify gans for all units in line
 processLineUnits units =
   let
     laWIdx = laWithIdx units 0 Array.empty
@@ -213,7 +219,7 @@ processLineUnits units =
     l1 = (Array.foldr (Array.append) Array.empty lGanSetsWGan)
       |> aReInsert0RAs laWIdx 0 Array.empty 0
   in
-    l1
+    (l1, Array.length lWOZero)
 
 setLineYati vUnits vi mUnits mi =
   let 
@@ -241,6 +247,7 @@ setLineYati vUnits vi mUnits mi =
 setYati varna =
   {varna | patternValue = -1}
 
+-- line array with ids
 -- lus: line units, i.e varnas
 laWithIdx lus i lus1 =
   let 
@@ -251,6 +258,7 @@ laWithIdx lus i lus1 =
     else
       laWithIdx lus (i+1) (Array.push {u | idx = i} lus1)
 
+-- get units where rhythm is not zero
 laFilterZero el =
   (el.rhythm /= 0)
 
@@ -279,6 +287,7 @@ laSetGanameToGanset gs gn i ns =
 laGanSetWGaname gs gn =
   laSetGanameToGanset gs gn 0 Array.empty
 
+-- reinsert akshars w zero rhythm
 aReInsert0RAs la1 i1 lan i2 la2 =
   let 
     a1 = Maybe.withDefault emptyVarna (Array.get i1 la1)
@@ -307,7 +316,8 @@ encodeAkshar a =
 
 encodeLine al =
   E.object
-    [("rhythmAmtCumulative",E.int al.rhythmTotal)
+    [("rhythmAmtCumulative",E.int al.rhythmTotal) -- Number of Maatraas
+    , ("varnaCount", E.int al.varnaCount)
     , ("subUnits", E.array encodeAkshar al.units)
     ]
 
