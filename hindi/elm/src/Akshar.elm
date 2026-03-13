@@ -150,8 +150,8 @@ calcHalfAksharRhythm ac ap an =
       ac
     else if (ap.rhythm == 1) && (ap.aksharType /= Half) then
         {ac | rhythm = 1, userRhythm = 1}
-      else if (ap.rhythm == 2) && (an.rhythm == 2) then
-          {ac | rhythm = 1, userRhythm = 1}
+      else if (ap.rhythm == 2) && (an.rhythm == 2) then -- changed this in Sept 23
+          ac
         else
           ac
 
