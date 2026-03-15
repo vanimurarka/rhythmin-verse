@@ -8,6 +8,7 @@ let fShowText = true;
 let fLineSpacing = true;
 let fFreeVerse = false;
 let fGhazal = false;
+let fVarnik = false;
 let fRhymingLines = false;
 let dPoem;
 
@@ -66,12 +67,14 @@ function initSvgFlex(svgViewBox)
 
 function visualize(givenPoem, dAvailableW, dPoemType)
 {
-	fGhazal = fFreeVerse = false;
+	fGhazal = fFreeVerse = fVarnik = false;
 	dPoem = givenPoem;
 	if (dPoem.poemType == "GHAZAL")
 		fGhazal = true;
 	if (dPoem.poemType == "FREEVERSE")
 		fFreeVerse= true;
+	if (dPoem.poemType == "VARNIK")
+		fVarnik = true;
 
 	oVisual = new cVisual(dAvailableW);
 	if (dPoem.maxLineLen > 0)
@@ -82,6 +85,7 @@ function visualize(givenPoem, dAvailableW, dPoemType)
 // The D3 draw dance!
 function draw()
 {	
+	console.log(dPoem);
 	const maxLen = dPoem.maxLineLen;
 	const lineCount = dPoem.lines.length;
 	// pattern = maapnee
@@ -89,6 +93,11 @@ function draw()
 	const iForPattern = pattern ? 1 : 0;
 	var chart = d3.select("#chart");
 	chart.select("svg").remove();
+	if (fVarnik) 
+	{
+		charW = charH;
+		charW = charW * 2;
+	}
 	const svgW = fFreeVerse?(charW*maxLen)+80:(charW*maxLen)+40;
 	const svgH = fLineSpacing?((lineCount+iForPattern)*(charH+lineSpacing))+(charH*2):((lineCount+iForPattern)*charH)+(charH*2);
 	const svgViewBox = "0 0 "+svgW+" "+svgH;
@@ -267,9 +276,19 @@ function drawCharBlock(d,i)
 	if (i==0) lineRhythmTotal = 0;
 	// console.log(lineRhythmTotal);
 	let p = "";
-	let x = ((lineRhythmTotal)*charW);  // where the drawing of this path has to start horizontally
-	lineRhythmTotal += d.rhythmAmt;
-	let w = charW*d.rhythmAmt;
+	let x = ((lineRhythmTotal)*charW);  // where the drawing of this path has to start horizontally'
+
+	if (fVarnik)
+		lineRhythmTotal += (d.rhythmAmt > 0)?1:0;
+	else
+		lineRhythmTotal += d.rhythmAmt;
+
+	let w = 0;
+	if (fVarnik)
+		w = (d.rhythmAmt > 0)?charW:0;
+	else
+		w = charW*d.rhythmAmt;
+
 	let h = charH;
 	if ((d.isHalfLetter) && (d.rhythmAmt == 0)) // half letter of 0 width
 	{
