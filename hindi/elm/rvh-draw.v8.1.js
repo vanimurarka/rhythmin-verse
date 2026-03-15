@@ -1,6 +1,3 @@
-// THIS HAS TO BE UPDATED TO DISPLAY VARNA COUNT
-
-let charW = 20; 
 let charH = 20; 
 let paddingLeft = 7;
 let lineSpacing = 5;
@@ -93,9 +90,9 @@ function draw()
 	const iForPattern = pattern ? 1 : 0;
 	var chart = d3.select("#chart");
 	chart.select("svg").remove();
+	charW = charH;
 	if (fVarnik) 
 	{
-		charW = charH;
 		charW = charW * 2;
 	}
 	const svgW = fFreeVerse?(charW*maxLen)+80:(charW*maxLen)+40;
@@ -311,8 +308,15 @@ function drawCharTxtPos(d,i)
 {
 	if (i==0) lineRhythmTotal = 0;
 	let x = ((lineRhythmTotal)*charW);
-	let w = charW*d.rhythmAmt;
-	lineRhythmTotal += d.rhythmAmt;
+	let w = 0;
+	if (fVarnik)
+		w = charW;
+	else
+		w = charW*d.rhythmAmt;
+	if (fVarnik)
+		lineRhythmTotal += (d.rhythmAmt > 0)?1:0;
+	else
+		lineRhythmTotal += d.rhythmAmt;
 	return x+(w/2);
 }
 
