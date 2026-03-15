@@ -71,6 +71,17 @@ mergeHalfIntoPriorLaghu i van va =
 vaFilterZero el =
   (el.rhythm /= 0)
 
+-- insert indexes into varna as per their position in line
+-- lus: line units, i.e varnas
+laWithIdx lus i lus1 =
+  let 
+    u = Maybe.withDefault emptyVarna (Array.get i lus)
+  in 
+    if i >= (Array.length lus) then
+      lus1
+    else
+      laWithIdx lus (i+1) (Array.push {u | idx = i} lus1)
+
 -- CALCULATE GANS --
 ganSigToGan sig =
   case sig of
@@ -117,9 +128,44 @@ laGanSetToGanName ganset =
   in
     ganSigToGan sig
 
---processLineUnits units =
---  let
---  in
+laSetGanameToGanset gs gn i ns =
+  let
+    len = Array.length gs
+    a = Maybe.withDefault emptyVarna (Array.get i gs)
+    newVarna = {a | gan = gn}
+    ns1 = Array.push newVarna ns
+  in
+    if (i >= len) then
+      ns
+    else
+      laSetGanameToGanset gs gn (i+1) ns1
+
+aReInsert0RAs la1 i1 lan i2 la2 =
+  let 
+    a1 = Maybe.withDefault emptyVarna (Array.get i1 la1)
+    a2 = Maybe.withDefault emptyVarna (Array.get i2 la2)
+  in 
+    if (i1 >= (Array.length la1)) then
+      lan
+    else if (a1.idx == a2.idx) then
+      aReInsert0RAs la1 (i1+1) (Array.push a2 lan) (i2+1) la2
+    else
+      aReInsert0RAs la1 (i1+1) (Array.push a1 lan) (i2) la2
+
+laGanSetWGaname gs gn =
+  laSetGanameToGanset gs gn 0 Array.empty
+
+processLineUnits units =
+  let
+    lWOZero = (Array.filter vaFilterZero units)
+    laWIdx = laWithIdx lWOZero 0 Array.empty
+    lGanSets = toGanSets laWIdx Array.empty
+    gans = Array.map laGanSetToGanName lGanSets
+    lGanSetsWGan = Array.map2 laGanSetWGaname lGanSets gans
+    l1 = (Array.foldr (Array.append) Array.empty lGanSetsWGan)
+      |> aReInsert0RAs laWIdx 0 Array.empty 0
+  in
+    l1
 
 -- REAL PROCESSING --
 
@@ -127,7 +173,7 @@ fromBasicL lineP =
   let 
     vUnits = Array.map varnaFrmAkshar lineP.units
       |> mergeHalfIntoPriorLaghu 0 Array.empty
-      --|> processLineUnits
+      |> processLineUnits
     vUnitsWOZero = Array.filter vaFilterZero vUnits
       --|> processLineUnits 
     --vUnits1 = 

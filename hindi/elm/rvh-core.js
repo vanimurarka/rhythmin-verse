@@ -600,11 +600,11 @@ function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.an.L === region.as.L)
+	if (region.ap.L === region.au.L)
 	{
-		return 'on line ' + region.an.L;
+		return 'on line ' + region.ap.L;
 	}
-	return 'on lines ' + region.an.L + ' through ' + region.as.L;
+	return 'on lines ' + region.ap.L + ' through ' + region.au.L;
 }
 
 
@@ -2403,7 +2403,7 @@ var _Regex_fromStringWith = F2(function(options, string)
 {
 	var flags = 'g';
 	if (options.a9) { flags += 'm'; }
-	if (options.a_) { flags += 'i'; }
+	if (options.a$) { flags += 'i'; }
 
 	try
 	{
@@ -3061,16 +3061,16 @@ var $author$project$RVHFreeVerse$encodeComposite = function (c) {
 			[
 				_Utils_Tuple2(
 				'originalLineIdx',
-				$elm$json$Json$Encode$int(c.ai)),
+				$elm$json$Json$Encode$int(c.ak)),
 				_Utils_Tuple2(
 				'rhythmAmtCumulative',
 				$elm$json$Json$Encode$int(c.c)),
 				_Utils_Tuple2(
 				'remainder',
-				$elm$json$Json$Encode$int(c.aa)),
+				$elm$json$Json$Encode$int(c.ab)),
 				_Utils_Tuple2(
 				'multipleOfBaseCount',
-				$elm$json$Json$Encode$bool(c._))
+				$elm$json$Json$Encode$bool(c.aa))
 			]));
 };
 var $author$project$Akshar$Half = 3;
@@ -3099,13 +3099,13 @@ var $author$project$RVHFreeVerse$encodeLine = function (fvl) {
 			[
 				_Utils_Tuple2(
 				'rhythmAmtCumulative',
-				$elm$json$Json$Encode$int(fvl.L.ab)),
+				$elm$json$Json$Encode$int(fvl.L.ac)),
 				_Utils_Tuple2(
 				'subUnits',
 				A2($elm$json$Json$Encode$array, $author$project$Akshar$encodeAkshar, fvl.L.z)),
 				_Utils_Tuple2(
 				'isComposite',
-				$elm$json$Json$Encode$bool(fvl.ae))
+				$elm$json$Json$Encode$bool(fvl.ag))
 			]));
 };
 var $author$project$RVHCore$encodeFreeVerse = F3(
@@ -3133,7 +3133,7 @@ var $author$project$RVHLine$encodeLine = function (al) {
 			[
 				_Utils_Tuple2(
 				'rhythmAmtCumulative',
-				$elm$json$Json$Encode$int(al.ab)),
+				$elm$json$Json$Encode$int(al.ac)),
 				_Utils_Tuple2(
 				'subUnits',
 				A2($elm$json$Json$Encode$array, $author$project$Akshar$encodeAkshar, al.z))
@@ -3157,7 +3157,7 @@ var $author$project$RVHCore$encodeGeneric = F2(
 	});
 var $author$project$RVHGhazal$combineAksharRK = F2(
 	function (a, rk) {
-		return {g: a.g, c: a.c, aN: rk, G: a.G, f: a.f};
+		return {g: a.g, c: a.c, aO: rk, G: a.G, f: a.f};
 	});
 var $elm$core$String$cons = _String_cons;
 var $elm$core$String$fromChar = function (_char) {
@@ -3182,7 +3182,7 @@ var $author$project$RVHGhazal$encodeAksharRK = function (a) {
 				_Utils_Tuple2(
 				'rk',
 				$elm$json$Json$Encode$string(
-					$elm$core$String$fromChar(a.aN)))
+					$elm$core$String$fromChar(a.aO)))
 			]));
 };
 var $elm$core$Array$fromListHelp = F3(
@@ -3235,13 +3235,13 @@ var $author$project$RVHGhazal$encodeMisraa = function (m) {
 			[
 				_Utils_Tuple2(
 				'rhythmAmtCumulative',
-				$elm$json$Json$Encode$int(m.L.ab)),
+				$elm$json$Json$Encode$int(m.L.ac)),
 				_Utils_Tuple2(
 				'subUnits',
 				A2(
 					$elm$json$Json$Encode$array,
 					$author$project$RVHGhazal$encodeAksharRK,
-					A3($elm_community$array_extra$Array$Extra$map2, $author$project$RVHGhazal$combineAksharRK, m.L.z, m.al)))
+					A3($elm_community$array_extra$Array$Extra$map2, $author$project$RVHGhazal$combineAksharRK, m.L.z, m.an)))
 			]));
 };
 var $author$project$RVHCore$encodeGhazal = F2(
@@ -3288,7 +3288,7 @@ var $author$project$RVHMaatrikLine$encodeLine = function (al) {
 			[
 				_Utils_Tuple2(
 				'rhythmAmtCumulative',
-				$elm$json$Json$Encode$int(al.ab)),
+				$elm$json$Json$Encode$int(al.ac)),
 				_Utils_Tuple2(
 				'subUnits',
 				A2($elm$json$Json$Encode$array, $author$project$RVHMaatrikLine$encodeAkshar, al.z))
@@ -3326,7 +3326,7 @@ var $author$project$RVHPattern$encodeMaapnee = function (m) {
 			[
 				_Utils_Tuple2(
 				'rhythmAmtCumulative',
-				$elm$json$Json$Encode$int(m.aA)),
+				$elm$json$Json$Encode$int(m.aB)),
 				_Utils_Tuple2(
 				'subUnits',
 				A2($elm$json$Json$Encode$array, $author$project$RVHPattern$encodeMaapneeUnits, m.z))
@@ -3365,10 +3365,10 @@ var $author$project$RVHVarnikLine$encodeVarna = function (a) {
 				$elm$json$Json$Encode$int(a.c)),
 				_Utils_Tuple2(
 				'isHalfLetter',
-				$elm$json$Json$Encode$bool(a.aR === 3)),
+				$elm$json$Json$Encode$bool(a.aS === 3)),
 				_Utils_Tuple2(
 				'belongsToGan',
-				$elm$json$Json$Encode$string(a.av)),
+				$elm$json$Json$Encode$string(a.af)),
 				_Utils_Tuple2(
 				'rhythmPatternValue',
 				$elm$json$Json$Encode$int(a.y))
@@ -3380,7 +3380,7 @@ var $author$project$RVHVarnikLine$encodeLine = function (al) {
 			[
 				_Utils_Tuple2(
 				'rhythmAmtCumulative',
-				$elm$json$Json$Encode$int(al.ab)),
+				$elm$json$Json$Encode$int(al.ac)),
 				_Utils_Tuple2(
 				'subUnits',
 				A2($elm$json$Json$Encode$array, $author$project$RVHVarnikLine$encodeVarna, al.z))
@@ -3447,7 +3447,7 @@ var $author$project$RVHCore$Ghazal = function (a) {
 };
 var $author$project$RVHLine$PoemLine = F3(
 	function (str, rhythmTotal, units) {
-		return {ab: rhythmTotal, G: str, z: units};
+		return {ac: rhythmTotal, G: str, z: units};
 	});
 var $author$project$Akshar$Consonant = 4;
 var $author$project$Akshar$PureVowel = 0;
@@ -3464,7 +3464,7 @@ var $author$project$Akshar$adjustMaatraa = function (a) {
 };
 var $author$project$Akshar$Akshar = F7(
 	function (str, code, aksharType, mainChar, vowel, rhythm, userRhythm) {
-		return {g: aksharType, aq: code, R: mainChar, c: rhythm, G: str, f: userRhythm, r: vowel};
+		return {g: aksharType, as: code, R: mainChar, c: rhythm, G: str, f: userRhythm, r: vowel};
 	});
 var $author$project$Akshar$Empty = 8;
 var $author$project$Akshar$emptyAkshar = A7($author$project$Akshar$Akshar, ' ', 0, 8, ' ', ' ', 0, 0);
@@ -3571,16 +3571,16 @@ var $author$project$RVHLine$adjustMaatraa = F2(
 		var aNew = $author$project$Akshar$adjustMaatraa(a);
 		var newAkshars = A3($elm$core$Array$set, aI, aNew, oldLine.z);
 		var diff = aNew.f - a.f;
-		var newRhythm = oldLine.ab + diff;
+		var newRhythm = oldLine.ac + diff;
 		return A3($author$project$RVHLine$PoemLine, oldLine.G, newRhythm, newAkshars);
 	});
 var $author$project$RVHFreeVerse$CompositeLine = F4(
 	function (originalLineI, rhythm, remainder, multipleOfBase) {
-		return {_: multipleOfBase, ai: originalLineI, aa: remainder, c: rhythm};
+		return {aa: multipleOfBase, ak: originalLineI, ab: remainder, c: rhythm};
 	});
 var $author$project$RVHFreeVerse$Line = F2(
 	function (line, isComposite) {
-		return {ae: isComposite, L: line};
+		return {ag: isComposite, L: line};
 	});
 var $author$project$RVHLine$emptyLine = A3($author$project$RVHLine$PoemLine, '', 0, $elm$core$Array$empty);
 var $elm$core$Elm$JsArray$push = _JsArray_push;
@@ -3689,15 +3689,15 @@ var $author$project$RVHFreeVerse$calcCompositeRhythm = F4(
 				$elm$core$Maybe$withDefault,
 				A4($author$project$RVHFreeVerse$CompositeLine, -1, 0, 0, true),
 				A2($elm$core$Array$get, compositesLastI, compsiteLines));
-			var newComposite = A4($author$project$RVHFreeVerse$CompositeLine, composite.ai, composite.c + line.L.ab, 0, true);
+			var newComposite = A4($author$project$RVHFreeVerse$CompositeLine, composite.ak, composite.c + line.L.ac, 0, true);
 			var updatedComposites = A3($elm$core$Array$set, compositesLastI, newComposite, compsiteLines);
-			var addedComposites = A4($author$project$RVHFreeVerse$fvAddComposite, compsiteLines, li - 1, line0.L.ab, line.L.ab);
+			var addedComposites = A4($author$project$RVHFreeVerse$fvAddComposite, compsiteLines, li - 1, line0.L.ac, line.L.ac);
 			if (_Utils_cmp(
 				li,
 				$elm$core$Array$length(lines)) > 0) {
 				return compsiteLines;
 			} else {
-				if (line.ae) {
+				if (line.ag) {
 					if (!inProgress) {
 						var $temp$lines = lines,
 							$temp$li = li + 1,
@@ -3735,10 +3735,10 @@ var $author$project$RVHFreeVerse$calcCompositeRhythm = F4(
 	});
 var $author$project$RVHLine$biggerLine = F2(
 	function (line1, line2) {
-		return (_Utils_cmp(line1.ab, line2.ab) > 0) ? line1 : line2;
+		return (_Utils_cmp(line1.ac, line2.ac) > 0) ? line1 : line2;
 	});
 var $author$project$RVHLine$calcMaxLineLen = function (lines) {
-	return A3($elm$core$Array$foldl, $author$project$RVHLine$biggerLine, $author$project$RVHLine$emptyLine, lines).ab;
+	return A3($elm$core$Array$foldl, $author$project$RVHLine$biggerLine, $author$project$RVHLine$emptyLine, lines).ac;
 };
 var $author$project$RVHFreeVerse$fvCalcRemainderSingle = F2(
 	function (compositeLine, baseCount) {
@@ -3749,9 +3749,9 @@ var $author$project$RVHFreeVerse$fvCalcRemainderSingle = F2(
 		var useR = (r < 0.5) ? (rhy - (intQuo * baseCount)) : ((((intQuo + 1) * baseCount) - rhy) * (-1));
 		return (!(!useR)) ? _Utils_update(
 			compositeLine,
-			{_: false, aa: useR}) : _Utils_update(
+			{aa: false, ab: useR}) : _Utils_update(
 			compositeLine,
-			{_: true, aa: useR});
+			{aa: true, ab: useR});
 	});
 var $author$project$RVHFreeVerse$calcRemainderWhole = F3(
 	function (composites, baseCount, i) {
@@ -3794,7 +3794,7 @@ var $author$project$RVHCore$MaatrikPoem = function (a) {
 };
 var $author$project$RVHMaatrikLine$PoemLine = F3(
 	function (str, rhythmTotal, units) {
-		return {ab: rhythmTotal, G: str, z: units};
+		return {ac: rhythmTotal, G: str, z: units};
 	});
 var $author$project$RVHMaatrikLine$Akshar = F2(
 	function (a, patternValue) {
@@ -3832,7 +3832,7 @@ var $author$project$RVHMaatrikLine$fromBasicL = function (lineP) {
 	return A3(
 		$author$project$RVHMaatrikLine$PoemLine,
 		lineP.G,
-		lineP.ab,
+		lineP.ac,
 		A2($elm$core$Array$map, $author$project$RVHMaatrikLine$aksharFrmBA, lineP.z));
 };
 var $author$project$RVHMaatrikLine$emptyLine = $author$project$RVHMaatrikLine$fromBasicL($author$project$RVHLine$emptyLine);
@@ -3895,8 +3895,8 @@ var $author$project$RVHMaatrikLine$maatrikSetAksharPattern = F2(
 			k: _Utils_update(
 				an,
 				{y: 1.5}),
-			ac: true
-		} : {j: ac, k: an, ac: false};
+			ad: true
+		} : {j: ac, k: an, ad: false};
 	});
 var $author$project$RVHMaatrikLine$maatrikSetLineUnitsPattern = F2(
 	function (lineUnits, i) {
@@ -3918,7 +3918,7 @@ var $author$project$RVHMaatrikLine$maatrikSetLineUnitsPattern = F2(
 				$elm$core$Array$length(lineUnits) - 1) > 0) {
 				return lineUnits;
 			} else {
-				if (result.ac) {
+				if (result.ad) {
 					var $temp$lineUnits = newLineUnits,
 						$temp$i = i + 2;
 					lineUnits = $temp$lineUnits;
@@ -4022,7 +4022,7 @@ var $author$project$RVHMaatrikLine$toBasicL = function (lineM) {
 	return A3(
 		$author$project$RVHLine$PoemLine,
 		lineM.G,
-		lineM.ab,
+		lineM.ac,
 		A2(
 			$elm$core$Array$map,
 			function ($) {
@@ -4045,13 +4045,13 @@ var $author$project$RVHCore$maatrikAdjustMaatraa = F3(
 			$author$project$RVHMaatrikLine$fromBasicL(newBasicLine),
 			poemData.C.z);
 		var newLines = A3($elm$core$Array$set, li, newLine, poemData.a);
-		var newMaxLineLen = (_Utils_cmp(newLine.ab, poemData.b) > 0) ? newLine.ab : poemData.b;
+		var newMaxLineLen = (_Utils_cmp(newLine.ac, poemData.b) > 0) ? newLine.ac : poemData.b;
 		return $author$project$RVHCore$MaatrikPoem(
 			{a: newLines, C: poemData.C, b: newMaxLineLen});
 	});
 var $author$project$RVHGhazal$Misraa = F2(
 	function (line, rkUnits) {
-		return {L: line, al: rkUnits};
+		return {L: line, an: rkUnits};
 	});
 var $author$project$RVHGhazal$misraaFromLineWRK = F2(
 	function (line, rk) {
@@ -4062,7 +4062,7 @@ var $author$project$RVHCore$VarnikPoem = function (a) {
 };
 var $author$project$RVHVarnikLine$PoemLine = F3(
 	function (str, rhythmTotal, units) {
-		return {ab: rhythmTotal, G: str, z: units};
+		return {ac: rhythmTotal, G: str, z: units};
 	});
 var $author$project$RVHVarnikLine$emptyLine = A3($author$project$RVHVarnikLine$PoemLine, '', 0, $elm$core$Array$empty);
 var $elm$core$Array$filter = F2(
@@ -4079,7 +4079,7 @@ var $elm$core$Array$filter = F2(
 	});
 var $author$project$RVHVarnikLine$Varna = F7(
 	function (a, str, rhythm, gan, idx, patternValue, varnaType) {
-		return {l: a, av: gan, a4: idx, y: patternValue, c: rhythm, G: str, aR: varnaType};
+		return {l: a, af: gan, _: idx, y: patternValue, c: rhythm, G: str, aS: varnaType};
 	});
 var $author$project$RVHVarnikLine$varnaFrmAkshar = function (a) {
 	return A7(
@@ -4154,22 +4154,51 @@ var $author$project$RVHVarnikLine$mergeHalfIntoPriorLaghu = F3(
 			}
 		}
 	});
-var $author$project$RVHVarnikLine$vaFilterZero = function (el) {
-	return !(!el.c);
-};
-var $author$project$RVHVarnikLine$fromBasicL = function (lineP) {
-	var vUnits = A3(
-		$author$project$RVHVarnikLine$mergeHalfIntoPriorLaghu,
-		0,
-		$elm$core$Array$empty,
-		A2($elm$core$Array$map, $author$project$RVHVarnikLine$varnaFrmAkshar, lineP.z));
-	var vUnitsWOZero = A2($elm$core$Array$filter, $author$project$RVHVarnikLine$vaFilterZero, vUnits);
-	return A3(
-		$author$project$RVHVarnikLine$PoemLine,
-		lineP.G,
-		$elm$core$Array$length(vUnitsWOZero),
-		vUnits);
-};
+var $author$project$RVHVarnikLine$aReInsert0RAs = F5(
+	function (la1, i1, lan, i2, la2) {
+		aReInsert0RAs:
+		while (true) {
+			var a2 = A2(
+				$elm$core$Maybe$withDefault,
+				$author$project$RVHVarnikLine$emptyVarna,
+				A2($elm$core$Array$get, i2, la2));
+			var a1 = A2(
+				$elm$core$Maybe$withDefault,
+				$author$project$RVHVarnikLine$emptyVarna,
+				A2($elm$core$Array$get, i1, la1));
+			if (_Utils_cmp(
+				i1,
+				$elm$core$Array$length(la1)) > -1) {
+				return lan;
+			} else {
+				if (_Utils_eq(a1._, a2._)) {
+					var $temp$la1 = la1,
+						$temp$i1 = i1 + 1,
+						$temp$lan = A2($elm$core$Array$push, a2, lan),
+						$temp$i2 = i2 + 1,
+						$temp$la2 = la2;
+					la1 = $temp$la1;
+					i1 = $temp$i1;
+					lan = $temp$lan;
+					i2 = $temp$i2;
+					la2 = $temp$la2;
+					continue aReInsert0RAs;
+				} else {
+					var $temp$la1 = la1,
+						$temp$i1 = i1 + 1,
+						$temp$lan = A2($elm$core$Array$push, a1, lan),
+						$temp$i2 = i2,
+						$temp$la2 = la2;
+					la1 = $temp$la1;
+					i1 = $temp$i1;
+					lan = $temp$lan;
+					i2 = $temp$i2;
+					la2 = $temp$la2;
+					continue aReInsert0RAs;
+				}
+			}
+		}
+	});
 var $elm$core$Elm$JsArray$appendN = _JsArray_appendN;
 var $elm$core$Elm$JsArray$slice = _JsArray_slice;
 var $elm$core$Array$appendHelpBuilder = F2(
@@ -4273,670 +4302,107 @@ var $elm$core$Array$append = F2(
 						bTree)));
 		}
 	});
-var $author$project$RVHVarnikLine$toBasicL = function (lineV) {
-	var akshars2D = A2(
-		$elm$core$Array$map,
-		function ($) {
-			return $.l;
-		},
-		lineV.z);
-	var aAkshars = A3($elm$core$Array$foldl, $elm$core$Array$append, $elm$core$Array$empty, akshars2D);
-	return A3($author$project$RVHLine$PoemLine, lineV.G, lineV.ab, aAkshars);
+var $author$project$RVHVarnikLine$arStr = function (a) {
+	return $elm$core$String$fromInt(a.c);
 };
-var $author$project$RVHCore$vaarnikAdjustMaatraa = F3(
-	function (poemData, li, ci) {
-		var oldLine = A2(
-			$elm$core$Maybe$withDefault,
-			$author$project$RVHVarnikLine$emptyLine,
-			A2($elm$core$Array$get, li, poemData.a));
-		var newBasicLine = A2(
-			$author$project$RVHLine$adjustMaatraa,
-			$author$project$RVHVarnikLine$toBasicL(oldLine),
-			ci);
-		var newLine = $author$project$RVHVarnikLine$fromBasicL(newBasicLine);
-		var newLines = A3($elm$core$Array$set, li, newLine, poemData.a);
-		var newMaxLineLen = (_Utils_cmp(newLine.ab, poemData.b) > 0) ? newLine.ab : poemData.b;
-		return $author$project$RVHCore$VarnikPoem(
-			{a: newLines, b: newMaxLineLen});
-	});
-var $author$project$RVHCore$adjustMaatraaPoem = F3(
-	function (poem, li, ci) {
-		var lines = function () {
-			switch (poem.$) {
-				case 0:
-					var data = poem.a;
-					return data.a;
-				case 3:
-					var data = poem.a;
-					return A2(
-						$elm$core$Array$map,
-						function ($) {
-							return $.L;
-						},
-						data.a);
-				case 4:
-					var data = poem.a;
-					return A2(
-						$elm$core$Array$map,
-						function ($) {
-							return $.L;
-						},
-						data.a);
-				case 1:
-					var data = poem.a;
-					return A2($elm$core$Array$map, $author$project$RVHMaatrikLine$toBasicL, data.a);
-				default:
-					var data = poem.a;
-					return $elm$core$Array$fromList(
-						_List_fromArray(
-							[$author$project$RVHLine$emptyLine]));
-			}
-		}();
-		var oldLine = A2(
-			$elm$core$Maybe$withDefault,
-			$author$project$RVHLine$emptyLine,
-			A2($elm$core$Array$get, li, lines));
-		var newLine = A2($author$project$RVHLine$adjustMaatraa, oldLine, ci);
-		var newLines = A3($elm$core$Array$set, li, newLine, lines);
-		var newMaxLineLen = $author$project$RVHLine$calcMaxLineLen(newLines);
-		var finalFVLines = function () {
-			if (poem.$ === 4) {
-				var data = poem.a;
-				return A3(
-					$elm_community$array_extra$Array$Extra$map2,
-					$author$project$RVHFreeVerse$fromLineWFlag,
-					newLines,
-					A2(
-						$elm$core$Array$map,
-						function ($) {
-							return $.ae;
-						},
-						data.a));
-			} else {
-				return A2($elm$core$Array$map, $author$project$RVHFreeVerse$fromLine, newLines);
-			}
-		}();
-		switch (poem.$) {
-			case 0:
-				return $author$project$RVHCore$GenericPoem(
-					{a: newLines, b: newMaxLineLen});
-			case 3:
-				var data = poem.a;
-				return $author$project$RVHCore$Ghazal(
-					_Utils_update(
-						data,
-						{
-							a: A3(
-								$elm_community$array_extra$Array$Extra$map2,
-								$author$project$RVHGhazal$misraaFromLineWRK,
-								newLines,
-								A2(
-									$elm$core$Array$map,
-									function ($) {
-										return $.al;
-									},
-									data.a)),
-							b: newMaxLineLen
-						}));
-			case 4:
-				var data = poem.a;
-				return $author$project$RVHCore$FreeVerse(
-					{
-						s: data.s,
-						I: A3(
-							$author$project$RVHFreeVerse$calcRemainderWhole,
-							A4($author$project$RVHFreeVerse$calcCompositeRhythm, finalFVLines, 0, $elm$core$Array$empty, false),
-							data.s,
-							0),
-						a: finalFVLines,
-						b: newMaxLineLen
-					});
-			case 1:
-				var data = poem.a;
-				return A3($author$project$RVHCore$maatrikAdjustMaatraa, data, li, ci);
-			default:
-				var data = poem.a;
-				return A3($author$project$RVHCore$vaarnikAdjustMaatraa, data, li, ci);
-		}
-	});
-var $elm$regex$Regex$Match = F4(
-	function (match, index, number, submatches) {
-		return {a6: index, a8: match, bb: number, bg: submatches};
-	});
-var $elm$regex$Regex$fromStringWith = _Regex_fromStringWith;
-var $elm$regex$Regex$fromString = function (string) {
-	return A2(
-		$elm$regex$Regex$fromStringWith,
-		{a_: false, a9: false},
-		string);
-};
-var $elm$regex$Regex$replace = _Regex_replaceAtMost(_Regex_infinity);
-var $author$project$RVHLine$userReplace = F3(
-	function (userRegex, replacer, string) {
-		var _v0 = $elm$regex$Regex$fromString(userRegex);
-		if (_v0.$ === 1) {
-			return string;
-		} else {
-			var regex = _v0.a;
-			return A3($elm$regex$Regex$replace, regex, replacer, string);
-		}
-	});
-var $author$project$RVHLine$cleanMaapnee = function (string) {
-	return A3(
-		$author$project$RVHLine$userReplace,
-		'[^21२१ ]',
-		function (_v0) {
-			return '';
-		},
-		string);
-};
-var $author$project$RVHCore$IncomingPoem = F3(
-	function (poem, poemType, maapnee) {
-		return {C: maapnee, E: poem, aj: poemType};
-	});
-var $elm$json$Json$Decode$field = _Json_decodeField;
-var $elm$json$Json$Decode$map3 = _Json_map3;
-var $author$project$RVHCore$decodeIncomingPoem = A4(
-	$elm$json$Json$Decode$map3,
-	$author$project$RVHCore$IncomingPoem,
-	A2($elm$json$Json$Decode$field, 'poem', $elm$json$Json$Decode$string),
-	A2($elm$json$Json$Decode$field, 'poemType', $elm$json$Json$Decode$string),
-	A2($elm$json$Json$Decode$field, 'maapnee', $elm$json$Json$Decode$string));
-var $elm$json$Json$Decode$decodeString = _Json_runOnString;
-var $author$project$RVHCore$WhichChar = F2(
-	function (lineI, charI) {
-		return {ad: charI, af: lineI};
-	});
-var $elm$json$Json$Decode$int = _Json_decodeInt;
-var $elm$json$Json$Decode$map2 = _Json_map2;
-var $author$project$RVHCore$decodeWhichChar = A3(
-	$elm$json$Json$Decode$map2,
-	$author$project$RVHCore$WhichChar,
-	A2($elm$json$Json$Decode$field, 'lineI', $elm$json$Json$Decode$int),
-	A2($elm$json$Json$Decode$field, 'charI', $elm$json$Json$Decode$int));
-var $author$project$RVHCore$fvGetData = function (p) {
-	if (p.$ === 4) {
-		var data = p.a;
-		return data;
-	} else {
-		return {s: 1, I: $elm$core$Array$empty, a: $elm$core$Array$empty, b: 0};
-	}
-};
-var $author$project$RVHCore$fvSetBase = F2(
-	function (pom, base) {
-		var data = $author$project$RVHCore$fvGetData(pom);
-		var compositeWRemainder = A3($author$project$RVHFreeVerse$calcRemainderWhole, data.I, base, 0);
-		return $author$project$RVHCore$FreeVerse(
-			_Utils_update(
-				data,
-				{s: base, I: compositeWRemainder}));
-	});
-var $author$project$RVHCore$fvSetComposite = F2(
-	function (pom, li) {
-		var data = $author$project$RVHCore$fvGetData(pom);
-		var line = A2(
-			$elm$core$Maybe$withDefault,
-			A2($author$project$RVHFreeVerse$Line, $author$project$RVHLine$emptyLine, false),
-			A2($elm$core$Array$get, li, data.a));
-		var newLine = A2($author$project$RVHFreeVerse$Line, line.L, !line.ae);
-		var newLines = A3($elm$core$Array$set, li, newLine, data.a);
-		var composite = A4($author$project$RVHFreeVerse$calcCompositeRhythm, newLines, 0, $elm$core$Array$empty, false);
-		var compositeWRemainder = A3($author$project$RVHFreeVerse$calcRemainderWhole, composite, data.s, 0);
-		return $author$project$RVHCore$FreeVerse(
-			{s: data.s, I: compositeWRemainder, a: newLines, b: data.b});
-	});
-var $author$project$RVHCore$genericGetData = function (p) {
-	switch (p.$) {
-		case 0:
-			var data = p.a;
-			return data;
-		case 3:
-			var data = p.a;
-			return {
-				a: A2(
-					$elm$core$Array$map,
-					function ($) {
-						return $.L;
-					},
-					data.a),
-				b: data.b
-			};
-		case 4:
-			var data = p.a;
-			return {
-				a: A2(
-					$elm$core$Array$map,
-					function ($) {
-						return $.L;
-					},
-					data.a),
-				b: data.b
-			};
-		case 1:
-			var data = p.a;
-			return {
-				a: A2($elm$core$Array$map, $author$project$RVHMaatrikLine$toBasicL, data.a),
-				b: data.b
-			};
+var $author$project$RVHVarnikLine$ganSigToGan = function (sig) {
+	switch (sig) {
+		case '122':
+			return 'y';
+		case '222':
+			return 'm';
+		case '221':
+			return 't';
+		case '212':
+			return 'r';
+		case '121':
+			return 'j';
+		case '211':
+			return 'b';
+		case '111':
+			return 'n';
+		case '112':
+			return 's';
+		case '1':
+			return 'l';
+		case '2':
+			return 'g';
 		default:
-			var data = p.a;
-			return {a: $elm$core$Array$empty, b: 0};
+			return '';
 	}
 };
-var $elm$core$String$lines = _String_lines;
-var $author$project$Akshar$calcHalfAksharRhythm = F3(
-	function (ac, ap, an) {
-		return (ac.g !== 3) ? ac : ((((ac.R === 'म') && (an.R === 'ह')) || ((ac.R === 'न') && (an.R === 'ह'))) ? ac : (((ap.c === 1) && (ap.g !== 3)) ? _Utils_update(
-			ac,
-			{c: 1, f: 1}) : (((ap.c === 2) && (an.c === 2)) ? ac : ac)));
-	});
-var $author$project$RVHLine$calcHalfAksharRhythmLine = F3(
-	function (line, i, r) {
-		calcHalfAksharRhythmLine:
+var $author$project$RVHVarnikLine$laGanSetToGanName = function (ganset) {
+	var sig = A3(
+		$elm$core$Array$foldr,
+		$elm$core$Basics$append,
+		'',
+		A2($elm$core$Array$map, $author$project$RVHVarnikLine$arStr, ganset));
+	return $author$project$RVHVarnikLine$ganSigToGan(sig);
+};
+var $author$project$RVHVarnikLine$laSetGanameToGanset = F4(
+	function (gs, gn, i, ns) {
+		laSetGanameToGanset:
 		while (true) {
-			var len = $elm$core$Array$length(line);
-			var maxI = len - 1;
-			var ap = A2(
+			var len = $elm$core$Array$length(gs);
+			var a = A2(
 				$elm$core$Maybe$withDefault,
-				$author$project$Akshar$emptyAkshar,
-				A2($elm$core$Array$get, i - 1, line));
-			var an = A2(
-				$elm$core$Maybe$withDefault,
-				$author$project$Akshar$emptyAkshar,
-				A2($elm$core$Array$get, i + 1, line));
-			var ac = A2(
-				$elm$core$Maybe$withDefault,
-				$author$project$Akshar$emptyAkshar,
-				A2($elm$core$Array$get, i, line));
-			var aNew = A3($author$project$Akshar$calcHalfAksharRhythm, ac, ap, an);
-			var newline = A3($elm$core$Array$set, i, aNew, line);
-			if (_Utils_cmp(i, maxI) > 0) {
-				return _Utils_Tuple2(line, r);
+				$author$project$RVHVarnikLine$emptyVarna,
+				A2($elm$core$Array$get, i, gs));
+			var newVarna = _Utils_update(
+				a,
+				{af: gn});
+			var ns1 = A2($elm$core$Array$push, newVarna, ns);
+			if (_Utils_cmp(i, len) > -1) {
+				return ns;
 			} else {
-				var $temp$line = newline,
+				var $temp$gs = gs,
+					$temp$gn = gn,
 					$temp$i = i + 1,
-					$temp$r = r + aNew.c;
-				line = $temp$line;
+					$temp$ns = ns1;
+				gs = $temp$gs;
+				gn = $temp$gn;
 				i = $temp$i;
-				r = $temp$r;
-				continue calcHalfAksharRhythmLine;
+				ns = $temp$ns;
+				continue laSetGanameToGanset;
 			}
 		}
 	});
-var $elm$core$List$foldrHelper = F4(
-	function (fn, acc, ctr, ls) {
-		if (!ls.b) {
-			return acc;
-		} else {
-			var a = ls.a;
-			var r1 = ls.b;
-			if (!r1.b) {
-				return A2(fn, a, acc);
+var $author$project$RVHVarnikLine$laGanSetWGaname = F2(
+	function (gs, gn) {
+		return A4($author$project$RVHVarnikLine$laSetGanameToGanset, gs, gn, 0, $elm$core$Array$empty);
+	});
+var $author$project$RVHVarnikLine$laWithIdx = F3(
+	function (lus, i, lus1) {
+		laWithIdx:
+		while (true) {
+			var u = A2(
+				$elm$core$Maybe$withDefault,
+				$author$project$RVHVarnikLine$emptyVarna,
+				A2($elm$core$Array$get, i, lus));
+			if (_Utils_cmp(
+				i,
+				$elm$core$Array$length(lus)) > -1) {
+				return lus1;
 			} else {
-				var b = r1.a;
-				var r2 = r1.b;
-				if (!r2.b) {
-					return A2(
-						fn,
-						a,
-						A2(fn, b, acc));
-				} else {
-					var c = r2.a;
-					var r3 = r2.b;
-					if (!r3.b) {
-						return A2(
-							fn,
-							a,
-							A2(
-								fn,
-								b,
-								A2(fn, c, acc)));
-					} else {
-						var d = r3.a;
-						var r4 = r3.b;
-						var res = (ctr > 500) ? A3(
-							$elm$core$List$foldl,
-							fn,
-							acc,
-							$elm$core$List$reverse(r4)) : A4($elm$core$List$foldrHelper, fn, acc, ctr + 1, r4);
-						return A2(
-							fn,
-							a,
-							A2(
-								fn,
-								b,
-								A2(
-									fn,
-									c,
-									A2(fn, d, res))));
-					}
-				}
+				var $temp$lus = lus,
+					$temp$i = i + 1,
+					$temp$lus1 = A2(
+					$elm$core$Array$push,
+					_Utils_update(
+						u,
+						{_: i}),
+					lus1);
+				lus = $temp$lus;
+				i = $temp$i;
+				lus1 = $temp$lus1;
+				continue laWithIdx;
 			}
-		}
-	});
-var $elm$core$List$foldr = F3(
-	function (fn, acc, ls) {
-		return A4($elm$core$List$foldrHelper, fn, acc, 0, ls);
-	});
-var $elm$core$List$map = F2(
-	function (f, xs) {
-		return A3(
-			$elm$core$List$foldr,
-			F2(
-				function (x, acc) {
-					return A2(
-						$elm$core$List$cons,
-						f(x),
-						acc);
-				}),
-			_List_Nil,
-			xs);
-	});
-var $author$project$Akshar$mergeBottomBindi = F3(
-	function (aB, aC, aPartlyPrepared) {
-		return (aB.c > 0) ? aPartlyPrepared : _Utils_update(
-			aPartlyPrepared,
-			{c: aC.c, f: aC.c, r: aC.r});
-	});
-var $author$project$Akshar$mrgMaatraaCons = F2(
-	function (aM, aC) {
-		var aNew = _Utils_update(
-			aC,
-			{
-				c: aM.c,
-				G: _Utils_ap(aC.G, aM.G),
-				f: aM.c,
-				r: aM.r
-			});
-		if (aC.g === 4) {
-			var _v0 = aM.g;
-			switch (_v0) {
-				case 1:
-					return _Utils_Tuple2(true, aNew);
-				case 2:
-					return _Utils_Tuple2(
-						true,
-						_Utils_update(
-							aNew,
-							{g: 3}));
-				case 6:
-					return _Utils_Tuple2(
-						true,
-						A3($author$project$Akshar$mergeBottomBindi, aM, aC, aNew));
-				default:
-					return _Utils_Tuple2(false, aM);
-			}
-		} else {
-			return _Utils_Tuple2(false, aM);
 		}
 	});
 var $elm$core$Tuple$second = function (_v0) {
 	var y = _v0.b;
 	return y;
 };
-var $author$project$RVHLine$mrgMChelper = F3(
-	function (inAr, iStart, collectAr) {
-		mrgMChelper:
-		while (true) {
-			var iNext = iStart + 1;
-			var collectArLen = $elm$core$Array$length(collectAr);
-			var aM = A2(
-				$elm$core$Maybe$withDefault,
-				$author$project$Akshar$emptyAkshar,
-				A2($elm$core$Array$get, collectArLen - 1, collectAr));
-			var aL = A2(
-				$elm$core$Maybe$withDefault,
-				$author$project$Akshar$emptyAkshar,
-				A2($elm$core$Array$get, iStart, inAr));
-			var mrgResult = A2($author$project$Akshar$mrgMaatraaCons, aL, aM);
-			var aC = mrgResult.b;
-			if (_Utils_eq(
-				iStart,
-				$elm$core$Array$length(inAr))) {
-				return collectAr;
-			} else {
-				if ($elm$core$Array$length(inAr) === 1) {
-					var $temp$inAr = inAr,
-						$temp$iStart = iNext,
-						$temp$collectAr = A2($elm$core$Array$push, aL, collectAr);
-					inAr = $temp$inAr;
-					iStart = $temp$iStart;
-					collectAr = $temp$collectAr;
-					continue mrgMChelper;
-				} else {
-					if (mrgResult.a) {
-						var $temp$inAr = inAr,
-							$temp$iStart = iNext,
-							$temp$collectAr = A3($elm$core$Array$set, collectArLen - 1, aC, collectAr);
-						inAr = $temp$inAr;
-						iStart = $temp$iStart;
-						collectAr = $temp$collectAr;
-						continue mrgMChelper;
-					} else {
-						var $temp$inAr = inAr,
-							$temp$iStart = iNext,
-							$temp$collectAr = A2($elm$core$Array$push, aC, collectAr);
-						inAr = $temp$inAr;
-						iStart = $temp$iStart;
-						collectAr = $temp$collectAr;
-						continue mrgMChelper;
-					}
-				}
-			}
-		}
-	});
-var $author$project$RVHLine$mrgMCline = function (inputArray) {
-	return A3($author$project$RVHLine$mrgMChelper, inputArray, 0, $elm$core$Array$empty);
-};
-var $author$project$Akshar$BottomBindi = 6;
-var $author$project$Akshar$ChandraBindu = 5;
-var $author$project$Akshar$Halant = 2;
-var $author$project$Akshar$Maatraa = 1;
-var $author$project$Akshar$Other = 7;
-var $author$project$Akshar$isBindu = function (c) {
-	return $elm$core$Char$toCode(c) === 2306;
-};
-var $author$project$Akshar$isBottomBindi = function (cd) {
-	return cd === 2364;
-};
-var $author$project$Akshar$isChandraBindu = function (c) {
-	return $elm$core$Char$toCode(c) === 2305;
-};
-var $author$project$Akshar$isHalant = function (cd) {
-	return cd === 2381;
-};
-var $author$project$Akshar$isHindi = function (cd) {
-	return (cd >= 2305) && (cd <= 2399);
-};
-var $author$project$Akshar$isMaatraaVowel = function (cd) {
-	return (cd >= 2366) && (cd <= 2380);
-};
-var $author$project$Akshar$isPureVowel = function (cd) {
-	return (cd >= 2309) && (cd <= 2324);
-};
-var $author$project$Akshar$maatraaToVowel = function (c) {
-	switch (c) {
-		case 'ा':
-			return 'आ';
-		case 'ि':
-			return 'इ';
-		case 'ी':
-			return 'ई';
-		case 'ु':
-			return 'उ';
-		case 'ू':
-			return 'ऊ';
-		case 'े':
-			return 'ए';
-		case 'ै':
-			return 'ऐ';
-		case 'ो':
-			return 'ओ';
-		case 'ौ':
-			return 'औ';
-		case 'ॉ':
-			return 'ऑ';
-		case 'ृ':
-			return 'ऋ';
-		default:
-			return c;
-	}
-};
-var $author$project$Akshar$vowelRhythm = function (c) {
-	switch (c) {
-		case 'अ':
-			return 1;
-		case 'आ':
-			return 2;
-		case 'इ':
-			return 1;
-		case 'ई':
-			return 2;
-		case 'उ':
-			return 1;
-		case 'ऊ':
-			return 2;
-		case 'ए':
-			return 2;
-		case 'ऐ':
-			return 2;
-		case 'ओ':
-			return 2;
-		case 'औ':
-			return 2;
-		case 'ऑ':
-			return 2;
-		case 'ऋ':
-			return 1;
-		default:
-			return 0;
-	}
-};
-var $author$project$Akshar$processChar = function (c) {
-	var m = 0;
-	var cd = $elm$core$Char$toCode(c);
-	var aRhythm = $author$project$Akshar$vowelRhythm('अ');
-	var a = {
-		g: 7,
-		aq: cd,
-		R: c,
-		c: 0,
-		G: $elm$core$String$fromChar(c),
-		f: 0,
-		r: c
-	};
-	var newRhythm = $author$project$Akshar$isPureVowel(cd) ? $author$project$Akshar$vowelRhythm(a.r) : ($author$project$Akshar$isMaatraaVowel(cd) ? $author$project$Akshar$vowelRhythm(
-		$author$project$Akshar$maatraaToVowel(a.r)) : 0);
-	return $author$project$Akshar$isHindi(cd) ? ($author$project$Akshar$isPureVowel(cd) ? _Utils_update(
-		a,
-		{g: 0, c: newRhythm, f: newRhythm}) : ($author$project$Akshar$isMaatraaVowel(cd) ? _Utils_update(
-		a,
-		{g: 1, c: newRhythm, f: newRhythm}) : ($author$project$Akshar$isBindu(c) ? _Utils_update(
-		a,
-		{g: 3, c: 0, f: 0}) : ($author$project$Akshar$isHalant(cd) ? _Utils_update(
-		a,
-		{g: 2, c: 0, f: 0}) : ($author$project$Akshar$isChandraBindu(c) ? _Utils_update(
-		a,
-		{g: 5, c: 0, f: 0}) : ($author$project$Akshar$isBottomBindi(cd) ? _Utils_update(
-		a,
-		{g: 6, c: 0, f: 0}) : _Utils_update(
-		a,
-		{g: 4, c: aRhythm, f: aRhythm, r: 'अ'}))))))) : a;
-};
-var $elm$core$String$foldr = _String_foldr;
-var $elm$core$String$toList = function (string) {
-	return A3($elm$core$String$foldr, $elm$core$List$cons, _List_Nil, string);
-};
-var $author$project$RVHLine$processLine = function (pomLine) {
-	var pChars = $elm$core$String$toList(pomLine);
-	var pPoem = A2($elm$core$List$map, $author$project$Akshar$processChar, pChars);
-	var pPoemA = $elm$core$Array$fromList(pPoem);
-	var mergedLine = $author$project$RVHLine$mrgMCline(pPoemA);
-	var _final = A3($author$project$RVHLine$calcHalfAksharRhythmLine, mergedLine, 0, 0);
-	return A3($author$project$RVHLine$PoemLine, pomLine, _final.b, _final.a);
-};
-var $author$project$RVHLine$removeExtraSpaces = function (string) {
-	return A3(
-		$author$project$RVHLine$userReplace,
-		'\\s+',
-		function (_v0) {
-			return ' ';
-		},
-		string);
-};
-var $author$project$RVHLine$removeNonDevanagari = function (string) {
-	return A3(
-		$author$project$RVHLine$userReplace,
-		'[^\u0900-\u097F]',
-		function (_v0) {
-			return ' ';
-		},
-		string);
-};
-var $author$project$RVHLine$removePoornviraam = function (string) {
-	return A3(
-		$author$project$RVHLine$userReplace,
-		'।',
-		function (_v0) {
-			return ' ';
-		},
-		string);
-};
-var $elm$core$String$trim = _String_trim;
-var $author$project$RVHLine$preProcessLine = F2(
-	function (pomLine, oldLine) {
-		var pCleaned = $elm$core$String$trim(
-			$author$project$RVHLine$removeExtraSpaces(
-				$author$project$RVHLine$removePoornviraam(
-					$author$project$RVHLine$removeNonDevanagari(pomLine))));
-		return _Utils_eq(pCleaned, oldLine.G) ? oldLine : $author$project$RVHLine$processLine(pCleaned);
-	});
-var $elm$core$Array$repeat = F2(
-	function (n, e) {
-		return A2(
-			$elm$core$Array$initialize,
-			n,
-			function (_v0) {
-				return e;
-			});
-	});
-var $author$project$RVHCore$processPoem = F2(
-	function (pom, oldLines) {
-		var pLines = $elm$core$Array$fromList(
-			$elm$core$String$lines(pom));
-		var diff = $elm$core$Array$length(pLines) - $elm$core$Array$length(oldLines);
-		var paddedOldPoem = (diff > 0) ? A2(
-			$elm$core$Array$append,
-			oldLines,
-			A2($elm$core$Array$repeat, diff, $author$project$RVHLine$emptyLine)) : oldLines;
-		var processedLines = A3($elm_community$array_extra$Array$Extra$map2, $author$project$RVHLine$preProcessLine, pLines, paddedOldPoem);
-		var maxLineLen = $author$project$RVHLine$calcMaxLineLen(processedLines);
-		return $author$project$RVHCore$GenericPoem(
-			{a: processedLines, b: maxLineLen});
-	});
-var $author$project$RVHCore$fvProcess = F2(
-	function (pom, oldPom) {
-		var oldFVData = $author$project$RVHCore$fvGetData(oldPom);
-		var oldFVFlags = A2(
-			$elm$core$Array$map,
-			function ($) {
-				return $.ae;
-			},
-			oldFVData.a);
-		var basicOldLines = $author$project$RVHCore$genericGetData(oldPom).a;
-		var basicProcessed = $author$project$RVHCore$genericGetData(
-			A2($author$project$RVHCore$processPoem, pom, basicOldLines));
-		var diff = $elm$core$Array$length(basicProcessed.a) - $elm$core$Array$length(oldFVData.a);
-		var paddedOldFlags = (diff > 0) ? A2(
-			$elm$core$Array$append,
-			oldFVFlags,
-			A2($elm$core$Array$repeat, diff, false)) : oldFVFlags;
-		var newFVLines = A3($elm_community$array_extra$Array$Extra$map2, $author$project$RVHFreeVerse$fromLineWFlag, basicProcessed.a, paddedOldFlags);
-		var composite = A4($author$project$RVHFreeVerse$calcCompositeRhythm, newFVLines, 0, $elm$core$Array$empty, false);
-		var compositeWRemainder = A3($author$project$RVHFreeVerse$calcRemainderWhole, composite, oldFVData.s, 0);
-		return $author$project$RVHCore$FreeVerse(
-			{s: oldFVData.s, I: compositeWRemainder, a: newFVLines, b: basicProcessed.b});
-	});
 var $elm$core$List$drop = F2(
 	function (n, list) {
 		drop:
@@ -5137,6 +4603,753 @@ var $elm$core$Array$slice = F3(
 			correctFrom,
 			A2($elm$core$Array$sliceRight, correctTo, array));
 	});
+var $elm_community$array_extra$Array$Extra$sliceFrom = function (lengthDropped) {
+	return function (array) {
+		return A3(
+			$elm$core$Array$slice,
+			lengthDropped,
+			$elm$core$Array$length(array),
+			array);
+	};
+};
+var $elm_community$array_extra$Array$Extra$sliceUntil = function (lengthNew) {
+	return function (array) {
+		return A3(
+			$elm$core$Array$slice,
+			0,
+			(lengthNew >= 0) ? lengthNew : ($elm$core$Array$length(array) + lengthNew),
+			array);
+	};
+};
+var $elm_community$array_extra$Array$Extra$splitAt = function (index) {
+	return function (array) {
+		return (index > 0) ? _Utils_Tuple2(
+			A2($elm_community$array_extra$Array$Extra$sliceUntil, index, array),
+			A2($elm_community$array_extra$Array$Extra$sliceFrom, index, array)) : _Utils_Tuple2($elm$core$Array$empty, array);
+	};
+};
+var $author$project$RVHVarnikLine$toGanSets = F2(
+	function (a, na) {
+		toGanSets:
+		while (true) {
+			var na3a3 = A2($elm_community$array_extra$Array$Extra$splitAt, 3, a);
+			var na3 = na3a3.a;
+			var na1a1 = A2($elm_community$array_extra$Array$Extra$splitAt, 1, a);
+			var na1 = na1a1.a;
+			var len = $elm$core$Array$length(a);
+			var a3 = na3a3.b;
+			var a1 = na1a1.b;
+			if (!len) {
+				return na;
+			} else {
+				if (len >= 3) {
+					var $temp$a = a3,
+						$temp$na = A2($elm$core$Array$push, na3, na);
+					a = $temp$a;
+					na = $temp$na;
+					continue toGanSets;
+				} else {
+					var $temp$a = a1,
+						$temp$na = A2($elm$core$Array$push, na1, na);
+					a = $temp$a;
+					na = $temp$na;
+					continue toGanSets;
+				}
+			}
+		}
+	});
+var $author$project$RVHVarnikLine$vaFilterZero = function (el) {
+	return !(!el.c);
+};
+var $author$project$RVHVarnikLine$processLineUnits = function (units) {
+	var lWOZero = A2($elm$core$Array$filter, $author$project$RVHVarnikLine$vaFilterZero, units);
+	var laWIdx = A3($author$project$RVHVarnikLine$laWithIdx, lWOZero, 0, $elm$core$Array$empty);
+	var lGanSets = A2($author$project$RVHVarnikLine$toGanSets, laWIdx, $elm$core$Array$empty);
+	var gans = A2($elm$core$Array$map, $author$project$RVHVarnikLine$laGanSetToGanName, lGanSets);
+	var lGanSetsWGan = A3($elm_community$array_extra$Array$Extra$map2, $author$project$RVHVarnikLine$laGanSetWGaname, lGanSets, gans);
+	var l1 = A5(
+		$author$project$RVHVarnikLine$aReInsert0RAs,
+		laWIdx,
+		0,
+		$elm$core$Array$empty,
+		0,
+		A3($elm$core$Array$foldr, $elm$core$Array$append, $elm$core$Array$empty, lGanSetsWGan));
+	return l1;
+};
+var $author$project$RVHVarnikLine$fromBasicL = function (lineP) {
+	var vUnits = $author$project$RVHVarnikLine$processLineUnits(
+		A3(
+			$author$project$RVHVarnikLine$mergeHalfIntoPriorLaghu,
+			0,
+			$elm$core$Array$empty,
+			A2($elm$core$Array$map, $author$project$RVHVarnikLine$varnaFrmAkshar, lineP.z)));
+	var vUnitsWOZero = A2($elm$core$Array$filter, $author$project$RVHVarnikLine$vaFilterZero, vUnits);
+	return A3(
+		$author$project$RVHVarnikLine$PoemLine,
+		lineP.G,
+		$elm$core$Array$length(vUnitsWOZero),
+		vUnits);
+};
+var $author$project$RVHVarnikLine$toBasicL = function (lineV) {
+	var akshars2D = A2(
+		$elm$core$Array$map,
+		function ($) {
+			return $.l;
+		},
+		lineV.z);
+	var aAkshars = A3($elm$core$Array$foldl, $elm$core$Array$append, $elm$core$Array$empty, akshars2D);
+	return A3($author$project$RVHLine$PoemLine, lineV.G, lineV.ac, aAkshars);
+};
+var $author$project$RVHCore$vaarnikAdjustMaatraa = F3(
+	function (poemData, li, ci) {
+		var oldLine = A2(
+			$elm$core$Maybe$withDefault,
+			$author$project$RVHVarnikLine$emptyLine,
+			A2($elm$core$Array$get, li, poemData.a));
+		var newBasicLine = A2(
+			$author$project$RVHLine$adjustMaatraa,
+			$author$project$RVHVarnikLine$toBasicL(oldLine),
+			ci);
+		var newLine = $author$project$RVHVarnikLine$fromBasicL(newBasicLine);
+		var newLines = A3($elm$core$Array$set, li, newLine, poemData.a);
+		var newMaxLineLen = (_Utils_cmp(newLine.ac, poemData.b) > 0) ? newLine.ac : poemData.b;
+		return $author$project$RVHCore$VarnikPoem(
+			{a: newLines, b: newMaxLineLen});
+	});
+var $author$project$RVHCore$adjustMaatraaPoem = F3(
+	function (poem, li, ci) {
+		var lines = function () {
+			switch (poem.$) {
+				case 0:
+					var data = poem.a;
+					return data.a;
+				case 3:
+					var data = poem.a;
+					return A2(
+						$elm$core$Array$map,
+						function ($) {
+							return $.L;
+						},
+						data.a);
+				case 4:
+					var data = poem.a;
+					return A2(
+						$elm$core$Array$map,
+						function ($) {
+							return $.L;
+						},
+						data.a);
+				case 1:
+					var data = poem.a;
+					return A2($elm$core$Array$map, $author$project$RVHMaatrikLine$toBasicL, data.a);
+				default:
+					var data = poem.a;
+					return $elm$core$Array$fromList(
+						_List_fromArray(
+							[$author$project$RVHLine$emptyLine]));
+			}
+		}();
+		var oldLine = A2(
+			$elm$core$Maybe$withDefault,
+			$author$project$RVHLine$emptyLine,
+			A2($elm$core$Array$get, li, lines));
+		var newLine = A2($author$project$RVHLine$adjustMaatraa, oldLine, ci);
+		var newLines = A3($elm$core$Array$set, li, newLine, lines);
+		var newMaxLineLen = $author$project$RVHLine$calcMaxLineLen(newLines);
+		var finalFVLines = function () {
+			if (poem.$ === 4) {
+				var data = poem.a;
+				return A3(
+					$elm_community$array_extra$Array$Extra$map2,
+					$author$project$RVHFreeVerse$fromLineWFlag,
+					newLines,
+					A2(
+						$elm$core$Array$map,
+						function ($) {
+							return $.ag;
+						},
+						data.a));
+			} else {
+				return A2($elm$core$Array$map, $author$project$RVHFreeVerse$fromLine, newLines);
+			}
+		}();
+		switch (poem.$) {
+			case 0:
+				return $author$project$RVHCore$GenericPoem(
+					{a: newLines, b: newMaxLineLen});
+			case 3:
+				var data = poem.a;
+				return $author$project$RVHCore$Ghazal(
+					_Utils_update(
+						data,
+						{
+							a: A3(
+								$elm_community$array_extra$Array$Extra$map2,
+								$author$project$RVHGhazal$misraaFromLineWRK,
+								newLines,
+								A2(
+									$elm$core$Array$map,
+									function ($) {
+										return $.an;
+									},
+									data.a)),
+							b: newMaxLineLen
+						}));
+			case 4:
+				var data = poem.a;
+				return $author$project$RVHCore$FreeVerse(
+					{
+						s: data.s,
+						I: A3(
+							$author$project$RVHFreeVerse$calcRemainderWhole,
+							A4($author$project$RVHFreeVerse$calcCompositeRhythm, finalFVLines, 0, $elm$core$Array$empty, false),
+							data.s,
+							0),
+						a: finalFVLines,
+						b: newMaxLineLen
+					});
+			case 1:
+				var data = poem.a;
+				return A3($author$project$RVHCore$maatrikAdjustMaatraa, data, li, ci);
+			default:
+				var data = poem.a;
+				return A3($author$project$RVHCore$vaarnikAdjustMaatraa, data, li, ci);
+		}
+	});
+var $elm$regex$Regex$Match = F4(
+	function (match, index, number, submatches) {
+		return {a6: index, a8: match, bb: number, bg: submatches};
+	});
+var $elm$regex$Regex$fromStringWith = _Regex_fromStringWith;
+var $elm$regex$Regex$fromString = function (string) {
+	return A2(
+		$elm$regex$Regex$fromStringWith,
+		{a$: false, a9: false},
+		string);
+};
+var $elm$regex$Regex$replace = _Regex_replaceAtMost(_Regex_infinity);
+var $author$project$RVHLine$userReplace = F3(
+	function (userRegex, replacer, string) {
+		var _v0 = $elm$regex$Regex$fromString(userRegex);
+		if (_v0.$ === 1) {
+			return string;
+		} else {
+			var regex = _v0.a;
+			return A3($elm$regex$Regex$replace, regex, replacer, string);
+		}
+	});
+var $author$project$RVHLine$cleanMaapnee = function (string) {
+	return A3(
+		$author$project$RVHLine$userReplace,
+		'[^21२१ ]',
+		function (_v0) {
+			return '';
+		},
+		string);
+};
+var $author$project$RVHCore$IncomingPoem = F3(
+	function (poem, poemType, maapnee) {
+		return {C: maapnee, E: poem, al: poemType};
+	});
+var $elm$json$Json$Decode$field = _Json_decodeField;
+var $elm$json$Json$Decode$map3 = _Json_map3;
+var $author$project$RVHCore$decodeIncomingPoem = A4(
+	$elm$json$Json$Decode$map3,
+	$author$project$RVHCore$IncomingPoem,
+	A2($elm$json$Json$Decode$field, 'poem', $elm$json$Json$Decode$string),
+	A2($elm$json$Json$Decode$field, 'poemType', $elm$json$Json$Decode$string),
+	A2($elm$json$Json$Decode$field, 'maapnee', $elm$json$Json$Decode$string));
+var $elm$json$Json$Decode$decodeString = _Json_runOnString;
+var $author$project$RVHCore$WhichChar = F2(
+	function (lineI, charI) {
+		return {ae: charI, ah: lineI};
+	});
+var $elm$json$Json$Decode$int = _Json_decodeInt;
+var $elm$json$Json$Decode$map2 = _Json_map2;
+var $author$project$RVHCore$decodeWhichChar = A3(
+	$elm$json$Json$Decode$map2,
+	$author$project$RVHCore$WhichChar,
+	A2($elm$json$Json$Decode$field, 'lineI', $elm$json$Json$Decode$int),
+	A2($elm$json$Json$Decode$field, 'charI', $elm$json$Json$Decode$int));
+var $author$project$RVHCore$fvGetData = function (p) {
+	if (p.$ === 4) {
+		var data = p.a;
+		return data;
+	} else {
+		return {s: 1, I: $elm$core$Array$empty, a: $elm$core$Array$empty, b: 0};
+	}
+};
+var $author$project$RVHCore$fvSetBase = F2(
+	function (pom, base) {
+		var data = $author$project$RVHCore$fvGetData(pom);
+		var compositeWRemainder = A3($author$project$RVHFreeVerse$calcRemainderWhole, data.I, base, 0);
+		return $author$project$RVHCore$FreeVerse(
+			_Utils_update(
+				data,
+				{s: base, I: compositeWRemainder}));
+	});
+var $author$project$RVHCore$fvSetComposite = F2(
+	function (pom, li) {
+		var data = $author$project$RVHCore$fvGetData(pom);
+		var line = A2(
+			$elm$core$Maybe$withDefault,
+			A2($author$project$RVHFreeVerse$Line, $author$project$RVHLine$emptyLine, false),
+			A2($elm$core$Array$get, li, data.a));
+		var newLine = A2($author$project$RVHFreeVerse$Line, line.L, !line.ag);
+		var newLines = A3($elm$core$Array$set, li, newLine, data.a);
+		var composite = A4($author$project$RVHFreeVerse$calcCompositeRhythm, newLines, 0, $elm$core$Array$empty, false);
+		var compositeWRemainder = A3($author$project$RVHFreeVerse$calcRemainderWhole, composite, data.s, 0);
+		return $author$project$RVHCore$FreeVerse(
+			{s: data.s, I: compositeWRemainder, a: newLines, b: data.b});
+	});
+var $author$project$RVHCore$genericGetData = function (p) {
+	switch (p.$) {
+		case 0:
+			var data = p.a;
+			return data;
+		case 3:
+			var data = p.a;
+			return {
+				a: A2(
+					$elm$core$Array$map,
+					function ($) {
+						return $.L;
+					},
+					data.a),
+				b: data.b
+			};
+		case 4:
+			var data = p.a;
+			return {
+				a: A2(
+					$elm$core$Array$map,
+					function ($) {
+						return $.L;
+					},
+					data.a),
+				b: data.b
+			};
+		case 1:
+			var data = p.a;
+			return {
+				a: A2($elm$core$Array$map, $author$project$RVHMaatrikLine$toBasicL, data.a),
+				b: data.b
+			};
+		default:
+			var data = p.a;
+			return {a: $elm$core$Array$empty, b: 0};
+	}
+};
+var $elm$core$String$lines = _String_lines;
+var $author$project$Akshar$calcHalfAksharRhythm = F3(
+	function (ac, ap, an) {
+		return (ac.g !== 3) ? ac : ((((ac.R === 'म') && (an.R === 'ह')) || ((ac.R === 'न') && (an.R === 'ह'))) ? ac : (((ap.c === 1) && (ap.g !== 3)) ? _Utils_update(
+			ac,
+			{c: 1, f: 1}) : (((ap.c === 2) && (an.c === 2)) ? ac : ac)));
+	});
+var $author$project$RVHLine$calcHalfAksharRhythmLine = F3(
+	function (line, i, r) {
+		calcHalfAksharRhythmLine:
+		while (true) {
+			var len = $elm$core$Array$length(line);
+			var maxI = len - 1;
+			var ap = A2(
+				$elm$core$Maybe$withDefault,
+				$author$project$Akshar$emptyAkshar,
+				A2($elm$core$Array$get, i - 1, line));
+			var an = A2(
+				$elm$core$Maybe$withDefault,
+				$author$project$Akshar$emptyAkshar,
+				A2($elm$core$Array$get, i + 1, line));
+			var ac = A2(
+				$elm$core$Maybe$withDefault,
+				$author$project$Akshar$emptyAkshar,
+				A2($elm$core$Array$get, i, line));
+			var aNew = A3($author$project$Akshar$calcHalfAksharRhythm, ac, ap, an);
+			var newline = A3($elm$core$Array$set, i, aNew, line);
+			if (_Utils_cmp(i, maxI) > 0) {
+				return _Utils_Tuple2(line, r);
+			} else {
+				var $temp$line = newline,
+					$temp$i = i + 1,
+					$temp$r = r + aNew.c;
+				line = $temp$line;
+				i = $temp$i;
+				r = $temp$r;
+				continue calcHalfAksharRhythmLine;
+			}
+		}
+	});
+var $elm$core$List$foldrHelper = F4(
+	function (fn, acc, ctr, ls) {
+		if (!ls.b) {
+			return acc;
+		} else {
+			var a = ls.a;
+			var r1 = ls.b;
+			if (!r1.b) {
+				return A2(fn, a, acc);
+			} else {
+				var b = r1.a;
+				var r2 = r1.b;
+				if (!r2.b) {
+					return A2(
+						fn,
+						a,
+						A2(fn, b, acc));
+				} else {
+					var c = r2.a;
+					var r3 = r2.b;
+					if (!r3.b) {
+						return A2(
+							fn,
+							a,
+							A2(
+								fn,
+								b,
+								A2(fn, c, acc)));
+					} else {
+						var d = r3.a;
+						var r4 = r3.b;
+						var res = (ctr > 500) ? A3(
+							$elm$core$List$foldl,
+							fn,
+							acc,
+							$elm$core$List$reverse(r4)) : A4($elm$core$List$foldrHelper, fn, acc, ctr + 1, r4);
+						return A2(
+							fn,
+							a,
+							A2(
+								fn,
+								b,
+								A2(
+									fn,
+									c,
+									A2(fn, d, res))));
+					}
+				}
+			}
+		}
+	});
+var $elm$core$List$foldr = F3(
+	function (fn, acc, ls) {
+		return A4($elm$core$List$foldrHelper, fn, acc, 0, ls);
+	});
+var $elm$core$List$map = F2(
+	function (f, xs) {
+		return A3(
+			$elm$core$List$foldr,
+			F2(
+				function (x, acc) {
+					return A2(
+						$elm$core$List$cons,
+						f(x),
+						acc);
+				}),
+			_List_Nil,
+			xs);
+	});
+var $author$project$Akshar$mergeBottomBindi = F3(
+	function (aB, aC, aPartlyPrepared) {
+		return (aB.c > 0) ? aPartlyPrepared : _Utils_update(
+			aPartlyPrepared,
+			{c: aC.c, f: aC.c, r: aC.r});
+	});
+var $author$project$Akshar$mrgMaatraaCons = F2(
+	function (aM, aC) {
+		var aNew = _Utils_update(
+			aC,
+			{
+				c: aM.c,
+				G: _Utils_ap(aC.G, aM.G),
+				f: aM.c,
+				r: aM.r
+			});
+		if (aC.g === 4) {
+			var _v0 = aM.g;
+			switch (_v0) {
+				case 1:
+					return _Utils_Tuple2(true, aNew);
+				case 2:
+					return _Utils_Tuple2(
+						true,
+						_Utils_update(
+							aNew,
+							{g: 3}));
+				case 6:
+					return _Utils_Tuple2(
+						true,
+						A3($author$project$Akshar$mergeBottomBindi, aM, aC, aNew));
+				default:
+					return _Utils_Tuple2(false, aM);
+			}
+		} else {
+			return _Utils_Tuple2(false, aM);
+		}
+	});
+var $author$project$RVHLine$mrgMChelper = F3(
+	function (inAr, iStart, collectAr) {
+		mrgMChelper:
+		while (true) {
+			var iNext = iStart + 1;
+			var collectArLen = $elm$core$Array$length(collectAr);
+			var aM = A2(
+				$elm$core$Maybe$withDefault,
+				$author$project$Akshar$emptyAkshar,
+				A2($elm$core$Array$get, collectArLen - 1, collectAr));
+			var aL = A2(
+				$elm$core$Maybe$withDefault,
+				$author$project$Akshar$emptyAkshar,
+				A2($elm$core$Array$get, iStart, inAr));
+			var mrgResult = A2($author$project$Akshar$mrgMaatraaCons, aL, aM);
+			var aC = mrgResult.b;
+			if (_Utils_eq(
+				iStart,
+				$elm$core$Array$length(inAr))) {
+				return collectAr;
+			} else {
+				if ($elm$core$Array$length(inAr) === 1) {
+					var $temp$inAr = inAr,
+						$temp$iStart = iNext,
+						$temp$collectAr = A2($elm$core$Array$push, aL, collectAr);
+					inAr = $temp$inAr;
+					iStart = $temp$iStart;
+					collectAr = $temp$collectAr;
+					continue mrgMChelper;
+				} else {
+					if (mrgResult.a) {
+						var $temp$inAr = inAr,
+							$temp$iStart = iNext,
+							$temp$collectAr = A3($elm$core$Array$set, collectArLen - 1, aC, collectAr);
+						inAr = $temp$inAr;
+						iStart = $temp$iStart;
+						collectAr = $temp$collectAr;
+						continue mrgMChelper;
+					} else {
+						var $temp$inAr = inAr,
+							$temp$iStart = iNext,
+							$temp$collectAr = A2($elm$core$Array$push, aC, collectAr);
+						inAr = $temp$inAr;
+						iStart = $temp$iStart;
+						collectAr = $temp$collectAr;
+						continue mrgMChelper;
+					}
+				}
+			}
+		}
+	});
+var $author$project$RVHLine$mrgMCline = function (inputArray) {
+	return A3($author$project$RVHLine$mrgMChelper, inputArray, 0, $elm$core$Array$empty);
+};
+var $author$project$Akshar$BottomBindi = 6;
+var $author$project$Akshar$ChandraBindu = 5;
+var $author$project$Akshar$Halant = 2;
+var $author$project$Akshar$Maatraa = 1;
+var $author$project$Akshar$Other = 7;
+var $author$project$Akshar$isBindu = function (c) {
+	return $elm$core$Char$toCode(c) === 2306;
+};
+var $author$project$Akshar$isBottomBindi = function (cd) {
+	return cd === 2364;
+};
+var $author$project$Akshar$isChandraBindu = function (c) {
+	return $elm$core$Char$toCode(c) === 2305;
+};
+var $author$project$Akshar$isHalant = function (cd) {
+	return cd === 2381;
+};
+var $author$project$Akshar$isHindi = function (cd) {
+	return (cd >= 2305) && (cd <= 2399);
+};
+var $author$project$Akshar$isMaatraaVowel = function (cd) {
+	return (cd >= 2366) && (cd <= 2380);
+};
+var $author$project$Akshar$isPureVowel = function (cd) {
+	return (cd >= 2309) && (cd <= 2324);
+};
+var $author$project$Akshar$maatraaToVowel = function (c) {
+	switch (c) {
+		case 'ा':
+			return 'आ';
+		case 'ि':
+			return 'इ';
+		case 'ी':
+			return 'ई';
+		case 'ु':
+			return 'उ';
+		case 'ू':
+			return 'ऊ';
+		case 'े':
+			return 'ए';
+		case 'ै':
+			return 'ऐ';
+		case 'ो':
+			return 'ओ';
+		case 'ौ':
+			return 'औ';
+		case 'ॉ':
+			return 'ऑ';
+		case 'ृ':
+			return 'ऋ';
+		default:
+			return c;
+	}
+};
+var $author$project$Akshar$vowelRhythm = function (c) {
+	switch (c) {
+		case 'अ':
+			return 1;
+		case 'आ':
+			return 2;
+		case 'इ':
+			return 1;
+		case 'ई':
+			return 2;
+		case 'उ':
+			return 1;
+		case 'ऊ':
+			return 2;
+		case 'ए':
+			return 2;
+		case 'ऐ':
+			return 2;
+		case 'ओ':
+			return 2;
+		case 'औ':
+			return 2;
+		case 'ऑ':
+			return 2;
+		case 'ऋ':
+			return 1;
+		default:
+			return 0;
+	}
+};
+var $author$project$Akshar$processChar = function (c) {
+	var m = 0;
+	var cd = $elm$core$Char$toCode(c);
+	var aRhythm = $author$project$Akshar$vowelRhythm('अ');
+	var a = {
+		g: 7,
+		as: cd,
+		R: c,
+		c: 0,
+		G: $elm$core$String$fromChar(c),
+		f: 0,
+		r: c
+	};
+	var newRhythm = $author$project$Akshar$isPureVowel(cd) ? $author$project$Akshar$vowelRhythm(a.r) : ($author$project$Akshar$isMaatraaVowel(cd) ? $author$project$Akshar$vowelRhythm(
+		$author$project$Akshar$maatraaToVowel(a.r)) : 0);
+	return $author$project$Akshar$isHindi(cd) ? ($author$project$Akshar$isPureVowel(cd) ? _Utils_update(
+		a,
+		{g: 0, c: newRhythm, f: newRhythm}) : ($author$project$Akshar$isMaatraaVowel(cd) ? _Utils_update(
+		a,
+		{g: 1, c: newRhythm, f: newRhythm}) : ($author$project$Akshar$isBindu(c) ? _Utils_update(
+		a,
+		{g: 3, c: 0, f: 0}) : ($author$project$Akshar$isHalant(cd) ? _Utils_update(
+		a,
+		{g: 2, c: 0, f: 0}) : ($author$project$Akshar$isChandraBindu(c) ? _Utils_update(
+		a,
+		{g: 5, c: 0, f: 0}) : ($author$project$Akshar$isBottomBindi(cd) ? _Utils_update(
+		a,
+		{g: 6, c: 0, f: 0}) : _Utils_update(
+		a,
+		{g: 4, c: aRhythm, f: aRhythm, r: 'अ'}))))))) : a;
+};
+var $elm$core$String$foldr = _String_foldr;
+var $elm$core$String$toList = function (string) {
+	return A3($elm$core$String$foldr, $elm$core$List$cons, _List_Nil, string);
+};
+var $author$project$RVHLine$processLine = function (pomLine) {
+	var pChars = $elm$core$String$toList(pomLine);
+	var pPoem = A2($elm$core$List$map, $author$project$Akshar$processChar, pChars);
+	var pPoemA = $elm$core$Array$fromList(pPoem);
+	var mergedLine = $author$project$RVHLine$mrgMCline(pPoemA);
+	var _final = A3($author$project$RVHLine$calcHalfAksharRhythmLine, mergedLine, 0, 0);
+	return A3($author$project$RVHLine$PoemLine, pomLine, _final.b, _final.a);
+};
+var $author$project$RVHLine$removeExtraSpaces = function (string) {
+	return A3(
+		$author$project$RVHLine$userReplace,
+		'\\s+',
+		function (_v0) {
+			return ' ';
+		},
+		string);
+};
+var $author$project$RVHLine$removeNonDevanagari = function (string) {
+	return A3(
+		$author$project$RVHLine$userReplace,
+		'[^\u0900-\u097F]',
+		function (_v0) {
+			return ' ';
+		},
+		string);
+};
+var $author$project$RVHLine$removePoornviraam = function (string) {
+	return A3(
+		$author$project$RVHLine$userReplace,
+		'।',
+		function (_v0) {
+			return ' ';
+		},
+		string);
+};
+var $elm$core$String$trim = _String_trim;
+var $author$project$RVHLine$preProcessLine = F2(
+	function (pomLine, oldLine) {
+		var pCleaned = $elm$core$String$trim(
+			$author$project$RVHLine$removeExtraSpaces(
+				$author$project$RVHLine$removePoornviraam(
+					$author$project$RVHLine$removeNonDevanagari(pomLine))));
+		return _Utils_eq(pCleaned, oldLine.G) ? oldLine : $author$project$RVHLine$processLine(pCleaned);
+	});
+var $elm$core$Array$repeat = F2(
+	function (n, e) {
+		return A2(
+			$elm$core$Array$initialize,
+			n,
+			function (_v0) {
+				return e;
+			});
+	});
+var $author$project$RVHCore$processPoem = F2(
+	function (pom, oldLines) {
+		var pLines = $elm$core$Array$fromList(
+			$elm$core$String$lines(pom));
+		var diff = $elm$core$Array$length(pLines) - $elm$core$Array$length(oldLines);
+		var paddedOldPoem = (diff > 0) ? A2(
+			$elm$core$Array$append,
+			oldLines,
+			A2($elm$core$Array$repeat, diff, $author$project$RVHLine$emptyLine)) : oldLines;
+		var processedLines = A3($elm_community$array_extra$Array$Extra$map2, $author$project$RVHLine$preProcessLine, pLines, paddedOldPoem);
+		var maxLineLen = $author$project$RVHLine$calcMaxLineLen(processedLines);
+		return $author$project$RVHCore$GenericPoem(
+			{a: processedLines, b: maxLineLen});
+	});
+var $author$project$RVHCore$fvProcess = F2(
+	function (pom, oldPom) {
+		var oldFVData = $author$project$RVHCore$fvGetData(oldPom);
+		var oldFVFlags = A2(
+			$elm$core$Array$map,
+			function ($) {
+				return $.ag;
+			},
+			oldFVData.a);
+		var basicOldLines = $author$project$RVHCore$genericGetData(oldPom).a;
+		var basicProcessed = $author$project$RVHCore$genericGetData(
+			A2($author$project$RVHCore$processPoem, pom, basicOldLines));
+		var diff = $elm$core$Array$length(basicProcessed.a) - $elm$core$Array$length(oldFVData.a);
+		var paddedOldFlags = (diff > 0) ? A2(
+			$elm$core$Array$append,
+			oldFVFlags,
+			A2($elm$core$Array$repeat, diff, false)) : oldFVFlags;
+		var newFVLines = A3($elm_community$array_extra$Array$Extra$map2, $author$project$RVHFreeVerse$fromLineWFlag, basicProcessed.a, paddedOldFlags);
+		var composite = A4($author$project$RVHFreeVerse$calcCompositeRhythm, newFVLines, 0, $elm$core$Array$empty, false);
+		var compositeWRemainder = A3($author$project$RVHFreeVerse$calcRemainderWhole, composite, oldFVData.s, 0);
+		return $author$project$RVHCore$FreeVerse(
+			{s: oldFVData.s, I: compositeWRemainder, a: newFVLines, b: basicProcessed.b});
+	});
 var $author$project$Akshar$unitsLast = function (akshars) {
 	return A2(
 		$elm$core$Maybe$withDefault,
@@ -5229,7 +5442,7 @@ var $author$project$RVHGhazal$setMisraaKaafiyaa = F4(
 					var $temp$misraa = _Utils_update(
 						misraa,
 						{
-							al: A3($elm$core$Array$set, ai, 'k', misraa.al)
+							an: A3($elm$core$Array$set, ai, 'k', misraa.an)
 						}),
 						$temp$radeefLen = radeefLen,
 						$temp$kaafiyaa = kaafiyaa,
@@ -5251,7 +5464,7 @@ var $author$project$RVHCore$ghazalSetKaafiyaa = F4(
 		while (true) {
 			var misraa = A2(
 				$elm$core$Maybe$withDefault,
-				{L: $author$project$RVHLine$emptyLine, al: $elm$core$Array$empty},
+				{L: $author$project$RVHLine$emptyLine, an: $elm$core$Array$empty},
 				A2($elm$core$Array$get, mi, misre));
 			var newMisraa = A4($author$project$RVHGhazal$setMisraaKaafiyaa, misraa, radeefLen, kaafiyaa, 0);
 			var misre1 = A3($elm$core$Array$set, mi, newMisraa, misre);
@@ -5296,7 +5509,7 @@ var $author$project$RVHGhazal$setMisraaRadeef = F3(
 					var $temp$misraa = _Utils_update(
 						misraa,
 						{
-							al: A3($elm$core$Array$set, ai, 'r', misraa.al)
+							an: A3($elm$core$Array$set, ai, 'r', misraa.an)
 						}),
 						$temp$radeef = radeef,
 						$temp$radeefI = radeefI + 1;
@@ -5316,7 +5529,7 @@ var $author$project$RVHCore$ghazalSetRadeef = F3(
 		while (true) {
 			var misraa = A2(
 				$elm$core$Maybe$withDefault,
-				{L: $author$project$RVHLine$emptyLine, al: $elm$core$Array$empty},
+				{L: $author$project$RVHLine$emptyLine, an: $elm$core$Array$empty},
 				A2($elm$core$Array$get, mi, misre));
 			var newMisraa = A3($author$project$RVHGhazal$setMisraaRadeef, misraa, radeef, 0);
 			var misre1 = A3($elm$core$Array$set, mi, newMisraa, misre);
@@ -5415,11 +5628,11 @@ var $author$project$RVHCore$ghazalProcess = F2(
 			kaafiyaa,
 			0);
 		return $author$project$RVHCore$Ghazal(
-			{ay: kaafiyaa, a: misre2, b: basic.b, aK: radeef});
+			{az: kaafiyaa, a: misre2, b: basic.b, aL: radeef});
 	});
 var $author$project$RVHPattern$Maapnee = F3(
 	function (units, str, len) {
-		return {aA: len, G: str, z: units};
+		return {aB: len, G: str, z: units};
 	});
 var $author$project$RVHPattern$maapneeToInt = function (m) {
 	switch (m) {
@@ -5461,15 +5674,15 @@ var $author$project$RVHCore$maatrikProcessPoem = F3(
 			{
 				a: maatrikLinesWMaapnee,
 				C: processedMaapnee,
-				b: (_Utils_cmp(processedMaapnee.aA, basic.b) > 0) ? processedMaapnee.aA : basic.b
+				b: (_Utils_cmp(processedMaapnee.aB, basic.b) > 0) ? processedMaapnee.aB : basic.b
 			});
 	});
 var $author$project$RVHVarnikLine$biggerLine = F2(
 	function (line1, line2) {
-		return (_Utils_cmp(line1.ab, line2.ab) > 0) ? line1 : line2;
+		return (_Utils_cmp(line1.ac, line2.ac) > 0) ? line1 : line2;
 	});
 var $author$project$RVHVarnikLine$calcMaxLineLen = function (lines) {
-	return A3($elm$core$Array$foldl, $author$project$RVHVarnikLine$biggerLine, $author$project$RVHVarnikLine$emptyLine, lines).ab;
+	return A3($elm$core$Array$foldl, $author$project$RVHVarnikLine$biggerLine, $author$project$RVHVarnikLine$emptyLine, lines).ac;
 };
 var $author$project$RVHCore$varnikProcessPoem = F3(
 	function (pom, oldPom, maapnee) {
@@ -5517,13 +5730,13 @@ var $author$project$RVHCore$update = F2(
 						var result = _v1.a;
 						return result;
 					} else {
-						return {C: '', E: '', aj: ''};
+						return {C: '', E: '', al: ''};
 					}
 				}();
 				var maapnee = $elm$core$String$trim(
 					$author$project$RVHLine$removeExtraSpaces(
 						$author$project$RVHLine$cleanMaapnee(incomingPoem.C)));
-				var poemType = $elm$core$String$toUpper(incomingPoem.aj);
+				var poemType = $elm$core$String$toUpper(incomingPoem.al);
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
@@ -5541,7 +5754,7 @@ var $author$project$RVHCore$update = F2(
 						var result = _v2.a;
 						return result;
 					} else {
-						return {ad: -1, af: -1};
+						return {ae: -1, ah: -1};
 					}
 				}();
 				return _Utils_Tuple2(
@@ -5549,7 +5762,7 @@ var $author$project$RVHCore$update = F2(
 						model,
 						{
 							K: 'Maatraa Adjusted ' + str,
-							u: A3($author$project$RVHCore$adjustMaatraaPoem, model.u, whichChar.af, whichChar.ad)
+							u: A3($author$project$RVHCore$adjustMaatraaPoem, model.u, whichChar.ah, whichChar.ae)
 						}),
 					$elm$core$Platform$Cmd$none);
 			case 2:
