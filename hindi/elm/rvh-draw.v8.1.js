@@ -254,17 +254,8 @@ function draw()
       g.append("svg:text")            // line total maatraa, d = line
       .attr("y", charH)
       .attr("x", function(d) {return charW*maxLen+(5);})
-      .text(function(d) { return (d.rhythmAmtCumulative > 0) ? maatraaNVarnaCount(d) : "";});
+      .text(function(d) { return (d.rhythmAmtCumulative > 0) ? d.rhythmAmtCumulative : "";});
     }
-}
-
-function maatraaNVarnaCount(d)
-{
-	console.log(d);
-	if (typeof d.varnaCount == undefined)
-		return d.rhythmAmtCumulative;
-	else
-		return (d.rhythmAmtCumulative + ", " + d.varnaCount);
 }
 
 // Function: drawCharBlock

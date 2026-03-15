@@ -16,7 +16,8 @@ import RVHFreeVerse as FV
 type ProcessedPoem 
   = GenericPoem { maxLineLen : Int, lines : Array.Array L.PoemLine }
   | MaatrikPoem { maxLineLen : Int, lines : Array.Array ML.PoemLine, maapnee : P.Maapnee }
-  | VarnikPoem {maxLineLen : Int, lines : Array.Array VL.PoemLine, maapnee : VL.Maapnee }
+  --| VarnikPoem {maxLineLen : Int, lines : Array.Array VL.PoemLine, maapnee : VL.Maapnee }
+  | VarnikPoem {maxLineLen : Int, lines : Array.Array VL.PoemLine }
   | Ghazal { maxLineLen: Int, lines: Array.Array Gh.Misraa, radeef : Array.Array A.Akshar, kaafiyaa : Array.Array A.Akshar}
   | FreeVerse {maxLineLen: Int, lines: Array.Array FV.Line, composite : Array.Array FV.CompositeLine, baseCount : Int }
 
@@ -72,31 +73,34 @@ maatrikAdjustMaatraa poemData li ci =
 
 -- == VARNIK == --
 
-emptyVarnik = VarnikPoem {maxLineLen = 0, lines = Array.empty, maapnee = P.emptyMaapnee}
+--emptyVarnik = VarnikPoem {maxLineLen = 0, lines = Array.empty, maapnee = P.emptyMaapnee}
+emptyVarnik = VarnikPoem {maxLineLen = 0, lines = Array.empty}
 
 varnikProcessPoem pom oldPom maapnee =
   let
     genericOld = genericGetData oldPom
     basic = genericGetData (processPoem pom genericOld.lines)
-    processedMaapnee = VL.mProcess (P.process maapnee)
-    repeatedMaapnees = Array.repeat (Array.length basic.lines) processedMaapnee.units
-    vaarnikLines = Array.map2 VL.fromBasicL basic.lines repeatedMaapnees
+    --processedMaapnee = VL.mProcess (P.process maapnee)
+    --repeatedMaapnees = Array.repeat (Array.length basic.lines) processedMaapnee.units
+    --vaarnikLines = Array.map2 VL.fromBasicL basic.lines repeatedMaapnees
+    vaarnikLines = Array.map VL.fromBasicL basic.lines
   in
     VarnikPoem {
       maxLineLen = 
-        if (processedMaapnee.len > basic.maxLineLen) then 
-          processedMaapnee.len 
-        else 
-          basic.maxLineLen, 
-      lines = vaarnikLines, 
-      maapnee = processedMaapnee
+        --if (processedMaapnee.len > basic.maxLineLen) then 
+          --processedMaapnee.len 
+        --else 
+          VL.calcMaxLineLen vaarnikLines, 
+      lines = vaarnikLines 
+      --maapnee = processedMaapnee
     }
 
 vaarnikAdjustMaatraa poemData li ci =
   let 
     oldLine = Maybe.withDefault VL.emptyLine (Array.get li poemData.lines)
     newBasicLine = L.adjustMaatraa (VL.toBasicL oldLine) ci
-    newLine = VL.fromBasicL newBasicLine poemData.maapnee.units
+    --newLine = VL.fromBasicL newBasicLine poemData.maapnee.units
+    newLine = VL.fromBasicL newBasicLine
     newLines = Array.set li newLine poemData.lines
     newMaxLineLen = if (newLine.rhythmTotal > poemData.maxLineLen) then
         newLine.rhythmTotal
@@ -105,8 +109,8 @@ vaarnikAdjustMaatraa poemData li ci =
   in 
     VarnikPoem 
       { maxLineLen = newMaxLineLen
-      , lines = newLines
-      , maapnee = poemData.maapnee}
+      , lines = newLines}
+      --, maapnee = poemData.maapnee}
 
 -- == GHAZAL == --
 
@@ -375,7 +379,7 @@ encodeVarnik p =
   E.object
     [ ("maxLineLen", E.int p.maxLineLen)
     , ("lines", E.array VL.encodeLine p.lines)
-    , ("pattern", VL.encodeMaapnee p.maapnee)
+    --, ("pattern", VL.encodeMaapnee p.maapnee)
     , ("poemType", E.string "VARNIK")
     ]
 
