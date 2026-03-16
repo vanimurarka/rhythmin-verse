@@ -4195,51 +4195,22 @@ var $author$project$RVHVarnikLine$mergeHalfIntoPriorLaghu = F3(
 			}
 		}
 	});
-var $author$project$RVHVarnikLine$aReInsert0RAs = F5(
-	function (la1, i1, lan, i2, la2) {
-		aReInsert0RAs:
-		while (true) {
-			var a2 = A2(
-				$elm$core$Maybe$withDefault,
-				$author$project$RVHVarnikLine$emptyVarna,
-				A2($elm$core$Array$get, i2, la2));
-			var a1 = A2(
-				$elm$core$Maybe$withDefault,
-				$author$project$RVHVarnikLine$emptyVarna,
-				A2($elm$core$Array$get, i1, la1));
-			if (_Utils_cmp(
-				i1,
-				$elm$core$Array$length(la1)) > -1) {
-				return lan;
-			} else {
-				if (_Utils_eq(a1.S, a2.S)) {
-					var $temp$la1 = la1,
-						$temp$i1 = i1 + 1,
-						$temp$lan = A2($elm$core$Array$push, a2, lan),
-						$temp$i2 = i2 + 1,
-						$temp$la2 = la2;
-					la1 = $temp$la1;
-					i1 = $temp$i1;
-					lan = $temp$lan;
-					i2 = $temp$i2;
-					la2 = $temp$la2;
-					continue aReInsert0RAs;
-				} else {
-					var $temp$la1 = la1,
-						$temp$i1 = i1 + 1,
-						$temp$lan = A2($elm$core$Array$push, a1, lan),
-						$temp$i2 = i2,
-						$temp$la2 = la2;
-					la1 = $temp$la1;
-					i1 = $temp$i1;
-					lan = $temp$lan;
-					i2 = $temp$i2;
-					la2 = $temp$la2;
-					continue aReInsert0RAs;
-				}
-			}
-		}
-	});
+var $author$project$RVHVarnikLine$vaFilterZero = function (el) {
+	return !(!el.c);
+};
+var $author$project$RVHVarnikLine$fromBasicL = function (lineP) {
+	var vUnits = A3(
+		$author$project$RVHVarnikLine$mergeHalfIntoPriorLaghu,
+		0,
+		$elm$core$Array$empty,
+		A2($elm$core$Array$map, $author$project$RVHVarnikLine$varnaFrmAkshar, lineP.A));
+	var vUnitsWOZero = A2($elm$core$Array$filter, $author$project$RVHVarnikLine$vaFilterZero, vUnits);
+	return A3(
+		$author$project$RVHVarnikLine$PoemLine,
+		lineP.G,
+		$elm$core$Array$length(vUnitsWOZero),
+		vUnits);
+};
 var $elm$core$Elm$JsArray$appendN = _JsArray_appendN;
 var $elm$core$Elm$JsArray$slice = _JsArray_slice;
 var $elm$core$Array$appendHelpBuilder = F2(
@@ -4343,394 +4314,6 @@ var $elm$core$Array$append = F2(
 						bTree)));
 		}
 	});
-var $author$project$RVHVarnikLine$arStr = function (a) {
-	return $elm$core$String$fromInt(a.c);
-};
-var $author$project$RVHVarnikLine$ganSigToGan = function (sig) {
-	switch (sig) {
-		case '122':
-			return 'y';
-		case '222':
-			return 'm';
-		case '221':
-			return 't';
-		case '212':
-			return 'r';
-		case '121':
-			return 'j';
-		case '211':
-			return 'b';
-		case '111':
-			return 'n';
-		case '112':
-			return 's';
-		case '1':
-			return 'l';
-		case '2':
-			return 'g';
-		default:
-			return '';
-	}
-};
-var $author$project$RVHVarnikLine$laGanSetToGanName = function (ganset) {
-	var sig = A3(
-		$elm$core$Array$foldr,
-		$elm$core$Basics$append,
-		'',
-		A2($elm$core$Array$map, $author$project$RVHVarnikLine$arStr, ganset));
-	return $author$project$RVHVarnikLine$ganSigToGan(sig);
-};
-var $author$project$RVHVarnikLine$laSetGanameToGanset = F4(
-	function (gs, gn, i, ns) {
-		laSetGanameToGanset:
-		while (true) {
-			var len = $elm$core$Array$length(gs);
-			var a = A2(
-				$elm$core$Maybe$withDefault,
-				$author$project$RVHVarnikLine$emptyVarna,
-				A2($elm$core$Array$get, i, gs));
-			var newVarna = _Utils_update(
-				a,
-				{aj: gn});
-			var ns1 = A2($elm$core$Array$push, newVarna, ns);
-			if (_Utils_cmp(i, len) > -1) {
-				return ns;
-			} else {
-				var $temp$gs = gs,
-					$temp$gn = gn,
-					$temp$i = i + 1,
-					$temp$ns = ns1;
-				gs = $temp$gs;
-				gn = $temp$gn;
-				i = $temp$i;
-				ns = $temp$ns;
-				continue laSetGanameToGanset;
-			}
-		}
-	});
-var $author$project$RVHVarnikLine$laGanSetWGaname = F2(
-	function (gs, gn) {
-		return A4($author$project$RVHVarnikLine$laSetGanameToGanset, gs, gn, 0, $elm$core$Array$empty);
-	});
-var $author$project$RVHVarnikLine$laWithIdx = F3(
-	function (lus, i, lus1) {
-		laWithIdx:
-		while (true) {
-			var u = A2(
-				$elm$core$Maybe$withDefault,
-				$author$project$RVHVarnikLine$emptyVarna,
-				A2($elm$core$Array$get, i, lus));
-			if (_Utils_cmp(
-				i,
-				$elm$core$Array$length(lus)) > -1) {
-				return lus1;
-			} else {
-				var $temp$lus = lus,
-					$temp$i = i + 1,
-					$temp$lus1 = A2(
-					$elm$core$Array$push,
-					_Utils_update(
-						u,
-						{S: i}),
-					lus1);
-				lus = $temp$lus;
-				i = $temp$i;
-				lus1 = $temp$lus1;
-				continue laWithIdx;
-			}
-		}
-	});
-var $elm$core$Tuple$second = function (_v0) {
-	var y = _v0.b;
-	return y;
-};
-var $elm$core$List$drop = F2(
-	function (n, list) {
-		drop:
-		while (true) {
-			if (n <= 0) {
-				return list;
-			} else {
-				if (!list.b) {
-					return list;
-				} else {
-					var x = list.a;
-					var xs = list.b;
-					var $temp$n = n - 1,
-						$temp$list = xs;
-					n = $temp$n;
-					list = $temp$list;
-					continue drop;
-				}
-			}
-		}
-	});
-var $elm$core$Array$sliceLeft = F2(
-	function (from, array) {
-		var len = array.a;
-		var tree = array.c;
-		var tail = array.d;
-		if (!from) {
-			return array;
-		} else {
-			if (_Utils_cmp(
-				from,
-				$elm$core$Array$tailIndex(len)) > -1) {
-				return A4(
-					$elm$core$Array$Array_elm_builtin,
-					len - from,
-					$elm$core$Array$shiftStep,
-					$elm$core$Elm$JsArray$empty,
-					A3(
-						$elm$core$Elm$JsArray$slice,
-						from - $elm$core$Array$tailIndex(len),
-						$elm$core$Elm$JsArray$length(tail),
-						tail));
-			} else {
-				var skipNodes = (from / $elm$core$Array$branchFactor) | 0;
-				var helper = F2(
-					function (node, acc) {
-						if (!node.$) {
-							var subTree = node.a;
-							return A3($elm$core$Elm$JsArray$foldr, helper, acc, subTree);
-						} else {
-							var leaf = node.a;
-							return A2($elm$core$List$cons, leaf, acc);
-						}
-					});
-				var leafNodes = A3(
-					$elm$core$Elm$JsArray$foldr,
-					helper,
-					_List_fromArray(
-						[tail]),
-					tree);
-				var nodesToInsert = A2($elm$core$List$drop, skipNodes, leafNodes);
-				if (!nodesToInsert.b) {
-					return $elm$core$Array$empty;
-				} else {
-					var head = nodesToInsert.a;
-					var rest = nodesToInsert.b;
-					var firstSlice = from - (skipNodes * $elm$core$Array$branchFactor);
-					var initialBuilder = {
-						i: _List_Nil,
-						d: 0,
-						h: A3(
-							$elm$core$Elm$JsArray$slice,
-							firstSlice,
-							$elm$core$Elm$JsArray$length(head),
-							head)
-					};
-					return A2(
-						$elm$core$Array$builderToArray,
-						true,
-						A3($elm$core$List$foldl, $elm$core$Array$appendHelpBuilder, initialBuilder, rest));
-				}
-			}
-		}
-	});
-var $elm$core$Array$fetchNewTail = F4(
-	function (shift, end, treeEnd, tree) {
-		fetchNewTail:
-		while (true) {
-			var pos = $elm$core$Array$bitMask & (treeEnd >>> shift);
-			var _v0 = A2($elm$core$Elm$JsArray$unsafeGet, pos, tree);
-			if (!_v0.$) {
-				var sub = _v0.a;
-				var $temp$shift = shift - $elm$core$Array$shiftStep,
-					$temp$end = end,
-					$temp$treeEnd = treeEnd,
-					$temp$tree = sub;
-				shift = $temp$shift;
-				end = $temp$end;
-				treeEnd = $temp$treeEnd;
-				tree = $temp$tree;
-				continue fetchNewTail;
-			} else {
-				var values = _v0.a;
-				return A3($elm$core$Elm$JsArray$slice, 0, $elm$core$Array$bitMask & end, values);
-			}
-		}
-	});
-var $elm$core$Array$hoistTree = F3(
-	function (oldShift, newShift, tree) {
-		hoistTree:
-		while (true) {
-			if ((_Utils_cmp(oldShift, newShift) < 1) || (!$elm$core$Elm$JsArray$length(tree))) {
-				return tree;
-			} else {
-				var _v0 = A2($elm$core$Elm$JsArray$unsafeGet, 0, tree);
-				if (!_v0.$) {
-					var sub = _v0.a;
-					var $temp$oldShift = oldShift - $elm$core$Array$shiftStep,
-						$temp$newShift = newShift,
-						$temp$tree = sub;
-					oldShift = $temp$oldShift;
-					newShift = $temp$newShift;
-					tree = $temp$tree;
-					continue hoistTree;
-				} else {
-					return tree;
-				}
-			}
-		}
-	});
-var $elm$core$Array$sliceTree = F3(
-	function (shift, endIdx, tree) {
-		var lastPos = $elm$core$Array$bitMask & (endIdx >>> shift);
-		var _v0 = A2($elm$core$Elm$JsArray$unsafeGet, lastPos, tree);
-		if (!_v0.$) {
-			var sub = _v0.a;
-			var newSub = A3($elm$core$Array$sliceTree, shift - $elm$core$Array$shiftStep, endIdx, sub);
-			return (!$elm$core$Elm$JsArray$length(newSub)) ? A3($elm$core$Elm$JsArray$slice, 0, lastPos, tree) : A3(
-				$elm$core$Elm$JsArray$unsafeSet,
-				lastPos,
-				$elm$core$Array$SubTree(newSub),
-				A3($elm$core$Elm$JsArray$slice, 0, lastPos + 1, tree));
-		} else {
-			return A3($elm$core$Elm$JsArray$slice, 0, lastPos, tree);
-		}
-	});
-var $elm$core$Array$sliceRight = F2(
-	function (end, array) {
-		var len = array.a;
-		var startShift = array.b;
-		var tree = array.c;
-		var tail = array.d;
-		if (_Utils_eq(end, len)) {
-			return array;
-		} else {
-			if (_Utils_cmp(
-				end,
-				$elm$core$Array$tailIndex(len)) > -1) {
-				return A4(
-					$elm$core$Array$Array_elm_builtin,
-					end,
-					startShift,
-					tree,
-					A3($elm$core$Elm$JsArray$slice, 0, $elm$core$Array$bitMask & end, tail));
-			} else {
-				var endIdx = $elm$core$Array$tailIndex(end);
-				var depth = $elm$core$Basics$floor(
-					A2(
-						$elm$core$Basics$logBase,
-						$elm$core$Array$branchFactor,
-						A2($elm$core$Basics$max, 1, endIdx - 1)));
-				var newShift = A2($elm$core$Basics$max, 5, depth * $elm$core$Array$shiftStep);
-				return A4(
-					$elm$core$Array$Array_elm_builtin,
-					end,
-					newShift,
-					A3(
-						$elm$core$Array$hoistTree,
-						startShift,
-						newShift,
-						A3($elm$core$Array$sliceTree, startShift, endIdx, tree)),
-					A4($elm$core$Array$fetchNewTail, startShift, end, endIdx, tree));
-			}
-		}
-	});
-var $elm$core$Array$translateIndex = F2(
-	function (index, _v0) {
-		var len = _v0.a;
-		var posIndex = (index < 0) ? (len + index) : index;
-		return (posIndex < 0) ? 0 : ((_Utils_cmp(posIndex, len) > 0) ? len : posIndex);
-	});
-var $elm$core$Array$slice = F3(
-	function (from, to, array) {
-		var correctTo = A2($elm$core$Array$translateIndex, to, array);
-		var correctFrom = A2($elm$core$Array$translateIndex, from, array);
-		return (_Utils_cmp(correctFrom, correctTo) > 0) ? $elm$core$Array$empty : A2(
-			$elm$core$Array$sliceLeft,
-			correctFrom,
-			A2($elm$core$Array$sliceRight, correctTo, array));
-	});
-var $elm_community$array_extra$Array$Extra$sliceFrom = function (lengthDropped) {
-	return function (array) {
-		return A3(
-			$elm$core$Array$slice,
-			lengthDropped,
-			$elm$core$Array$length(array),
-			array);
-	};
-};
-var $elm_community$array_extra$Array$Extra$sliceUntil = function (lengthNew) {
-	return function (array) {
-		return A3(
-			$elm$core$Array$slice,
-			0,
-			(lengthNew >= 0) ? lengthNew : ($elm$core$Array$length(array) + lengthNew),
-			array);
-	};
-};
-var $elm_community$array_extra$Array$Extra$splitAt = function (index) {
-	return function (array) {
-		return (index > 0) ? _Utils_Tuple2(
-			A2($elm_community$array_extra$Array$Extra$sliceUntil, index, array),
-			A2($elm_community$array_extra$Array$Extra$sliceFrom, index, array)) : _Utils_Tuple2($elm$core$Array$empty, array);
-	};
-};
-var $author$project$RVHVarnikLine$toGanSets = F2(
-	function (a, na) {
-		toGanSets:
-		while (true) {
-			var na3a3 = A2($elm_community$array_extra$Array$Extra$splitAt, 3, a);
-			var na3 = na3a3.a;
-			var na1a1 = A2($elm_community$array_extra$Array$Extra$splitAt, 1, a);
-			var na1 = na1a1.a;
-			var len = $elm$core$Array$length(a);
-			var a3 = na3a3.b;
-			var a1 = na1a1.b;
-			if (!len) {
-				return na;
-			} else {
-				if (len >= 3) {
-					var $temp$a = a3,
-						$temp$na = A2($elm$core$Array$push, na3, na);
-					a = $temp$a;
-					na = $temp$na;
-					continue toGanSets;
-				} else {
-					var $temp$a = a1,
-						$temp$na = A2($elm$core$Array$push, na1, na);
-					a = $temp$a;
-					na = $temp$na;
-					continue toGanSets;
-				}
-			}
-		}
-	});
-var $author$project$RVHVarnikLine$vaFilterZero = function (el) {
-	return !(!el.c);
-};
-var $author$project$RVHVarnikLine$processLineUnits = function (units) {
-	var lWOZero = A2($elm$core$Array$filter, $author$project$RVHVarnikLine$vaFilterZero, units);
-	var laWIdx = A3($author$project$RVHVarnikLine$laWithIdx, lWOZero, 0, $elm$core$Array$empty);
-	var lGanSets = A2($author$project$RVHVarnikLine$toGanSets, laWIdx, $elm$core$Array$empty);
-	var gans = A2($elm$core$Array$map, $author$project$RVHVarnikLine$laGanSetToGanName, lGanSets);
-	var lGanSetsWGan = A3($elm_community$array_extra$Array$Extra$map2, $author$project$RVHVarnikLine$laGanSetWGaname, lGanSets, gans);
-	var l1 = A5(
-		$author$project$RVHVarnikLine$aReInsert0RAs,
-		laWIdx,
-		0,
-		$elm$core$Array$empty,
-		0,
-		A3($elm$core$Array$foldr, $elm$core$Array$append, $elm$core$Array$empty, lGanSetsWGan));
-	return l1;
-};
-var $author$project$RVHVarnikLine$fromBasicL = function (lineP) {
-	var vUnits = $author$project$RVHVarnikLine$processLineUnits(
-		A3(
-			$author$project$RVHVarnikLine$mergeHalfIntoPriorLaghu,
-			0,
-			$elm$core$Array$empty,
-			A2($elm$core$Array$map, $author$project$RVHVarnikLine$varnaFrmAkshar, lineP.A)));
-	var vUnitsWOZero = A2($elm$core$Array$filter, $author$project$RVHVarnikLine$vaFilterZero, vUnits);
-	return A3(
-		$author$project$RVHVarnikLine$PoemLine,
-		lineP.G,
-		$elm$core$Array$length(vUnitsWOZero),
-		vUnits);
-};
 var $author$project$RVHVarnikLine$toBasicL = function (lineV) {
 	var akshars2D = A2(
 		$elm$core$Array$map,
@@ -5128,6 +4711,10 @@ var $author$project$Akshar$mrgMaatraaCons = F2(
 			return _Utils_Tuple2(false, aM);
 		}
 	});
+var $elm$core$Tuple$second = function (_v0) {
+	var y = _v0.b;
+	return y;
+};
 var $author$project$RVHLine$mrgMChelper = F3(
 	function (inAr, iStart, collectAr) {
 		mrgMChelper:
@@ -5390,6 +4977,206 @@ var $author$project$RVHCore$fvProcess = F2(
 		var compositeWRemainder = A3($author$project$RVHFreeVerse$calcRemainderWhole, composite, oldFVData.t, 0);
 		return $author$project$RVHCore$FreeVerse(
 			{t: oldFVData.t, J: compositeWRemainder, a: newFVLines, b: basicProcessed.b});
+	});
+var $elm$core$List$drop = F2(
+	function (n, list) {
+		drop:
+		while (true) {
+			if (n <= 0) {
+				return list;
+			} else {
+				if (!list.b) {
+					return list;
+				} else {
+					var x = list.a;
+					var xs = list.b;
+					var $temp$n = n - 1,
+						$temp$list = xs;
+					n = $temp$n;
+					list = $temp$list;
+					continue drop;
+				}
+			}
+		}
+	});
+var $elm$core$Array$sliceLeft = F2(
+	function (from, array) {
+		var len = array.a;
+		var tree = array.c;
+		var tail = array.d;
+		if (!from) {
+			return array;
+		} else {
+			if (_Utils_cmp(
+				from,
+				$elm$core$Array$tailIndex(len)) > -1) {
+				return A4(
+					$elm$core$Array$Array_elm_builtin,
+					len - from,
+					$elm$core$Array$shiftStep,
+					$elm$core$Elm$JsArray$empty,
+					A3(
+						$elm$core$Elm$JsArray$slice,
+						from - $elm$core$Array$tailIndex(len),
+						$elm$core$Elm$JsArray$length(tail),
+						tail));
+			} else {
+				var skipNodes = (from / $elm$core$Array$branchFactor) | 0;
+				var helper = F2(
+					function (node, acc) {
+						if (!node.$) {
+							var subTree = node.a;
+							return A3($elm$core$Elm$JsArray$foldr, helper, acc, subTree);
+						} else {
+							var leaf = node.a;
+							return A2($elm$core$List$cons, leaf, acc);
+						}
+					});
+				var leafNodes = A3(
+					$elm$core$Elm$JsArray$foldr,
+					helper,
+					_List_fromArray(
+						[tail]),
+					tree);
+				var nodesToInsert = A2($elm$core$List$drop, skipNodes, leafNodes);
+				if (!nodesToInsert.b) {
+					return $elm$core$Array$empty;
+				} else {
+					var head = nodesToInsert.a;
+					var rest = nodesToInsert.b;
+					var firstSlice = from - (skipNodes * $elm$core$Array$branchFactor);
+					var initialBuilder = {
+						i: _List_Nil,
+						d: 0,
+						h: A3(
+							$elm$core$Elm$JsArray$slice,
+							firstSlice,
+							$elm$core$Elm$JsArray$length(head),
+							head)
+					};
+					return A2(
+						$elm$core$Array$builderToArray,
+						true,
+						A3($elm$core$List$foldl, $elm$core$Array$appendHelpBuilder, initialBuilder, rest));
+				}
+			}
+		}
+	});
+var $elm$core$Array$fetchNewTail = F4(
+	function (shift, end, treeEnd, tree) {
+		fetchNewTail:
+		while (true) {
+			var pos = $elm$core$Array$bitMask & (treeEnd >>> shift);
+			var _v0 = A2($elm$core$Elm$JsArray$unsafeGet, pos, tree);
+			if (!_v0.$) {
+				var sub = _v0.a;
+				var $temp$shift = shift - $elm$core$Array$shiftStep,
+					$temp$end = end,
+					$temp$treeEnd = treeEnd,
+					$temp$tree = sub;
+				shift = $temp$shift;
+				end = $temp$end;
+				treeEnd = $temp$treeEnd;
+				tree = $temp$tree;
+				continue fetchNewTail;
+			} else {
+				var values = _v0.a;
+				return A3($elm$core$Elm$JsArray$slice, 0, $elm$core$Array$bitMask & end, values);
+			}
+		}
+	});
+var $elm$core$Array$hoistTree = F3(
+	function (oldShift, newShift, tree) {
+		hoistTree:
+		while (true) {
+			if ((_Utils_cmp(oldShift, newShift) < 1) || (!$elm$core$Elm$JsArray$length(tree))) {
+				return tree;
+			} else {
+				var _v0 = A2($elm$core$Elm$JsArray$unsafeGet, 0, tree);
+				if (!_v0.$) {
+					var sub = _v0.a;
+					var $temp$oldShift = oldShift - $elm$core$Array$shiftStep,
+						$temp$newShift = newShift,
+						$temp$tree = sub;
+					oldShift = $temp$oldShift;
+					newShift = $temp$newShift;
+					tree = $temp$tree;
+					continue hoistTree;
+				} else {
+					return tree;
+				}
+			}
+		}
+	});
+var $elm$core$Array$sliceTree = F3(
+	function (shift, endIdx, tree) {
+		var lastPos = $elm$core$Array$bitMask & (endIdx >>> shift);
+		var _v0 = A2($elm$core$Elm$JsArray$unsafeGet, lastPos, tree);
+		if (!_v0.$) {
+			var sub = _v0.a;
+			var newSub = A3($elm$core$Array$sliceTree, shift - $elm$core$Array$shiftStep, endIdx, sub);
+			return (!$elm$core$Elm$JsArray$length(newSub)) ? A3($elm$core$Elm$JsArray$slice, 0, lastPos, tree) : A3(
+				$elm$core$Elm$JsArray$unsafeSet,
+				lastPos,
+				$elm$core$Array$SubTree(newSub),
+				A3($elm$core$Elm$JsArray$slice, 0, lastPos + 1, tree));
+		} else {
+			return A3($elm$core$Elm$JsArray$slice, 0, lastPos, tree);
+		}
+	});
+var $elm$core$Array$sliceRight = F2(
+	function (end, array) {
+		var len = array.a;
+		var startShift = array.b;
+		var tree = array.c;
+		var tail = array.d;
+		if (_Utils_eq(end, len)) {
+			return array;
+		} else {
+			if (_Utils_cmp(
+				end,
+				$elm$core$Array$tailIndex(len)) > -1) {
+				return A4(
+					$elm$core$Array$Array_elm_builtin,
+					end,
+					startShift,
+					tree,
+					A3($elm$core$Elm$JsArray$slice, 0, $elm$core$Array$bitMask & end, tail));
+			} else {
+				var endIdx = $elm$core$Array$tailIndex(end);
+				var depth = $elm$core$Basics$floor(
+					A2(
+						$elm$core$Basics$logBase,
+						$elm$core$Array$branchFactor,
+						A2($elm$core$Basics$max, 1, endIdx - 1)));
+				var newShift = A2($elm$core$Basics$max, 5, depth * $elm$core$Array$shiftStep);
+				return A4(
+					$elm$core$Array$Array_elm_builtin,
+					end,
+					newShift,
+					A3(
+						$elm$core$Array$hoistTree,
+						startShift,
+						newShift,
+						A3($elm$core$Array$sliceTree, startShift, endIdx, tree)),
+					A4($elm$core$Array$fetchNewTail, startShift, end, endIdx, tree));
+			}
+		}
+	});
+var $elm$core$Array$translateIndex = F2(
+	function (index, _v0) {
+		var len = _v0.a;
+		var posIndex = (index < 0) ? (len + index) : index;
+		return (posIndex < 0) ? 0 : ((_Utils_cmp(posIndex, len) > 0) ? len : posIndex);
+	});
+var $elm$core$Array$slice = F3(
+	function (from, to, array) {
+		var correctTo = A2($elm$core$Array$translateIndex, to, array);
+		var correctFrom = A2($elm$core$Array$translateIndex, from, array);
+		return (_Utils_cmp(correctFrom, correctTo) > 0) ? $elm$core$Array$empty : A2(
+			$elm$core$Array$sliceLeft,
+			correctFrom,
+			A2($elm$core$Array$sliceRight, correctTo, array));
 	});
 var $author$project$Akshar$unitsLast = function (akshars) {
 	return A2(
@@ -5731,6 +5518,32 @@ var $author$project$RVHVarnikLine$Maapnee = F3(
 	function (units, str, len) {
 		return {al: len, G: str, A: units};
 	});
+var $author$project$RVHVarnikLine$ganSigToGan = function (sig) {
+	switch (sig) {
+		case '122':
+			return 'y';
+		case '222':
+			return 'm';
+		case '221':
+			return 't';
+		case '212':
+			return 'r';
+		case '121':
+			return 'j';
+		case '211':
+			return 'b';
+		case '111':
+			return 'n';
+		case '112':
+			return 's';
+		case '1':
+			return 'l';
+		case '2':
+			return 'g';
+		default:
+			return '';
+	}
+};
 var $author$project$RVHVarnikLine$mGanSetToGanName = function (ganset) {
 	var sig = A3(
 		$elm$core$Array$foldr,
@@ -5858,6 +5671,61 @@ var $author$project$RVHVarnikLine$mUtoUwIx = F3(
 				i = $temp$i;
 				a1 = $temp$a1;
 				continue mUtoUwIx;
+			}
+		}
+	});
+var $elm_community$array_extra$Array$Extra$sliceFrom = function (lengthDropped) {
+	return function (array) {
+		return A3(
+			$elm$core$Array$slice,
+			lengthDropped,
+			$elm$core$Array$length(array),
+			array);
+	};
+};
+var $elm_community$array_extra$Array$Extra$sliceUntil = function (lengthNew) {
+	return function (array) {
+		return A3(
+			$elm$core$Array$slice,
+			0,
+			(lengthNew >= 0) ? lengthNew : ($elm$core$Array$length(array) + lengthNew),
+			array);
+	};
+};
+var $elm_community$array_extra$Array$Extra$splitAt = function (index) {
+	return function (array) {
+		return (index > 0) ? _Utils_Tuple2(
+			A2($elm_community$array_extra$Array$Extra$sliceUntil, index, array),
+			A2($elm_community$array_extra$Array$Extra$sliceFrom, index, array)) : _Utils_Tuple2($elm$core$Array$empty, array);
+	};
+};
+var $author$project$RVHVarnikLine$toGanSets = F2(
+	function (a, na) {
+		toGanSets:
+		while (true) {
+			var na3a3 = A2($elm_community$array_extra$Array$Extra$splitAt, 3, a);
+			var na3 = na3a3.a;
+			var na1a1 = A2($elm_community$array_extra$Array$Extra$splitAt, 1, a);
+			var na1 = na1a1.a;
+			var len = $elm$core$Array$length(a);
+			var a3 = na3a3.b;
+			var a1 = na1a1.b;
+			if (!len) {
+				return na;
+			} else {
+				if (len >= 3) {
+					var $temp$a = a3,
+						$temp$na = A2($elm$core$Array$push, na3, na);
+					a = $temp$a;
+					na = $temp$na;
+					continue toGanSets;
+				} else {
+					var $temp$a = a1,
+						$temp$na = A2($elm$core$Array$push, na1, na);
+					a = $temp$a;
+					na = $temp$na;
+					continue toGanSets;
+				}
 			}
 		}
 	});

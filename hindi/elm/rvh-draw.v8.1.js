@@ -84,7 +84,7 @@ function visualize(givenPoem, dAvailableW, dPoemType)
 // The D3 draw dance!
 function draw()
 {	
-	console.log(dPoem);
+	// console.log(dPoem);
 	const maxLen = dPoem.maxLineLen;
 	const lineCount = dPoem.lines.length;
 	// pattern = maapnee

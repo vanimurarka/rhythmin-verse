@@ -257,7 +257,7 @@ fromBasicL lineP =
   let 
     vUnits = Array.map varnaFrmAkshar lineP.units
       |> mergeHalfIntoPriorLaghu 0 Array.empty
-      |> processLineUnits
+      --|> processLineUnits
     vUnitsWOZero = Array.filter vaFilterZero vUnits
       --|> processLineUnits 
     --vUnits1 = 
