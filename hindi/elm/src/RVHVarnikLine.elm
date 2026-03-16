@@ -30,6 +30,15 @@ type alias PoemLine =
 
 emptyLine = PoemLine "" 0 Array.empty
 
+type alias Maapnee =
+  { units : Array.Array {unitVal : Int, idx : Int, g : String}
+  , str : String
+  , len : Int
+  }
+
+-- record of maapnee unit (u) and its index (i)
+type alias MUwIdx = {u : String, i : Int, g : String}
+
 -- HELPER FUNCTIONS --
 
 toBasicL lineV =
@@ -44,7 +53,14 @@ biggerLine line1 line2 =
   if (line1.rhythmTotal) > (line2.rhythmTotal) then line1
     else line2
 
-calcMaxLineLen lines = (Array.foldl biggerLine emptyLine lines).rhythmTotal
+calcMaxLineLen lines maapneeLen = 
+  let
+    maxLenInLines = (Array.foldl biggerLine emptyLine lines).rhythmTotal
+  in
+    if (maxLenInLines > maapneeLen) then
+      maxLenInLines
+    else
+      maapneeLen
 
 -- if a half akshar having one maatraa is preceeded by a laghu varna then the half akshar merges the prev laghu to form a guru varna
 -- va = array of varnas, van = new array of varnas 
@@ -167,6 +183,74 @@ processLineUnits units =
   in
     l1
 
+-- PROCESS MAAPNEE --
+-- convert maapnee array of integers to array of MUwIdxs
+mUtoUwIx a i a1 =
+  let
+    u = Maybe.withDefault -100 (Array.get i a)
+  in
+    if (u == -100) then
+      a1
+    else
+      mUtoUwIx a (i+1) (Array.push (MUwIdx (String.fromInt u) i "") a1)
+
+-- to test if el is zero
+mUFilterZero el =
+  (el.u /= "0")
+
+mGanSetToGanName ganset =
+  let 
+    -- get the gan signature as string for a ganset
+    sig = Array.foldr (++) "" (Array.map .u ganset)
+  in
+    ganSigToGan sig
+
+mSetGanameToGanset gs gn i ns =
+  let
+    len = Array.length gs
+    ui = Maybe.withDefault (MUwIdx "0" -1 "") (Array.get i gs)
+    newMUwIdx = {ui | g = gn}
+    ns1 = Array.push newMUwIdx ns
+  in
+    if (i >= len) then
+      ns
+    else
+      mSetGanameToGanset gs gn (i+1) ns1
+
+mGanSetWGaname gs gn =
+  mSetGanameToGanset gs gn 0 Array.empty
+
+mUReInsertZero uia i uia1 =
+  let
+    len = Array.length uia
+    ui1 = Maybe.withDefault (MUwIdx "0" -1 "") (Array.get i uia)
+    ui2 = Maybe.withDefault (MUwIdx "0" -1 "") (Array.get (i+1) uia)
+    u1Int = Maybe.withDefault 0 (String.toInt ui1.u)
+    ui1Int = {unitVal = u1Int, idx = ui1.i, g = ui1.g}
+    uia11 = Array.push ui1Int uia1
+  in
+    if (i >= len) then
+      uia1
+    else if (i == (len - 1)) then
+      uia11
+    else if (ui1.i == (ui2.i - 1)) then
+      mUReInsertZero uia (i+1) uia11
+    else
+      mUReInsertZero uia (i+1) (Array.push {unitVal=0,idx=(i+1),g=""} uia11)
+
+mProcess : P.Maapnee -> Maapnee
+mProcess bmaapnee =
+  let  
+    -- filter out 0s which signify yati
+    muWOZero = (Array.filter mUFilterZero (mUtoUwIx bmaapnee.units 0 Array.empty))
+    gansets = toGanSets muWOZero Array.empty
+    gans = Array.map mGanSetToGanName gansets
+    gansetsWgan = Array.map2 mGanSetWGaname gansets gans
+    uisWgan = Array.foldr (Array.append) Array.empty gansetsWgan
+    uisWganWZ = mUReInsertZero uisWgan 0 Array.empty
+  in  
+    Maapnee uisWganWZ bmaapnee.str bmaapnee.len
+
 -- REAL PROCESSING --
 
 fromBasicL lineP =
@@ -202,3 +286,20 @@ encodeLine al =
     [("rhythmAmtCumulative",E.int al.rhythmTotal)
     , ("subUnits", E.array encodeVarna al.units)
     ]
+
+encodeMaapneeUnits mu =
+  E.object
+    [ ("txt", if (mu.unitVal /= 0) then E.string (String.fromInt mu.unitVal) else E.string " ")
+    , ("systemRhythmAmt", E.int mu.unitVal)
+    , ("rhythmAmt", E.int mu.unitVal)
+    , ("rhythmPatternValue", E.float 
+        (if (mu.unitVal == 0) then (toFloat -1) else (toFloat mu.unitVal))
+      )
+    , ("isHalfLetter", E.bool False)
+    , ("belongsToGan", E.string mu.g)
+    ]  
+
+encodeMaapnee m =
+  E.object 
+    [("rhythmAmtCumulative",E.int m.len)
+    , ("subUnits", E.array encodeMaapneeUnits m.units)]
