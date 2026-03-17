@@ -169,6 +169,18 @@ adjustMaatraa a =
   else
     a
 
+encodeAksharType t =
+  case t of
+    PureVowel -> "PVOWEL"
+    Maatraa -> "MAATRAA"
+    Halant -> "HALANT"
+    Half -> "HALF"
+    Consonant -> "CONSONANT"
+    ChandraBindu -> "CBINDU"
+    BottomBindi -> "BBINDI"
+    Other -> "OTHER"
+    Empty -> ""
+
 -- JSON ENCODE/DECODE
 encodeAkshar a =
   E.object

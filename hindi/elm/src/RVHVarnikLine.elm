@@ -13,12 +13,12 @@ type alias Varna =
   , rhythm : Int
   , gan : String
   , idx : Int
-  , patternValue : Int -- only to capture yati = -1
+  , patternValue : String -- only to capture yati = -1
   , varnaType : A.AksharType
   }
 
 varnaFrmAkshar a =
-  Varna (Array.fromList [a]) a.str a.userRhythm "" -1 0 a.aksharType
+  Varna (Array.fromList [a]) a.str a.userRhythm "" -1 "0" a.aksharType
 
 emptyVarna = varnaFrmAkshar A.emptyAkshar
 
@@ -71,7 +71,7 @@ mergeHalfIntoPriorLaghu i van va =
     v2 = Maybe.withDefault emptyVarna (Array.get (i+1) va)
     a2 = Maybe.withDefault A.emptyAkshar (Array.get 0 v2.a)
     -- array with merging, if required
-    van1 = Array.push (Varna (Array.fromList [a1,a2]) (a1.str++a2.str) 2 "" -1 0 A.Consonant) van
+    van1 = Array.push (Varna (Array.fromList [a1,a2]) (a1.str++a2.str) 2 "" -1 "0" A.Consonant) van
   in 
     if i < (Array.length va) then
       if (a1.userRhythm == 1) && (a2.userRhythm == 1) && (a2.aksharType == A.Half) then
@@ -173,13 +173,14 @@ laGanSetWGaname gs gn =
 
 processLineUnits units =
   let
-    lWOZero = (Array.filter vaFilterZero units)
-    laWIdx = laWithIdx lWOZero 0 Array.empty
-    lGanSets = toGanSets laWIdx Array.empty
+    originalWIdx = laWithIdx units 0 Array.empty
+    lWOZero = (Array.filter vaFilterZero originalWIdx)
+    --laWIdx = laWithIdx lWOZero 0 Array.empty
+    lGanSets = toGanSets lWOZero Array.empty
     gans = Array.map laGanSetToGanName lGanSets
     lGanSetsWGan = Array.map2 laGanSetWGaname lGanSets gans
     l1 = (Array.foldr (Array.append) Array.empty lGanSetsWGan)
-      |> aReInsert0RAs laWIdx 0 Array.empty 0
+      |> aReInsert0RAs originalWIdx 0 Array.empty 0
   in
     l1
 
@@ -251,21 +252,51 @@ mProcess bmaapnee =
   in  
     Maapnee uisWganWZ bmaapnee.str bmaapnee.len
 
+setLineYati vUnits vi mUnits mi =
+  let 
+    vu = Maybe.withDefault emptyVarna (Array.get vi vUnits)
+    mu = Maybe.withDefault {unitVal = -2, idx = -1, g = ""} (Array.get mi mUnits)
+    vun = setYati vu
+  in 
+    if (vi == 1) then
+      setLineYati (Array.set vi vun vUnits) (vi+1) mUnits (mi+1)
+    else if (vi < Array.length vUnits) then
+      setLineYati vUnits (vi+1) mUnits (mi+1)
+    else
+      vUnits
+    --if (vi >= (Array.length vUnits)) || (mi >= (Array.length mUnits)) then -- end of maapnee or varna units, end loop
+    --  vUnits
+    --else 
+    --  if (vu.rhythm == 0) then
+    --    if (mu.unitVal == 0) then
+    --      if (vu.varnaType == A.Other) then -- yati found! set yati value in varna and go ahead
+    --        setLineYati (Array.set vi vun vUnits) (vi+1) mUnits (mi+1)
+    --      else -- just some empty char in line, increase vi
+    --        setLineYati vUnits (vi+1) mUnits mi
+    --    else -- just some empty char in line, increase vi
+    --      setLineYati vUnits (vi+1) mUnits mi
+    --  else 
+    --    if (mu.unitVal == vu.rhythm) then -- varna as per maapnee unit, increase vi and mi
+    --      setLineYati vUnits (vi+1) mUnits (mi+1)
+    --    else -- varna not as per maapnee, abort
+    --      vUnits
+
+setYati varna =
+  Varna varna.a varna.str varna.rhythm varna.gan varna.idx "-1" varna.varnaType
+
 -- REAL PROCESSING --
 
-fromBasicL lineP =
+fromBasicL lineP maapneeUnits =
   let 
     vUnits = Array.map varnaFrmAkshar lineP.units
       |> mergeHalfIntoPriorLaghu 0 Array.empty
-      --|> processLineUnits
+      |> processLineUnits
     vUnitsWOZero = Array.filter vaFilterZero vUnits
-      --|> processLineUnits 
-    --vUnits1 = 
-    --  if (Array.length maapneeUnits) > 0 then
-    --    setLineYati vUnits 0 maapneeUnits 0
-    --  else 
-    --    vUnits
-    --avUnits = unravelVarnasToAkshars vUnits1
+    vUnits1 = 
+      if (Array.length maapneeUnits) > 0 then
+        setLineYati vUnits 0 maapneeUnits 0
+      else 
+        vUnits
   in
     PoemLine lineP.str (Array.length vUnitsWOZero) vUnits
 
@@ -278,7 +309,8 @@ encodeVarna a =
     , ("rhythmAmt", E.int a.rhythm)
     , ("isHalfLetter", E.bool (a.varnaType == A.Half))
     , ("belongsToGan", E.string a.gan)
-    , ("rhythmPatternValue", E.int a.patternValue)
+    , ("rhythmPatternValue", E.string a.patternValue)
+    , ("type",E.string (A.encodeAksharType a.varnaType))
     ]
 
 encodeLine al =
@@ -292,8 +324,8 @@ encodeMaapneeUnits mu =
     [ ("txt", if (mu.unitVal /= 0) then E.string (String.fromInt mu.unitVal) else E.string " ")
     , ("systemRhythmAmt", E.int mu.unitVal)
     , ("rhythmAmt", E.int mu.unitVal)
-    , ("rhythmPatternValue", E.float 
-        (if (mu.unitVal == 0) then (toFloat -1) else (toFloat mu.unitVal))
+    , ("rhythmPatternValue", E.string 
+        (if (mu.unitVal == 0) then "-1" else (String.fromInt mu.unitVal))
       )
     , ("isHalfLetter", E.bool False)
     , ("belongsToGan", E.string mu.g)

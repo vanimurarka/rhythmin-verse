@@ -79,9 +79,9 @@ varnikProcessPoem pom oldPom maapnee =
     genericOld = genericGetData oldPom
     basic = genericGetData (processPoem pom genericOld.lines)
     processedMaapnee = VL.mProcess (P.process maapnee)
-    --repeatedMaapnees = Array.repeat (Array.length basic.lines) processedMaapnee.units
-    --vaarnikLines = Array.map2 VL.fromBasicL basic.lines repeatedMaapnees
-    vaarnikLines = Array.map VL.fromBasicL basic.lines
+    repeatedMaapnees = Array.repeat (Array.length basic.lines) processedMaapnee.units
+    vaarnikLines = Array.map2 VL.fromBasicL basic.lines repeatedMaapnees
+    --vaarnikLines = Array.map VL.fromBasicL basic.lines
   in
     VarnikPoem {
       maxLineLen = VL.calcMaxLineLen vaarnikLines processedMaapnee.len, 
@@ -90,21 +90,22 @@ varnikProcessPoem pom oldPom maapnee =
     }
 
 vaarnikAdjustMaatraa poemData li ci =
-  let 
-    oldLine = Maybe.withDefault VL.emptyLine (Array.get li poemData.lines)
-    newBasicLine = L.adjustMaatraa (VL.toBasicL oldLine) ci
-    --newLine = VL.fromBasicL newBasicLine poemData.maapnee.units
-    newLine = VL.fromBasicL newBasicLine
-    newLines = Array.set li newLine poemData.lines
-    newMaxLineLen = if (newLine.rhythmTotal > poemData.maxLineLen) then
-        newLine.rhythmTotal
-      else
-        poemData.maxLineLen
-  in 
-    VarnikPoem 
-      { maxLineLen = newMaxLineLen
-      , lines = newLines
-      , maapnee = poemData.maapnee}
+  --let 
+  --  oldLine = Maybe.withDefault VL.emptyLine (Array.get li poemData.lines)
+  --  newBasicLine = L.adjustMaatraa (VL.toBasicL oldLine) ci
+  --  --newLine = VL.fromBasicL newBasicLine poemData.maapnee.units
+  --  newLine = VL.fromBasicL newBasicLine
+  --  newLines = Array.set li newLine poemData.lines
+  --  newMaxLineLen = if (newLine.rhythmTotal > poemData.maxLineLen) then
+  --      newLine.rhythmTotal
+  --    else
+  --      poemData.maxLineLen
+  --in 
+  --  VarnikPoem 
+  --    { maxLineLen = newMaxLineLen
+  --    , lines = newLines
+  --    , maapnee = poemData.maapnee}
+  poemData
 
 -- == GHAZAL == --
 
@@ -234,7 +235,8 @@ adjustMaatraaPoem poem li ci =
       Ghazal data -> Ghazal {data | maxLineLen = newMaxLineLen, lines = (Array.map2 Gh.misraaFromLineWRK newLines (Array.map .rkUnits data.lines))}
       FreeVerse data -> FreeVerse {maxLineLen = newMaxLineLen, lines = finalFVLines, composite = FV.calcRemainderWhole (FV.calcCompositeRhythm finalFVLines 0 Array.empty False) data.baseCount 0, baseCount = data.baseCount}
       MaatrikPoem data -> maatrikAdjustMaatraa data li ci
-      VarnikPoem data -> vaarnikAdjustMaatraa data li ci
+      --VarnikPoem data -> vaarnikAdjustMaatraa data li ci
+      VarnikPoem data -> poem
 
 
 
