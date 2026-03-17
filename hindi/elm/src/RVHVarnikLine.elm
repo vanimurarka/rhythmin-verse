@@ -257,32 +257,37 @@ setLineYati vUnits vi mUnits mi =
     vu = Maybe.withDefault emptyVarna (Array.get vi vUnits)
     mu = Maybe.withDefault {unitVal = -2, idx = -1, g = ""} (Array.get mi mUnits)
     vun = setYati vu
+    vUnitsNew = Array.set vi vun vUnits
   in 
-    if (vi == 1) then
-      setLineYati (Array.set vi vun vUnits) (vi+1) mUnits (mi+1)
-    else if (vi < Array.length vUnits) then
-      setLineYati vUnits (vi+1) mUnits (mi+1)
-    else
+    --case vi of
+    --  0 -> 
+    --    setLineYati vUnits (vi+1) mUnits (mi+1)
+    --  1 ->
+    --    setLineYati vUnitsNew (vi+1) mUnits (mi+1)
+    --  _ ->
+    --    vUnits
+    if (vi >= (Array.length vUnits)) || (mi >= (Array.length mUnits)) then -- end of maapnee or varna units, end loop
       vUnits
-    --if (vi >= (Array.length vUnits)) || (mi >= (Array.length mUnits)) then -- end of maapnee or varna units, end loop
-    --  vUnits
-    --else 
-    --  if (vu.rhythm == 0) then
-    --    if (mu.unitVal == 0) then
-    --      if (vu.varnaType == A.Other) then -- yati found! set yati value in varna and go ahead
-    --        setLineYati (Array.set vi vun vUnits) (vi+1) mUnits (mi+1)
-    --      else -- just some empty char in line, increase vi
-    --        setLineYati vUnits (vi+1) mUnits mi
-    --    else -- just some empty char in line, increase vi
-    --      setLineYati vUnits (vi+1) mUnits mi
-    --  else 
-    --    if (mu.unitVal == vu.rhythm) then -- varna as per maapnee unit, increase vi and mi
-    --      setLineYati vUnits (vi+1) mUnits (mi+1)
-    --    else -- varna not as per maapnee, abort
-    --      vUnits
+    else 
+      if (vu.rhythm == 0) then
+        if (mu.unitVal == 0) then
+          if (vu.varnaType == A.Other) then -- yati found! set yati value in varna and go ahead
+            setLineYati (Array.set vi vun vUnits) (vi+1) mUnits (mi+1)
+          else -- just some empty char in line, increase vi
+            setLineYati vUnits (vi+1) mUnits mi
+        else -- just some empty char in line, increase vi
+          setLineYati vUnits (vi+1) mUnits mi
+      else 
+        if (mu.unitVal == vu.rhythm) then -- varna as per maapnee unit, increase vi and mi
+          setLineYati vUnits (vi+1) mUnits (mi+1)
+        else -- varna not as per maapnee, abort
+          vUnits
 
 setYati varna =
-  Varna varna.a varna.str varna.rhythm varna.gan varna.idx "-1" varna.varnaType
+  --let
+    --dummy = Debug.log "dump varna" (Varna varna.a varna.str varna.rhythm varna.gan varna.idx "-1" varna.varnaType)
+  --in
+    Varna varna.a varna.str varna.rhythm varna.gan varna.idx "-1" varna.varnaType
 
 -- REAL PROCESSING --
 
@@ -298,7 +303,7 @@ fromBasicL lineP maapneeUnits =
       else 
         vUnits
   in
-    PoemLine lineP.str (Array.length vUnitsWOZero) vUnits
+    PoemLine lineP.str (Array.length vUnitsWOZero) vUnits1
 
  -- JSON ENCODE/DECODE
 
