@@ -250,7 +250,7 @@ mProcess bmaapnee =
     uisWgan = Array.foldr (Array.append) Array.empty gansetsWgan
     uisWganWZ = mUReInsertZero uisWgan 0 Array.empty
   in  
-    Maapnee uisWganWZ bmaapnee.str bmaapnee.len
+    Maapnee uisWganWZ bmaapnee.str (Array.length muWOZero)
 
 setLineYati vUnits vi mUnits mi =
   let 

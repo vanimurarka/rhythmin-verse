@@ -312,7 +312,11 @@ function drawCharTxtPos(d,i)
 	let x = ((lineRhythmTotal)*charW);
 	let w = 0;
 	if (fVarnik)
+	{
 		w = charW;
+		if (d.rhythmAmt == 0)
+			x = x - (charW/2);
+	}
 	else
 		w = charW*d.rhythmAmt;
 	if (fVarnik)
@@ -336,7 +340,8 @@ function drawStyleCharBlock(c,colorBy)
 	if (c.txt == " ")
 	{
 		if (c.rhythmPatternValue == -1) // yati
-			return "stroke:rgb(0,118,255);stroke-width:3";
+			// return "stroke:rgb(0,118,255);stroke-width:3";
+			return "stroke:white;stroke-width:10";
 		else // do not display normal space, comma
 			return "display: none";
 	}
@@ -433,12 +438,18 @@ function drawStyleCharBlock(c,colorBy)
 	  		}
 
 		}
-	  	else // user adjusted maatraa show in diff color
-	  	{
-	  		// color = "rgb(220,45,45)"; //
-	  		color = "yellow";
-	  		fillOp = "0.5";
-	  	}
+  	else // user adjusted maatraa show in diff color
+  	{
+  		// color = "rgb(220,45,45)"; //
+  		color = "yellow";
+  		fillOp = "0.5";
+  	}
+
+  	if (fVarnik && (c.rhythmAmt > 1))
+  	{
+  		strokeW = 3;
+  	}
+
 
 	}
 	if (colorBy == 'ghazal')
