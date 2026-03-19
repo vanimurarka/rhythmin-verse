@@ -290,6 +290,8 @@ setYati varna =
   --in
     Varna varna.a varna.str varna.rhythm varna.userRhythm varna.gan varna.idx "-1" varna.varnaType
 
+
+
 -- REAL PROCESSING --
 
 fromBasicL lineP maapneeUnits =
@@ -306,8 +308,19 @@ fromBasicL lineP maapneeUnits =
   in
     PoemLine lineP.str (Array.length vUnitsWOZero) vUnits1
 
- -- JSON ENCODE/DECODE
+adjustMaatraa line maapneeUnits ci =
+  let 
+    oldVarna = Maybe.withDefault emptyVarna (Array.get ci line.units)
+    oldBasicLine = toBasicL line
+  in 
+    -- for conjuncts like कर् in कर्म and हं in हंस 
+    if ((Array.length oldVarna.a) == 2) then
+      fromBasicL (L.adjustMaatraa oldBasicLine (ci+1)) maapneeUnits
+    else --normal varna / akshar
+      fromBasicL (L.adjustMaatraa oldBasicLine ci) maapneeUnits
 
+
+ -- JSON ENCODE/DECODE
 encodeVarna a =
   E.object
     [ ("txt", E.string a.str)

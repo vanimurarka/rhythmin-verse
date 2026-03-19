@@ -341,7 +341,7 @@ function drawStyleCharBlock(c,colorBy)
 	{
 		if (c.rhythmPatternValue == -1) // yati
 			// return "stroke:rgb(0,118,255);stroke-width:3";
-			return "stroke:white;stroke-width:10";
+			return "stroke:black;stroke-width:10";
 		else // do not display normal space, comma
 			return "display: none";
 	}
