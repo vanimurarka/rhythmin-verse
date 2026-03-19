@@ -11,6 +11,7 @@ type alias Varna =
   { a : Array.Array A.Akshar
   , str : String
   , rhythm : Int
+  , userRhythm: Int
   , gan : String
   , idx : Int
   , patternValue : String -- only to capture yati = -1
@@ -18,7 +19,7 @@ type alias Varna =
   }
 
 varnaFrmAkshar a =
-  Varna (Array.fromList [a]) a.str a.userRhythm "" -1 "0" a.aksharType
+  Varna (Array.fromList [a]) a.str a.rhythm a.userRhythm "" -1 "0" a.aksharType
 
 emptyVarna = varnaFrmAkshar A.emptyAkshar
 
@@ -45,7 +46,7 @@ toBasicL lineV =
   --L.PoemLine lineV.str lineV.rhythmTotal (Array.map .a lineV.units)
   let
     akshars2D = Array.map .a lineV.units
-    aAkshars = Array.foldl Array.append Array.empty akshars2D
+    aAkshars = Array.foldr Array.append Array.empty akshars2D
   in
    L.PoemLine lineV.str lineV.rhythmTotal aAkshars
 
@@ -71,7 +72,7 @@ mergeHalfIntoPriorLaghu i van va =
     v2 = Maybe.withDefault emptyVarna (Array.get (i+1) va)
     a2 = Maybe.withDefault A.emptyAkshar (Array.get 0 v2.a)
     -- array with merging, if required
-    van1 = Array.push (Varna (Array.fromList [a1,a2]) (a1.str++a2.str) 2 "" -1 "0" A.Consonant) van
+    van1 = Array.push (Varna (Array.fromList [a1,a2]) (a1.str++a2.str) 2 2 "" -1 "0" A.Consonant) van
   in 
     if i < (Array.length va) then
       if (a1.userRhythm == 1) && (a2.userRhythm == 1) && (a2.aksharType == A.Half) then
@@ -85,7 +86,7 @@ mergeHalfIntoPriorLaghu i van va =
 
 -- get array of varnas where rhythm is not zero
 vaFilterZero el =
-  (el.rhythm /= 0)
+  (el.userRhythm /= 0)
 
 -- insert indexes into varna as per their position in line
 -- lus: line units, i.e varnas
@@ -135,7 +136,7 @@ toGanSets a na =
         toGanSets a1 (Array.push na1 na)
 
 -- rhythm of varna as String
-arStr a = String.fromInt a.rhythm
+arStr a = String.fromInt a.userRhythm
 
 laGanSetToGanName ganset =
   let 
@@ -269,7 +270,7 @@ setLineYati vUnits vi mUnits mi =
     if (vi >= (Array.length vUnits)) || (mi >= (Array.length mUnits)) then -- end of maapnee or varna units, end loop
       vUnits
     else 
-      if (vu.rhythm == 0) then
+      if (vu.userRhythm == 0) then
         if (mu.unitVal == 0) then
           if (vu.varnaType == A.Other) then -- yati found! set yati value in varna and go ahead
             setLineYati (Array.set vi vun vUnits) (vi+1) mUnits (mi+1)
@@ -278,7 +279,7 @@ setLineYati vUnits vi mUnits mi =
         else -- just some empty char in line, increase vi
           setLineYati vUnits (vi+1) mUnits mi
       else 
-        if (mu.unitVal == vu.rhythm) then -- varna as per maapnee unit, increase vi and mi
+        if (mu.unitVal == vu.userRhythm) then -- varna as per maapnee unit, increase vi and mi
           setLineYati vUnits (vi+1) mUnits (mi+1)
         else -- varna not as per maapnee, abort
           vUnits
@@ -287,7 +288,7 @@ setYati varna =
   --let
     --dummy = Debug.log "dump varna" (Varna varna.a varna.str varna.rhythm varna.gan varna.idx "-1" varna.varnaType)
   --in
-    Varna varna.a varna.str varna.rhythm varna.gan varna.idx "-1" varna.varnaType
+    Varna varna.a varna.str varna.rhythm varna.userRhythm varna.gan varna.idx "-1" varna.varnaType
 
 -- REAL PROCESSING --
 
@@ -311,7 +312,7 @@ encodeVarna a =
   E.object
     [ ("txt", E.string a.str)
     , ("systemRhythmAmt", E.int a.rhythm)
-    , ("rhythmAmt", E.int a.rhythm)
+    , ("rhythmAmt", E.int a.userRhythm)
     , ("isHalfLetter", E.bool (a.varnaType == A.Half))
     , ("belongsToGan", E.string a.gan)
     , ("rhythmPatternValue", E.string a.patternValue)
