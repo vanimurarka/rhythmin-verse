@@ -1,5 +1,3 @@
--- rhythmtotal has to be recalculated when switching from varnik to anything else
-
 port module RVHCore exposing (..)
 
 import Array exposing (Array)
@@ -16,7 +14,7 @@ import RVHGhazal as Gh
 import RVHFreeVerse as FV
 
 type ProcessedPoem 
-  = GenericPoem { maxLineLen : Int, lines : Array.Array L.PoemLine }
+  = GenericPoem { maxLineLen : Int, lines : Array.Array L.PoemLine}
   | MaatrikPoem { maxLineLen : Int, lines : Array.Array ML.PoemLine, maapnee : P.Maapnee }
   | VarnikPoem {maxLineLen : Int, lines : Array.Array VL.PoemLine, maapnee : VL.Maapnee }
   | Ghazal { maxLineLen: Int, lines: Array.Array Gh.Misraa, radeef : Array.Array A.Akshar, kaafiyaa : Array.Array A.Akshar}
@@ -204,12 +202,11 @@ fvSetBase pom base =
 
 preProcessPoem pom oldpom pomType maapnee =
   case pomType of
-    "GHAZAL" -> 
-        ghazalProcess pom (genericGetData oldpom).lines
-    "FREEVERSE" -> fvProcess pom oldpom 
-    "MAATRIK" -> maatrikProcessPoem pom oldpom maapnee
-    "VARNIK" -> varnikProcessPoem pom oldpom maapnee
-    _ -> processPoem pom (genericGetData oldpom).lines
+  "GHAZAL" -> ghazalProcess pom (genericGetData oldpom).lines
+  "FREEVERSE" -> fvProcess pom oldpom 
+  "MAATRIK" -> maatrikProcessPoem pom oldpom maapnee
+  "VARNIK" -> varnikProcessPoem pom oldpom maapnee
+  _ -> processPoem pom (genericGetData oldpom).lines
 
 adjustMaatraaPoem poem li ci =
   let 

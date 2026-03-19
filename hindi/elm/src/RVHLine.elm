@@ -73,6 +73,10 @@ calcHalfAksharRhythmLine line i r =
     else
       calcHalfAksharRhythmLine newline (i+1) (r+aNew.rhythm)
 
+-- get total rhythm, given an array of akshars
+rhythmTotal aAkshars = 
+  Array.foldl (\x a -> x.userRhythm + a) 0 aAkshars
+
 biggerLine line1 line2 = 
   if (line1.rhythmTotal) > (line2.rhythmTotal) then line1
     else line2

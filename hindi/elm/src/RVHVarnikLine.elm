@@ -48,7 +48,7 @@ toBasicL lineV =
     akshars2D = Array.map .a lineV.units
     aAkshars = Array.foldr Array.append Array.empty akshars2D
   in
-   L.PoemLine lineV.str lineV.rhythmTotal aAkshars
+   L.PoemLine lineV.str (L.rhythmTotal aAkshars) aAkshars
 
 biggerLine line1 line2 = 
   if (line1.rhythmTotal) > (line2.rhythmTotal) then line1
