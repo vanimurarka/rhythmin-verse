@@ -1,4 +1,3 @@
-// check why नस and सल of भानस and नसल are being shown in light light green in maatrik poem
 
 let charH = 20; 
 let paddingLeft = 7;

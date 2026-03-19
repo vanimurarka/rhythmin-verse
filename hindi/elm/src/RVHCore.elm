@@ -1,3 +1,5 @@
+-- rhythmtotal has to be recalculated when switching from varnik to anything else
+
 port module RVHCore exposing (..)
 
 import Array exposing (Array)
