@@ -4,9 +4,10 @@
 <head>
   <meta charset="UTF-8">
   <title>GG Elm</title>
-  <script type="text/javascript" src="rvh-core.v8.1.min.js"></script>
+  <!-- <script type="text/javascript" src="rvh-core.v8.1.min.js"></script> -->
+  <script type="text/javascript" src="rvh-core.v8.2.min.js"></script>
   <script type="text/javascript" src="d3.v2.min.js"></script>
-  <script type="text/javascript" src="rvh-draw.v8.0.js"></script>
+  <script type="text/javascript" src="rvh-draw.v8.1.js"></script>
 </head>
 
 <body style="background-color: black; color: white;">
@@ -24,7 +25,9 @@
       <label for="chkMaapnee"> मापनी</label>
     </div>
   </div>
-  <div id='divMaapnee' style="display: block">मापनी<br><input type="text" id='idMaapnee' value="122 222 221 212 121 211 111 112" size="50"></div>
+  <div id='divMaapnee' style="display: block">मापनी<br>
+    <input type="text" id='idMaapnee' value="122 222 221 212 121 211 111 112" size="50">
+  </div>
   <textarea id="poem" rows="5" cols="40">कर्म</textarea>
   <br>
   <button onclick="callProcessPoem();">प्रतिरूप देखें</button>

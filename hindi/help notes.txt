@@ -1,0 +1,2 @@
+// used for minification
+// https://javascript-minifier.com/
