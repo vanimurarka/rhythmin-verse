@@ -94,7 +94,7 @@ function draw()
 	charW = charH;
 	if (fVarnik) 
 	{
-		charW = charW * 2;
+		charW = charW * 1.5;
 	}
 	const svgW = fFreeVerse?(charW*maxLen)+80:(charW*maxLen)+40;
 	const svgH = fLineSpacing?((lineCount+iForPattern)*(charH+lineSpacing))+(charH*2):((lineCount+iForPattern)*charH)+(charH*2);
@@ -340,7 +340,7 @@ function drawStyleCharBlock(c,colorBy)
 	{
 		if (c.rhythmPatternValue == -1) // yati
 			// return "stroke:rgb(0,118,255);stroke-width:3";
-			return "stroke:black;stroke-width:10";
+			return "stroke:white;stroke-width:10";
 		else // do not display normal space, comma
 			return "display: none";
 	}
